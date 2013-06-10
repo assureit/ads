@@ -1059,13 +1059,13 @@ declare module "tty" {
 declare module "domain" {
     import events = module("events");
 
-    export interface Domain extends events.NodeEventEmitter { }
-
     export function create(): Domain;
-    export function run(fn: Function): void;
-    export function add(emitter: events.NodeEventEmitter): void;
-    export function remove(emitter: events.NodeEventEmitter): void;
-    export function bind(cb: (er: Error, data: any) =>any): any;
-    export function intercept(cb: (data: any) => any): any;
-    export function dispose(): void;
+    export interface Domain extends events.NodeEventEmitter {
+        run(fn: Function): void;
+        add(emitter: events.NodeEventEmitter): void;
+        remove(emitter: events.NodeEventEmitter): void;
+        bind(cb: (er: Error, data: any) =>any): any;
+        intercept(cb: (data: any) => any): any;
+        dispose(): void;
+    }
 }
