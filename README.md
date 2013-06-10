@@ -7,7 +7,8 @@ AssureIt
 ```
 mysql -u root -p < db/create_user_test.sql
 mysql -u root -p < db/create_tables.sql
-
+ mysql -u root -p < db/initial_data.sql
+ 
 cd app
 npm install -g typescript  
 npm install -g express  

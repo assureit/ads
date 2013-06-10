@@ -11,10 +11,12 @@ USE `ads` ;
 CREATE  TABLE IF NOT EXISTS `ads`.`user` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NULL ,
+  `delete_flag` TINYINT(1) NOT NULL DEFAULT FALSE ,
+  `system_flag` TINYINT(1) NOT NULL DEFAULT FALSE ,
   `created` TIMESTAMP NULL ,
   `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `user_name_UNIQUE` (`name` ASC) )
+  UNIQUE INDEX `unq_user1` (`name` ASC) )
 ENGINE = InnoDB;
 
 
