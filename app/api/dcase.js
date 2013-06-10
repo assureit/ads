@@ -32,7 +32,7 @@ function createDCase(params, callback) {
             userId: userId,
             dcaseName: params.dcaseName
         }, function (dcaseId) {
-            var cm = new commit.Commit(con);
+            var cm = new commit.CommitDAO(con);
             cm.insert({
                 data: JSON.stringify(params.contents),
                 dcaseId: dcaseId,

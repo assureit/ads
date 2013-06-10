@@ -61,5 +61,10 @@ describe('api', function () {
                 });
             });
         });
+        describe('commit', function () {
+            it('should return result', function (done) {
+                done();
+            });
+        });
     });
 });

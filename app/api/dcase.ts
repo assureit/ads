@@ -30,7 +30,7 @@ export function createDCase(params:any, callback: type.Callback) {
 	con.begin((err, result) => {
 		var dc = new dcase.DCase(con);
 		dc.insert({userId: userId, dcaseName: params.dcaseName}, (dcaseId) => {
-			var cm = new commit.Commit(con);
+			var cm = new commit.CommitDAO(con);
 			cm.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (commitId) => {
 				var nd = new node.Node(con);
 				nd.insertList(commitId, params.contents.NodeList, () => {
@@ -43,3 +43,29 @@ export function createDCase(params:any, callback: type.Callback) {
 		});
 	});
 }
+
+// export var commit = function (params: any, callback: type.Callback) {
+// 	// TODO: 認証チェック
+// 	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
+
+// 	var con = new db.Database();
+// 	con.begin((err, result) => {
+// 		var cm = new commit.CommitDAO(con);
+// 		cm.get(params.commitId, (commit: commit.Commit) => {
+// 			con.close();
+// 		});
+
+// 		// var dc = new dcase.DCase(con);
+// 		// dc.insert({userId: userId, dcaseName: params.dcaseName}, (dcaseId) => {
+// 		// 	cm.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (commitId) => {
+// 		// 		var nd = new node.Node(con);
+// 		// 		nd.insertList(commitId, params.contents.NodeList, () => {
+// 		// 			con.commit((err, result) =>{
+// 		// 				callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
+// 		// 				con.close();
+// 		// 			});
+// 		// 		});
+// 		// 	});
+// 		// });
+// 	});
+// }
