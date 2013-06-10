@@ -1,6 +1,8 @@
 var db = require('../db/db')
 
 var constant = require('../constant')
+var dcase = require('../model/dcase')
+var commit = require('../model/commit')
 function getDCaseList(params, callback) {
     var con = new db.Database();
     con.query('SELECT * FROM dcase', function (err, result) {
@@ -24,29 +26,18 @@ function createDCase(params, callback) {
     var userId = constant.SYSTEM_USER_ID;
     var con = new db.Database();
     con.begin(function (err, result) {
-        con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [
-            userId, 
-            params.dcaseName
-        ], function (err, result) {
-            if(err) {
-                con.rollback();
-                con.close();
-                throw err;
-            }
-            var dcaseId = result.insertId;
-            con.query('INSERT INTO commit(data, date_time, prev_commit_id, latest_flag,  dcase_id, `user_id`, `message`) VALUES(?,now(),?,TRUE,?,?,?)', [
-                JSON.stringify(params.contents), 
-                0, 
-                dcaseId, 
-                userId, 
-                'Initial Commit'
-            ], function (err, result) {
-                if(err) {
-                    con.rollback();
-                    con.close();
-                    throw err;
-                }
-                var commitId = result.insertId;
+        var dc = new dcase.DCase(con);
+        dc.insert({
+            userId: userId,
+            dcaseName: params.dcaseName
+        }, function (dcaseId) {
+            var cm = new commit.Commit(con);
+            cm.insert({
+                data: JSON.stringify(params.contents),
+                dcaseId: dcaseId,
+                userId: userId,
+                message: 'Initial Commit'
+            }, function (commitId) {
                 con.commit(function (err, result) {
                     callback.onSuccess({
                         dcaseId: dcaseId,

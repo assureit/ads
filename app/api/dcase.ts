@@ -1,6 +1,8 @@
 import db = module('../db/db')
 import type = module('./type')
 import constant = module('../constant')
+import dcase = module('../model/dcase')
+import commit = module('../model/commit')
 
 export function getDCaseList(params:any, callback: type.Callback) {
 	var con = new db.Database();
@@ -25,21 +27,10 @@ export function createDCase(params:any, callback: type.Callback) {
 
 	var con = new db.Database();
 	con.begin((err, result) => {
-		con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [userId, params.dcaseName], (err, result) => {
-			if (err) {
-				con.rollback();
-				con.close();
-				throw err;
-			}
-			var dcaseId = result.insertId;
-
-			con.query('INSERT INTO commit(data, date_time, prev_commit_id, latest_flag,  dcase_id, `user_id`, `message`) VALUES(?,now(),?,TRUE,?,?,?)', [JSON.stringify(params.contents), 0, dcaseId, userId, 'Initial Commit'], (err, result) => {
-				if (err) {
-					con.rollback();
-					con.close();
-					throw err;
-				}
-				var commitId = result.insertId;
+		var dc = new dcase.DCase(con);
+		dc.insert({userId: userId, dcaseName: params.dcaseName}, (dcaseId) => {
+			var cm = new commit.Commit(con);
+			cm.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (commitId) => {
 				con.commit((err, result) =>{
 					callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
 					con.close();
