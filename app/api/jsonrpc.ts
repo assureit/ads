@@ -8,6 +8,7 @@
 import express = module("express")
 import error = module("./error")
 import type = module('./type')
+import domain = module('domain')
 
 export var methods: {[key: string]: type.Method;} = {};
 export function add(key:string, method: type.Method) {
@@ -22,6 +23,7 @@ export function addModule(module:any) {
  * handle method call
  */
 export function httpHandler(req: any, res: any) {
+
 	function onError(id: any, statusCode: number, error: error.RPCError) : void {
 		res.send(JSON.stringify({
 			jsonrpc: '2.0',
@@ -43,7 +45,12 @@ export function httpHandler(req: any, res: any) {
 		return;
 	}
 
-	try {
+	var d = domain.create();
+	d.on('error', function(err){
+		onError(req.body.id, 500, new error.InternalError('Execution error is occured', JSON.stringify(err)));
+	});
+
+	d.run(function() {
 		method(req.body.params, {
 			onSuccess: function(result: any) {
 				res.send(JSON.stringify({
@@ -59,11 +66,12 @@ export function httpHandler(req: any, res: any) {
 						error: error,
 						id: req.body.id
 						}), 500);
+			},
+			throw: function(e: any) {
+				// onError(req.body.id, 500, new error.InternalError('Execution error is occured', JSON.stringify(e)));
 			}
 		});
-	} catch (e) {
-		onError(req.body.id, 500, new error.InternalError('Execution error is occured', null));
-	}
+	});
 	return;
 }
 
