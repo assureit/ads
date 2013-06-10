@@ -13,7 +13,11 @@ export var methods: {[key: string]: type.Method;} = {};
 export function add(key:string, method: type.Method) {
 	methods[key] = method;
 }
-
+export function addModule(module:any) {
+	for (var fn in module) {
+		if (typeof module[fn] === 'function') add(fn, module[fn]);
+	}
+}
 /**
  * handle method call
  */

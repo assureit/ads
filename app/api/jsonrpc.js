@@ -7,6 +7,14 @@ function add(key, method) {
     exports.methods[key] = method;
 }
 exports.add = add;
+function addModule(module) {
+    for(var fn in module) {
+        if(typeof module[fn] === 'function') {
+            add(fn, module[fn]);
+        }
+    }
+}
+exports.addModule = addModule;
 function httpHandler(req, res) {
     function onError(id, statusCode, error) {
         res.send(JSON.stringify({

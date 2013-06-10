@@ -26,7 +26,7 @@ tsc @compile_list
 テスト
 ------------
 ```
-mocha
+mocha --recursive
 ```
 
 
