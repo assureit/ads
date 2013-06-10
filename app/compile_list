@@ -1,6 +1,7 @@
 app.ts
 constant.ts
 routes/api.ts
+routes/index.ts
 api/error.ts
 api/jsonrpc.ts
 api/dcase.ts
