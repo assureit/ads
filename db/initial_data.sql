@@ -1,2 +1,2 @@
 use ads;
-insert into user (name, system_flag, created, modified) values ('system', TRUE, now(), now());
+insert into user (id, name, system_flag, created, modified) values (1, 'system', TRUE, now(), now());
