@@ -39,13 +39,19 @@ var CommitDAO = (function (_super) {
                 _this.con.close();
                 throw err;
             }
-            callback(result.insertId);
+            _this._clearLastUpdateFlag(params.prevId, function () {
+                callback(result.insertId);
+            });
         });
     };
-    CommitDAO.prototype.get = function (commitId, callback) {
+    CommitDAO.prototype._clearLastUpdateFlag = function (id, callback) {
         var _this = this;
-        this.con.query('SELECT * FROM commit WHERE commitId=?', [
-            commitId
+        if(id == 0) {
+            callback();
+            return;
+        }
+        this.con.query('UPDATE commit SET latest_flag = FALSE WHERE id = ?', [
+            id
         ], function (err, result) {
             if(err) {
                 _this.con.rollback();
@@ -53,6 +59,20 @@ var CommitDAO = (function (_super) {
                 throw err;
             }
             console.log(result);
+            callback();
+        });
+    };
+    CommitDAO.prototype.get = function (commitId, callback) {
+        var _this = this;
+        this.con.query('SELECT * FROM commit WHERE id=?', [
+            commitId
+        ], function (err, result) {
+            if(err) {
+                _this.con.rollback();
+                _this.con.close();
+                throw err;
+            }
+            result = result[0];
             callback(new Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
         });
     };

@@ -20,18 +20,36 @@ export class CommitDAO extends model.Model {
 				this.con.close();
 				throw err;
 			}
-			callback(result.insertId);
+			this._clearLastUpdateFlag(params.prevId, () => {
+				callback(result.insertId);
+			});
 		});
 	}
 
-	get(commitId: number, callback: (commit: Commit) => void) {
-		this.con.query('SELECT * FROM commit WHERE commitId=?', [commitId], (err, result) => {
+	_clearLastUpdateFlag(id: number, callback: ()=>void): void {
+		if (id == 0) {
+			callback();
+			return;
+		}
+		this.con.query('UPDATE commit SET latest_flag = FALSE WHERE id = ?', [id], (err, result) => {
 			if (err) {
 				this.con.rollback();
 				this.con.close();
 				throw err;
 			}
 			console.log(result);
+			callback();
+		});
+	}
+
+	get(commitId: number, callback: (commit: Commit) => void):void {
+		this.con.query('SELECT * FROM commit WHERE id=?', [commitId], (err, result) => {
+			if (err) {
+				this.con.rollback();
+				this.con.close();
+				throw err;
+			}
+			result = result[0];
 			callback(new Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
 		});
 	}

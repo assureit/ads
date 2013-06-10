@@ -63,7 +63,48 @@ describe('api', function () {
         });
         describe('commit', function () {
             it('should return result', function (done) {
-                done();
+                dcase.commit({
+                    commitId: 12,
+                    commitMessage: 'test',
+                    contents: {
+                        NodeCount: 3,
+                        TopGoalId: 1,
+                        NodeList: [
+                            {
+                                ThisNodeId: 1,
+                                Description: "dcase1",
+                                Children: [
+                                    2
+                                ],
+                                NodeType: "Goal"
+                            }, 
+                            {
+                                ThisNodeId: 2,
+                                Description: "s1",
+                                Children: [
+                                    3
+                                ],
+                                NodeType: "Strategy"
+                            }, 
+                            {
+                                ThisNodeId: 3,
+                                Description: "g1",
+                                Children: [],
+                                NodeType: "Goal"
+                            }
+                        ]
+                    }
+                }, {
+                    onSuccess: function (result) {
+                        console.log(result);
+                        done();
+                    },
+                    onFailure: function (error) {
+                        console.log('err');
+                        console.log(error);
+                        done();
+                    }
+                });
             });
         });
     });
