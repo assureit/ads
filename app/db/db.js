@@ -8,7 +8,7 @@ var Database = (function () {
             host: 'localhost',
             user: 'ads_test',
             password: 'ads_test',
-            database: 'dcase'
+            database: 'ads'
         });
     };
     Database.prototype.query = function (sql, values, callback) {
@@ -32,6 +32,11 @@ var Database = (function () {
         });
     };
     Database.prototype.rollback = function (callback) {
+        callback = callback || function (err, result) {
+            if(err) {
+                throw err;
+            }
+        };
         this.query('ROLLBACK', function (err, query) {
             callback(err, query);
         });

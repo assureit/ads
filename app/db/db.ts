@@ -10,7 +10,7 @@ export class Database {
 				host: 'localhost',
 				user: 'ads_test',
 				password: 'ads_test',
-				database: 'dcase'
+				database: 'ads'
 			});
 	}
 
@@ -42,7 +42,8 @@ export class Database {
 		});
 	}
 
-	rollback(callback): void {
+	rollback(callback?): void {
+		callback = callback || (err, result) => {if (err) throw err;};
 		this.query('ROLLBACK', (err, query) => {
 			callback(err, query);
 		});
