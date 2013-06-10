@@ -67,9 +67,6 @@ export function httpHandler(req: any, res: any) {
 						id: req.body.id
 						}), 500);
 			},
-			throw: function(e: any) {
-				// onError(req.body.id, 500, new error.InternalError('Execution error is occured', JSON.stringify(e)));
-			}
 		});
 	});
 	return;

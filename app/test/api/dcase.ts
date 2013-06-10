@@ -14,9 +14,30 @@ describe('api', function() {
 					onSuccess: (result: any) => {
 						console.log(result);
 					}, 
-					onFailure: (error: error.RPCError) => {}
+					onFailure: (error: error.RPCError) => {},
 				});
 				done();
+			});
+		});
+
+
+		///////////////////////////////////////////////
+		describe('createDCase', function() {
+			it('should return result', function(done) {
+				dcase.createDCase(
+					{dcaseName: 'test dcase', tree: null}, 
+					{
+						onSuccess: (result: any) => {
+							console.log(result);
+							done();
+						}, 
+						onFailure: (error: error.RPCError) => {
+							console.log('err');
+							console.log(error);
+							done();
+						},
+					}
+				);
 			});
 		});
 	});

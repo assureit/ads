@@ -54,8 +54,6 @@ function httpHandler(req, res) {
                     error: error,
                     id: req.body.id
                 }), 500);
-            },
-            throw: function (e) {
             }
         });
     });
