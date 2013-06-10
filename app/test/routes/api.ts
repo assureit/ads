@@ -69,7 +69,7 @@ describe('api', function() {
 					assert.equal(-32601, res.body.error.code);
 				});
 		});
-		it('should return HTTP200 and response object when it succeeded', function() {
+		it('should return HTTP200 and response object when it succeeded', function(done) {
 			request(app['app'])	// TODO: 型制約を逃げている。要修正。
 				.post('/api/1.0')
 				.send({jsonrpc:"2.0", method:"ping", id:100})
@@ -80,7 +80,10 @@ describe('api', function() {
 					assert.strictEqual(null, res.body.error);
 					assert.notStrictEqual(undefined, res.body.result);
 					assert.equal('ok', res.body.result);
+					done();
 				});
+		});
+		it('should handle / added url', function(done) {
 			request(app['app'])	// TODO: 型制約を逃げている。要修正。
 				.post('/api/1.0/')
 				.send({jsonrpc:"2.0", method:"ping", id:100})
@@ -91,6 +94,7 @@ describe('api', function() {
 					assert.strictEqual(null, res.body.error);
 					assert.notStrictEqual(undefined, res.body.result);
 					assert.equal('ok', res.body.result);
+					done();
 				});
 		});
 	})
