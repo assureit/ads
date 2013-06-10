@@ -24,7 +24,7 @@ DCaseAPI.call = function(method, params, callback, error_callback) {
 		type: "POST",
 		url: this.uri,
 		async: async,
-		data: JSON.stringify(cmd),
+		data: cmd,
 		dataType: "json",
 		success: function(response) {
 			callback(response.result);
