@@ -1,12 +1,21 @@
 
 var error = require("./error")
 
+var domain = require('domain')
 exports.methods = {
 };
 function add(key, method) {
     exports.methods[key] = method;
 }
 exports.add = add;
+function addModule(module) {
+    for(var fn in module) {
+        if(typeof module[fn] === 'function') {
+            add(fn, module[fn]);
+        }
+    }
+}
+exports.addModule = addModule;
 function httpHandler(req, res) {
     function onError(id, statusCode, error) {
         res.send(JSON.stringify({
@@ -25,7 +34,11 @@ function httpHandler(req, res) {
         onError(req.body.id, 404, new error.MethodNotFoundError(req.body.method, null));
         return;
     }
-    try  {
+    var d = domain.create();
+    d.on('error', function (err) {
+        onError(req.body.id, 500, new error.InternalError('Execution error is occured', JSON.stringify(err)));
+    });
+    d.run(function () {
         method(req.body.params, {
             onSuccess: function (result) {
                 res.send(JSON.stringify({
@@ -43,9 +56,7 @@ function httpHandler(req, res) {
                 }), 500);
             }
         });
-    } catch (e) {
-        onError(req.body.id, 500, new error.InternalError('Execution error is occured', null));
-    }
+    });
     return;
 }
 exports.httpHandler = httpHandler;
