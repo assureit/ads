@@ -3,6 +3,7 @@ var db = require('../db/db')
 var constant = require('../constant')
 var dcase = require('../model/dcase')
 var commit = require('../model/commit')
+var node = require('../model/node')
 function getDCaseList(params, callback) {
     var con = new db.Database();
     con.query('SELECT * FROM dcase', function (err, result) {
@@ -38,12 +39,15 @@ function createDCase(params, callback) {
                 userId: userId,
                 message: 'Initial Commit'
             }, function (commitId) {
-                con.commit(function (err, result) {
-                    callback.onSuccess({
-                        dcaseId: dcaseId,
-                        commitId: commitId
+                var nd = new node.Node(con);
+                nd.insertList(commitId, params.contents.NodeList, function () {
+                    con.commit(function (err, result) {
+                        callback.onSuccess({
+                            dcaseId: dcaseId,
+                            commitId: commitId
+                        });
+                        con.close();
                     });
-                    con.close();
                 });
             });
         });

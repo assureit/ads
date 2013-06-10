@@ -3,6 +3,7 @@ import type = module('./type')
 import constant = module('../constant')
 import dcase = module('../model/dcase')
 import commit = module('../model/commit')
+import node = module('../model/node')
 
 export function getDCaseList(params:any, callback: type.Callback) {
 	var con = new db.Database();
@@ -31,9 +32,12 @@ export function createDCase(params:any, callback: type.Callback) {
 		dc.insert({userId: userId, dcaseName: params.dcaseName}, (dcaseId) => {
 			var cm = new commit.Commit(con);
 			cm.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (commitId) => {
-				con.commit((err, result) =>{
-					callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
-					con.close();
+				var nd = new node.Node(con);
+				nd.insertList(commitId, params.contents.NodeList, () => {
+					con.commit((err, result) =>{
+						callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
+						con.close();
+					});
 				});
 			});
 		});
