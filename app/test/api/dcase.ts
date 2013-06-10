@@ -25,7 +25,7 @@ describe('api', function() {
 		describe('createDCase', function() {
 			it('should return result', function(done) {
 				dcase.createDCase(
-					{dcaseName: 'test dcase', tree: null}, 
+					{dcaseName: 'test dcase', contents: {}}, 
 					{
 						onSuccess: (result: any) => {
 							console.log(result);

@@ -34,11 +34,26 @@ function createDCase(params, callback) {
                 throw err;
             }
             var dcaseId = result.insertId;
-            con.commit(function (err, result) {
-                callback.onSuccess({
-                    'dcaseId': dcaseId
+            con.query('INSERT INTO commit(data, date_time, prev_commit_id, latest_flag,  dcase_id, `user_id`, `message`) VALUES(?,now(),?,TRUE,?,?,?)', [
+                JSON.stringify(params.contents), 
+                0, 
+                dcaseId, 
+                userId, 
+                'Initial Commit'
+            ], function (err, result) {
+                if(err) {
+                    con.rollback();
+                    con.close();
+                    throw err;
+                }
+                var commitId = result.insertId;
+                con.commit(function (err, result) {
+                    callback.onSuccess({
+                        dcaseId: dcaseId,
+                        commitId: commitId
+                    });
+                    con.close();
                 });
-                con.close();
             });
         });
     });

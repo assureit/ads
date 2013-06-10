@@ -20,7 +20,8 @@ describe('api', function () {
             it('should return result', function (done) {
                 dcase.createDCase({
                     dcaseName: 'test dcase',
-                    tree: null
+                    contents: {
+                    }
                 }, {
                     onSuccess: function (result) {
                         console.log(result);
