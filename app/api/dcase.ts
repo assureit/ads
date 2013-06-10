@@ -24,15 +24,18 @@ export function createDCase(params:any, callback: type.Callback) {
 	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
 
 	var con = new db.Database();
-	con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [userId, params.dcaseName], (err, result) => {
-		if (err) {
-			con.rollback();
-			con.close();
-			throw err;
-		}
-		con.close();
-
-		var dcaseId = result.insertId;
-		callback.onSuccess({'dcaseId': dcaseId});
+	con.begin((err, result) => {
+		con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [userId, params.dcaseName], (err, result) => {
+			if (err) {
+				con.rollback();
+				con.close();
+				throw err;
+			}
+			var dcaseId = result.insertId;
+			con.commit((err, result) =>{
+				callback.onSuccess({'dcaseId': dcaseId});
+				con.close();
+			});
+		});
 	});
 }
