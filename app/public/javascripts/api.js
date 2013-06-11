@@ -82,7 +82,7 @@ DCaseAPI.deleteDCase = function(dcaseId, callback, error) {
 };
 
 DCaseAPI.getNodeTree = function(commitId, callback, error) {
-	return this.call("getNodeTree", { commitId: commitId }, callback, error).tree;
+	return JSON.parse(this.call("getNodeTree", { commitId: commitId }, callback, error).contents);
 };
 
 DCaseAPI.searchDCase = function(text, callback, error) {
