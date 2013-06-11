@@ -3,7 +3,7 @@ import type = module('./type')
 import constant = module('../constant')
 import model_dcase = module('../model/dcase')
 import model_commit = module('../model/commit')
-import node = module('../model/node')
+import model_node = module('../model/node')
 
 export function getDCaseList(params:any, callback: type.Callback) {
 	var con = new db.Database();
@@ -69,8 +69,8 @@ export function createDCase(params:any, callback: type.Callback) {
 		dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName}, (dcaseId:number) => {
 			var commitDAO = new model_commit.CommitDAO(con);
 			commitDAO.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (commitId) => {
-				var nd = new node.Node(con);
-				nd.insertList(commitId, params.contents.NodeList, () => {
+				var nodeDAO = new model_node.NodeDAO(con);
+				nodeDAO.insertList(commitId, params.contents.NodeList, () => {
 					con.commit((err, result) =>{
 						callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
 						con.close();
@@ -91,8 +91,8 @@ export function commit(params: any, callback: type.Callback) {
 		commitDAO.get(params.commitId, (com: model_commit.Commit) => {
 			console.log(com);
 			commitDAO.insert({data: JSON.stringify(params.contents), prevId: params.commitId, dcaseId: com.dcaseId, userId: userId, message: params.commitMessage}, (commitId) => {
-				var nd = new node.Node(con);
-				nd.insertList(commitId, params.contents.NodeList, () => {
+				var nodeDAO = new model_node.NodeDAO(con);
+				nodeDAO.insertList(commitId, params.contents.NodeList, () => {
 					con.commit((err, result) =>{
 						callback.onSuccess({commitId: commitId});
 						con.close();

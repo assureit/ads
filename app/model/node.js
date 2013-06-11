@@ -4,13 +4,13 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var model = require('./model')
-var Node = (function (_super) {
-    __extends(Node, _super);
-    function Node() {
+var NodeDAO = (function (_super) {
+    __extends(NodeDAO, _super);
+    function NodeDAO() {
         _super.apply(this, arguments);
 
     }
-    Node.prototype.insert = function (commitId, data, callback) {
+    NodeDAO.prototype.insert = function (commitId, data, callback) {
         var _this = this;
         this.con.query('INSERT INTO node(this_node_id, description, node_type, commit_id) VALUES(?,?,?,?)', [
             data.ThisNodeId, 
@@ -26,7 +26,7 @@ var Node = (function (_super) {
             callback(result.insertId);
         });
     };
-    Node.prototype.insertList = function (commitId, list, callback) {
+    NodeDAO.prototype.insertList = function (commitId, list, callback) {
         var _this = this;
         if(list.length == 0) {
             callback();
@@ -37,6 +37,6 @@ var Node = (function (_super) {
             _this.insertList(commitId, list.slice(1), callback);
         });
     };
-    return Node;
+    return NodeDAO;
 })(model.Model);
-exports.Node = Node;
+exports.NodeDAO = NodeDAO;
