@@ -8,7 +8,6 @@ describe('api', function () {
             it('should return result', function (done) {
                 dcase.getDCaseList(null, {
                     onSuccess: function (result) {
-                        console.log(result);
                     },
                     onFailure: function (error) {
                     }
@@ -22,7 +21,6 @@ describe('api', function () {
                     dcaseId: 50
                 }, {
                     onSuccess: function (result) {
-                        console.log(result);
                     },
                     onFailure: function (error) {
                     }
@@ -36,7 +34,6 @@ describe('api', function () {
                     commitId: 42
                 }, {
                     onSuccess: function (result) {
-                        console.log(result);
                     },
                     onFailure: function (error) {
                     }
@@ -50,7 +47,6 @@ describe('api', function () {
                     dcaseId: 50
                 }, {
                     onSuccess: function (result) {
-                        console.log(result);
                     },
                     onFailure: function (error) {
                     }
@@ -92,7 +88,6 @@ describe('api', function () {
                     }
                 }, {
                     onSuccess: function (result) {
-                        console.log(result);
                         done();
                     },
                     onFailure: function (error) {
@@ -107,6 +102,23 @@ describe('api', function () {
             it('should return result', function (done) {
                 dcase.deleteDCase({
                     dcaseId: 36
+                }, {
+                    onSuccess: function (result) {
+                        done();
+                    },
+                    onFailure: function (error) {
+                        console.log('err');
+                        console.log(error);
+                        done();
+                    }
+                });
+            });
+        });
+        describe('editDCase', function () {
+            it('should return result', function (done) {
+                dcase.editDCase({
+                    dcaseId: 37,
+                    dcaseName: 'modified dcase name'
                 }, {
                     onSuccess: function (result) {
                         console.log(result);
@@ -155,7 +167,6 @@ describe('api', function () {
                     }
                 }, {
                     onSuccess: function (result) {
-                        console.log(result);
                         done();
                     },
                     onFailure: function (error) {

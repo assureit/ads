@@ -33,7 +33,6 @@ var NodeDAO = (function (_super) {
             return;
         }
         this.insert(commitId, list[0], function (nodeId) {
-            console.log(nodeId);
             _this.insertList(commitId, list.slice(1), callback);
         });
     };
