@@ -66,6 +66,27 @@ export function getNodeTree(params:any, callback: type.Callback) {
 	});
 }
 
+export function searchDCase(params:any, callback: type.Callback) {
+	var con = new db.Database();
+	con.begin((err, result) => {
+		var nodeDAO = new model_node.NodeDAO(con);
+		nodeDAO.search(params.text, (list: model_node.Node[]) => {
+			var searchResultList = [];
+			list.forEach((node) => {
+				searchResultList.push({
+					dcase_id: node.dcase.id, 
+					this_node_id: node.thisNodeId, 
+					dcaseName:node.dcase.name, 
+					description: node.description, 
+					nodeType: node.nodeType
+				});
+			});
+			callback.onSuccess({searchResultList: searchResultList});
+			con.close();
+		});
+	});
+}
+
 export function createDCase(params:any, callback: type.Callback) {
 	// TODO: 認証チェック
 	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更

@@ -54,6 +54,20 @@ describe('api', function () {
                 done();
             });
         });
+        describe('searchDCase', function () {
+            it('should return result', function (done) {
+                dcase.searchDCase({
+                    text: 'dcase1'
+                }, {
+                    onSuccess: function (result) {
+                        console.log(result);
+                    },
+                    onFailure: function (error) {
+                    }
+                });
+                done();
+            });
+        });
         describe('createDCase', function () {
             it('should return result', function (done) {
                 dcase.createDCase({
@@ -121,7 +135,6 @@ describe('api', function () {
                     dcaseName: 'modified dcase name'
                 }, {
                     onSuccess: function (result) {
-                        console.log(result);
                         done();
                     },
                     onFailure: function (error) {
