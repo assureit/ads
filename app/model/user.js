@@ -1,5 +1,6 @@
 var User = (function () {
-    function User(name, deleteFlag, systemFlag) {
+    function User(id, name, deleteFlag, systemFlag) {
+        this.id = id;
         this.name = name;
         this.deleteFlag = deleteFlag;
         this.systemFlag = systemFlag;

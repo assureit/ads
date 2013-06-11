@@ -90,7 +90,7 @@ var CommitDAO = (function (_super) {
             var list = [];
             result.forEach(function (row) {
                 var c = new Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
-                c.user = new model_user.User(row.u.name, row.u.delete_flag, row.u.system_flag);
+                c.user = new model_user.User(row.u.id, row.u.name, row.u.delete_flag, row.u.system_flag);
                 list.push(c);
             });
             callback(list);
