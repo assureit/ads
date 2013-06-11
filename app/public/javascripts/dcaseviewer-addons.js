@@ -193,14 +193,33 @@ for (var __i = 0; __i < test_case.length; __i++) {
 	}
 }
 
+function generateMetadata(n) {
+	var metadata = n.metadata;
+	var keys = Object.keys(metadata);
+	var res = (keys.length > 0) ? "\n" : "";
+	for (var i = 0; i < keys.length; i++) {
+		var key = keys[i];
+		if (key != "Description") {
+			res += key + ": " + metadata[key] + "\n";
+		}
+	}
+	if (metadata["Description"]) {
+		res += metadata["Description"];
+	} else {
+		res = res.substr(0, res.length-1);
+	}
+	return res;
+}
+
 var DNodeView_InplaceEdit = function(self) {
 	var $edit = null;
 
 	self.$divText.addClass("node-text-editable");
 
+
 	function generateMarkdownText(node) {
 		var convert = (function(n){
-			return ("# " + n.type + " " + n.name + " " + n.id + (n.desc.length > 0 ? ("\n" + n.desc) : "") + "\n\n");
+			return ("# " + n.type + " " + n.name + " " + n.id + (n.desc.length > 0 ? ("\n" + n.desc) : "") + generateMetadata(n) + "\n\n");
 		});
 
 		var markdown = convert(node);  
@@ -276,8 +295,9 @@ var DNodeView_InplaceEdit = function(self) {
 		var newDesc = nodejson.description;
 		var newType = nodejson.type;
 		var newName = nodejson.name || newType[0] + "_" + node.id;
+		var newMetadata = nodejson.metadata;
 		var DCase = self.viewer.getDCase();
-		DCase.setParam(node, newType, newName, newDesc);
+		DCase.setParam(node, newType, newName, newDesc, newMetadata);
 		return node;
 	}
 
@@ -347,7 +367,7 @@ var DNodeView_InplaceEdit = function(self) {
 					(newNode.isContext ? newContexts : newChildren).push(newNode);
 				}else if(node.isTypeApendable(nd.type)){
 					// create new node
-					var newNode = DCase.insertNode(node, nd.type, nd.description);
+					var newNode = DCase.insertNode(node, nd.type, nd.description, nd.metadata);
 					treeChanged = true;
 					(newNode.isContext ? newContexts : newChildren).push(newNode);
 				}
