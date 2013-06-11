@@ -130,6 +130,69 @@ var DNodeView_ExpandBranch = function(self) {
 
 //-----------------------------------------------------------------------------
 
+/* find first line appering key value structure */
+var checkKeyValue = function(str) {
+	return str.indexOf(":") != -1;
+}
+
+var findVaridMetaData = function(body) {
+	body = body.join("\n").trim().split("\n");
+
+	if (checkKeyValue(body[0])) {
+		return 0;
+	}
+
+	var emptyLineIndex;
+	for (emptyLineIndex = 0; emptyLineIndex < body.length; emptyLineIndex++) {
+		if (body[emptyLineIndex] == "") {
+			while (emptyLineIndex+1 < body.length && body[emptyLineIndex+1] == "") {
+				emptyLineIndex++;
+			}
+			break;
+		}
+	}
+
+	if (emptyLineIndex < body.length-1 && checkKeyValue(body[emptyLineIndex+1])) {
+		return emptyLineIndex+1;
+	}
+
+	return -1
+}
+
+
+var parseMetaData = function(data) {
+	console.log(data);
+	var metadata = {};
+	var i = 0;
+	for (; i < data.length; i++) {
+		if (data[i].indexOf(":") == -1) break;
+		var list = data[i].split(":");
+		var key = list[0].trim();
+		var value = list.slice(1).join("").trim();
+		metadata[key] = value;
+	}
+	if (i < data.length) {
+		metadata["Description"] = data.slice(i).join("\n");
+	} else {
+		metadata["Description"] = "";
+	}
+	return metadata;
+}
+
+var test_case = [
+                 ["", "", "hi"],
+				 ["", "", "hi: bye"],
+                 ["hi", "bye", "", "hi: bye"],
+                 ["hi", "", "", "key: value"],
+                 [""]];
+for (var __i = 0; __i < test_case.length; __i++) {
+	test_case[__i] = test_case[__i].join("\n").trim().split("\n");
+	var ___i = findVaridMetaData(test_case[__i]);
+	if (___i != -1) {
+		console.log(parseMetaData(test_case[__i].slice(___i)));
+	}
+}
+
 var DNodeView_InplaceEdit = function(self) {
 	var $edit = null;
 
@@ -151,13 +214,28 @@ var DNodeView_InplaceEdit = function(self) {
 		var nodesrc = src.split(/^#+/m).slice(1);
 		var nodes = [];
 		for(var i = 0; i < nodesrc.length; ++i){
+
 			var lines = nodesrc[i].split(/\r\n|\r|\n/);
 			var heads = lines[0].trim().split(/\s+/);
+
+			/* handle metadata */
+			var body = lines.slice(1).join("\n").trim().split("\n");
+			var metadata = {};
+			var description;
+			var metadataIndex = findVaridMetaData(body);
+			if (metadataIndex != -1) {
+				description = body.slice(0, metadataIndex).join("\n");
+				metadata = parseMetaData(body.slice(metadataIndex));
+			} else {
+				description = lines.slice(1).join("\n").trim();
+			}
+
 			var node = {
 				type: findMostSimilarNodeType(heads[0]),
 				name: heads[1],
 				id  : heads[2],
-				description: lines.slice(1).join("\n").trim(),
+				description: description,
+				metadata: metadata,
 				children: [],
 			};
 			nodes.push(node);
