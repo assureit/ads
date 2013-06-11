@@ -1,0 +1,18 @@
+body {
+	min-height: 480px;
+	margin: 0px;
+}
+#viewer {
+	left: 0px;
+	top : 40px;
+	width : 100%;
+	bottom: 0px;
+}
+#dcase-manager {
+	margin-top: 60px;
+}
+#ase-logo {
+	position: absolute;
+	right: 0px;
+	top: 40px;
+}

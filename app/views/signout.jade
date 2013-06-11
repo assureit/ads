@@ -1,0 +1,11 @@
+extends index
+
+block sign
+    ul.nav.pull-right
+        li.divider-vertical
+            li.dropdown
+                a.dropdown-toggle(href="#", data-toggle="dropdown") user_name
+                    strong.caret
+                .dropdown-menu(style="padding: 15px; padding-bottom: 0px;")
+                    form#sign-in-form.navbar-form.pull-right(method="post", action="action/logout.php")
+                        input.btn.btn-danger(type="submit", style="margin-bottom: 15px; width: 100%; height: 32px; font-size: 13px;", value="Sign out")
