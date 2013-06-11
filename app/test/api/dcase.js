@@ -16,6 +16,20 @@ describe('api', function () {
                 done();
             });
         });
+        describe('getDCase', function () {
+            it('should return result', function (done) {
+                dcase.getDCase({
+                    dcaseId: 50
+                }, {
+                    onSuccess: function (result) {
+                        console.log(result);
+                    },
+                    onFailure: function (error) {
+                    }
+                });
+                done();
+            });
+        });
         describe('createDCase', function () {
             it('should return result', function (done) {
                 dcase.createDCase({
