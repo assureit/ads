@@ -42,7 +42,7 @@ var DCaseDAO = (function (_super) {
     DCaseDAO.prototype.list = function (callback) {
         var _this = this;
         this.con.query({
-            sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = 1',
+            sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = 1 AND d.delete_flag = FALSE',
             nestTables: true
         }, [], function (err, result) {
             if(err) {
