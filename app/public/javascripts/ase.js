@@ -76,7 +76,7 @@ var ASE = function(body) {
 			var id = dcase.dcaseId;
 			var name = dcase.dcaseName;
 			var user = dcase.userName;
-			var lastDate = new DateFormatter(dcase.latestCommit.time).format();
+			var lastDate = dcase.latestCommit.dateTime;//new DateFormatter(dcase.latestCommit.time).format();
 			var lastUser = dcase.latestCommit.userName;
 			var html = "<td><a href=\"./?dcaseId=" + id + "\">" + name + 
 					"</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" +
