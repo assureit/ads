@@ -60,7 +60,6 @@ describe('api', function () {
                     text: 'dcase1'
                 }, {
                     onSuccess: function (result) {
-                        console.log(result);
                     },
                     onFailure: function (error) {
                     }
