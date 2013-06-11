@@ -45,6 +45,18 @@ describe('api', function() {
 			});
 		});
 
+		describe('getCommitList', function() {
+			it('should return result', function(done) {
+				dcase.getCommitList({dcaseId: 50}, {
+					onSuccess: (result: any) => {
+						console.log(result);
+					}, 
+					onFailure: (error: error.RPCError) => {},
+				});
+				done();
+			});
+		});
+
 		///////////////////////////////////////////////
 		describe('createDCase', function() {
 			it('should return result', function(done) {
