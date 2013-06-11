@@ -6,17 +6,22 @@ var model_commit = require('../model/commit')
 var model_node = require('../model/node')
 function getDCaseList(params, callback) {
     var con = new db.Database();
-    con.query('SELECT * FROM dcase', function (err, result) {
-        if(err) {
-            con.close();
-            throw err;
-        }
+    var dcaseDAO = new model_dcase.DCaseDAO(con);
+    dcaseDAO.list(function (result) {
         con.close();
         var list = [];
         result.forEach(function (val) {
             list.push({
                 dcaseId: val.id,
-                dcaseName: val.name
+                dcaseName: val.name,
+                userName: val.user.name,
+                latestCommit: {
+                    dateTime: val.latestCommit.dateTime,
+                    commitId: val.latestCommit.id,
+                    userName: val.latestCommit.user.name,
+                    userId: val.latestCommit.userId,
+                    commitMessage: val.latestCommit.message
+                }
             });
         });
         callback.onSuccess(list);

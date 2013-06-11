@@ -7,16 +7,23 @@ import model_node = module('../model/node')
 
 export function getDCaseList(params:any, callback: type.Callback) {
 	var con = new db.Database();
-	con.query('SELECT * FROM dcase', (err, result) => {
-		if (err) {
-			con.close();
-			throw err;
-		}
+	var dcaseDAO = new model_dcase.DCaseDAO(con);
+	dcaseDAO.list((result: model_dcase.DCase[]) => {
 		con.close();
-
 		var list = [];
 		result.forEach((val) => {
-			list.push({dcaseId: val.id, dcaseName: val.name});
+			list.push({
+				dcaseId: val.id, 
+				dcaseName: val.name,
+				userName: val.user.name,
+				latestCommit: {
+					dateTime: val.latestCommit.dateTime,
+					commitId: val.latestCommit.id,
+					userName: val.latestCommit.user.name,
+					userId: val.latestCommit.userId,
+					commitMessage: val.latestCommit.message
+				}
+			});
 		});
 		callback.onSuccess(list);
 	});
