@@ -46,6 +46,26 @@ function getDCase(params, callback) {
     });
 }
 exports.getDCase = getDCase;
+function getNodeTree(params, callback) {
+    var con = new db.Database();
+    con.query({
+        sql: 'SELECT * FROM commit WHERE id = ?',
+        nestTables: true
+    }, [
+        params.commitId
+    ], function (err, result) {
+        if(err) {
+            con.close();
+            throw err;
+        }
+        con.close();
+        var c = result[0].commit;
+        callback.onSuccess({
+            contents: c.data
+        });
+    });
+}
+exports.getNodeTree = getNodeTree;
 function createDCase(params, callback) {
     var userId = constant.SYSTEM_USER_ID;
     var con = new db.Database();

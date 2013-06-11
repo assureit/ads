@@ -30,6 +30,20 @@ describe('api', function () {
                 done();
             });
         });
+        describe('getNodeTree', function () {
+            it('should return result', function (done) {
+                dcase.getNodeTree({
+                    commitId: 42
+                }, {
+                    onSuccess: function (result) {
+                        console.log(result);
+                    },
+                    onFailure: function (error) {
+                    }
+                });
+                done();
+            });
+        });
         describe('createDCase', function () {
             it('should return result', function (done) {
                 dcase.createDCase({
