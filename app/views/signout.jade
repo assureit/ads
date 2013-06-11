@@ -4,7 +4,7 @@ block sign
     ul.nav.pull-right
         li.divider-vertical
             li.dropdown
-                a.dropdown-toggle(href="#", data-toggle="dropdown") user_name
+                a.dropdown-toggle(href="#", data-toggle="dropdown")= userName
                     strong.caret
                 .dropdown-menu(style="padding: 15px; padding-bottom: 0px;")
                     form#sign-in-form.navbar-form.pull-right(method="post", action="action/logout.php")
