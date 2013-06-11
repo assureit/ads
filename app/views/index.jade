@@ -12,46 +12,46 @@ block bar
                 .nav-collapse.collapse
                     ul.nav
                         li
-                            a( href="./") home
+                            a( href="./")= lang.home
                         li.dropdown.ase-edit-menu
-                            a.dropdown-toggle(data-toggle="dropdown", href="#") edit
+                            a.dropdown-toggle(data-toggle="dropdown", href="#") lang.edit
                                 b.caret
                             ul.dropdown-menu
                                 li
-                                    a#menu-undo(href="#") undo
+                                    a#menu-undo(href="#")= lang.undo
                                 li
-                                    a#menu-redo(href="#") redo
+                                    a#menu-redo(href="#")= lang.redo
                            li.dropdown.ase-edit-menu.ase-view-menu
-                               a.dropdown-toggle(data-toggle="dropdown", href="#") export
+                               a.dropdown-toggle(data-toggle="dropdown", href="#")= lang.export
                                    b.caret
                                ul.dropdown-menu
                                    li
-                                       a#menu-export-json(href="#") JSON
+                                       a#menu-export-json(href="#")= lang.JSON
                                    li
-                                       a#menu-export-png(href="#") PNG
+                                       a#menu-export-png(href="#")= lang.PNG
                                    li
-                                       a#menu-export-pdf(href="#") PDF
+                                       a#menu-export-pdf(href="#")= lang.PDF
                                    li
                                        a#menu-export-dscript(href="#") D-Script
                             li.ase-edit-menu
-                                a#menu-commit(href="#") commit
+                                a#menu-commit(href="#")= lang.commit
                             li.dropdown.ase-edit-menu.ase-view-menu
-                                a.dropdown-toggle#menu-history-toggle(href="#") commitlog
+                                a.dropdown-toggle#menu-history-toggle(href="#")= lang.commitlog
                                     b.caret
                             li.dropdown.ase-edit-menu.ase-view-menu
-                                a.dropdown-toggle(data-toggle="dropdown", href="#") config
+                                a.dropdown-toggle(data-toggle="dropdown", href="#")= lang.config
                                     b.caret
                                 ul.dropdown-menu
                                     li.dropdown-submenu
-                                        a(href="#") Theme
+                                        a(href="#")= lang.Theme
                                         ul#menu-change-theme.dropdown-menu
                                     li.dropdown-submenu
-                                        a(href="#") Language
+                                        a(href="#")= lang.Language
                                         ul#lang-theme.dropdown-menu
                                             li
-                                                a#lang-select-english(href="#") English
+                                                a#lang-select-english(href="#")= lang.English
                                             li
-                                                a#lang-select-japanese(href="#") Japanese
+                                                a#lang-select-japanese(href="#")= lang.Japanese
                 block sign
 block content
     #ase.container
@@ -60,49 +60,49 @@ block content
         #dcase-manager.container-fluid(style="display: none;")
         .row-fluid
             .span6
-                h2 new_DCase
+                h2= lang.new_DCase
                 form.form-horizontal
                     .control-group#newdcase-name
-                        label.control-label(for="inputDCaseName") DCase_name
+                        label.control-label(for="inputDCaseName")= lang.DCase_name
                         .controls
                             input#inputDCaseName(type="text", id="inputDCaseName")
                     .control-group#newdcase-desc
-                        label.control-label(for="inputDesc") topgoal
+                        label.control-label(for="inputDesc")= lang.topgoal
                         .controls
                             textarea#inputDesc(rows=5)
                     .control-group
                         .controls
-                            button.btn#dcase-create(type="button") create
+                            button.btn#dcase-create(type="button")= lang.create
             .span6
                 h2 DCaseを選択
                 table.table.table-striped.table-hover
                     thead
                         tr
-                            th DCase_name
-                            th creater
-                            th last_commit
-                            th last_commiter
+                            th= lang.DCase_name
+                            th= lang.creater
+                            th= lang.last_commit
+                            th= lang.last_commiter
                     tbody#dcase-select-table
     .dropdown#edit-menulist(style="display: none;")
         a.dropdown-toggle(data-toggle="dropdown", href="#")
             i.icon-list
         ul.dropdown-menu
             li
-                a#ml-cut(href="#") cut
+                a#ml-cut(href="#")= lang.cut
             li
-                a#ml-copy(href="#") copy
+                a#ml-copy(href="#")= lang.copy
             li
-                a#ml-paste(href="#") paste
+                a#ml-paste(href="#")= lang.paste
             li
-                a#ml-delete(href="#") delete
+                a#ml-delete(href="#")= lang.delete
             li.divider
             li
-                a#ml-openall(href="#") openall
+                a#ml-openall(href="#")= lang.openall
             li
-                a#ml-closeall(href="#") closeall
+                a#ml-closeall(href="#")= lang.closeall
             li.divider
             li.dropdown-submenu
-                a(tabindex="-1", href="#") export
+                a(tabindex="-1", href="#")= lang.export
                 ul.dropdown-menu
                     li
                         a#ml-export-json(href="#") JSON

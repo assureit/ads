@@ -1,5 +1,14 @@
+var lang = require('./lang')
 exports.index = function (req, res) {
-    res.render('signin', {
-        title: 'Assurance DS'
-    });
+    if(req.cookies.userId !== null) {
+        res.render('signin', {
+            title: 'Assurance DS',
+            lang: lang.lang.ja
+        });
+    } else {
+        res.render('signout', {
+            title: 'Assurance DS',
+            lang: lang.lang.ja
+        });
+    }
 };
