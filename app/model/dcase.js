@@ -72,6 +72,19 @@ var DCaseDAO = (function (_super) {
             callback();
         });
     };
+    DCaseDAO.prototype.update = function (dcaseId, name, callback) {
+        var _this = this;
+        this.con.query('UPDATE dcase SET name=? WHERE id = ?', [
+            name, 
+            dcaseId
+        ], function (err, result) {
+            if(err) {
+                _this.con.close();
+                throw err;
+            }
+            callback();
+        });
+    };
     return DCaseDAO;
 })(model.Model);
 exports.DCaseDAO = DCaseDAO;

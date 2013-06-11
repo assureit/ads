@@ -96,7 +96,6 @@ export function commit(params: any, callback: type.Callback) {
 	con.begin((err, result) => {
 		var commitDAO = new model_commit.CommitDAO(con);
 		commitDAO.get(params.commitId, (com: model_commit.Commit) => {
-			console.log(com);
 			commitDAO.insert({data: JSON.stringify(params.contents), prevId: params.commitId, dcaseId: com.dcaseId, userId: userId, message: params.commitMessage}, (commitId) => {
 				var nodeDAO = new model_node.NodeDAO(con);
 				nodeDAO.insertList(commitId, params.contents.NodeList, () => {
@@ -119,6 +118,22 @@ export function deleteDCase(params:any, callback: type.Callback) {
 	con.begin((err, result) => {
 		var dcaseDAO = new model_dcase.DCaseDAO(con);
 		dcaseDAO.remove(params.dcaseId, () => {
+			con.commit((err, result) =>{
+				callback.onSuccess({dcaseId: params.dcaseId});
+				con.close();
+			});
+		});
+	});
+}
+
+export function editDCase(params:any, callback: type.Callback) {
+	// TODO: 認証チェック
+	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
+
+	var con = new db.Database();
+	con.begin((err, result) => {
+		var dcaseDAO = new model_dcase.DCaseDAO(con);
+		dcaseDAO.update(params.dcaseId, params.dcaseName, () => {
 			con.commit((err, result) =>{
 				callback.onSuccess({dcaseId: params.dcaseId});
 				con.close();
