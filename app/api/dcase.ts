@@ -103,3 +103,18 @@ export function commit(params: any, callback: type.Callback) {
 
 	});
 };
+
+export function getCommitList(params:any, callback: type.Callback) {
+	var con = new db.Database();
+	var commitDAO = new model_commit.CommitDAO(con);
+	commitDAO.list(params.dcaseId, (list: model_commit.Commit[]) => {
+		con.close();
+		var commitList = [];
+		list.forEach((c: model_commit.Commit) => {
+			commitList.push({commitId: c.id, dateTime: c.dateTime, commitMessage: c.message, userId: c.userId, userName: c.user.name});
+		});
+		callback.onSuccess({
+			commitList: commitList
+		});
+	});
+}

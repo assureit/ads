@@ -126,3 +126,24 @@ function commit(params, callback) {
 }
 exports.commit = commit;
 ;
+function getCommitList(params, callback) {
+    var con = new db.Database();
+    var commitDAO = new model_commit.CommitDAO(con);
+    commitDAO.list(params.dcaseId, function (list) {
+        con.close();
+        var commitList = [];
+        list.forEach(function (c) {
+            commitList.push({
+                commitId: c.id,
+                dateTime: c.dateTime,
+                commitMessage: c.message,
+                userId: c.userId,
+                userName: c.user.name
+            });
+        });
+        callback.onSuccess({
+            commitList: commitList
+        });
+    });
+}
+exports.getCommitList = getCommitList;
