@@ -92,7 +92,7 @@ var ASE = function(body) {
 				$("a#e"+id).click(function(){
 					var msg = prompt("dcase名を入力して下さい");
 					if(msg != null) {
-						if(DCaseAPI.renameDCase(id, msg) != null) {
+						if(DCaseAPI.editDCase(id, msg) != null) {
 							alert("変更しました");
 							location.reload();
 						}

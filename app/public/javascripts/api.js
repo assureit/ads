@@ -70,10 +70,10 @@ DCaseAPI.getDCase = function(dcaseId, callback, error) {
 	return this.call("getDCase", { dcaseId: dcaseId }, callback, error);
 };
 
-DCaseAPI.renameDCase = function(dcaseId, name, callback, error) {
-	return this.call("renameDCase", {
+DCaseAPI.editDCase = function(dcaseId, name, callback, error) {
+	return this.call("editDCase", {
 		dcaseId: dcaseId,
-		name: name
+		dcaseName: name
 	}, callback, error);
 };
 
