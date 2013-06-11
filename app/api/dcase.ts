@@ -42,6 +42,23 @@ export function getDCase(params:any, callback: type.Callback) {
 	});
 }
 
+export function getNodeTree(params:any, callback: type.Callback) {
+	var con = new db.Database();
+	con.query({sql: 'SELECT * FROM commit WHERE id = ?', nestTables: true}, [params.commitId], (err, result) => {
+		if (err) {
+			con.close();
+			throw err;
+		}
+
+		// TODO: NotFound処理
+		con.close();
+		var c = result[0].commit;
+		callback.onSuccess({
+			contents: c.data
+		});
+	});
+}
+
 export function createDCase(params:any, callback: type.Callback) {
 	// TODO: 認証チェック
 	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
