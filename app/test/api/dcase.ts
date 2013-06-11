@@ -57,6 +57,18 @@ describe('api', function() {
 			});
 		});
 
+		describe('searchDCase', function() {
+			it('should return result', function(done) {
+				dcase.searchDCase({text: 'dcase1'}, {
+					onSuccess: (result: any) => {
+						console.log(result);
+					}, 
+					onFailure: (error: error.RPCError) => {},
+				});
+				done();
+			});
+		});
+
 		///////////////////////////////////////////////
 		describe('createDCase', function() {
 			it('should return result', function(done) {
@@ -128,7 +140,7 @@ describe('api', function() {
 					{dcaseId: 37, dcaseName: 'modified dcase name'}, 
 					{
 						onSuccess: (result: any) => {
-							console.log(result);
+							// console.log(result);
 							done();
 						}, 
 						onFailure: (error: error.RPCError) => {

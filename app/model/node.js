@@ -4,6 +4,18 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var model = require('./model')
+var model_dcase = require('./dcase')
+var Node = (function () {
+    function Node(id, commitId, thisNodeId, nodeType, description) {
+        this.id = id;
+        this.commitId = commitId;
+        this.thisNodeId = thisNodeId;
+        this.nodeType = nodeType;
+        this.description = description;
+    }
+    return Node;
+})();
+exports.Node = Node;
 var NodeDAO = (function (_super) {
     __extends(NodeDAO, _super);
     function NodeDAO() {
@@ -34,6 +46,28 @@ var NodeDAO = (function (_super) {
         }
         this.insert(commitId, list[0], function (nodeId) {
             _this.insertList(commitId, list.slice(1), callback);
+        });
+    };
+    NodeDAO.prototype.search = function (query, callback) {
+        var _this = this;
+        this.con.query({
+            sql: 'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ?',
+            nestTables: true
+        }, [
+            '%' + query + '%'
+        ], function (err, result) {
+            if(err) {
+                _this.con.rollback();
+                _this.con.close();
+                throw err;
+            }
+            var list = new Array();
+            result.forEach(function (row) {
+                var node = new Node(row.n.id, row.n.commit_id, row.n.this_node_id, row.n.node_type, row.n.description);
+                node.dcase = new model_dcase.DCase(row.d.id, row.d.name, row.d.user_id, row.d.delete_flag);
+                list.push(node);
+            });
+            callback(list);
         });
     };
     return NodeDAO;

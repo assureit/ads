@@ -71,6 +71,29 @@ function getNodeTree(params, callback) {
     });
 }
 exports.getNodeTree = getNodeTree;
+function searchDCase(params, callback) {
+    var con = new db.Database();
+    con.begin(function (err, result) {
+        var nodeDAO = new model_node.NodeDAO(con);
+        nodeDAO.search(params.text, function (list) {
+            var searchResultList = [];
+            list.forEach(function (node) {
+                searchResultList.push({
+                    dcase_id: node.dcase.id,
+                    this_node_id: node.thisNodeId,
+                    dcaseName: node.dcase.name,
+                    description: node.description,
+                    nodeType: node.nodeType
+                });
+            });
+            callback.onSuccess({
+                searchResultList: searchResultList
+            });
+            con.close();
+        });
+    });
+}
+exports.searchDCase = searchDCase;
 function createDCase(params, callback) {
     var userId = constant.SYSTEM_USER_ID;
     var con = new db.Database();
