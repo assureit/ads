@@ -18,8 +18,10 @@ export class Database {
 		this.con = Database.getConnection();
 	}
 
+	// TODO: ちゃんとした型定義
 	query(sql:string, callback: mysql.QueryCallback);
 	query(sql:string, values:any[], callback: mysql.QueryCallback);
+	query(sql:any, values:any[], callback: mysql.QueryCallback);
 	query(sql: string, values: any, callback?: any) {
 		this.con.query(sql, values, callback);
 	}
