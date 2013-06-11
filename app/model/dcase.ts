@@ -45,4 +45,14 @@ export class DCaseDAO extends model.Model {
 			callback(list);
 		});
 	}
+
+	remove(dcaseId: number, callback: ()=>void) {
+		this.con.query('UPDATE dcase SET delete_flag=TRUE WHERE id = ?', [dcaseId], (err, result) => {
+			if (err) {
+				this.con.close();
+				throw err;
+			}
+			callback();
+		});
+	}
 }

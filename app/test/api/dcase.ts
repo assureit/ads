@@ -103,6 +103,24 @@ describe('api', function() {
 			});
 		});
 
+		describe('deleteDCase', function() {
+			it('should return result', function(done) {
+				dcase.deleteDCase(
+					{dcaseId: 36}, 
+					{
+						onSuccess: (result: any) => {
+							console.log(result);
+							done();
+						}, 
+						onFailure: (error: error.RPCError) => {
+							console.log('err');
+							console.log(error);
+							done();
+						},
+					}
+				);
+			});
+		});
 
 		///////////////////////////////////////////////
 		describe('commit', function() {

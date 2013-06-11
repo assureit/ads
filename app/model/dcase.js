@@ -60,6 +60,18 @@ var DCaseDAO = (function (_super) {
             callback(list);
         });
     };
+    DCaseDAO.prototype.remove = function (dcaseId, callback) {
+        var _this = this;
+        this.con.query('UPDATE dcase SET delete_flag=TRUE WHERE id = ?', [
+            dcaseId
+        ], function (err, result) {
+            if(err) {
+                _this.con.close();
+                throw err;
+            }
+            callback();
+        });
+    };
     return DCaseDAO;
 })(model.Model);
 exports.DCaseDAO = DCaseDAO;
