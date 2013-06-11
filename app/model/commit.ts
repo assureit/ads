@@ -20,18 +20,14 @@ export class CommitDAO extends model.Model {
 				this.con.close();
 				throw err;
 			}
-			this._clearLastUpdateFlag(params.prevId, () => {
+			this._clearLastUpdateFlag(params.dcaseId, result.insertId, () => {
 				callback(result.insertId);
 			});
 		});
 	}
 
-	_clearLastUpdateFlag(id: number, callback: ()=>void): void {
-		if (id == 0) {
-			callback();
-			return;
-		}
-		this.con.query('UPDATE commit SET latest_flag = FALSE WHERE id = ?', [id], (err, result) => {
+	_clearLastUpdateFlag(dcaseId: number, latestCommitId: number, callback: ()=>void): void {
+		this.con.query('UPDATE commit SET latest_flag = FALSE WHERE dcase_id = ? AND id <> ? AND latest_flag = TRUE', [dcaseId, latestCommitId], (err, result) => {
 			if (err) {
 				this.con.rollback();
 				this.con.close();

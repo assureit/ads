@@ -22,6 +22,26 @@ export function getDCaseList(params:any, callback: type.Callback) {
 	});
 }
 
+export function getDCase(params:any, callback: type.Callback) {
+	var con = new db.Database();
+	con.query({sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?', nestTables: true}, [params.dcaseId], (err, result) => {
+		if (err) {
+			con.close();
+			throw err;
+		}
+
+		// TODO: NotFound処理
+		con.close();
+		var c = result[0].c;
+		var d = result[0].d;
+		callback.onSuccess({
+			commitId: c.id,
+			dcaseName: d.name,
+			contents: c.data
+		});
+	});
+}
+
 export function createDCase(params:any, callback: type.Callback) {
 	// TODO: 認証チェック
 	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
@@ -66,4 +86,3 @@ export function commit(params: any, callback: type.Callback) {
 
 	});
 };
-

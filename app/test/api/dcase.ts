@@ -21,6 +21,19 @@ describe('api', function() {
 		});
 
 
+		describe('getDCase', function() {
+			it('should return result', function(done) {
+				dcase.getDCase({dcaseId: 50}, {
+					onSuccess: (result: any) => {
+						console.log(result);
+					}, 
+					onFailure: (error: error.RPCError) => {},
+				});
+				done();
+			});
+		});
+
+
 		///////////////////////////////////////////////
 		describe('createDCase', function() {
 			it('should return result', function(done) {

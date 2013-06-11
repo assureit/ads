@@ -23,6 +23,29 @@ function getDCaseList(params, callback) {
     });
 }
 exports.getDCaseList = getDCaseList;
+function getDCase(params, callback) {
+    var con = new db.Database();
+    con.query({
+        sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?',
+        nestTables: true
+    }, [
+        params.dcaseId
+    ], function (err, result) {
+        if(err) {
+            con.close();
+            throw err;
+        }
+        con.close();
+        var c = result[0].c;
+        var d = result[0].d;
+        callback.onSuccess({
+            commitId: c.id,
+            dcaseName: d.name,
+            contents: c.data
+        });
+    });
+}
+exports.getDCase = getDCase;
 function createDCase(params, callback) {
     var userId = constant.SYSTEM_USER_ID;
     var con = new db.Database();
