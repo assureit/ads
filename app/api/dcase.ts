@@ -25,7 +25,7 @@ export function getDCaseList(params:any, callback: type.Callback) {
 				}
 			});
 		});
-		callback.onSuccess(list);
+		callback.onSuccess({dcaseList:list});
 	});
 }
 

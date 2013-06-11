@@ -61,7 +61,7 @@ describe('api', function() {
 			it('should return result', function(done) {
 				dcase.searchDCase({text: 'dcase1'}, {
 					onSuccess: (result: any) => {
-						console.log(result);
+						// console.log(result);
 					}, 
 					onFailure: (error: error.RPCError) => {},
 				});

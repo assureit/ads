@@ -24,7 +24,9 @@ function getDCaseList(params, callback) {
                 }
             });
         });
-        callback.onSuccess(list);
+        callback.onSuccess({
+            dcaseList: list
+        });
     });
 }
 exports.getDCaseList = getDCaseList;
