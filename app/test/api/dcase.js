@@ -103,6 +103,23 @@ describe('api', function () {
                 });
             });
         });
+        describe('deleteDCase', function () {
+            it('should return result', function (done) {
+                dcase.deleteDCase({
+                    dcaseId: 36
+                }, {
+                    onSuccess: function (result) {
+                        console.log(result);
+                        done();
+                    },
+                    onFailure: function (error) {
+                        console.log('err');
+                        console.log(error);
+                        done();
+                    }
+                });
+            });
+        });
         describe('commit', function () {
             it('should return result', function (done) {
                 dcase.commit({

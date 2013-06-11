@@ -28,7 +28,7 @@ export class DCaseDAO extends model.Model {
 	}
 
 	list(callback: (list: DCase[])=>void): void {
-		this.con.query({sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = 1', nestTables:true}, [], (err, result) => {
+		this.con.query({sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = 1 AND d.delete_flag = FALSE', nestTables:true}, [], (err, result) => {
 			if (err) {
 				this.con.close();
 				throw err;
@@ -43,6 +43,16 @@ export class DCaseDAO extends model.Model {
 				list.push(d);
 			});
 			callback(list);
+		});
+	}
+
+	remove(dcaseId: number, callback: ()=>void) {
+		this.con.query('UPDATE dcase SET delete_flag=TRUE WHERE id = ?', [dcaseId], (err, result) => {
+			if (err) {
+				this.con.close();
+				throw err;
+			}
+			callback();
 		});
 	}
 }
