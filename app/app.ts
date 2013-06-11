@@ -4,6 +4,7 @@
 import http = module('http')
 import express = module('express')
 import api = module('./routes/api')
+import client = module('./routes/index')
 import path = module('path')
 
 var app = exports.app = <Express> express();
@@ -15,6 +16,7 @@ app.configure(function() {
 	app.set('view engine', 'jade');
 	app.use(express.favicon());
 	app.use(express.bodyParser());
+	app.use(express.cookieParser());
 	app.use(express.methodOverride());
 	app.use(app.router);
 	app.use(express.static(path.join(__dirname, 'public')));
@@ -32,8 +34,8 @@ app.configure('production', function() {
   app.use(express.errorHandler());
 });
 
-//app.get('/', routes.index);
 app.post('/api/1.0', api.httpHandler);
+app.get('/', client.index);
 
 if (!module.parent) {
 	http.createServer(app).listen(app.get('port'), function(){
