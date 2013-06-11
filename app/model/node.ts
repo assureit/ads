@@ -5,7 +5,7 @@ export interface NodeData {
 	Description: string;
 	NodeType: string;
 }
-export class Node extends model.Model {
+export class NodeDAO extends model.Model {
 	insert(commitId: number, data: NodeData, callback: (nodeId: number)=>void): void {
 		// TODO: node propertyをどうするべきか？TicketやMonitorに変更するべきか、meta.ticket1.id、meta.ticket1.nameなどとして並列にするか
 		this.con.query('INSERT INTO node(this_node_id, description, node_type, commit_id) VALUES(?,?,?,?)', 
