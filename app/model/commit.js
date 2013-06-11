@@ -56,7 +56,6 @@ var CommitDAO = (function (_super) {
                 _this.con.close();
                 throw err;
             }
-            console.log(result);
             callback();
         });
     };

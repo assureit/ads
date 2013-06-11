@@ -25,7 +25,6 @@ export class NodeDAO extends model.Model {
 			return;
 		}
 		this.insert(commitId, list[0], (nodeId: number) => {
-			console.log(nodeId);
 			this.insertList(commitId, list.slice(1), callback);
 		});
 	}

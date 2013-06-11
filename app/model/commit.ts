@@ -35,7 +35,6 @@ export class CommitDAO extends model.Model {
 				this.con.close();
 				throw err;
 			}
-			console.log(result);
 			callback();
 		});
 	}

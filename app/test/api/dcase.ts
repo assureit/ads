@@ -12,7 +12,7 @@ describe('api', function() {
 			it('should return result', function(done) {
 				dcase.getDCaseList(null, {
 					onSuccess: (result: any) => {
-						console.log(result);
+						// console.log(result);
 					}, 
 					onFailure: (error: error.RPCError) => {},
 				});
@@ -25,7 +25,7 @@ describe('api', function() {
 			it('should return result', function(done) {
 				dcase.getDCase({dcaseId: 50}, {
 					onSuccess: (result: any) => {
-						console.log(result);
+						// console.log(result);
 					}, 
 					onFailure: (error: error.RPCError) => {},
 				});
@@ -37,7 +37,7 @@ describe('api', function() {
 			it('should return result', function(done) {
 				dcase.getNodeTree({commitId: 42}, {
 					onSuccess: (result: any) => {
-						console.log(result);
+						// console.log(result);
 					}, 
 					onFailure: (error: error.RPCError) => {},
 				});
@@ -49,7 +49,7 @@ describe('api', function() {
 			it('should return result', function(done) {
 				dcase.getCommitList({dcaseId: 50}, {
 					onSuccess: (result: any) => {
-						console.log(result);
+						// console.log(result);
 					}, 
 					onFailure: (error: error.RPCError) => {},
 				});
@@ -90,7 +90,7 @@ describe('api', function() {
 					}, 
 					{
 						onSuccess: (result: any) => {
-							console.log(result);
+							// console.log(result);
 							done();
 						}, 
 						onFailure: (error: error.RPCError) => {
@@ -107,6 +107,25 @@ describe('api', function() {
 			it('should return result', function(done) {
 				dcase.deleteDCase(
 					{dcaseId: 36}, 
+					{
+						onSuccess: (result: any) => {
+							// console.log(result);
+							done();
+						}, 
+						onFailure: (error: error.RPCError) => {
+							console.log('err');
+							console.log(error);
+							done();
+						},
+					}
+				);
+			});
+		});
+
+		describe('editDCase', function() {
+			it('should return result', function(done) {
+				dcase.editDCase(
+					{dcaseId: 37, dcaseName: 'modified dcase name'}, 
 					{
 						onSuccess: (result: any) => {
 							console.log(result);
@@ -156,7 +175,7 @@ describe('api', function() {
 					}, 
 					{
 						onSuccess: (result: any) => {
-							console.log(result);
+							// console.log(result);
 							done();
 						}, 
 						onFailure: (error: error.RPCError) => {

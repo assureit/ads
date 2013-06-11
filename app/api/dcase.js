@@ -108,7 +108,6 @@ function commit(params, callback) {
     con.begin(function (err, result) {
         var commitDAO = new model_commit.CommitDAO(con);
         commitDAO.get(params.commitId, function (com) {
-            console.log(com);
             commitDAO.insert({
                 data: JSON.stringify(params.contents),
                 prevId: params.commitId,
@@ -147,6 +146,22 @@ function deleteDCase(params, callback) {
     });
 }
 exports.deleteDCase = deleteDCase;
+function editDCase(params, callback) {
+    var userId = constant.SYSTEM_USER_ID;
+    var con = new db.Database();
+    con.begin(function (err, result) {
+        var dcaseDAO = new model_dcase.DCaseDAO(con);
+        dcaseDAO.update(params.dcaseId, params.dcaseName, function () {
+            con.commit(function (err, result) {
+                callback.onSuccess({
+                    dcaseId: params.dcaseId
+                });
+                con.close();
+            });
+        });
+    });
+}
+exports.editDCase = editDCase;
 function getCommitList(params, callback) {
     var con = new db.Database();
     var commitDAO = new model_commit.CommitDAO(con);

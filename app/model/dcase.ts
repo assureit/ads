@@ -55,4 +55,14 @@ export class DCaseDAO extends model.Model {
 			callback();
 		});
 	}
+
+	update(dcaseId: number, name: string, callback: ()=>void) {
+		this.con.query('UPDATE dcase SET name=? WHERE id = ?', [name, dcaseId], (err, result) => {
+			if (err) {
+				this.con.close();
+				throw err;
+			}
+			callback();
+		});
+	}
 }
