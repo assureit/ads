@@ -1,7 +1,7 @@
 var db = require('../db/db')
 
 var constant = require('../constant')
-var dcase = require('../model/dcase')
+var model_dcase = require('../model/dcase')
 var model_commit = require('../model/commit')
 var node = require('../model/node')
 function getDCaseList(params, callback) {
@@ -70,8 +70,8 @@ function createDCase(params, callback) {
     var userId = constant.SYSTEM_USER_ID;
     var con = new db.Database();
     con.begin(function (err, result) {
-        var dc = new dcase.DCase(con);
-        dc.insert({
+        var dcaseDAO = new model_dcase.DCaseDAO(con);
+        dcaseDAO.insert({
             userId: userId,
             dcaseName: params.dcaseName
         }, function (dcaseId) {

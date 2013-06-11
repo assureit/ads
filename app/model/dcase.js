@@ -4,13 +4,13 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var model = require('./model')
-var DCase = (function (_super) {
-    __extends(DCase, _super);
-    function DCase() {
+var DCaseDAO = (function (_super) {
+    __extends(DCaseDAO, _super);
+    function DCaseDAO() {
         _super.apply(this, arguments);
 
     }
-    DCase.prototype.insert = function (params, callback) {
+    DCaseDAO.prototype.insert = function (params, callback) {
         var _this = this;
         this.con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [
             params.userId, 
@@ -24,6 +24,24 @@ var DCase = (function (_super) {
             callback(result.insertId);
         });
     };
-    return DCase;
+    DCaseDAO.prototype.list = function (callback) {
+        var _this = this;
+        this.con.query('SELECT * FROM dcase', function (err, result) {
+            if(err) {
+                _this.con.close();
+                throw err;
+            }
+            _this.con.close();
+            var list = [];
+            result.forEach(function (val) {
+                list.push({
+                    dcaseId: val.id,
+                    dcaseName: val.name
+                });
+            });
+            callback.onSuccess(list);
+        });
+    };
+    return DCaseDAO;
 })(model.Model);
-exports.DCase = DCase;
+exports.DCaseDAO = DCaseDAO;

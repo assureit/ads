@@ -1,7 +1,7 @@
 import db = module('../db/db')
 import type = module('./type')
 import constant = module('../constant')
-import dcase = module('../model/dcase')
+import model_dcase = module('../model/dcase')
 import model_commit = module('../model/commit')
 import node = module('../model/node')
 
@@ -65,8 +65,8 @@ export function createDCase(params:any, callback: type.Callback) {
 
 	var con = new db.Database();
 	con.begin((err, result) => {
-		var dc = new dcase.DCase(con);
-		dc.insert({userId: userId, dcaseName: params.dcaseName}, (dcaseId:number) => {
+		var dcaseDAO = new model_dcase.DCaseDAO(con);
+		dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName}, (dcaseId:number) => {
 			var commitDAO = new model_commit.CommitDAO(con);
 			commitDAO.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (commitId) => {
 				var nd = new node.Node(con);
