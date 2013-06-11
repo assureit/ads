@@ -473,7 +473,7 @@ var ASE = function(body) {
 
 		// show DCase
 		var r = DCaseAPI.getDCase(dcaseId);
-		var dcase = new DCase(r.tree, dcaseId, r.commitId);
+		var dcase = new DCase(JSON.parse(r.contents), dcaseId, r.commitId);
 		viewer.setDCase(dcase);
 		timeline.repaint(dcase);
 		dcase_latest = dcase;
