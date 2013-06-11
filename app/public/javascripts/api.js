@@ -41,7 +41,7 @@ DCaseAPI.call = function(method, params, callback, error_callback) {
 
 DCaseAPI.getDCaseList = function(callback, error) {
 	try{
-		return this.call("getDCaseList", {}, callback, error).dcaseList;
+		return this.call("getDCaseList", {}, callback, error);
 	}catch(e){
 		return [];
 	}
@@ -70,10 +70,10 @@ DCaseAPI.getDCase = function(dcaseId, callback, error) {
 	return this.call("getDCase", { dcaseId: dcaseId }, callback, error);
 };
 
-DCaseAPI.renameDCase = function(dcaseId, name, callback, error) {
-	return this.call("renameDCase", {
+DCaseAPI.editDCase = function(dcaseId, name, callback, error) {
+	return this.call("editDCase", {
 		dcaseId: dcaseId,
-		name: name
+		dcaseName: name
 	}, callback, error);
 };
 

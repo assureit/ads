@@ -76,7 +76,7 @@ var ASE = function(body) {
 			var id = dcase.dcaseId;
 			var name = dcase.dcaseName;
 			var user = dcase.userName;
-			var lastDate = new DateFormatter(dcase.latestCommit.time).format();
+			var lastDate = dcase.latestCommit.dateTime;//new DateFormatter(dcase.latestCommit.time).format();
 			var lastUser = dcase.latestCommit.userName;
 			var html = "<td><a href=\"./?dcaseId=" + id + "\">" + name + 
 					"</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" +
@@ -92,7 +92,7 @@ var ASE = function(body) {
 				$("a#e"+id).click(function(){
 					var msg = prompt("dcase名を入力して下さい");
 					if(msg != null) {
-						if(DCaseAPI.renameDCase(id, msg) != null) {
+						if(DCaseAPI.editDCase(id, msg) != null) {
 							alert("変更しました");
 							location.reload();
 						}
