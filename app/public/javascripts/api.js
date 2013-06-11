@@ -24,8 +24,9 @@ DCaseAPI.call = function(method, params, callback, error_callback) {
 		type: "POST",
 		url: this.uri,
 		async: async,
-		data: cmd,
+		data: JSON.stringify(cmd),
 		dataType: "json",
+		contentType: "application/json; charset=utf-8",
 		success: function(response) {
 			callback(response.result);
 		},
@@ -48,7 +49,7 @@ DCaseAPI.getDCaseList = function(callback, error) {
 
 DCaseAPI.createDCase = function(name, tree, userId, callback, error) {
 	return this.call("createDCase", {
-		dcaseName: name, tree: tree, userId: userId
+		dcaseName: name, contents: tree, userId: userId
 	}, callback, error);
 };
 
@@ -58,7 +59,7 @@ DCaseAPI.getCommitList = function(dcaseId, callback, error) {
 
 DCaseAPI.commit = function(tree, msg, commitId, userId, callback, error) {
 	return this.call("commit", {
-		tree: tree,
+		contents: tree,
 		commitMessage: msg,
 		commitId: commitId, 
 		userId: userId
@@ -81,7 +82,7 @@ DCaseAPI.deleteDCase = function(dcaseId, callback, error) {
 };
 
 DCaseAPI.getNodeTree = function(commitId, callback, error) {
-	return this.call("getNodeTree", { commitId: commitId }, callback, error).tree;
+	return JSON.parse(this.call("getNodeTree", { commitId: commitId }, callback, error).contents);
 };
 
 DCaseAPI.searchDCase = function(text, callback, error) {
