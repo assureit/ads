@@ -4,6 +4,7 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var model = require('./model')
+var model_user = require('./user')
 var Commit = (function () {
     function Commit(id, prevCommitId, dcaseId, userId, message, data, dateTime, latestFlag) {
         this.id = id;
@@ -71,6 +72,28 @@ var CommitDAO = (function (_super) {
             }
             result = result[0];
             callback(new Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
+        });
+    };
+    CommitDAO.prototype.list = function (dcaseId, callback) {
+        var _this = this;
+        this.con.query({
+            sql: 'SELECT * FROM commit c, user u WHERE c.user_id = u.id AND c.dcase_id = ? ORDER BY c.id',
+            nestTables: true
+        }, [
+            dcaseId
+        ], function (err, result) {
+            if(err) {
+                _this.con.rollback();
+                _this.con.close();
+                throw err;
+            }
+            var list = [];
+            result.forEach(function (row) {
+                var c = new Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
+                c.user = new model_user.User(row.u.name, row.u.delete_flag, row.u.system_flag);
+                list.push(c);
+            });
+            callback(list);
         });
     };
     return CommitDAO;
