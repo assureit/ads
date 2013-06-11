@@ -73,11 +73,11 @@ var TimeLine = function($root) {
 			.appendTo($container)
 
 		var info = list[commitId];
-		var timefmt = new DateFormatter(info.time).format();
+		//var timefmt = DateFormatter(info.time).format();
 
 		$d.popover({
 			placement: "bottom",
-			title: timefmt + " " + info.userName,
+			title: info.dateTime + " " + info.userName,
 			content: info.commitMessage,
 			trigger: "hover",
 		});

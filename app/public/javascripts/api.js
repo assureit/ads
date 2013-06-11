@@ -41,7 +41,7 @@ DCaseAPI.call = function(method, params, callback, error_callback) {
 
 DCaseAPI.getDCaseList = function(callback, error) {
 	try{
-		return this.call("getDCaseList", {}, callback, error).dcaseList;
+		return this.call("getDCaseList", {}, callback, error);
 	}catch(e){
 		return [];
 	}
