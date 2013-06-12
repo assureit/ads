@@ -196,6 +196,20 @@ function generateMetadata(n) {
 	return res;
 }
 
+var parseNodeBody = function(body) {
+	var metadata = {};
+	var description;
+	var metadataIndex = findVaridMetaData(body);
+	if (metadataIndex != -1) {
+		description = body.slice(0, metadataIndex).join("\n");
+		metadata = parseMetaData(body.slice(metadataIndex));
+	} else {
+		description = body.join("\n").trim();
+	}
+
+	return {"description": description, "metadata": metadata};
+}
+
 var DNodeView_InplaceEdit = function(self) {
 	var $edit = null;
 
@@ -224,22 +238,14 @@ var DNodeView_InplaceEdit = function(self) {
 
 			/* handle metadata */
 			var body = lines.slice(1).join("\n").trim().split("\n");
-			var metadata = {};
-			var description;
-			var metadataIndex = findVaridMetaData(body);
-			if (metadataIndex != -1) {
-				description = body.slice(0, metadataIndex).join("\n");
-				metadata = parseMetaData(body.slice(metadataIndex));
-			} else {
-				description = lines.slice(1).join("\n").trim();
-			}
+			var parsedBody = parseNodeBody(body);
 
 			var node = {
 				type: findMostSimilarNodeType(heads[0]),
 				name: heads[1],
 				id  : heads[2],
-				description: description,
-				metadata: metadata,
+				description: parsedBody.description,
+				metadata: parsedBody.metadata,
 				children: [],
 			};
 			nodes.push(node);
@@ -429,7 +435,8 @@ var DNodeView_ToolBox = function(self) {
 				self.viewer.$root.one("click", function() {
 					var text = $edit.find("textarea").attr("value");
 					if(text != "") {
-						self.viewer.getDCase().insertNode(self.node, type_selected, text);
+						var parsedBody = parseNodeBody(text.trim().split("\n"));
+						self.viewer.getDCase().insertNode(self.node, type_selected, parsedBody.description, parsedBody.metadata);
 					}
 					edit_close();
 				});
