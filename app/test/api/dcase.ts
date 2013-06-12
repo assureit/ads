@@ -229,8 +229,7 @@ describe('api', function() {
 					onSuccess: (result1st: any) => {
 						dcase.searchDCase({text: query, page:0}, {
 							onSuccess: (result: any) => {
-								console.log(result.searchResultList[0]);
-								expect(result.searchResultList[0]).not.to.eql(result1st.searchResultList[0]);
+								expect(result.searchResultList[0]).to.eql(result1st.searchResultList[0]);
 								done();
 							}, 
 							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},

@@ -40,8 +40,8 @@ export class NodeDAO extends model.Model {
 		// TODO: 全文検索エンジン対応
 		var pager = new model_pager.Pager(page);
 		query = '%' + query + '%';
-		this.con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT ?', nestTables:true}, 
-			[query, pager.limit], (err, result) => {
+		this.con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT ? OFFSET ? ', nestTables:true}, 
+			[query, pager.limit, pager.getOffset()], (err, result) => {
 			if (err) {
 				this.con.rollback();
 				this.con.close();

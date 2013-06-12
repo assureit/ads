@@ -282,8 +282,7 @@ describe('api', function () {
                             page: 0
                         }, {
                             onSuccess: function (result) {
-                                console.log(result.searchResultList[0]);
-                                expect(result.searchResultList[0]).not.to.eql(result1st.searchResultList[0]);
+                                expect(result.searchResultList[0]).to.eql(result1st.searchResultList[0]);
                                 done();
                             },
                             onFailure: function (error) {

@@ -54,11 +54,12 @@ var NodeDAO = (function (_super) {
         var pager = new model_pager.Pager(page);
         query = '%' + query + '%';
         this.con.query({
-            sql: 'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT ?',
+            sql: 'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT ? OFFSET ? ',
             nestTables: true
         }, [
             query, 
-            pager.limit
+            pager.limit, 
+            pager.getOffset()
         ], function (err, result) {
             if(err) {
                 _this.con.rollback();
