@@ -11,9 +11,9 @@ var expect = require('expect.js');	// TODO: import module化
 
 describe('api', function() {
 	describe('dcase', function() {
-		describe('getDCaseList', function() {
+		describe('searchDCase', function() {
 			it('should return result', function(done) {
-				dcase.getDCaseList(null, {
+				dcase.searchDCase(null, {
 					onSuccess: (result: any) => {
 						// console.log(result);
 						done();
@@ -23,7 +23,7 @@ describe('api', function() {
 			});
 
 			it('dcaseList should be limited length', function(done) {
-				dcase.getDCaseList({page: 1}, {
+				dcase.searchDCase({page: 1}, {
 					onSuccess: (result: any) => {
 						assert.equal(20, result.dcaseList.length);
 						done();
@@ -33,7 +33,7 @@ describe('api', function() {
 			});
 
 			it('provides paging feature', function(done) {
-				dcase.getDCaseList({page:1}, {
+				dcase.searchDCase({page:1}, {
 					onSuccess: (result: any) => {
 						expect(result.summary).not.to.be(undefined);
 						expect(result.summary.currentPage).not.to.be(undefined);
@@ -56,9 +56,9 @@ describe('api', function() {
 			});
 
 			it('can return next page result', function(done) {
-				dcase.getDCaseList({page:1}, {
+				dcase.searchDCase({page:1}, {
 					onSuccess: (result1st: any) => {
-						dcase.getDCaseList({page:2}, {
+						dcase.searchDCase({page:2}, {
 							onSuccess: (result: any) => {
 								assert.notEqual(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
 								done();
@@ -71,9 +71,9 @@ describe('api', function() {
 			});
 
 			it('allow page 0 as 1', function(done) {
-				dcase.getDCaseList({page:1}, {
+				dcase.searchDCase({page:1}, {
 					onSuccess: (result1st: any) => {
-						dcase.getDCaseList({page:0}, {
+						dcase.searchDCase({page:0}, {
 							onSuccess: (result: any) => {
 								assert.equal(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
 								done();
@@ -86,9 +86,9 @@ describe('api', function() {
 			});
 
 			it('allow minus page as 1', function(done) {
-				dcase.getDCaseList({page:1}, {
+				dcase.searchDCase({page:1}, {
 					onSuccess: (result1st: any) => {
-						dcase.getDCaseList({page:-1}, {
+						dcase.searchDCase({page:-1}, {
 							onSuccess: (result: any) => {
 								assert.equal(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
 								done();
@@ -101,14 +101,14 @@ describe('api', function() {
 			});
 
 			it('should start from offset 0', function(done) {
-				// 最初のクエリとgetDCaseListの実行間にcreateDCaseが走ってエラーになったことがあったかもしれない。
+				// 最初のクエリとsearchDCaseの実行間にcreateDCaseが走ってエラーになったことがあったかもしれない。
 				var con = new db.Database();
 				con.query('SELECT d.* FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT 1', (err, expectedResult) => {
 					if (err) {
 						con.close();
 						throw err;
 					}
-					dcase.getDCaseList({page:1}, {
+					dcase.searchDCase({page:1}, {
 						onSuccess: (result: any) => {
 							assert.equal(result.dcaseList[0].dcaseId, expectedResult[0].id);
 							done();
@@ -157,9 +157,9 @@ describe('api', function() {
 			});
 		});
 
-		describe('searchDCase', function() {
+		describe('searchNode', function() {
 			it('should return result', function(done) {
-				dcase.searchDCase({text: 'dcase1'}, {
+				dcase.searchNode({text: 'dcase1'}, {
 					onSuccess: (result: any) => {
 						expect(result.searchResultList).to.be.an('array');
 						expect(result.searchResultList[0].dcaseId).not.to.be(undefined);
@@ -173,7 +173,7 @@ describe('api', function() {
 				});
 			});
 			it('dcaseList should be limited length', function(done) {
-				dcase.searchDCase({text: 'dcase1', page:1}, {
+				dcase.searchNode({text: 'dcase1', page:1}, {
 					onSuccess: (result: any) => {
 						assert.equal(20, result.searchResultList.length);
 						done();
@@ -184,7 +184,7 @@ describe('api', function() {
 
 			it('provides paging feature', function(done) {
 				var query = 'dcase1';
-				dcase.searchDCase({text: query, page:1}, {
+				dcase.searchNode({text: query, page:1}, {
 					onSuccess: (result: any) => {
 						expect(result.summary).not.to.be(undefined);
 						expect(result.summary.currentPage).not.to.be(undefined);
@@ -209,9 +209,9 @@ describe('api', function() {
 
 			it('can return next page result', function(done) {
 				var query = 'dcase1';
-				dcase.searchDCase({text: query, page:1}, {
+				dcase.searchNode({text: query, page:1}, {
 					onSuccess: (result1st: any) => {
-						dcase.searchDCase({text: query, page:2}, {
+						dcase.searchNode({text: query, page:2}, {
 							onSuccess: (result: any) => {
 								expect(result.searchResultList[0]).not.to.eql(result1st.searchResultList[0]);
 								done();
@@ -225,9 +225,9 @@ describe('api', function() {
 
 			it('allow page 0 as 1', function(done) {
 				var query = 'dcase1';
-				dcase.searchDCase({text: query, page:1}, {
+				dcase.searchNode({text: query, page:1}, {
 					onSuccess: (result1st: any) => {
-						dcase.searchDCase({text: query, page:0}, {
+						dcase.searchNode({text: query, page:0}, {
 							onSuccess: (result: any) => {
 								expect(result.searchResultList[0]).to.eql(result1st.searchResultList[0]);
 								done();
@@ -241,9 +241,9 @@ describe('api', function() {
 
 			it('allow minus page as 1', function(done) {
 				var query = 'dcase1';
-				dcase.searchDCase({text: query, page:1}, {
+				dcase.searchNode({text: query, page:1}, {
 					onSuccess: (result1st: any) => {
-						dcase.searchDCase({text: query, page:-1}, {
+						dcase.searchNode({text: query, page:-1}, {
 							onSuccess: (result: any) => {
 								expect(result.searchResultList[0]).to.eql(result1st.searchResultList[0]);
 								done();
@@ -256,7 +256,7 @@ describe('api', function() {
 			});
 
 			it('should start from offset 0', function(done) {
-				// 最初のクエリとgetDCaseListの実行間にcreateDCaseが走ってエラーになったことがあったかもしれない。
+				// 最初のクエリとsearchDCaseの実行間にcreateDCaseが走ってエラーになったことがあったかもしれない。
 				var query = 'dcase1';
 				var con = new db.Database();
 				con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT 1', nestTables:true}, 
@@ -265,7 +265,7 @@ describe('api', function() {
 						con.close();
 						throw err;
 					}
-					dcase.searchDCase({text: query, page:1}, {
+					dcase.searchNode({text: query, page:1}, {
 						onSuccess: (result: any) => {
 							expect({
 								dcaseId: result.searchResultList[0].dcaseId,
