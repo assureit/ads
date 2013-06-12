@@ -12,6 +12,9 @@ var Pager = (function () {
         this.totalItems = this.totalItems || 0;
         return Math.ceil(this.totalItems / this.limit);
     };
+    Pager.prototype.getCurrentPage = function () {
+        return this.current + 1;
+    };
     Pager.prototype.getOffset = function () {
         return this.current * this.limit;
     };

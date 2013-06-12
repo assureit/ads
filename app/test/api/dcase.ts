@@ -46,12 +46,22 @@ describe('api', function() {
 			it('provides paging feature', function(done) {
 				dcase.getDCaseList({page:1}, {
 					onSuccess: (result: any) => {
+						console.log(result.summary);
 						expect(result.summary).not.to.be(undefined);
 						expect(result.summary.currentPage).not.to.be(undefined);
 						expect(result.summary.maxPage).not.to.be(undefined);
 						expect(result.summary.totalItems).not.to.be(undefined);
 						expect(result.summary.itemsPerPage).not.to.be(undefined);
-						done();
+
+						var con = new db.Database();
+						con.query('SELECT count(d.id) as cnt FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE', (err, expectResult) => {
+							if (err) {
+								con.close();
+								throw err;
+							}
+							expect(result.summary.totalItems).to.be(expectResult[0].cnt);
+							done();
+						});
 					}, 
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});

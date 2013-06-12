@@ -28,6 +28,12 @@ function getDCaseList(params, callback) {
             });
         });
         callback.onSuccess({
+            summary: {
+                currentPage: pager.getCurrentPage(),
+                maxPage: pager.getMaxPage(),
+                totalItems: pager.totalItems,
+                itemsPerPage: pager.limit
+            },
             dcaseList: list
         });
     });

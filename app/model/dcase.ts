@@ -32,9 +32,8 @@ export class DCaseDAO extends model.Model {
 	 * @param page 検索結果の取得対象ページ（1始まり）
 	 */
 	list(page: number, callback: (summary: model_pager.Pager, list: DCase[])=>void): void {
-		// TODO: LIMITの外部設定ファイル化
 		var pager = new model_pager.Pager(page);
-		this.con.query({sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = 1 AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT 20 OFFSET ? ' , nestTables:true}, 
+		this.con.query({sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT 20 OFFSET ? ' , nestTables:true}, 
 			[pager.getOffset()], (err, result) => {
 			if (err) {
 				this.con.close();
@@ -49,7 +48,16 @@ export class DCaseDAO extends model.Model {
 				d.latestCommit.user = new model_user.User(row.cu.id, row.cu.name, row.cu.delete_flag, row.cu.system_flag);
 				list.push(d);
 			});
-			callback(pager, list);
+
+			this.con.query('SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ',(err, countResult) => {
+				if (err) {
+					this.con.close();
+					throw err;
+				}
+				pager.totalItems = countResult[0].cnt;
+				callback(pager, list);
+			}); 
+
 		});
 	}
 
