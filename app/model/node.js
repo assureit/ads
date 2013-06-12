@@ -49,14 +49,15 @@ var NodeDAO = (function (_super) {
             _this.insertList(commitId, list.slice(1), callback);
         });
     };
-    NodeDAO.prototype.search = function (query, callback) {
+    NodeDAO.prototype.search = function (page, query, callback) {
         var _this = this;
-        var pager = new model_pager.Pager(0);
+        var pager = new model_pager.Pager(page);
+        query = '%' + query + '%';
         this.con.query({
             sql: 'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT ?',
             nestTables: true
         }, [
-            '%' + query + '%', 
+            query, 
             pager.limit
         ], function (err, result) {
             if(err) {
@@ -70,7 +71,16 @@ var NodeDAO = (function (_super) {
                 node.dcase = new model_dcase.DCase(row.d.id, row.d.name, row.d.user_id, row.d.delete_flag);
                 list.push(node);
             });
-            callback(list);
+            _this.con.query('SELECT count(d.id) as cnt from node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? ', [
+                query
+            ], function (err, countResult) {
+                if(err) {
+                    _this.con.close();
+                    throw err;
+                }
+                pager.totalItems = countResult[0].cnt;
+                callback(pager, list);
+            });
         });
     };
     return NodeDAO;

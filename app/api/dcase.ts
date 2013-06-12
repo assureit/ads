@@ -80,18 +80,26 @@ export function searchDCase(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var nodeDAO = new model_node.NodeDAO(con);
-		nodeDAO.search(params.text, (list: model_node.Node[]) => {
+		nodeDAO.search(params.page, params.text, (pager: model_pager.Pager, list: model_node.Node[]) => {
 			var searchResultList = [];
 			list.forEach((node) => {
 				searchResultList.push({
-					dcase_id: node.dcase.id, 
-					this_node_id: node.thisNodeId, 
+					dcaseId: node.dcase.id, 
+					nodeId: node.thisNodeId, 
 					dcaseName:node.dcase.name, 
 					description: node.description, 
 					nodeType: node.nodeType
 				});
 			});
-			callback.onSuccess({searchResultList: searchResultList});
+			callback.onSuccess({
+				summary: {
+					currentPage: pager.getCurrentPage(),
+					maxPage: pager.getMaxPage(),
+					totalItems:pager.totalItems,
+					itemsPerPage: pager.limit
+				},
+				searchResultList: searchResultList
+			});
 			con.close();
 		});
 	});

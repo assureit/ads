@@ -40,12 +40,12 @@ describe('api', function () {
                         expect(result.summary.totalItems).not.to.be(undefined);
                         expect(result.summary.itemsPerPage).not.to.be(undefined);
                         var con = new db.Database();
-                        con.query('SELECT count(d.id) as cnt FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE', function (err, expectResult) {
+                        con.query('SELECT count(d.id) as cnt FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE', function (err, expectedResult) {
                             if(err) {
                                 con.close();
                                 throw err;
                             }
-                            expect(result.summary.totalItems).to.be(expectResult[0].cnt);
+                            expect(result.summary.totalItems).to.be(expectedResult[0].cnt);
                             done();
                         });
                     },
@@ -122,7 +122,7 @@ describe('api', function () {
             });
             it('should start from offset 0', function (done) {
                 var con = new db.Database();
-                con.query('SELECT d.* FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT 1', function (err, expectResult) {
+                con.query('SELECT d.* FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT 1', function (err, expectedResult) {
                     if(err) {
                         con.close();
                         throw err;
@@ -131,7 +131,7 @@ describe('api', function () {
                         page: 1
                     }, {
                         onSuccess: function (result) {
-                            assert.equal(result.dcaseList[0].dcaseId, expectResult[0].id);
+                            assert.equal(result.dcaseList[0].dcaseId, expectedResult[0].id);
                             done();
                         },
                         onFailure: function (error) {
@@ -189,12 +189,18 @@ describe('api', function () {
                     text: 'dcase1'
                 }, {
                     onSuccess: function (result) {
+                        expect(result.searchResultList).to.be.an('array');
+                        expect(result.searchResultList[0].dcaseId).not.to.be(undefined);
+                        expect(result.searchResultList[0].nodeId).not.to.be(undefined);
+                        expect(result.searchResultList[0].dcaseName).not.to.be(undefined);
+                        expect(result.searchResultList[0].description).not.to.be(undefined);
+                        expect(result.searchResultList[0].nodeType).not.to.be(undefined);
+                        done();
                     },
                     onFailure: function (error) {
                         expect().fail(JSON.stringify(error));
                     }
                 });
-                done();
             });
             it('dcaseList should be limited length', function (done) {
                 dcase.searchDCase({
@@ -223,7 +229,7 @@ describe('api', function () {
                         expect(result.summary.totalItems).not.to.be(undefined);
                         expect(result.summary.itemsPerPage).not.to.be(undefined);
                         var con = new db.Database();
-                        con.query('SELECT count(n.id) FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ?', [
+                        con.query('SELECT count(n.id) as cnt FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ?', [
                             '%' + query + '%'
                         ], function (err, expectedResult) {
                             if(err) {
@@ -251,13 +257,7 @@ describe('api', function () {
                             page: 2
                         }, {
                             onSuccess: function (result) {
-                                expect({
-                                    dcaseId: result.searchResultList[0].dcaseId,
-                                    thisNodeId: result.searchResultList[0].this_node_id
-                                }).not.to.eql({
-                                    dcaseId: result1st.searchResultList[0].dcaseId,
-                                    this_node_id: result1st.searchResultList[0].this_node_id
-                                });
+                                expect(result.searchResultList[0]).not.to.eql(result1st.searchResultList[0]);
                                 done();
                             },
                             onFailure: function (error) {
@@ -282,13 +282,8 @@ describe('api', function () {
                             page: 0
                         }, {
                             onSuccess: function (result) {
-                                expect({
-                                    dcaseId: result.searchResultList[0].dcaseId,
-                                    thisNodeId: result.searchResultList[0].this_node_id
-                                }).to.eql({
-                                    dcaseId: result1st.searchResultList[0].dcaseId,
-                                    this_node_id: result1st.searchResultList[0].this_node_id
-                                });
+                                console.log(result.searchResultList[0]);
+                                expect(result.searchResultList[0]).not.to.eql(result1st.searchResultList[0]);
                                 done();
                             },
                             onFailure: function (error) {
@@ -313,13 +308,7 @@ describe('api', function () {
                             page: -1
                         }, {
                             onSuccess: function (result) {
-                                expect({
-                                    dcaseId: result.searchResultList[0].dcaseId,
-                                    thisNodeId: result.searchResultList[0].this_node_id
-                                }).to.eql({
-                                    dcaseId: result1st.searchResultList[0].dcaseId,
-                                    this_node_id: result1st.searchResultList[0].this_node_id
-                                });
+                                expect(result.searchResultList[0]).to.eql(result1st.searchResultList[0]);
                                 done();
                             },
                             onFailure: function (error) {
@@ -336,7 +325,7 @@ describe('api', function () {
                 var query = 'dcase1';
                 var con = new db.Database();
                 con.query({
-                    sql: 'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ?',
+                    sql: 'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT 1',
                     nestTables: true
                 }, [
                     '%' + query + '%'
@@ -352,10 +341,10 @@ describe('api', function () {
                         onSuccess: function (result) {
                             expect({
                                 dcaseId: result.searchResultList[0].dcaseId,
-                                thisNodeId: result.searchResultList[0].this_node_id
+                                nodeId: result.searchResultList[0].nodeId
                             }).to.eql({
-                                dcaseId: expectedResult.searchResultList[0].dcaseId,
-                                this_node_id: expectedResult.searchResultList[0].this_node_id
+                                dcaseId: expectedResult[0].d.id,
+                                nodeId: expectedResult[0].n.id
                             });
                             done();
                         },
