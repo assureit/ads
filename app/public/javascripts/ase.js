@@ -67,7 +67,7 @@ var ASE = function(body) {
 		}
 
 		var $tbody = $("#dcase-select-table");
-		var dcaseList = DCaseAPI.getDCaseList();
+		var dcaseList = DCaseAPI.getDCaseList().dcaseList;
 		if(dcaseList.length == 0) {
 			$("<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>")
 			.appendTo($tbody);
