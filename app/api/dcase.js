@@ -4,10 +4,13 @@ var constant = require('../constant')
 var model_dcase = require('../model/dcase')
 var model_commit = require('../model/commit')
 var model_node = require('../model/node')
+
 function getDCaseList(params, callback) {
     var con = new db.Database();
     var dcaseDAO = new model_dcase.DCaseDAO(con);
-    dcaseDAO.list(function (result) {
+    params = params || {
+    };
+    dcaseDAO.list(params.page, function (pager, result) {
         con.close();
         var list = [];
         result.forEach(function (val) {
@@ -25,6 +28,12 @@ function getDCaseList(params, callback) {
             });
         });
         callback.onSuccess({
+            summary: {
+                currentPage: pager.getCurrentPage(),
+                maxPage: pager.getMaxPage(),
+                totalItems: pager.totalItems,
+                itemsPerPage: pager.limit
+            },
             dcaseList: list
         });
     });
@@ -77,18 +86,24 @@ function searchDCase(params, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
         var nodeDAO = new model_node.NodeDAO(con);
-        nodeDAO.search(params.text, function (list) {
+        nodeDAO.search(params.page, params.text, function (pager, list) {
             var searchResultList = [];
             list.forEach(function (node) {
                 searchResultList.push({
-                    dcase_id: node.dcase.id,
-                    this_node_id: node.thisNodeId,
+                    dcaseId: node.dcase.id,
+                    nodeId: node.thisNodeId,
                     dcaseName: node.dcase.name,
                     description: node.description,
                     nodeType: node.nodeType
                 });
             });
             callback.onSuccess({
+                summary: {
+                    currentPage: pager.getCurrentPage(),
+                    maxPage: pager.getMaxPage(),
+                    totalItems: pager.totalItems,
+                    itemsPerPage: pager.limit
+                },
                 searchResultList: searchResultList
             });
             con.close();
