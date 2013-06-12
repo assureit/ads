@@ -57,18 +57,65 @@ describe('api', function() {
 				});
 			});
 
-			it('provides paging feature', function(done) {
+			it('can return next page result', function(done) {
 				dcase.getDCaseList({page:1}, {
 					onSuccess: (result1st: any) => {
 						dcase.getDCaseList({page:2}, {
 							onSuccess: (result: any) => {
-								assert.notEqual(result1st.summary.dcaseList[0].dcaseId, result.summary.dcaseList[0].dcaseId);
+								assert.notEqual(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
 								done();
 							}, 
 							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 						});
 					}, 
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+				});
+			});
+
+			it('allow page 0 as 1', function(done) {
+				dcase.getDCaseList({page:1}, {
+					onSuccess: (result1st: any) => {
+						dcase.getDCaseList({page:0}, {
+							onSuccess: (result: any) => {
+								assert.equal(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
+								done();
+							}, 
+							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+				});
+			});
+
+			it('allow minus page as 1', function(done) {
+				dcase.getDCaseList({page:1}, {
+					onSuccess: (result1st: any) => {
+						dcase.getDCaseList({page:-1}, {
+							onSuccess: (result: any) => {
+								assert.equal(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
+								done();
+							}, 
+							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+				});
+			});
+
+			it('should start from offset 0', function(done) {
+				var con = new db.Database();
+				con.query('SELECT d.* FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT 1', (err, expectResult) => {
+					if (err) {
+						con.close();
+						throw err;
+					}
+					dcase.getDCaseList({page:1}, {
+						onSuccess: (result: any) => {
+							assert.equal(result.dcaseList[0].dcaseId, expectResult[0].id);
+							done();
+						}, 
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					});
 				});
 			});
 

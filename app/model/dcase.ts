@@ -32,7 +32,10 @@ export class DCaseDAO extends model.Model {
 	 */
 	list(page: number, callback: (list: DCase[])=>void): void {
 		// TODO: LIMITの外部設定ファイル化
-		this.con.query({sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = 1 AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT 20', nestTables:true}, [], (err, result) => {
+		page = page || 1;
+		page = page -1;
+		if (page < 0) page = 0;
+		this.con.query({sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = 1 AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT 20 OFFSET ? ' , nestTables:true}, [page * 20], (err, result) => {
 			if (err) {
 				this.con.close();
 				throw err;
