@@ -435,7 +435,6 @@ var DNodeView_ToolBox = function(self) {
 				self.viewer.$root.one("click", function() {
 					var text = $edit.find("textarea").attr("value");
 					if(text != "") {
-					/* TODO Metadata */
 						var parsedBody = parseNodeBody(text.trim().split("\n"));
 						self.viewer.getDCase().insertNode(self.node, type_selected, parsedBody.description, parsedBody.metadata);
 					}
