@@ -615,7 +615,7 @@ DNodeView.prototype.nodeChanged = function() {
 
 	// node name and description
 	this.$divName.html(node.name);
-	this.$divText.html(node.getHtmlDescription());
+	this.$divText.html(node.getHtmlDescription() + node.getHtmlMetadata());
 	if(this.svg){
 		$(this.svg[0]).remove();
 	}

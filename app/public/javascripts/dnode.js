@@ -1,10 +1,11 @@
 //-----------------------------------------------------------------------------
 
-var DCaseNode = function(id, name, type, desc) {
+var DCaseNode = function(id, name, type, desc, metadata) {
 	this.id = id;
 	this.name = name;
 	this.type = type;
 	this.desc = desc;
+	this.metadata = metadata;
 	this.children = [];
 	this.contexts = [];
 	this.parents = [];
@@ -51,7 +52,7 @@ DCaseNode.prototype.traverse = function(f, parent, index) {
 };
 
 DCaseNode.prototype.deepCopy = function() {//FIXME id
-	var node = new DCaseNode(this.id, this.name, this.type, this.desc);
+	var node = new DCaseNode(this.id, this.name, this.type, this.desc, this.metadata);
 	this.eachNode(function(child) {
 		node.insertChild(child.deepCopy());
 	});
@@ -95,6 +96,12 @@ DCaseNode.prototype.getHtmlDescription = function() {
 	}
 };
 
+DCaseNode.prototype.getHtmlMetadata = function() {
+	return "<font color=\"red\">" + generateMetadata(this)
+		.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+		.replace(/\n/g, "<br>") + "</font>";
+}
+
 DCaseNode.prototype.appendableTypes = function() {
 	return DCaseNode.SELECTABLE_TYPES[this.type];
 };
@@ -113,6 +120,7 @@ DCaseNode.prototype.toJson = function() {
 		name: this.name,
 		type: this.type,
 		description: this.desc,
+		metadata: this.metadata,
 		children: children
 	};
 };
@@ -186,7 +194,8 @@ DCase.prototype.decode = function(tree) {
 		var data = nodes[id];
 		var type = data.NodeType;
 		var desc = data.Description;
-		var node = self.createNode(id, type, desc);
+		var metadata = data.Metadata ? data.Metadata : {};
+		var node = self.createNode(id, type, desc, metadata);
 		for(var i=0; i<data.Children.length; i++) {
 			node.insertChild(create(data.Children[i]));
 		}
@@ -209,6 +218,7 @@ DCase.prototype.encode = function() {
 			ThisNodeId: node.id,
 			NodeType: node.type,
 			Description: node.desc,
+			/* TODO add metadata */
 			Children: c,
 		});
 	});
@@ -240,27 +250,27 @@ DCase.prototype.getTopGoal = function() {
 
 //-----------------------------------------------------------------------------
 
-DCase.prototype.createNode = function(id, type, desc) {
+DCase.prototype.createNode = function(id, type, desc, metadata) {
 	var name = DCaseNode.NAME_PREFIX[type] + id;
-	return new DCaseNode(id, name, type, desc);
+	return new DCaseNode(id, name, type, desc, metadata);
 };
 
 DCase.prototype.copyNode = function(node) {
 	var self = this;
-	var newNode = self.createNode(++this.nodeCount, node.type, node.desc);
+	var newNode = self.createNode(++this.nodeCount, node.type, node.desc, node.metadata);
 	node.eachNode(function(child) {
 		newNode.insertChild(self.copyNode(child));
 	});
 	return newNode;
 };
 
-DCase.prototype.insertNode = function(parent, type, desc, index) {
+DCase.prototype.insertNode = function(parent, type, desc, metadata, index) {
 	var self = this;
 	if(index == null) {
 		index = parent.children.length;
 	}
 	var id = ++this.nodeCount;
-	var node = this.createNode(id, type, desc);
+	var node = this.createNode(id, type, desc, metadata);
 	this.applyOperation({
 		redo: function() {
 			parent.insertChild(node, index);
@@ -346,17 +356,19 @@ DCase.prototype.setType = function(node, type) {
 	});
 };
 
-DCase.prototype.setParam = function(node, type, name, desc) {
+DCase.prototype.setParam = function(node, type, name, desc, metadata) {
 	var self = this;
 	var oldType = node.type;
 	var oldName = node.name;
 	var oldDesc = node.desc;
+	var oldMetadata = node.metadata;
 	node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
 	this.applyOperation({
 		redo: function() {
 			node.type = type;
 			node.name = name;
 			node.desc = desc;
+			node.metadata = metadata;
 			node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
 			self.updateTypeFlag(node);
 			self.nodeChanged(node);
@@ -365,6 +377,7 @@ DCase.prototype.setParam = function(node, type, name, desc) {
 			node.type = oldType;
 			node.name = oldName;
 			node.desc = oldDesc;
+			node.metadata = oldMetadata;
 			node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
 			self.updateTypeFlag(node);
 			self.nodeChanged(node);
