@@ -7,7 +7,7 @@ import db = module('../../db/db');
 import dcase = module('../../api/dcase')
 import error = module('../../api/error')
 // import expect = module('expect.js')
-// var expect = require('expect.js');
+var expect = require('expect.js');	// TODO: import module化
 
 describe('api', function() {
 	describe('dcase', function() {

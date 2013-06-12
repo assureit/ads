@@ -2,6 +2,7 @@ var assert = require('assert')
 
 var dcase = require('../../api/dcase')
 
+var expect = require('expect.js');
 describe('api', function () {
     describe('dcase', function () {
         describe('getDCaseList', function () {
