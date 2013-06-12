@@ -97,9 +97,18 @@ DCaseNode.prototype.getHtmlDescription = function() {
 };
 
 DCaseNode.prototype.getHtmlMetadata = function() {
-	return "<font color=\"red\">" + generateMetadata(this)
+	var innerText = generateMetadata(this);
+	var divText = "<div></div>"
+	if (innerText != "") {
+		divText = "<div>Metadata</div>";
+	}
+	return $(divText)
+		.append($("<font color=\"black\">" + innerText
 		.replace(/</g, "&lt;").replace(/>/g, "&gt;")
-		.replace(/\n/g, "<br>") + "</font>";
+		.replace(/\n/g, "<br>") + "</font>"))
+		.addClass("node-text-metadata")
+		.css("background-color", "gray")
+		.css("opacity", "0.5");
 }
 
 DCaseNode.prototype.appendableTypes = function() {
@@ -218,7 +227,7 @@ DCase.prototype.encode = function() {
 			ThisNodeId: node.id,
 			NodeType: node.type,
 			Description: node.desc,
-			/* TODO add metadata */
+			Metadata: node.metadata,
 			Children: c,
 		});
 	});
