@@ -8,7 +8,8 @@ import model_node = module('../model/node')
 export function getDCaseList(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	var dcaseDAO = new model_dcase.DCaseDAO(con);
-	dcaseDAO.list((result: model_dcase.DCase[]) => {
+	params = params || {};
+	dcaseDAO.list(params.page, (result: model_dcase.DCase[]) => {
 		con.close();
 		var list = [];
 		result.forEach((val) => {

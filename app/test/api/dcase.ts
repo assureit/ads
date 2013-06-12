@@ -1,10 +1,13 @@
 ///<reference path='../../DefinitelyTyped/mocha/mocha.d.ts'/>
 ///<reference path='../../DefinitelyTyped/node/node.d.ts'/>
+///<reference path='../../DefinitelyTyped/expect.js/expect.js.d.ts'/>
 
 import assert = module('assert')
 import db = module('../../db/db');
 import dcase = module('../../api/dcase')
 import error = module('../../api/error')
+// import expect = module('expect.js')
+var expect = require('expect.js');
 
 describe('api', function() {
 	describe('dcase', function() {
@@ -13,11 +16,62 @@ describe('api', function() {
 				dcase.getDCaseList(null, {
 					onSuccess: (result: any) => {
 						// console.log(result);
+						done();
 					}, 
-					onFailure: (error: error.RPCError) => {},
+					onFailure: (error: error.RPCError) => {expect().fail(error);},
 				});
-				done();
 			});
+
+			it('allow page 0 as 1', function(done) {
+				dcase.getDCaseList({page: 0}, {
+					onSuccess: (result: any) => {
+						// console.log(result);
+						done();
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(error);},
+				});
+			});
+
+
+			it('dcaseList should be limited length', function(done) {
+				dcase.getDCaseList({page: 1}, {
+					onSuccess: (result: any) => {
+						assert.equal(20, result.dcaseList.length);
+						done();
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(error);},
+				});
+			});
+
+			it('provides paging feature', function(done) {
+				dcase.getDCaseList({page:1}, {
+					onSuccess: (result: any) => {
+						assert.notStrictEqual(result.summary, undefined);
+						assert.notStrictEqual(result.summary.currentPage, undefined);
+						assert.notStrictEqual(result.summary.maxPage, undefined);
+						assert.notStrictEqual(result.summary.totalItems, undefined);
+						assert.notStrictEqual(result.summary.itemsPerPage, undefined);
+						done();
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(error);},
+				});
+			});
+
+			it('provides paging feature', function(done) {
+				dcase.getDCaseList({page:1}, {
+					onSuccess: (result1st: any) => {
+						dcase.getDCaseList({page:2}, {
+							onSuccess: (result: any) => {
+								assert.notEqual(result1st.summary.dcaseList[0].dcaseId, result.summary.dcaseList[0].dcaseId);
+								done();
+							}, 
+							onFailure: (error: error.RPCError) => {expect().fail(error);},
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(error);},
+				});
+			});
+
 		});
 
 
