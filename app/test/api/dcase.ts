@@ -7,7 +7,7 @@ import db = module('../../db/db');
 import dcase = module('../../api/dcase')
 import error = module('../../api/error')
 // import expect = module('expect.js')
-var expect = require('expect.js');
+// var expect = require('expect.js');
 
 describe('api', function() {
 	describe('dcase', function() {
@@ -18,7 +18,7 @@ describe('api', function() {
 						// console.log(result);
 						done();
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(error);},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
 			});
 
@@ -28,7 +28,7 @@ describe('api', function() {
 						// console.log(result);
 						done();
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(error);},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
 			});
 
@@ -39,21 +39,21 @@ describe('api', function() {
 						assert.equal(20, result.dcaseList.length);
 						done();
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(error);},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
 			});
 
 			it('provides paging feature', function(done) {
 				dcase.getDCaseList({page:1}, {
 					onSuccess: (result: any) => {
-						assert.notStrictEqual(result.summary, undefined);
-						assert.notStrictEqual(result.summary.currentPage, undefined);
-						assert.notStrictEqual(result.summary.maxPage, undefined);
-						assert.notStrictEqual(result.summary.totalItems, undefined);
-						assert.notStrictEqual(result.summary.itemsPerPage, undefined);
+						expect(result.summary).not.to.be(undefined);
+						expect(result.summary.currentPage).not.to.be(undefined);
+						expect(result.summary.maxPage).not.to.be(undefined);
+						expect(result.summary.totalItems).not.to.be(undefined);
+						expect(result.summary.itemsPerPage).not.to.be(undefined);
 						done();
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(error);},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
 			});
 
@@ -65,10 +65,10 @@ describe('api', function() {
 								assert.notEqual(result1st.summary.dcaseList[0].dcaseId, result.summary.dcaseList[0].dcaseId);
 								done();
 							}, 
-							onFailure: (error: error.RPCError) => {expect().fail(error);},
+							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 						});
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(error);},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
 			});
 
@@ -81,7 +81,7 @@ describe('api', function() {
 					onSuccess: (result: any) => {
 						// console.log(result);
 					}, 
-					onFailure: (error: error.RPCError) => {},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
 				done();
 			});
@@ -93,7 +93,7 @@ describe('api', function() {
 					onSuccess: (result: any) => {
 						// console.log(result);
 					}, 
-					onFailure: (error: error.RPCError) => {},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
 				done();
 			});
@@ -105,7 +105,7 @@ describe('api', function() {
 					onSuccess: (result: any) => {
 						// console.log(result);
 					}, 
-					onFailure: (error: error.RPCError) => {},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
 				done();
 			});
@@ -117,7 +117,7 @@ describe('api', function() {
 					onSuccess: (result: any) => {
 						// console.log(result);
 					}, 
-					onFailure: (error: error.RPCError) => {},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
 				done();
 			});
@@ -159,11 +159,7 @@ describe('api', function() {
 							// console.log(result);
 							done();
 						}, 
-						onFailure: (error: error.RPCError) => {
-							console.log('err');
-							console.log(error);
-							done();
-						},
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 					}
 				);
 			});
@@ -178,11 +174,7 @@ describe('api', function() {
 							// console.log(result);
 							done();
 						}, 
-						onFailure: (error: error.RPCError) => {
-							console.log('err');
-							console.log(error);
-							done();
-						},
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 					}
 				);
 			});
@@ -197,11 +189,7 @@ describe('api', function() {
 							// console.log(result);
 							done();
 						}, 
-						onFailure: (error: error.RPCError) => {
-							console.log('err');
-							console.log(error);
-							done();
-						},
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 					}
 				);
 			});
@@ -244,11 +232,7 @@ describe('api', function() {
 							// console.log(result);
 							done();
 						}, 
-						onFailure: (error: error.RPCError) => {
-							console.log('err');
-							console.log(error);
-							done();
-						},
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 					}
 				);
 			});

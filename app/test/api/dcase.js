@@ -2,7 +2,6 @@ var assert = require('assert')
 
 var dcase = require('../../api/dcase')
 
-var expect = require('expect.js');
 describe('api', function () {
     describe('dcase', function () {
         describe('getDCaseList', function () {
@@ -12,7 +11,7 @@ describe('api', function () {
                         done();
                     },
                     onFailure: function (error) {
-                        expect().fail(error);
+                        expect().fail(JSON.stringify(error));
                     }
                 });
             });
@@ -24,7 +23,7 @@ describe('api', function () {
                         done();
                     },
                     onFailure: function (error) {
-                        expect().fail(error);
+                        expect().fail(JSON.stringify(error));
                     }
                 });
             });
@@ -37,7 +36,7 @@ describe('api', function () {
                         done();
                     },
                     onFailure: function (error) {
-                        expect().fail(error);
+                        expect().fail(JSON.stringify(error));
                     }
                 });
             });
@@ -46,15 +45,15 @@ describe('api', function () {
                     page: 1
                 }, {
                     onSuccess: function (result) {
-                        assert.notStrictEqual(result.summary, undefined);
-                        assert.notStrictEqual(result.summary.currentPage, undefined);
-                        assert.notStrictEqual(result.summary.maxPage, undefined);
-                        assert.notStrictEqual(result.summary.totalItems, undefined);
-                        assert.notStrictEqual(result.summary.itemsPerPage, undefined);
+                        expect(result.summary).not.to.be(undefined);
+                        expect(result.summary.currentPage).not.to.be(undefined);
+                        expect(result.summary.maxPage).not.to.be(undefined);
+                        expect(result.summary.totalItems).not.to.be(undefined);
+                        expect(result.summary.itemsPerPage).not.to.be(undefined);
                         done();
                     },
                     onFailure: function (error) {
-                        expect().fail(error);
+                        expect().fail(JSON.stringify(error));
                     }
                 });
             });
@@ -71,12 +70,12 @@ describe('api', function () {
                                 done();
                             },
                             onFailure: function (error) {
-                                expect().fail(error);
+                                expect().fail(JSON.stringify(error));
                             }
                         });
                     },
                     onFailure: function (error) {
-                        expect().fail(error);
+                        expect().fail(JSON.stringify(error));
                     }
                 });
             });
@@ -89,6 +88,7 @@ describe('api', function () {
                     onSuccess: function (result) {
                     },
                     onFailure: function (error) {
+                        expect().fail(JSON.stringify(error));
                     }
                 });
                 done();
@@ -102,6 +102,7 @@ describe('api', function () {
                     onSuccess: function (result) {
                     },
                     onFailure: function (error) {
+                        expect().fail(JSON.stringify(error));
                     }
                 });
                 done();
@@ -115,6 +116,7 @@ describe('api', function () {
                     onSuccess: function (result) {
                     },
                     onFailure: function (error) {
+                        expect().fail(JSON.stringify(error));
                     }
                 });
                 done();
@@ -128,6 +130,7 @@ describe('api', function () {
                     onSuccess: function (result) {
                     },
                     onFailure: function (error) {
+                        expect().fail(JSON.stringify(error));
                     }
                 });
                 done();
@@ -170,9 +173,7 @@ describe('api', function () {
                         done();
                     },
                     onFailure: function (error) {
-                        console.log('err');
-                        console.log(error);
-                        done();
+                        expect().fail(JSON.stringify(error));
                     }
                 });
             });
@@ -186,9 +187,7 @@ describe('api', function () {
                         done();
                     },
                     onFailure: function (error) {
-                        console.log('err');
-                        console.log(error);
-                        done();
+                        expect().fail(JSON.stringify(error));
                     }
                 });
             });
@@ -203,9 +202,7 @@ describe('api', function () {
                         done();
                     },
                     onFailure: function (error) {
-                        console.log('err');
-                        console.log(error);
-                        done();
+                        expect().fail(JSON.stringify(error));
                     }
                 });
             });
@@ -248,9 +245,7 @@ describe('api', function () {
                         done();
                     },
                     onFailure: function (error) {
-                        console.log('err');
-                        console.log(error);
-                        done();
+                        expect().fail(JSON.stringify(error));
                     }
                 });
             });
