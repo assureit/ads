@@ -5,9 +5,9 @@ var dcase = require('../../api/dcase')
 var expect = require('expect.js');
 describe('api', function () {
     describe('dcase', function () {
-        describe('getDCaseList', function () {
+        describe('searchDCase', function () {
             it('should return result', function (done) {
-                dcase.getDCaseList(null, {
+                dcase.searchDCase(null, {
                     onSuccess: function (result) {
                         done();
                     },
@@ -17,7 +17,7 @@ describe('api', function () {
                 });
             });
             it('dcaseList should be limited length', function (done) {
-                dcase.getDCaseList({
+                dcase.searchDCase({
                     page: 1
                 }, {
                     onSuccess: function (result) {
@@ -30,7 +30,7 @@ describe('api', function () {
                 });
             });
             it('provides paging feature', function (done) {
-                dcase.getDCaseList({
+                dcase.searchDCase({
                     page: 1
                 }, {
                     onSuccess: function (result) {
@@ -55,11 +55,11 @@ describe('api', function () {
                 });
             });
             it('can return next page result', function (done) {
-                dcase.getDCaseList({
+                dcase.searchDCase({
                     page: 1
                 }, {
                     onSuccess: function (result1st) {
-                        dcase.getDCaseList({
+                        dcase.searchDCase({
                             page: 2
                         }, {
                             onSuccess: function (result) {
@@ -77,11 +77,11 @@ describe('api', function () {
                 });
             });
             it('allow page 0 as 1', function (done) {
-                dcase.getDCaseList({
+                dcase.searchDCase({
                     page: 1
                 }, {
                     onSuccess: function (result1st) {
-                        dcase.getDCaseList({
+                        dcase.searchDCase({
                             page: 0
                         }, {
                             onSuccess: function (result) {
@@ -99,11 +99,11 @@ describe('api', function () {
                 });
             });
             it('allow minus page as 1', function (done) {
-                dcase.getDCaseList({
+                dcase.searchDCase({
                     page: 1
                 }, {
                     onSuccess: function (result1st) {
-                        dcase.getDCaseList({
+                        dcase.searchDCase({
                             page: -1
                         }, {
                             onSuccess: function (result) {
@@ -127,7 +127,7 @@ describe('api', function () {
                         con.close();
                         throw err;
                     }
-                    dcase.getDCaseList({
+                    dcase.searchDCase({
                         page: 1
                     }, {
                         onSuccess: function (result) {

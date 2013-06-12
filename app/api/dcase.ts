@@ -6,7 +6,7 @@ import model_commit = module('../model/commit')
 import model_node = module('../model/node')
 import model_pager = module('../model/pager')
 
-export function getDCaseList(params:any, callback: type.Callback) {
+export function searchDCase(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	var dcaseDAO = new model_dcase.DCaseDAO(con);
 	params = params || {};

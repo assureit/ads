@@ -5,7 +5,7 @@ var model_dcase = require('../model/dcase')
 var model_commit = require('../model/commit')
 var model_node = require('../model/node')
 
-function getDCaseList(params, callback) {
+function searchDCase(params, callback) {
     var con = new db.Database();
     var dcaseDAO = new model_dcase.DCaseDAO(con);
     params = params || {
@@ -38,7 +38,7 @@ function getDCaseList(params, callback) {
         });
     });
 }
-exports.getDCaseList = getDCaseList;
+exports.searchDCase = searchDCase;
 function getDCase(params, callback) {
     var con = new db.Database();
     con.query({
