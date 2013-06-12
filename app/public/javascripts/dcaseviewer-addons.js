@@ -161,7 +161,6 @@ var findVaridMetaData = function(body) {
 
 
 var parseMetaData = function(data) {
-	console.log(data);
 	var metadata = {};
 	var i = 0;
 	for (; i < data.length; i++) {
@@ -177,20 +176,6 @@ var parseMetaData = function(data) {
 		metadata["Description"] = "";
 	}
 	return metadata;
-}
-
-var test_case = [
-                 ["", "", "hi"],
-				 ["", "", "hi: bye"],
-                 ["hi", "bye", "", "hi: bye"],
-                 ["hi", "", "", "key: value"],
-                 [""]];
-for (var __i = 0; __i < test_case.length; __i++) {
-	test_case[__i] = test_case[__i].join("\n").trim().split("\n");
-	var ___i = findVaridMetaData(test_case[__i]);
-	if (___i != -1) {
-		console.log(parseMetaData(test_case[__i].slice(___i)));
-	}
 }
 
 function generateMetadata(n) {
