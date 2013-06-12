@@ -183,9 +183,9 @@ describe('api', function () {
                 done();
             });
         });
-        describe('searchDCase', function () {
+        describe('searchNode', function () {
             it('should return result', function (done) {
-                dcase.searchDCase({
+                dcase.searchNode({
                     text: 'dcase1'
                 }, {
                     onSuccess: function (result) {
@@ -203,7 +203,7 @@ describe('api', function () {
                 });
             });
             it('dcaseList should be limited length', function (done) {
-                dcase.searchDCase({
+                dcase.searchNode({
                     text: 'dcase1',
                     page: 1
                 }, {
@@ -218,7 +218,7 @@ describe('api', function () {
             });
             it('provides paging feature', function (done) {
                 var query = 'dcase1';
-                dcase.searchDCase({
+                dcase.searchNode({
                     text: query,
                     page: 1
                 }, {
@@ -247,12 +247,12 @@ describe('api', function () {
             });
             it('can return next page result', function (done) {
                 var query = 'dcase1';
-                dcase.searchDCase({
+                dcase.searchNode({
                     text: query,
                     page: 1
                 }, {
                     onSuccess: function (result1st) {
-                        dcase.searchDCase({
+                        dcase.searchNode({
                             text: query,
                             page: 2
                         }, {
@@ -272,12 +272,12 @@ describe('api', function () {
             });
             it('allow page 0 as 1', function (done) {
                 var query = 'dcase1';
-                dcase.searchDCase({
+                dcase.searchNode({
                     text: query,
                     page: 1
                 }, {
                     onSuccess: function (result1st) {
-                        dcase.searchDCase({
+                        dcase.searchNode({
                             text: query,
                             page: 0
                         }, {
@@ -297,12 +297,12 @@ describe('api', function () {
             });
             it('allow minus page as 1', function (done) {
                 var query = 'dcase1';
-                dcase.searchDCase({
+                dcase.searchNode({
                     text: query,
                     page: 1
                 }, {
                     onSuccess: function (result1st) {
-                        dcase.searchDCase({
+                        dcase.searchNode({
                             text: query,
                             page: -1
                         }, {
@@ -333,7 +333,7 @@ describe('api', function () {
                         con.close();
                         throw err;
                     }
-                    dcase.searchDCase({
+                    dcase.searchNode({
                         text: query,
                         page: 1
                     }, {

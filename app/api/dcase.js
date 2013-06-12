@@ -82,7 +82,7 @@ function getNodeTree(params, callback) {
     });
 }
 exports.getNodeTree = getNodeTree;
-function searchDCase(params, callback) {
+function searchNode(params, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
         var nodeDAO = new model_node.NodeDAO(con);
@@ -110,7 +110,7 @@ function searchDCase(params, callback) {
         });
     });
 }
-exports.searchDCase = searchDCase;
+exports.searchNode = searchNode;
 function createDCase(params, callback) {
     var userId = constant.SYSTEM_USER_ID;
     var con = new db.Database();

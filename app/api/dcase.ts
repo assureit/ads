@@ -76,7 +76,7 @@ export function getNodeTree(params:any, callback: type.Callback) {
 	});
 }
 
-export function searchDCase(params:any, callback: type.Callback) {
+export function searchNode(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var nodeDAO = new model_node.NodeDAO(con);
