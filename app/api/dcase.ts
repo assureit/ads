@@ -4,12 +4,13 @@ import constant = module('../constant')
 import model_dcase = module('../model/dcase')
 import model_commit = module('../model/commit')
 import model_node = module('../model/node')
+import model_pager = module('../model/pager')
 
 export function getDCaseList(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	var dcaseDAO = new model_dcase.DCaseDAO(con);
 	params = params || {};
-	dcaseDAO.list(params.page, (result: model_dcase.DCase[]) => {
+	dcaseDAO.list(params.page, (pager: model_pager.Pager, result: model_dcase.DCase[]) => {
 		con.close();
 		var list = [];
 		result.forEach((val) => {

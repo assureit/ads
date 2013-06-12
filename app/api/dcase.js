@@ -4,12 +4,13 @@ var constant = require('../constant')
 var model_dcase = require('../model/dcase')
 var model_commit = require('../model/commit')
 var model_node = require('../model/node')
+
 function getDCaseList(params, callback) {
     var con = new db.Database();
     var dcaseDAO = new model_dcase.DCaseDAO(con);
     params = params || {
     };
-    dcaseDAO.list(params.page, function (result) {
+    dcaseDAO.list(params.page, function (pager, result) {
         con.close();
         var list = [];
         result.forEach(function (val) {

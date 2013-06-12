@@ -6,6 +6,7 @@ var __extends = this.__extends || function (d, b) {
 var model = require('./model')
 var model_commit = require('./commit')
 var model_user = require('./user')
+var model_pager = require('./pager')
 var DCase = (function () {
     function DCase(id, name, userId, deleteFlag) {
         this.id = id;
@@ -41,16 +42,12 @@ var DCaseDAO = (function (_super) {
     };
     DCaseDAO.prototype.list = function (page, callback) {
         var _this = this;
-        page = page || 1;
-        page = page - 1;
-        if(page < 0) {
-            page = 0;
-        }
+        var pager = new model_pager.Pager(page);
         this.con.query({
             sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = 1 AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT 20 OFFSET ? ',
             nestTables: true
         }, [
-            page * 20
+            pager.getOffset()
         ], function (err, result) {
             if(err) {
                 _this.con.close();
@@ -64,7 +61,7 @@ var DCaseDAO = (function (_super) {
                 d.latestCommit.user = new model_user.User(row.cu.id, row.cu.name, row.cu.delete_flag, row.cu.system_flag);
                 list.push(d);
             });
-            callback(list);
+            callback(pager, list);
         });
     };
     DCaseDAO.prototype.remove = function (dcaseId, callback) {
