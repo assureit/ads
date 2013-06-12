@@ -12,6 +12,20 @@ var ASE = function(body) {
 	var dcaseId = parseInt(getURLParameter("dcaseId"));
 	if(isNaN(dcaseId)) dcaseId = 0;
 
+	if ("onhashchange" in window) { //FIXME
+		window.onhashchange = function () {
+			var hash = window.location.hash.slice(1);
+			if(hash == "new") {
+				$("#newDCase").show();
+				$("#selectDCase").hide();
+			} else if(hash == "") {
+				$("#newDCase").hide();
+				$("#selectDCase").show();
+			}
+		};
+		window.onhashchange();
+	}
+
 	var matchResult = document.cookie.match(/userId=(\w+);?/);
 	var userId = matchResult ? parseInt(matchResult[1]) : null;
 
