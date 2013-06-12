@@ -12,7 +12,9 @@ block bar
                 .nav-collapse.collapse
                     ul.nav
                         li
-                            a( href="./")= lang.home
+                            a( href="./#")= lang.home
+                        li
+                            a( href="./#new") new...
                         li.dropdown.ase-edit-menu
                             a.dropdown-toggle(data-toggle="dropdown", href="#")= lang.edit
                                 b.caret
@@ -43,23 +45,23 @@ block bar
                                     b.caret
                                 ul.dropdown-menu
                                     li.dropdown-submenu
-                                        a(href="#")= lang.Theme
+                                        a(href="#")= lang.color_theme
                                         ul#menu-change-theme.dropdown-menu
                                     li.dropdown-submenu
-                                        a(href="#")= lang.Language
+                                        a(href="#")= lang.locale
                                         ul#lang-theme.dropdown-menu
                                             li
-                                                a#lang-select-english(href="#")= lang.English
+                                                a#lang-select-english(href="#") English
                                             li
-                                                a#lang-select-japanese(href="#")= lang.Japanese
+                                                a#lang-select-japanese(href="#") 日本語
                 block sign
 block content
     #ase.container
         img#ase-logo(src="images/assuranceDS.png")
         #viewer(style="display: none;")
         #dcase-manager.container-fluid(style="display: none;")
-            .row-fluid
-                .span6
+            .row
+                #newDCase.span6.offset3(style='display: none;')
                     h2= lang.new_DCase
                     form.form-horizontal
                         .control-group#newdcase-name
@@ -73,7 +75,7 @@ block content
                         .control-group
                             .controls
                                 button.btn#dcase-create(type="button")= lang.create
-                .span6
+                #selectDCase.span6.offset3
                     h2 DCaseを選択
                     table.table.table-striped.table-hover
                         thead
