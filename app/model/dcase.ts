@@ -33,8 +33,8 @@ export class DCaseDAO extends model.Model {
 	 */
 	list(page: number, callback: (summary: model_pager.Pager, list: DCase[])=>void): void {
 		var pager = new model_pager.Pager(page);
-		this.con.query({sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT 20 OFFSET ? ' , nestTables:true}, 
-			[pager.getOffset()], (err, result) => {
+		this.con.query({sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT ? OFFSET ? ' , nestTables:true}, 
+			[pager.limit, pager.getOffset()], (err, result) => {
 			if (err) {
 				this.con.close();
 				throw err;

@@ -202,7 +202,7 @@ describe('api', function () {
                     page: 1
                 }, {
                     onSuccess: function (result) {
-                        assert.equal(20, result.dcaseList.length);
+                        assert.equal(20, result.searchResultList.length);
                         done();
                     },
                     onFailure: function (error) {

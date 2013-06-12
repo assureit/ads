@@ -1,5 +1,6 @@
 import model = module('./model')
 import model_dcase = module('./dcase')
+import model_pager = module('./pager')
 
 export interface NodeData {
 	ThisNodeId: number;
@@ -37,8 +38,9 @@ export class NodeDAO extends model.Model {
 
 	search(query: string, callback: (list: Node[]) => void) {
 		// TODO: 全文検索エンジン対応
-		this.con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ?', nestTables:true}, 
-			['%' + query + '%'], (err, result) => {
+		var pager = new model_pager.Pager(0);
+		this.con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT ?', nestTables:true}, 
+			['%' + query + '%', pager.limit], (err, result) => {
 			if (err) {
 				this.con.rollback();
 				this.con.close();

@@ -5,6 +5,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var model = require('./model')
 var model_dcase = require('./dcase')
+var model_pager = require('./pager')
 var Node = (function () {
     function Node(id, commitId, thisNodeId, nodeType, description) {
         this.id = id;
@@ -50,11 +51,13 @@ var NodeDAO = (function (_super) {
     };
     NodeDAO.prototype.search = function (query, callback) {
         var _this = this;
+        var pager = new model_pager.Pager(0);
         this.con.query({
-            sql: 'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ?',
+            sql: 'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT ?',
             nestTables: true
         }, [
-            '%' + query + '%'
+            '%' + query + '%', 
+            pager.limit
         ], function (err, result) {
             if(err) {
                 _this.con.rollback();

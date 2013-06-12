@@ -170,7 +170,7 @@ describe('api', function() {
 			it('dcaseList should be limited length', function(done) {
 				dcase.searchDCase({text: 'dcase1', page:1}, {
 					onSuccess: (result: any) => {
-						assert.equal(20, result.dcaseList.length);
+						assert.equal(20, result.searchResultList.length);
 						done();
 					}, 
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
