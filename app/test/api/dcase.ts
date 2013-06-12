@@ -22,17 +22,6 @@ describe('api', function() {
 				});
 			});
 
-			it('allow page 0 as 1', function(done) {
-				dcase.getDCaseList({page: 0}, {
-					onSuccess: (result: any) => {
-						// console.log(result);
-						done();
-					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
-				});
-			});
-
-
 			it('dcaseList should be limited length', function(done) {
 				dcase.getDCaseList({page: 1}, {
 					onSuccess: (result: any) => {
@@ -46,7 +35,6 @@ describe('api', function() {
 			it('provides paging feature', function(done) {
 				dcase.getDCaseList({page:1}, {
 					onSuccess: (result: any) => {
-						console.log(result.summary);
 						expect(result.summary).not.to.be(undefined);
 						expect(result.summary.currentPage).not.to.be(undefined);
 						expect(result.summary.maxPage).not.to.be(undefined);
@@ -178,6 +166,132 @@ describe('api', function() {
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
 				done();
+			});
+			it('dcaseList should be limited length', function(done) {
+				dcase.searchDCase({text: 'dcase1', page:1}, {
+					onSuccess: (result: any) => {
+						assert.equal(20, result.dcaseList.length);
+						done();
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+				});
+			});
+
+			it('provides paging feature', function(done) {
+				var query = 'dcase1';
+				dcase.searchDCase({text: query, page:1}, {
+					onSuccess: (result: any) => {
+						expect(result.summary).not.to.be(undefined);
+						expect(result.summary.currentPage).not.to.be(undefined);
+						expect(result.summary.maxPage).not.to.be(undefined);
+						expect(result.summary.totalItems).not.to.be(undefined);
+						expect(result.summary.itemsPerPage).not.to.be(undefined);
+
+						var con = new db.Database();
+						con.query('SELECT count(n.id) FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ?', 
+							['%' + query + '%'], (err, expectedResult) => {
+							if (err) {
+								con.close();
+								throw err;
+							}
+							expect(result.summary.totalItems).to.be(expectedResult[0].cnt);
+							done();
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+				});
+			});
+
+			it('can return next page result', function(done) {
+				var query = 'dcase1';
+				dcase.searchDCase({text: query, page:1}, {
+					onSuccess: (result1st: any) => {
+						dcase.searchDCase({text: query, page:2}, {
+							onSuccess: (result: any) => {
+								expect({
+									dcaseId: result.searchResultList[0].dcaseId, 
+									thisNodeId: result.searchResultList[0].this_node_id
+								}).not.to.eql({
+									dcaseId: result1st.searchResultList[0].dcaseId, 
+									this_node_id: result1st.searchResultList[0].this_node_id
+								});
+								done();
+							}, 
+							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+				});
+			});
+
+			it('allow page 0 as 1', function(done) {
+				var query = 'dcase1';
+				dcase.searchDCase({text: query, page:1}, {
+					onSuccess: (result1st: any) => {
+						dcase.searchDCase({text: query, page:0}, {
+							onSuccess: (result: any) => {
+								expect({
+									dcaseId: result.searchResultList[0].dcaseId, 
+									thisNodeId: result.searchResultList[0].this_node_id
+								}).to.eql({
+									dcaseId: result1st.searchResultList[0].dcaseId, 
+									this_node_id: result1st.searchResultList[0].this_node_id
+								});
+								done();
+							}, 
+							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+				});
+			});
+
+			it('allow minus page as 1', function(done) {
+				var query = 'dcase1';
+				dcase.searchDCase({text: query, page:1}, {
+					onSuccess: (result1st: any) => {
+						dcase.searchDCase({text: query, page:-1}, {
+							onSuccess: (result: any) => {
+								expect({
+									dcaseId: result.searchResultList[0].dcaseId, 
+									thisNodeId: result.searchResultList[0].this_node_id
+								}).to.eql({
+									dcaseId: result1st.searchResultList[0].dcaseId, 
+									this_node_id: result1st.searchResultList[0].this_node_id
+								});
+								done();
+							}, 
+							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+				});
+			});
+
+			it('should start from offset 0', function(done) {
+				// 最初のクエリとgetDCaseListの実行間にcreateDCaseが走ってエラーになったことがあったかもしれない。
+				var query = 'dcase1';
+				var con = new db.Database();
+				con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ?', nestTables:true}, 
+					['%' + query + '%'], (err, expectedResult) => {
+					if (err) {
+						con.close();
+						throw err;
+					}
+					dcase.searchDCase({text: query, page:1}, {
+						onSuccess: (result: any) => {
+							expect({
+								dcaseId: result.searchResultList[0].dcaseId, 
+								thisNodeId: result.searchResultList[0].this_node_id
+							}).to.eql({
+								dcaseId: expectedResult.searchResultList[0].dcaseId, 
+								this_node_id: expectedResult.searchResultList[0].this_node_id
+							});
+							done();
+						}, 
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					});
+				});
 			});
 		});
 
