@@ -1,5 +1,6 @@
 import model = module('./model')
 import model_dcase = module('./dcase')
+import model_pager = module('./pager')
 
 export interface NodeData {
 	ThisNodeId: number;
@@ -35,10 +36,12 @@ export class NodeDAO extends model.Model {
 	}
 
 
-	search(query: string, callback: (list: Node[]) => void) {
+	search(page: number, query: string, callback: (pager: model_pager.Pager, list: Node[]) => void) {
 		// TODO: 全文検索エンジン対応
-		this.con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ?', nestTables:true}, 
-			['%' + query + '%'], (err, result) => {
+		var pager = new model_pager.Pager(page);
+		query = '%' + query + '%';
+		this.con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT ? OFFSET ? ', nestTables:true}, 
+			[query, pager.limit, pager.getOffset()], (err, result) => {
 			if (err) {
 				this.con.rollback();
 				this.con.close();
@@ -50,7 +53,15 @@ export class NodeDAO extends model.Model {
 				node.dcase = new model_dcase.DCase(row.d.id, row.d.name, row.d.user_id, row.d.delete_flag);
 				list.push(node);
 			});
-			callback(list);
+
+			this.con.query('SELECT count(d.id) as cnt from node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? ', [query], (err, countResult) => {
+				if (err) {
+					this.con.close();
+					throw err;
+				}
+				pager.totalItems = countResult[0].cnt;
+				callback(pager, list);
+			});
 		});
 	}
 }

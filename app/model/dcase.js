@@ -6,6 +6,7 @@ var __extends = this.__extends || function (d, b) {
 var model = require('./model')
 var model_commit = require('./commit')
 var model_user = require('./user')
+var model_pager = require('./pager')
 var DCase = (function () {
     function DCase(id, name, userId, deleteFlag) {
         this.id = id;
@@ -39,12 +40,16 @@ var DCaseDAO = (function (_super) {
             callback(result.insertId);
         });
     };
-    DCaseDAO.prototype.list = function (callback) {
+    DCaseDAO.prototype.list = function (page, callback) {
         var _this = this;
+        var pager = new model_pager.Pager(page);
         this.con.query({
-            sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = 1 AND d.delete_flag = FALSE',
+            sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT ? OFFSET ? ',
             nestTables: true
-        }, [], function (err, result) {
+        }, [
+            pager.limit, 
+            pager.getOffset()
+        ], function (err, result) {
             if(err) {
                 _this.con.close();
                 throw err;
@@ -57,7 +62,14 @@ var DCaseDAO = (function (_super) {
                 d.latestCommit.user = new model_user.User(row.cu.id, row.cu.name, row.cu.delete_flag, row.cu.system_flag);
                 list.push(d);
             });
-            callback(list);
+            _this.con.query('SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ', function (err, countResult) {
+                if(err) {
+                    _this.con.close();
+                    throw err;
+                }
+                pager.totalItems = countResult[0].cnt;
+                callback(pager, list);
+            });
         });
     };
     DCaseDAO.prototype.remove = function (dcaseId, callback) {
