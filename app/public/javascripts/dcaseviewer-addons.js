@@ -130,14 +130,81 @@ var DNodeView_ExpandBranch = function(self) {
 
 //-----------------------------------------------------------------------------
 
+/* find first line appering key value structure */
+var checkKeyValue = function(str) {
+	return str.indexOf(":") != -1;
+}
+
+var findVaridMetaData = function(body) {
+	body = body.join("\n").trim().split("\n");
+
+	if (checkKeyValue(body[0])) {
+		return 0;
+	}
+
+	var emptyLineIndex;
+	for (emptyLineIndex = 0; emptyLineIndex < body.length; emptyLineIndex++) {
+		if (body[emptyLineIndex] == "") {
+			while (emptyLineIndex+1 < body.length && body[emptyLineIndex+1] == "") {
+				emptyLineIndex++;
+			}
+			break;
+		}
+	}
+
+	if (emptyLineIndex < body.length-1 && checkKeyValue(body[emptyLineIndex+1])) {
+		return emptyLineIndex+1;
+	}
+
+	return -1
+}
+
+
+var parseMetaData = function(data) {
+	var metadata = {};
+	var i = 0;
+	for (; i < data.length; i++) {
+		if (data[i].indexOf(":") == -1) break;
+		var list = data[i].split(":");
+		var key = list[0].trim();
+		var value = list.slice(1).join("").trim();
+		metadata[key] = value;
+	}
+	if (i < data.length) {
+		metadata["Description"] = data.slice(i).join("\n");
+	} else {
+		metadata["Description"] = "";
+	}
+	return metadata;
+}
+
+function generateMetadata(n) {
+	var metadata = n.metadata;
+	var keys = Object.keys(metadata);
+	var res = (keys.length > 0) ? "\n" : "";
+	for (var i = 0; i < keys.length; i++) {
+		var key = keys[i];
+		if (key != "Description") {
+			res += key + ": " + metadata[key] + "\n";
+		}
+	}
+	if (metadata["Description"]) {
+		res += metadata["Description"];
+	} else {
+		res = res.substr(0, res.length-1);
+	}
+	return res;
+}
+
 var DNodeView_InplaceEdit = function(self) {
 	var $edit = null;
 
 	self.$divText.addClass("node-text-editable");
 
+
 	function generateMarkdownText(node) {
 		var convert = (function(n){
-			return ("# " + n.type + " " + n.name + " " + n.id + (n.desc.length > 0 ? ("\n" + n.desc) : "") + "\n\n");
+			return ("# " + n.type + " " + n.name + " " + n.id + (n.desc.length > 0 ? ("\n" + n.desc) : "") + generateMetadata(n) + "\n\n");
 		});
 
 		var markdown = convert(node);  
@@ -151,13 +218,28 @@ var DNodeView_InplaceEdit = function(self) {
 		var nodesrc = src.split(/^#+/m).slice(1);
 		var nodes = [];
 		for(var i = 0; i < nodesrc.length; ++i){
+
 			var lines = nodesrc[i].split(/\r\n|\r|\n/);
 			var heads = lines[0].trim().split(/\s+/);
+
+			/* handle metadata */
+			var body = lines.slice(1).join("\n").trim().split("\n");
+			var metadata = {};
+			var description;
+			var metadataIndex = findVaridMetaData(body);
+			if (metadataIndex != -1) {
+				description = body.slice(0, metadataIndex).join("\n");
+				metadata = parseMetaData(body.slice(metadataIndex));
+			} else {
+				description = lines.slice(1).join("\n").trim();
+			}
+
 			var node = {
 				type: findMostSimilarNodeType(heads[0]),
 				name: heads[1],
 				id  : heads[2],
-				description: lines.slice(1).join("\n").trim(),
+				description: description,
+				metadata: metadata,
 				children: [],
 			};
 			nodes.push(node);
@@ -198,8 +280,9 @@ var DNodeView_InplaceEdit = function(self) {
 		var newDesc = nodejson.description;
 		var newType = nodejson.type;
 		var newName = nodejson.name || newType[0] + "_" + node.id;
+		var newMetadata = nodejson.metadata;
 		var DCase = self.viewer.getDCase();
-		DCase.setParam(node, newType, newName, newDesc);
+		DCase.setParam(node, newType, newName, newDesc, newMetadata);
 		return node;
 	}
 
@@ -269,7 +352,7 @@ var DNodeView_InplaceEdit = function(self) {
 					(newNode.isContext ? newContexts : newChildren).push(newNode);
 				}else if(node.isTypeApendable(nd.type)){
 					// create new node
-					var newNode = DCase.insertNode(node, nd.type, nd.description);
+					var newNode = DCase.insertNode(node, nd.type, nd.description, nd.metadata);
 					treeChanged = true;
 					(newNode.isContext ? newContexts : newChildren).push(newNode);
 				}
