@@ -218,7 +218,7 @@ DCase.prototype.encode = function() {
 			ThisNodeId: node.id,
 			NodeType: node.type,
 			Description: node.desc,
-			/* TODO add metadata */
+			Metadata: node.metadata,
 			Children: c,
 		});
 	});
