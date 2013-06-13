@@ -21,34 +21,4 @@ $(function() {
 	setTimeout(function(){
 		window.scrollTo(0, 0);
 	}, 0);
-
-	$("div.row").on('dragenter', function (e) {
-		e.stopPropagation();
-		e.preventDefault();
-	}).on('dragover', function (e) {
-		e.stopPropagation();
-		e.preventDefault();
-		$(this).addClass('hover');
-	}).on('dragleave', function (e) {
-		e.stopPropagation();
-		e.preventDefault();
-		$(this).removeClass('hover');
-	}).on('drop', function (e) {
-		e.stopPropagation();
-		e.preventDefault();
-		$(this).removeClass('hover');
-		var file = e.originalEvent.dataTransfer.files[0];
-		if(file) {
-			var reader = new FileReader();
-			reader.onerror = function(e) {
-				console.log('error', e.target.error.code);
-			}
-			//読み込み後の処理
-			reader.onload = function(e){
-				alert(e.target.result);
-			};
-			reader.readAsText(file, 'shift-jis');
-		}
-		return false;
-	});
 });

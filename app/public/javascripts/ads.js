@@ -71,6 +71,10 @@ var ADS = (function() {
 			initDefaultScreen(getLoginUserorNull());
 			$("#newDCase").hide();
 			$("#selectDCase").show();
+			var importFile = new ImportFile();
+			importFile.readFile(function(e){
+				console.log(e.target.result); //TODO
+			});
 		});
 
 		router.route("dcase/:id", "dcase", function(dcaseId){
