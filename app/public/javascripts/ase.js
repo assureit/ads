@@ -1,85 +1,58 @@
-var ASE = function(body) {
-	var self = this;
-	var TITLE_SUFFIX = " - AssuranceScriptEditor";
-
-	//--------------------------------------------------------
-
-	function getURLParameter(name) {
-		return decodeURI(
-			(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
-		);
+var CreateDCaseView = (function() {
+	function CreateDCaseView() {
 	}
-	var dcaseId = parseInt(getURLParameter("dcaseId"));
-	if(isNaN(dcaseId)) dcaseId = 0;
 
-	if ("onhashchange" in window) { //FIXME
-		window.onhashchange = function () {
-			var hash = window.location.hash.slice(1);
-			if(hash == "new") {
-				$("#newDCase").show();
-				$("#selectDCase").hide();
-			} else if(hash == "") {
-				$("#newDCase").hide();
-				$("#selectDCase").show();
+	CreateDCaseView.prototype.enableSubmit = function(userId) {
+		$("#dcase-create").click(function() {
+			var name = $("#inputDCaseName").attr("value");
+			var desc = $("#inputDesc").attr("value");
+			var error = false;
+			if(name == "") {
+				$("#newdcase-name").addClass("error");
+				error = true;
+			} else {
+				$("#newdcase-name").removeClass("error");
 			}
-		};
-		window.onhashchange();
+			if(desc == "") {
+				$("#newdcase-desc").addClass("error");
+				error = true;
+			}
+			if(error) return;
+			var id = 1;
+			var tree = {
+				NodeList: [{
+					ThisNodeId: id,
+					NodeType: "Goal",
+					Description: desc,
+					Children: [],
+				}],
+				TopGoalId: id,
+				NodeCount: 1,
+			};
+			var r = DCaseAPI.createDCase(name, tree, userId);
+			location.href = "./#dcase/" + r.dcaseId;
+		});
+	};
+
+	CreateDCaseView.prototype.disableSubmit = function() {
+		$("#dcase-create").addClass("disabled");
+		$("#inputDCaseName").attr("disabled", "");
+		$("#inputDesc").attr("disabled", "");
+	};
+
+	return CreateDCaseView;
+})();
+
+var SelectDCaseView = (function() {
+
+	function SelectDCaseView() {
 	}
 
-	var matchResult = document.cookie.match(/userId=(\w+);?/);
-	var userId = matchResult ? parseInt(matchResult[1]) : null;
+	SelectDCaseView.prototype.clearTable = function() {
+		$("tbody#dcase-select-table *").remove();
+	};
 
-	if(userId == null) {
-		// disable edit menu when non-login
-		$(".ase-edit-menu").css("display", "none");
-	}
-	if(dcaseId == 0) {
-		// disable view/edit menu when non-selected dcase
-		$(".ase-edit-menu").css("display", "none");
-		$(".ase-view-menu").css("display", "none");
-	} else {
-		$(".ase-view-menu").css("display", "block");
-	}
-
-	if(dcaseId == 0) {
-		$("#dcase-manager").css("display", "block");
-
-		if(userId != null) {
-			$("#dcase-create").click(function() {
-				var name = $("#inputDCaseName").attr("value");
-				var desc = $("#inputDesc").attr("value");
-				var error = false;
-				if(name == "") {
-					$("#newdcase-name").addClass("error");
-					error = true;
-				} else {
-					$("#newdcase-name").removeClass("error");
-				}
-				if(desc == "") {
-					$("#newdcase-desc").addClass("error");
-					error = true;
-				}
-				if(error) return;
-				var id = 1;
-				var tree = {
-					NodeList: [{
-						ThisNodeId: id,
-						NodeType: "Goal",
-						Description: desc,
-						Children: [],
-					}],
-					TopGoalId: id,
-					NodeCount: 1,
-				};
-				var r = DCaseAPI.createDCase(name, tree, userId);
-				location.href = "./?dcaseId=" + r.dcaseId;
-			});
-		} else {
-			$("#dcase-create").addClass("disabled");
-			$("#inputDCaseName").attr("disabled", "");
-			$("#inputDesc").attr("disabled", "");
-		}
-
+	SelectDCaseView.prototype.addTable = function(userId) {
 		var $tbody = $("#dcase-select-table");
 		var dcaseList = DCaseAPI.getDCaseList().dcaseList;
 		if(dcaseList.length == 0) {
@@ -92,7 +65,7 @@ var ASE = function(body) {
 			var user = dcase.userName;
 			var lastDate = dcase.latestCommit.dateTime;//new DateFormatter(dcase.latestCommit.time).format();
 			var lastUser = dcase.latestCommit.userName;
-			var html = "<td><a href=\"./?dcaseId=" + id + "\">" + name + 
+			var html = "<td><a href=\"#dcase/" + id + "\">" + name +
 					"</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" +
 					lastUser + "</td>";
 			if(userId != null) {
@@ -122,89 +95,274 @@ var ASE = function(body) {
 				});
 			}
 		});
-		return;
-	}
-
-	$("#viewer").css("display", "block");
-	var $body = this.$body = $(body);
-	var viewer = this.viewer = new DCaseViewer(document.getElementById("viewer"),
-			null, userId != null);
-	var timeline = this.timeline = new TimeLine($body);
-	var dcase_latest = null;
-
-	//--------------------------------------------------------
-
-	$("#menu-history-toggle").click(function() {
-		timeline.visible();
-	});
-
-	timeline.onDCaseSelected = function(dcaseId, commitId, isLatest) {
-		var dcase = viewer.getDCase();
-		if(dcase != null && dcase.isChanged()) {
-			dcase_latest = dcase;
-		}
-		viewer.editable = isLatest && userId != null;//FIXME
-		if(isLatest && dcase_latest != null) {
-			viewer.setDCase(dcase_latest);
-		} else {
-			var tree = DCaseAPI.getNodeTree(commitId);
-			viewer.setDCase(new DCase(tree, dcaseId, commitId));
-		}
-		return true;
 	};
 
-	//--------------------------------------------------------
+	return SelectDCaseView;
+})();
 
-	this.commit = function() {
-		if(viewer.editable) {
-			if(!viewer.getDCase().isChanged()) {
+var TimeLineView = (function() {
+
+	function TimeLineView($body, viewer, isLogin) {
+		var self = this;
+		this.timeline = new TimeLine($body);
+
+		$("#menu-history-toggle").click(function(e) {
+			self.timeline.visible();
+			e.preventDefault();
+		});
+
+		this.timeline.onDCaseSelected = function(dcaseId, commitId, isLatest) {
+			var dcase = viewer.getDCase();
+			if(dcase != null && dcase.isChanged()) {
+				dcase_latest = dcase;
+			}
+			viewer.editable = isLatest && isLogin;//FIXME
+			if(isLatest && dcase_latest != null) {
+				viewer.setDCase(dcase_latest);
+			} else {
+				var tree = DCaseAPI.getNodeTree(commitId);
+				viewer.setDCase(new DCase(tree, dcaseId, commitId));
+			}
+			return true;
+		};
+
+	}
+
+	TimeLineView.prototype.repaint = function (dcase) {
+		this.timeline.repaint(dcase);
+	};
+
+	return TimeLineView;
+})();
+
+var SearchView = (function() {
+
+	function SearchView() {
+		var searchQuery = $('#search-query');
+		searchQuery.popover({
+			html: true,
+			placement: 'bottom',
+			trigger: 'manual',
+			content: function(){
+				var wrapper = $('<div id="search_result_wrapper">');
+				$('<a class="btn btn-link">close</a>').click(function(){
+					searchQuery.popover('hide');
+					return false;
+				}).appendTo(wrapper);
+				wrapper.append('<ul id="search_result_ul" class="unstyled">');
+				wrapper.width(searchQuery.width());
+				return wrapper;
+			},
+		});
+		$('#search-form').submit(function(){
+			var query = searchQuery.val();
+			if(query.length > 0){
+				self.updateSearchResult(query);
+			}
+			return false;
+		});
+	}
+
+	return SearchView;
+})();
+
+var ADS = (function() {
+
+	function getLoginUserorNull() {
+		var matchResult = document.cookie.match(/userId=(\w+);?/);
+		var userId = matchResult ? parseInt(matchResult[1]) : null;
+		if(userId == null) { //FIXME
+			// disable edit menu when non-login
+			hideEditMenu();
+		}
+		return userId;
+	}
+
+	function isLogin(id) {
+		return id != null;
+	}
+
+	function hideEditMenu() {
+		$(".ase-edit-menu").css("display", "none");
+	}
+
+	function hideViewMenu() {
+		$(".ase-view-menu").css("display", "none");
+	}
+
+	function hideViewer() {
+		$("#viewer").hide();//.css("display", "none");
+		$("#viewer *").remove();//.css("display", "none");
+	}
+
+	function clearTimeLine() {
+		if($(".timeline").length > 0) {
+			$(".timeline").remove();
+		}
+	}
+
+	function defaultAse(userId) { //FIXME
+		clearTimeLine();
+		hideViewer();
+		hideEditMenu();
+		hideViewMenu();
+
+		$("#dcase-manager").css("display", "block");
+		var createDCaseView = new CreateDCaseView();
+
+		if(isLogin(userId)) {
+			createDCaseView.enableSubmit();
+		} else {
+			createDCaseView.disableSubmit();
+		}
+
+		var selectDCaseView = new SelectDCaseView();
+		selectDCaseView.clearTable();
+		selectDCaseView.addTable(userId);
+	}
+
+	function ADS(body) {
+		var self = this;
+		this.TITLE_SUFFIX = " - Assurance DS";
+		this.URL_EXPORT = "cgi/view2.cgi";  //FIXME
+		this.URL_EXPORT_SVG = "cgi/svg.cgi";
+
+
+		var router = new Router();
+		router.route("new", "new", function() {
+			defaultAse(getLoginUserorNull());
+			$("#newDCase").show();
+			$("#selectDCase").hide();
+		});
+
+		router.route("", "", function() {
+			defaultAse(getLoginUserorNull());
+			$("#newDCase").hide();
+			$("#selectDCase").show();
+		});
+
+		router.route("dcase/:id", "dcase", function(dcaseId){
+			hideViewer();
+			clearTimeLine();
+			$("#newDCase").hide();
+			$("#selectDCase").hide();
+			var userId = getLoginUserorNull();
+
+			$(".ase-view-menu").css("display", "block");
+			$(".ase-edit-menu").css("display", "block");
+
+			$("#viewer").css("display", "block");
+			var $body  = $(body);
+			var viewer = new DCaseViewer(document.getElementById("viewer"),
+					null, isLogin(userId));
+			self.viewer = viewer;
+			var timelineView = self.timelineView = new TimeLineView($body, viewer, isLogin(userId));
+			self.dcase_latest = null;
+
+			$(window).bind("beforeunload", function(e) {
+				if(dcase_latest != null && dcase_latest.isChanged()) {
+					return "未コミットの変更があります";
+				}
+			});
+			var searchView = new SearchView();
+
+			var colorThemes = {
+				"default":
+					viewer.default_colorTheme,
+				"TiffanyBlue": {
+					fill: {
+						"Goal"    : "#b4d8df",
+						"Context" : "#dbf5f3",
+						"Subject" : "#dbf5f3",
+						"Strategy": "#b4d8df",
+						"Evidence": "#dbf5f3",
+						"Solution": "#dbf5f3",
+						"Rebuttal": "#eeaaaa",
+					},
+					__proto__: viewer.default_colorTheme
+				},
+				"simple": {
+					fill: {
+						"Goal"    : "#ffffff",
+						"Context" : "#ffffff",
+						"Subject" : "#ffffff",
+						"Strategy": "#ffffff",
+						"Evidence": "#ffffff",
+						"Solution": "#ffffff",
+						"Rebuttal": "#ffffff",
+					},
+					stroke: {
+						"Goal"    : "#000000",
+						"Context" : "#000000",
+						"Subject" : "#000000",
+						"Strategy": "#000000",
+						"Evidence": "#000000",
+						"Solution": "#000000",
+						"Rebuttal": "#000000",
+					},
+					__proto__: viewer.default_colorTheme
+				},
+			};
+
+			(function() {
+				// update color theme menu
+				var $ul = $("#menu-change-theme");
+				$.each(colorThemes, function(name, theme) {
+					var sample = "";
+					$.each(DCaseNode.TYPES, function(i, type) {
+						sample += "<span style=\"color: " + theme.fill[type] + ";\">■</span>";
+					});
+					var $li = $("<li></li>")
+						.html("<a href=\"#\">" + sample + name + "</a>")
+						.appendTo($ul);
+					$li.click(function() {
+						viewer.setColorTheme(theme);
+						document.cookie="colorTheme=" + name;
+					});
+				});
+
+				// show DCase
+				var r = DCaseAPI.getDCase(dcaseId);
+				var dcase = new DCase(JSON.parse(r.contents), dcaseId, r.commitId);
+				viewer.setDCase(dcase);
+				timelineView.repaint(dcase);
+				dcase_latest = dcase;
+				document.title = r.dcaseName + this.TITLE_SUFFIX;
+				$("#dcaseName").text(r.dcaseName);
+
+				// change color theme
+				var name = document.cookie.match(/colorTheme=(\w+);?/);
+				if(name != null) {
+					viewer.setColorTheme(colorThemes[name[1]]);
+				}
+			}());
+		});
+
+		router.start();
+
+		viewer.exportSubtree = function(type, root) {
+			self.exportTree(type, root);
+		};
+	}
+
+	ADS.prototype.commit = function() {
+		if(this.viewer.editable) {
+			if(!this.viewer.getDCase().isChanged()) {
 				alert("変更されていません");
 			} else {
 				var msg = prompt("コミットメッセージを入力して下さい");
 				if(msg != null) {
-					if(viewer.getDCase().commit(msg, userId)) {
+					if(this.viewer.getDCase().commit(msg)) {
 						alert("コミットしました");
-						timeline.repaint(viewer.getDCase());
+						this.timelineView.repaint(this.viewer.getDCase());
 					}
 				}
 			}
 		}
 	};
 
-	$(window).bind("beforeunload", function(e) {
-		if(dcase_latest != null && dcase_latest.isChanged()) {
-			return "未コミットの変更があります";
-		}
-	});
-
-	//--------------------------------------------------------
-
-	var searchQuery = $('#search-query');
-	searchQuery.popover({
-		html: true,
-		placement: 'bottom',
-		trigger: 'manual',
-		content: function(){
-			var wrapper = $('<div id="search_result_wrapper">');
-			$('<a class="btn btn-link">close</a>').click(function(){
-				searchQuery.popover('hide');
-				return false;
-			}).appendTo(wrapper);
-			wrapper.append('<ul id="search_result_ul" class="unstyled">');
-			wrapper.width(searchQuery.width());
-			return wrapper;
-		},
-	});
-	$('#search-form').submit(function(){
-		var query = searchQuery.val();
-		if(query.length > 0){
-			self.updateSearchResult(query);
-		}
-		return false;
-	});
-
-	this.searchNode = function(text, types, beginDate, endDate, callback, callbackOnNoResult) {
-		var dcase = viewer.getDCase();
+	ADS.prototype.searchNode = function(text, types, beginDate, endDate, callback, callbackOnNoResult) {
+		var dcase = this.viewer.getDCase();
 		var root = dcase ? dcase.getTopGoal() : undefined;
 		if(!root) {
 			if(callbackOnNoResult) {
@@ -225,7 +383,7 @@ var ASE = function(body) {
 		});
 	};
 
-	this.updateSearchResult = function(text) {
+	ADS.prototype.updateSearchResult = function(text) {
 		$('#search-query').popover('show');
 		var $res = $("#search_result_ul");
 		$res.empty();
@@ -238,7 +396,7 @@ var ASE = function(body) {
 				var res = result[i];
 				var id = res.dcaseId;
 				$("<li>")
-					.html("<a href=\"./?dcaseId=" + id + "\">" + id + "</a>")
+					.html("<a href=\"#dcase/" + id + "\">" + id + "</a>")
 					.appendTo($res);
 			}
 		}
@@ -253,12 +411,7 @@ var ASE = function(body) {
 		});
 	};
 
-	//--------------------------------------------------------
-
-	var URL_EXPORT = "cgi/view2.cgi";
-	var URL_EXPORT_SVG = "cgi/svg.cgi";
-
-	this.foreachLine = function(str, max, callback){
+	ADS.prototype.foreachLine = function(str, max, callback){
 		if(!callback) return;
 		var rest = str;
 		var maxLength = max || 20;
@@ -281,14 +434,14 @@ var ASE = function(body) {
 		}
 		callback(rest, i);
 	};
-	
-	this.splitTextByLength = function(str, max){
+
+	ADS.prototype.splitTextByLength = function(str, max){
 		var arr = [];
 		foreachLine(str, max, function(s){ arr.push(s); });
 		return arr;
 	}
 
-	this.createSVGDocument = function(viewer, root) {
+	ADS.prototype.createSVGDocument = function(viewer, root) {
 		var nodeViewMap = viewer.nodeViewMap;
 		var dcase = viewer.getDCase();
 		if(root == null) {
@@ -346,7 +499,7 @@ var ASE = function(body) {
 		return doc;
 	};
 
-	this.executePost = function(action, data) {
+	ADS.prototype.executePost = function(action, data) {
 		var $body = $(document.body);
 		var $form = $("<form>").attr({
 			"action" : action,
@@ -365,141 +518,75 @@ var ASE = function(body) {
 		$form.submit();
 		$form.empty().remove();
 	}
-	
-	this.exportViaSVG = function(type, root) {
+
+	ADS.prototype.exportViaSVG = function(type, root) {
+		var self = this;
 		var svg = this.createSVGDocument(self.viewer, root);
 		svg = svg.replace("</svg></svg>", "</svg>"); // for IE10 Bug
-		this.executePost(URL_EXPORT_SVG, {"type" : type, "svg" : svg});
+		this.executePost(this.URL_EXPORT_SVG, {"type" : type, "svg" : svg});
 	}
 
-	this.exportTree = function(type, root) {
+	ADS.prototype.exportTree = function(type, root) {
 		if(type == "png" || type == "pdf" || type == "svg"){
 			this.exportViaSVG(type, root);
 			return;
 		}
 		var commitId = viewer.getDCase().commitId;
-		var url = URL_EXPORT + "?" + commitId + "." + type;
+		var url = this.URL_EXPORT + "?" + commitId + "." + type;
 		window.open(url, "_blank");
 	};
 
-	this.viewer.exportSubtree = function(type, root) {
-		self.exportTree(type, root);
-	};
+	ADS.prototype.initDefaultEventListeners = function() {
+		var self = this;
 
-	//--------------------------------------------------------
-
-	$("#menu-commit").click(function() {
-		self.commit();
-	});
-
-	$("#menu-undo").click(function() {
-		viewer.getDCase().undo();
-	});
-
-	$("#menu-redo").click(function() {
-		viewer.getDCase().redo();
-	});
-
-	$("#menu-export-json").click(function() {
-		self.exportTree("json");
-	});
-
-	$("#menu-export-png").click(function() {
-		self.exportTree("png");
-	});
-
-	$("#menu-export-pdf").click(function() {
-		self.exportTree("pdf");
-	});
-
-	$("#menu-export-dscript").click(function() {
-		self.exportTree("dscript");
-	});
-
-	$("#lang-select-english").click(function() {
-		document.cookie = "lang=en";
-		location.reload(true);
-	});
-
-	$("#lang-select-japanese").click(function() {
-		document.cookie = "lang=ja";
-		location.reload(true);
-	});
-
-	//--------------------------------------------------------
-
-	var colorThemes = {
-		"default": 
-			viewer.default_colorTheme,
-		"TiffanyBlue": {
-			fill: {
-				"Goal"    : "#b4d8df",
-				"Context" : "#dbf5f3",
-				"Subject" : "#dbf5f3",
-				"Strategy": "#b4d8df",
-				"Evidence": "#dbf5f3",
-				"Solution": "#dbf5f3",
-				"Rebuttal": "#eeaaaa",
-			},
-			__proto__: viewer.default_colorTheme
-		},
-		"simple": {
-			fill: {
-				"Goal"    : "#ffffff",
-				"Context" : "#ffffff",
-				"Subject" : "#ffffff",
-				"Strategy": "#ffffff",
-				"Evidence": "#ffffff",
-				"Solution": "#ffffff",
-				"Rebuttal": "#ffffff",
-			},
-			stroke: {
-				"Goal"    : "#000000",
-				"Context" : "#000000",
-				"Subject" : "#000000",
-				"Strategy": "#000000",
-				"Evidence": "#000000",
-				"Solution": "#000000",
-				"Rebuttal": "#000000",
-			},
-			__proto__: viewer.default_colorTheme
-		},
-	};
-
-	//--------------------------------------------------------
-
-	(function() {
-		// update color theme menu
-		var $ul = $("#menu-change-theme");
-		$.each(colorThemes, function(name, theme) {
-			var sample = "";
-			$.each(DCaseNode.TYPES, function(i, type) {
-				sample += "<span style=\"color: " + theme.fill[type] + ";\">■</span>";
-			});
-			var $li = $("<li></li>")
-				.html("<a href=\"#\">" + sample + name + "</a>")
-				.appendTo($ul);
-			$li.click(function() {
-				viewer.setColorTheme(theme);
-				document.cookie="colorTheme=" + name;
-			});
+		$("#menu-commit").click(function(e) {
+			self.commit();
+			e.preventDefault();
 		});
 
-		// show DCase
-		var r = DCaseAPI.getDCase(dcaseId);
-		var dcase = new DCase(JSON.parse(r.contents), dcaseId, r.commitId);
-		viewer.setDCase(dcase);
-		timeline.repaint(dcase);
-		dcase_latest = dcase;
-		document.title = r.dcaseName + TITLE_SUFFIX;
-		$("#dcaseName").text(r.dcaseName);
+		$("#menu-undo").click(function(e) {
+			self.viewer.getDCase().undo();
+			e.preventDefault();
+		});
 
-		// change color theme
-		var name = document.cookie.match(/colorTheme=(\w+);?/);
-		if(name != null) {
-			viewer.setColorTheme(colorThemes[name[1]]);
-		}
-	}());
+		$("#menu-redo").click(function(e) {
+			self.viewer.getDCase().redo();
+			e.preventDefault();
+		});
 
-};
+		$("#menu-export-json").click(function(e) {
+			self.exportTree("json");
+			e.preventDefault();
+		});
 
+		$("#menu-export-png").click(function(e) {
+			self.exportTree("png");
+			e.preventDefault();
+		});
+
+		$("#menu-export-pdf").click(function(e) {
+			self.exportTree("pdf");
+			e.preventDefault();
+		});
+
+		$("#menu-export-dscript").click(function(e) {
+			self.exportTree("dscript");
+			e.preventDefault();
+		});
+
+		$("#lang-select-english").click(function(e) {
+			document.cookie = "lang=en";
+			e.preventDefault();
+			location.reload(true);
+		});
+
+		$("#lang-select-japanese").click(function(e) {
+			document.cookie = "lang=ja";
+			e.preventDefault();
+			location.reload(true);
+		});
+
+	}
+
+	return ADS;
+})();

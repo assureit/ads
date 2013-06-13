@@ -425,9 +425,9 @@ DCase.prototype.applyOperation = function(op) {
 	op.redo();
 };
 
-DCase.prototype.commit = function(msg, userId) {
+DCase.prototype.commit = function(msg) {
 	var tree = this.encode();
-	var r = DCaseAPI.commit(tree, msg, this.commitId, userId);
+	var r = DCaseAPI.commit(tree, msg, this.commitId);
 	this.commitId = r;
 	this.undoCount = 0;
 	this.opQueue = [];
