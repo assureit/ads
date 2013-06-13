@@ -1,5 +1,6 @@
 var db = require('../../db/db')
 var model_user = require('../../model/user')
+var domain = require('domain')
 var expect = require('expect.js');
 describe('model', function () {
     describe('user', function () {
@@ -27,36 +28,50 @@ describe('model', function () {
                 });
             }
         });
-        describe('register', function () {
-            it('should return User object property', function (done) {
-                var loginName = 'unittest01';
-                var pwd = 'password';
-                userDAO.register(loginName, pwd, function (result) {
-                    expect(result).not.to.be(undefined);
-                    expect(result.loginName).to.eql(loginName);
-                    done();
+        var dom = domain.create();
+        dom.on('error', function (err) {
+            if(con) {
+                con.rollback(function (err2, result) {
+                    con.close();
+                    if(err2) {
+                        throw err;
+                    }
+                    throw err;
                 });
-            });
-            it('should insert data to user table', function (done) {
-                var loginName = 'unittest01';
-                var pwd = 'password';
-                userDAO.register(loginName, pwd, function (result) {
-                    con.query('SELECT id, login_name, delete_flag, system_flag FROM user WHERE login_name = ? ', [
-                        loginName
-                    ], function (err, expectedResult) {
-                        if(err) {
-                            throw err;
-                        }
-                        expect(result.id).to.be(expectedResult[0].id);
-                        expect(result.loginName).to.be(expectedResult[0].login_name);
-                        expect(result.deleteFlag).to.eql(expectedResult[0].delete_flag);
-                        expect(result.systemFlag).to.eql(expectedResult[0].system_flag);
+            }
+        });
+        dom.run(function () {
+            describe('register', function () {
+                it('should return User object property', function (done) {
+                    var loginName = 'unittest01';
+                    var pwd = 'password';
+                    userDAO.register(loginName, pwd, function (result) {
+                        expect(result).not.to.be(undefined);
+                        expect(result.loginName).to.eql(loginName);
                         done();
                     });
                 });
-            });
-            it('can not register if login name is duplicated', function (done) {
-                done();
+                it('should insert data to user table', function (done) {
+                    var loginName = 'unittest01';
+                    var pwd = 'password';
+                    userDAO.register(loginName, pwd, function (result) {
+                        con.query('SELECT id, login_name, delete_flag, system_flag FROM user WHERE login_name = ? ', [
+                            loginName
+                        ], function (err, expectedResult) {
+                            if(err) {
+                                throw err;
+                            }
+                            expect(result.id).to.be(expectedResult[0].id);
+                            expect(result.loginName).to.be(expectedResult[0].login_name);
+                            expect(result.deleteFlag).to.eql(expectedResult[0].delete_flag);
+                            expect(result.systemFlag).to.eql(expectedResult[0].system_flag);
+                            done();
+                        });
+                    });
+                });
+                it('can not register if login name is duplicated', function (done) {
+                    done();
+                });
             });
         });
     });
