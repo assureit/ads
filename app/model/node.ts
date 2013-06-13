@@ -11,7 +11,7 @@ export class Node {
 	public dcase: model_dcase.DCase;
 	constructor(public id: number, public commitId: number, public thisNodeId: number, public nodeType: string, public description: string) {}
 }
-export class NodeDAO extends model.Model {
+export class NodeDAO extends model.DAO {
 	insert(commitId: number, data: NodeData, callback: (nodeId: number)=>void): void {
 		// TODO: node propertyをどうするべきか？TicketやMonitorに変更するべきか、meta.ticket1.id、meta.ticket1.nameなどとして並列にするか
 		this.con.query('INSERT INTO node(this_node_id, description, node_type, commit_id) VALUES(?,?,?,?)', 

@@ -12,7 +12,7 @@ export class Commit {
 	public user: model_user.User;
 	constructor(public id:number, public prevCommitId: number, public dcaseId: number, public userId: number, public message:string, public data:string, public dateTime: Date, public latestFlag: bool) {}
 }
-export class CommitDAO extends model.Model {
+export class CommitDAO extends model.DAO {
 	insert(params: InsertArg, callback: (commitId: number)=>void): void {
 		params.prevId = params.prevId || 0;
 		this.con.query('INSERT INTO commit(data, date_time, prev_commit_id, latest_flag,  dcase_id, `user_id`, `message`) VALUES(?,now(),?,TRUE,?,?,?)', 

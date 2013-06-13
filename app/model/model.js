@@ -1,8 +1,8 @@
 
-var Model = (function () {
-    function Model(con) {
+var DAO = (function () {
+    function DAO(con) {
         this.con = con;
     }
-    return Model;
+    return DAO;
 })();
-exports.Model = Model;
+exports.DAO = DAO;

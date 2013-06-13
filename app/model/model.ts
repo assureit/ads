@@ -1,5 +1,5 @@
 import db = module('../db/db')
 
-export class Model {
+export class DAO {
 	constructor(public con: db.Database) {}
 }

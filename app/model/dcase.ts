@@ -16,7 +16,7 @@ export class DCase {
 		}
 	}
 }
-export class DCaseDAO extends model.Model {
+export class DCaseDAO extends model.DAO {
 	insert(params: InsertArg, callback: (dcaseId: number)=>void): void {
 		this.con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [params.userId, params.dcaseName], (err, result) => {
 			if (err) {

@@ -98,5 +98,5 @@ var DCaseDAO = (function (_super) {
         });
     };
     return DCaseDAO;
-})(model.Model);
+})(model.DAO);
 exports.DCaseDAO = DCaseDAO;

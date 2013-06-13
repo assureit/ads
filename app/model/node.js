@@ -85,5 +85,5 @@ var NodeDAO = (function (_super) {
         });
     };
     return NodeDAO;
-})(model.Model);
+})(model.DAO);
 exports.NodeDAO = NodeDAO;

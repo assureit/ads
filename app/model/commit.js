@@ -96,5 +96,5 @@ var CommitDAO = (function (_super) {
         });
     };
     return CommitDAO;
-})(model.Model);
+})(model.DAO);
 exports.CommitDAO = CommitDAO;
