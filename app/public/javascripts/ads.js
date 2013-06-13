@@ -138,6 +138,7 @@ var ADS = (function() {
 
 			(function() {
 				// update color theme menu
+				$("#menu-change-theme *").remove();
 				var $ul = $("#menu-change-theme");
 				$.each(colorThemes, function(name, theme) {
 					var sample = "";
