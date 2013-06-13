@@ -5,5 +5,11 @@ export class User {
 }
 
 export class UserDAO extends model.DAO {
-	// function login(loginName, password)
+	login(loginName: string, password: string, callback: (user: User) => void) {
+
+	}
+
+	register(loginName: string, password: string, callback: (user: User) => void) {
+		callback(null);
+	}
 }

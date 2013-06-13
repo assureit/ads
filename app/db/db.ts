@@ -26,7 +26,7 @@ export class Database {
 		this.con.query(sql, values, callback);
 	}
 
-	begin(callback): void {
+	begin(callback: mysql.QueryCallback): void {
 		this.query('SET autocommit=0', (err, result) => {
 			if (err) {
 				callback(err, result);
@@ -38,20 +38,20 @@ export class Database {
 		});
 	}
 
-	commit(callback): void {
+	commit(callback: mysql.QueryCallback): void {
 		this.query('COMMIT', (err, result) => {
 			callback(err, result);
 		});
 	}
 
-	rollback(callback?): void {
+	rollback(callback?: mysql.QueryCallback): void {
 		callback = callback || (err, result) => {if (err) throw err;};
 		this.query('ROLLBACK', (err, query) => {
 			callback(err, query);
 		});
 	}
 
-	endTransaction(callback): void {
+	endTransaction(callback: mysql.QueryCallback): void {
 		this.query('SET autocommit=1', (err, query) => {
 			callback(err, query);
 		});

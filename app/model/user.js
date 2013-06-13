@@ -20,6 +20,11 @@ var UserDAO = (function (_super) {
         _super.apply(this, arguments);
 
     }
+    UserDAO.prototype.login = function (loginName, password, callback) {
+    };
+    UserDAO.prototype.register = function (loginName, password, callback) {
+        callback(null);
+    };
     return UserDAO;
 })(model.DAO);
 exports.UserDAO = UserDAO;
