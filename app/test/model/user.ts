@@ -39,7 +39,6 @@ describe('model', function() {
 			it('should return User object property', function(done) {
 				var loginName = 'unittest01';
 				var pwd = 'password';
-				var con = new db.Database();
 
 				userDAO.register(loginName, pwd, (result: model_user.User) => {
 					expect(result).not.to.be(undefined);
@@ -50,15 +49,14 @@ describe('model', function() {
 			it('should insert data to user table', function(done) {
 				var loginName = 'unittest01';
 				var pwd = 'password';
-				var con = new db.Database();
 
 				userDAO.register(loginName, pwd, (result: model_user.User) => {
 
-					con.query('SELECT u.id, u.login_name, u.delete_flag, u.system_flag FROM user u WHERE u.login_name = ? ', [loginName],(err, expectedResult) => {
+					con.query('SELECT id, login_name, delete_flag, system_flag FROM user WHERE login_name = ? ', [loginName],(err, expectedResult) => {
 						if (err) {
 							throw err;
 						}
-
+						
 						expect(result.id).to.be(expectedResult[0].id);
 						expect(result.loginName).to.be(expectedResult[0].login_name);
 						expect(result.deleteFlag).to.eql(expectedResult[0].delete_flag);

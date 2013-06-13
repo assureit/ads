@@ -31,7 +31,6 @@ describe('model', function () {
             it('should return User object property', function (done) {
                 var loginName = 'unittest01';
                 var pwd = 'password';
-                var con = new db.Database();
                 userDAO.register(loginName, pwd, function (result) {
                     expect(result).not.to.be(undefined);
                     expect(result.loginName).to.eql(loginName);
@@ -41,9 +40,8 @@ describe('model', function () {
             it('should insert data to user table', function (done) {
                 var loginName = 'unittest01';
                 var pwd = 'password';
-                var con = new db.Database();
                 userDAO.register(loginName, pwd, function (result) {
-                    con.query('SELECT u.id, u.login_name, u.delete_flag, u.system_flag FROM user u WHERE u.login_name = ? ', [
+                    con.query('SELECT id, login_name, delete_flag, system_flag FROM user WHERE login_name = ? ', [
                         loginName
                     ], function (err, expectedResult) {
                         if(err) {
