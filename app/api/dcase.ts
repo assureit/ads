@@ -17,11 +17,11 @@ export function searchDCase(params:any, callback: type.Callback) {
 			list.push({
 				dcaseId: val.id, 
 				dcaseName: val.name,
-				userName: val.user.name,
+				userName: val.user.loginName,
 				latestCommit: {
 					dateTime: val.latestCommit.dateTime,
 					commitId: val.latestCommit.id,
-					userName: val.latestCommit.user.name,
+					userName: val.latestCommit.user.loginName,
 					userId: val.latestCommit.userId,
 					commitMessage: val.latestCommit.message
 				}
@@ -188,7 +188,7 @@ export function getCommitList(params:any, callback: type.Callback) {
 		con.close();
 		var commitList = [];
 		list.forEach((c: model_commit.Commit) => {
-			commitList.push({commitId: c.id, dateTime: c.dateTime, commitMessage: c.message, userId: c.userId, userName: c.user.name});
+			commitList.push({commitId: c.id, dateTime: c.dateTime, commitMessage: c.message, userId: c.userId, userName: c.user.loginName});
 		});
 		callback.onSuccess({
 			commitList: commitList

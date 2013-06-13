@@ -17,11 +17,11 @@ function searchDCase(params, callback) {
             list.push({
                 dcaseId: val.id,
                 dcaseName: val.name,
-                userName: val.user.name,
+                userName: val.user.loginName,
                 latestCommit: {
                     dateTime: val.latestCommit.dateTime,
                     commitId: val.latestCommit.id,
-                    userName: val.latestCommit.user.name,
+                    userName: val.latestCommit.user.loginName,
                     userId: val.latestCommit.userId,
                     commitMessage: val.latestCommit.message
                 }
@@ -214,7 +214,7 @@ function getCommitList(params, callback) {
                 dateTime: c.dateTime,
                 commitMessage: c.message,
                 userId: c.userId,
-                userName: c.user.name
+                userName: c.user.loginName
             });
         });
         callback.onSuccess({
