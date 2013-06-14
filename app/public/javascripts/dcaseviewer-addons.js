@@ -540,18 +540,21 @@ var DNodeView_ToolBox = function(self) {
 				.css({ position: "absolute",bottom: 4, left: 24, display: "block" })
 				.appendTo($toolbox);
 
-			$menu.find("#ml-cut").click(function() {
+			$menu.find("#ml-cut").click(function(e) {
+				e.preventDefault();
 				self.viewer.clipboard = self.node.deepCopy();
 				self.viewer.getDCase().removeNode(self.node);
 				console.log("cut");
 			});
 
-			$menu.find("#ml-copy").click(function() {
+			$menu.find("#ml-copy").click(function(e) {
+				e.preventDefault();
 				self.viewer.clipboard = self.node.deepCopy();
 				console.log("copied");
 			});
 
-			$menu.find("#ml-paste").click(function() {
+			$menu.find("#ml-paste").click(function(e) {
+				e.preventDefault();
 				var node = self.viewer.clipboard;
 				if(node != null) {
 					if(self.node.isTypeApendable(node.type)) {
@@ -564,7 +567,8 @@ var DNodeView_ToolBox = function(self) {
 			});
 
 			if(self.node.parents.length != 0) {
-				$menu.find("#ml-delete").click(function() {
+				$menu.find("#ml-delete").click(function(e) {
+					e.preventDefault();
 					self.viewer.getDCase().removeNode(self.node);
 				});
 			} else {
@@ -572,24 +576,30 @@ var DNodeView_ToolBox = function(self) {
 				$menu.find("#ml-cut").parent("li").addClass("disabled");
 			}
 
-			$menu.find("#ml-export-json").click(function() {
+			$menu.find("#ml-export-json").click(function(e) {
+				e.preventDefault();
 				self.viewer.exportSubtree("json", self.node);
 			});
-			$menu.find("#ml-export-png").click(function() {
+			$menu.find("#ml-export-png").click(function(e) {
+				e.preventDefault();
 				self.viewer.exportSubtree("png", self.node);
 			});
-			$menu.find("#ml-export-pdf").click(function() {
+			$menu.find("#ml-export-pdf").click(function(e) {
+				e.preventDefault();
 				self.viewer.exportSubtree("pdf", self.node);
 			});
-			$menu.find("#ml-export-dscript").click(function() {
+			$menu.find("#ml-export-dscript").click(function(e) {
+				e.preventDefault();
 				self.viewer.exportSubtree("dscript", self.node);
 			});
 
-			$menu.find("#ml-openall").click(function() {
+			$menu.find("#ml-openall").click(function(e) {
+				e.preventDefault();
 				self.viewer.expandBranch(self, true, true);
 			});
 
-			$menu.find("#ml-closeall").click(function() {
+			$menu.find("#ml-closeall").click(function(e) {
+				e.preventDefault();
 				self.viewer.expandBranch(self, false, true);
 			});
 
