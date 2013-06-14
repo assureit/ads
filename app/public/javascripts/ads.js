@@ -33,7 +33,7 @@ var ADS = (function() {
 		}
 	}
 
-	function initDefaultScreen(userId) { //FIXME
+	function initDefaultScreen(userId, pageIndex, selectDCaseView) { //FIXME
 		clearTimeLine();
 		hideViewer();
 		hideEditMenu();
@@ -48,9 +48,8 @@ var ADS = (function() {
 			createDCaseView.disableSubmit();
 		}
 
-		var selectDCaseView = new SelectDCaseView();
 		selectDCaseView.clearTable();
-		selectDCaseView.addTable(userId);
+		selectDCaseView.addTable(userId, pageIndex);
 	}
 
 	function ADS(body) {
@@ -58,6 +57,8 @@ var ADS = (function() {
 		this.TITLE_SUFFIX = " - Assurance DS";
 		this.URL_EXPORT = "cgi/view2.cgi";  //FIXME
 		this.URL_EXPORT_SVG = "cgi/svg.cgi";
+		var selectDCaseView = new SelectDCaseView();
+		selectDCaseView.initEvents();
 
 		var router = new Router();
 		router.route("new", "new", function() {
@@ -66,16 +67,28 @@ var ADS = (function() {
 			$("#selectDCase").hide();
 		});
 
-		router.route("", "", function() {
-			initDefaultScreen(getLoginUserorNull());
+		var defaultRouter = function(pageIndex) {
+			initDefaultScreen(getLoginUserorNull(), pageIndex, selectDCaseView);
 			$("#newDCase").hide();
 			$("#selectDCase").show();
 			var importFile = new ImportFile();
-			importFile.readFile(function(file){
+			importFile.read(function(file){
 				var tree = JSON.parse(file.result); //TODO convert to Markdown
-				var r = DCaseAPI.createDCase(file.name.split(".")[0], tree.contents);
-				location.href = "./#dcase/" + r.dcaseId;
+				if("contents" in tree) {
+					var r = DCaseAPI.createDCase(file.name.split(".")[0], tree.contents);
+					location.href = "./#dcase/" + r.dcaseId;
+				} else {
+					alert("Invalid File");
+				}
 			});
+		}
+
+		router.route("page/:id", "page", function(pageIndex) {
+			defaultRouter(pageIndex);
+		});
+
+		router.route("", "", function() {
+			defaultRouter(1);
 		});
 
 		router.route("dcase/:id", "dcase", function(dcaseId){

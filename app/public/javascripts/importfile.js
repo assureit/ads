@@ -15,7 +15,7 @@ var ImportFile = (function(){
 		});
 	}
 
-	ImportFile.prototype.readFile = function(callback) {
+	ImportFile.prototype.read = function(callback) {
 		$("div.row").on('drop', function (e) {
 			e.stopPropagation();
 			e.preventDefault();

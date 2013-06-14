@@ -46,15 +46,21 @@ var CreateDCaseView = (function() {
 var SelectDCaseView = (function() {
 
 	function SelectDCaseView() {
+		this.pageIndex = 1;
+		this.maxPageSize = 2;
 	}
 
 	SelectDCaseView.prototype.clearTable = function() {
 		$("tbody#dcase-select-table *").remove();
 	};
 
-	SelectDCaseView.prototype.addTable = function(userId) {
+	SelectDCaseView.prototype.addTable = function(userId, pageIndex) {
+		if(pageIndex == null || pageIndex < 1) pageIndex = 1;
+		this.pageIndex = pageIndex - 0;
 		var $tbody = $("#dcase-select-table");
-		var dcaseList = DCaseAPI.getDCaseList().dcaseList;
+		var searchResults = DCaseAPI.searchDCase(this.pageIndex);
+		var dcaseList     = searchResults.dcaseList;
+		this.maxPageSize  = searchResults.summary.maxPage;
 		if(dcaseList.length == 0) {
 			$("<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>")
 			.appendTo($tbody);
@@ -94,6 +100,27 @@ var SelectDCaseView = (function() {
 					}
 				});
 			}
+		});
+	};
+
+	SelectDCaseView.prototype.initEvents = function() {
+		var self = this;
+		$("#prev-page").click(function(e) {
+			var i = self.pageIndex - 0;
+			self.pageIndex = i - 1;
+			if(self.pageIndex < 1) {
+				location.href = "./#page/" + self.pageIndex;
+			}
+			e.preventDefault();
+		});
+
+		$("#next-page").click(function(e) {
+			var i = self.pageIndex - 0;
+			if(self.maxPageSize >= i + 1) {
+				self.pageIndex = i + 1;
+				location.href = "./#page/" + self.pageIndex;
+			}
+			e.preventDefault();
 		});
 	};
 
