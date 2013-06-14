@@ -1,5 +1,6 @@
 $(function() {
-	var ase = new ASE(document.getElementById("ase"));
+	var ads = new ADS(document.getElementById("ase"));
+	ads.initDefaultEventListeners();
 
 	var $id    = $('#signup-userid');
 	var $pass1 = $('#signup-pass');

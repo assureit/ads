@@ -39,30 +39,29 @@ DCaseAPI.call = function(method, params, callback, error_callback) {
 
 //-------------------------------------
 
-DCaseAPI.getDCaseList = function(callback, error) {
+DCaseAPI.searchDCase = function(pageIndex, callback, error) {
 	try{
-		return this.call("getDCaseList", {}, callback, error);
+		return this.call("searchDCase", {page: pageIndex}, callback, error);
 	}catch(e){
 		return [];
 	}
 };
 
-DCaseAPI.createDCase = function(name, tree, userId, callback, error) {
+DCaseAPI.createDCase = function(name, tree, callback, error) {
 	return this.call("createDCase", {
-		dcaseName: name, contents: tree, userId: userId
-	}, callback, error);
+		dcaseName: name, contents: tree }, callback, error);
 };
 
 DCaseAPI.getCommitList = function(dcaseId, callback, error) {
 	return this.call("getCommitList", { dcaseId:dcaseId }, callback, error).commitList;
 };
 
-DCaseAPI.commit = function(tree, msg, commitId, userId, callback, error) {
+DCaseAPI.commit = function(tree, msg, commitId, callback, error) {
 	return this.call("commit", {
 		contents: tree,
 		commitMessage: msg,
 		commitId: commitId, 
-		userId: userId
+//		userId: userId
 	}, callback, error).commitId;
 };
 
@@ -85,8 +84,8 @@ DCaseAPI.getNodeTree = function(commitId, callback, error) {
 	return JSON.parse(this.call("getNodeTree", { commitId: commitId }, callback, error).contents);
 };
 
-DCaseAPI.searchDCase = function(text, callback, error) {
-	return this.call("searchDCase", { text: text }, callback, error).searchResultList;
+DCaseAPI.searchNode = function(text, callback, error) {
+	return this.call("searchNode", { text: text }, callback, error).searchResultList;
 };
 
 DCaseAPI.searchDCaseHistory = function(dcaseId, text, callback, error) {

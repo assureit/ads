@@ -198,3 +198,38 @@ var TimeLine = function($root) {
 	};
 };
 
+var TimeLineView = (function() {
+
+	function TimeLineView($body, viewer, isLogin) {
+		var self = this;
+		this.timeline = new TimeLine($body);
+
+		$("#menu-history-toggle").click(function(e) {
+			self.timeline.visible();
+			e.preventDefault();
+		});
+
+		this.timeline.onDCaseSelected = function(dcaseId, commitId, isLatest) {
+			var dcase = viewer.getDCase();
+			if(dcase != null && dcase.isChanged()) {
+				dcase_latest = dcase;
+			}
+			viewer.editable = isLatest && isLogin;//FIXME
+			if(isLatest && dcase_latest != null) {
+				viewer.setDCase(dcase_latest);
+			} else {
+				var tree = DCaseAPI.getNodeTree(commitId);
+				viewer.setDCase(new DCase(tree, dcaseId, commitId));
+			}
+			return true;
+		};
+
+	}
+
+	TimeLineView.prototype.repaint = function (dcase) {
+		this.timeline.repaint(dcase);
+	};
+
+	return TimeLineView;
+})();
+
