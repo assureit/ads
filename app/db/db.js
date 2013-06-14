@@ -1,7 +1,14 @@
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var mysql = require('mysql')
-var Database = (function () {
+var events = require('events')
+var Database = (function (_super) {
+    __extends(Database, _super);
     function Database() {
-        this.errorHandler = ErrorHandler;
+        _super.call(this);
         this.con = Database.getConnection();
     }
     Database.getConnection = function getConnection() {
@@ -16,7 +23,7 @@ var Database = (function () {
         if(callback === undefined && typeof values === 'function') {
             callback = values;
         }
-        callback = this.errorHandler.bind(callback);
+        callback = this._bindErrorHandler(callback);
         if(this.con) {
             this.con.query(sql, values, callback);
         } else {
@@ -66,22 +73,20 @@ var Database = (function () {
             this.con = undefined;
         }
     };
-    return Database;
-})();
-exports.Database = Database;
-(function (ErrorHandler) {
-    function bind(callback) {
+    Database.prototype._bindErrorHandler = function (callback) {
         var _this = this;
         return function (err, result) {
             if(err) {
-                console.log('error handler');
-                _this.con.rollback();
-                _this.con.close();
+                console.log(err);
+                _this.rollback(function (err, result) {
+                    _this.close();
+                });
+                _this.emit('error', err);
                 throw err;
             }
             callback(err, result);
         };
-    }
-    ErrorHandler.bind = bind;
-})(exports.ErrorHandler || (exports.ErrorHandler = {}));
-var ErrorHandler = exports.ErrorHandler;
+    };
+    return Database;
+})(events.EventEmitter);
+exports.Database = Database;

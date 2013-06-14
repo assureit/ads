@@ -93,21 +93,27 @@ describe('model', function() {
 					var loginName = 'unittest02';
 					var pwd = 'password';
 
-					con.errorHandler = {
-	bind: (callback) => {
-		return (err: any, result:any) => {
-			if (err) {
-				console.log('==================================');
-				expect(err).not.to.be(null);
-				expect(err instanceof error.DuplicatedError).to.be(true);
-				this.con.rollback();
-				this.con.close();
-				done();
-			}
-			callback(err, result);
-		};
-	}
-					};
+					con.on('error', (err: any) => {
+						expect(err).not.to.be(null);
+						expect(err instanceof error.DuplicatedError).to.be(true);
+						done();
+					});
+
+	// 				con.errorHandler = {
+	// bind: (callback) => {
+	// 	return (err: any, result:any) => {
+	// 		if (err) {
+	// 			console.log('==================================');
+	// 			expect(err).not.to.be(null);
+	// 			expect(err instanceof error.DuplicatedError).to.be(true);
+	// 			this.con.rollback();
+	// 			this.con.close();
+	// 			done();
+	// 		}
+	// 		callback(err, result);
+	// 	};
+	// }
+					// };
 
 					userDAO.register(loginName, pwd, (result: model_user.User) => {
 						userDAO.register(loginName, pwd, (result: model_user.User) => {

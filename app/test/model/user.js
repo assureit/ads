@@ -74,24 +74,13 @@ describe('model', function () {
                     });
                 });
                 it('can not register if login name is duplicated', function (done) {
-                    var _this = this;
                     var loginName = 'unittest02';
                     var pwd = 'password';
-                    con.errorHandler = {
-                        bind: function (callback) {
-                            return function (err, result) {
-                                if(err) {
-                                    console.log('==================================');
-                                    expect(err).not.to.be(null);
-                                    expect(err instanceof error.DuplicatedError).to.be(true);
-                                    _this.con.rollback();
-                                    _this.con.close();
-                                    done();
-                                }
-                                callback(err, result);
-                            };
-                        }
-                    };
+                    con.on('error', function (err) {
+                        expect(err).not.to.be(null);
+                        expect(err instanceof error.DuplicatedError).to.be(true);
+                        done();
+                    });
                     userDAO.register(loginName, pwd, function (result) {
                         userDAO.register(loginName, pwd, function (result) {
                         });

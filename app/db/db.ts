@@ -1,10 +1,10 @@
 ///<reference path='../types/mysql.d.ts'/>
 
 import mysql = module('mysql')
+import events = module('events')
 
-export class Database {
+export class Database extends events.EventEmitter {
 	public con: mysql.Connection;
-	public errorHandler = ErrorHandler;
 
 	static getConnection() {
 		return mysql.createConnection({
@@ -16,6 +16,7 @@ export class Database {
 	}
 
 	constructor() {
+		super();
 		this.con = Database.getConnection();
 	}
 
@@ -28,7 +29,7 @@ export class Database {
 			callback = values;
 		}
 
-		callback = this.errorHandler.bind(callback);
+		callback = this._bindErrorHandler(callback);
 
 		if (this.con) {
 			this.con.query(sql, values, callback);
@@ -76,18 +77,31 @@ export class Database {
 		}
 	}
 
-}
-
-export module ErrorHandler {
-	export function bind(callback: mysql.QueryCallback) {
+	_bindErrorHandler(callback: mysql.QueryCallback): mysql.QueryCallback {
 		return (err: any, result:any) => {
 			if (err) {
-				console.log('error handler');
-				this.con.rollback();
-				this.con.close();
+				console.log(err);
+				this.rollback((err:any, result:any) => {
+					this.close();
+				});
+				this.emit('error', err);
 				throw err;
 			}
 			callback(err, result);
 		};
 	}
 }
+
+// export module ErrorHandler {
+// 	export function bind(callback: mysql.QueryCallback) {
+// 		return (err: any, result:any) => {
+// 			if (err) {
+// 				console.log('error handler');
+// 				this.con.rollback();
+// 				this.con.close();
+// 				throw err;
+// 			}
+// 			callback(err, result);
+// 		};
+// 	}
+// }
