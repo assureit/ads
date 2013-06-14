@@ -71,9 +71,9 @@ var ADS = (function() {
 			$("#newDCase").hide();
 			$("#selectDCase").show();
 			var importFile = new ImportFile();
-			importFile.readFile(function(e){
-				var tree = JSON.parse(e.target.result); //TODO convert to Markdown
-				var r = DCaseAPI.createDCase("hoge", tree.contents);
+			importFile.readFile(function(file){
+				var tree = JSON.parse(file.result); //TODO convert to Markdown
+				var r = DCaseAPI.createDCase(file.name.split(".")[0], tree.contents);
 				location.href = "./#dcase/" + r.dcaseId;
 			});
 		});

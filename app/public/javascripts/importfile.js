@@ -26,7 +26,9 @@ var ImportFile = (function(){
 				reader.onerror = function(e) {
 					console.log('error', e.target.error.code);
 				}
-				reader.onload = callback;
+				reader.onload = function(e){
+					callback({result: e.target.result, name: file.name});
+				};
 				reader.readAsText(file, 'utf-8');
 			}
 			return false;
