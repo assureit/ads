@@ -107,7 +107,6 @@ var ADS = (function() {
 			var $body  = $(body);
 			var viewer = new DCaseViewer(document.getElementById("viewer"),
 					null, isLogin(userId));
-			self.viewer = viewer;
 			var timelineView = self.timelineView = new TimeLineView($body, viewer, isLogin(userId));
 			self.dcase_latest = null;
 
@@ -118,79 +117,25 @@ var ADS = (function() {
 			});
 			var searchView = new SearchView();
 
-			var colorThemes = {
-				"default":
-					viewer.default_colorTheme,
-				"TiffanyBlue": {
-					fill: {
-						"Goal"    : "#b4d8df",
-						"Context" : "#dbf5f3",
-						"Subject" : "#dbf5f3",
-						"Strategy": "#b4d8df",
-						"Evidence": "#dbf5f3",
-						"Solution": "#dbf5f3",
-						"Rebuttal": "#eeaaaa",
-					},
-					__proto__: viewer.default_colorTheme
-				},
-				"simple": {
-					fill: {
-						"Goal"    : "#ffffff",
-						"Context" : "#ffffff",
-						"Subject" : "#ffffff",
-						"Strategy": "#ffffff",
-						"Evidence": "#ffffff",
-						"Solution": "#ffffff",
-						"Rebuttal": "#ffffff",
-					},
-					stroke: {
-						"Goal"    : "#000000",
-						"Context" : "#000000",
-						"Subject" : "#000000",
-						"Strategy": "#000000",
-						"Evidence": "#000000",
-						"Solution": "#000000",
-						"Rebuttal": "#000000",
-					},
-					__proto__: viewer.default_colorTheme
-				},
-			};
+			var colorSets = new ColorSets(viewer);
+			colorSets.initDefaultTheme();
+			colorSets.createDropMenu();
+			// change color theme
+			var name = document.cookie.match(/colorTheme=(\w+);?/);
+			if(name != null) {
+				viewer.setColorTheme(colorSets.changeTheme(name[1]));
+			}
 
-			(function() {
-				// update color theme menu
-				$("#menu-change-theme *").remove();
-				var $ul = $("#menu-change-theme");
-				$.each(colorThemes, function(name, theme) {
-					var sample = "";
-					$.each(DCaseNode.TYPES, function(i, type) {
-						sample += "<span style=\"color: " + theme.fill[type] + ";\">■</span>";
-					});
-					var $li = $("<li></li>")
-						.html("<a href=\"#\">" + sample + name + "</a>")
-						.appendTo($ul);
-					$li.click(function(e) {
-						viewer.setColorTheme(theme);
-						e.preventDefault();
-						document.cookie="colorTheme=" + name;
-					});
-				});
+			// show DCase
+			var r = DCaseAPI.getDCase(dcaseId);
+			var dcase = new DCase(JSON.parse(r.contents), dcaseId, r.commitId);
+			viewer.setDCase(dcase);
+			timelineView.repaint(dcase);
+			dcase_latest = dcase;
+			document.title = r.dcaseName + this.TITLE_SUFFIX;
+			$("#dcaseName").text(r.dcaseName);
 
-				// show DCase
-				var r = DCaseAPI.getDCase(dcaseId);
-				var dcase = new DCase(JSON.parse(r.contents), dcaseId, r.commitId);
-				viewer.setDCase(dcase);
-				timelineView.repaint(dcase);
-				dcase_latest = dcase;
-				document.title = r.dcaseName + this.TITLE_SUFFIX;
-				$("#dcaseName").text(r.dcaseName);
-
-				// change color theme
-				var name = document.cookie.match(/colorTheme=(\w+);?/);
-				if(name != null) {
-					viewer.setColorTheme(colorThemes[name[1]]);
-				}
-			}());
-		});
+	});
 
 		router.start();
 
