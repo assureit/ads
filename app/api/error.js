@@ -83,6 +83,14 @@ var NotFoundError = (function (_super) {
     return NotFoundError;
 })(ApplicationError);
 exports.NotFoundError = NotFoundError;
+var DuplicatedError = (function (_super) {
+    __extends(DuplicatedError, _super);
+    function DuplicatedError(msg, data) {
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.NOT_DEFINED, msg, data);
+    }
+    return DuplicatedError;
+})(ApplicationError);
+exports.DuplicatedError = DuplicatedError;
 var RPC_ERROR;
 (function (RPC_ERROR) {
     RPC_ERROR._map = [];
