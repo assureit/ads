@@ -107,8 +107,8 @@ var SelectDCaseView = (function() {
 		var self = this;
 		$("#prev-page").click(function(e) {
 			var i = self.pageIndex - 0;
-			self.pageIndex = i - 1;
-			if(self.pageIndex < 1) {
+			if(i > 1) {
+				self.pageIndex = i - 1;
 				location.href = "./#page/" + self.pageIndex;
 			}
 			e.preventDefault();
