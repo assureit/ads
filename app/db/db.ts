@@ -58,9 +58,14 @@ export class Database extends events.EventEmitter {
 
 	rollback(callback?: mysql.QueryCallback): void {
 		callback = callback || (err, result) => {if (err) throw err;};
-		this.query('ROLLBACK', (err, query) => {
-			callback(err, query);
-		});
+		if (this.con) {
+			// don't call this.query. it occure recursive rollback with _bind_ErrorHandler.
+			this.con.query('ROLLBACK', (err, query) => {
+				callback(err, query);
+			});
+		} else {
+			callback(null, null);
+		}
 	}
 
 	endTransaction(callback: mysql.QueryCallback): void {
@@ -80,7 +85,6 @@ export class Database extends events.EventEmitter {
 	_bindErrorHandler(callback: mysql.QueryCallback): mysql.QueryCallback {
 		return (err: any, result:any) => {
 			if (err) {
-				console.log(err);
 				this.rollback((err:any, result:any) => {
 					this.close();
 				});

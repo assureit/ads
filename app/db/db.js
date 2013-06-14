@@ -53,9 +53,13 @@ var Database = (function (_super) {
                 throw err;
             }
         };
-        this.query('ROLLBACK', function (err, query) {
-            callback(err, query);
-        });
+        if(this.con) {
+            this.con.query('ROLLBACK', function (err, query) {
+                callback(err, query);
+            });
+        } else {
+            callback(null, null);
+        }
     };
     Database.prototype.endTransaction = function (callback) {
         this.query('SET autocommit=1', function (err, query) {
@@ -77,7 +81,6 @@ var Database = (function (_super) {
         var _this = this;
         return function (err, result) {
             if(err) {
-                console.log(err);
                 _this.rollback(function (err, result) {
                     _this.close();
                 });
