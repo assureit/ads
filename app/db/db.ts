@@ -19,11 +19,18 @@ export class Database {
 	}
 
 	// TODO: ちゃんとした型定義
-	query(sql:string, callback: mysql.QueryCallback);
-	query(sql:string, values:any[], callback: mysql.QueryCallback);
-	query(sql:any, values:any[], callback: mysql.QueryCallback);
-	query(sql: string, values: any, callback?: any) {
-		this.con.query(sql, values, callback);
+	query(sql:string, 	callback: mysql.QueryCallback);
+	query(sql:string, 	values:any[], 	callback: mysql.QueryCallback);
+	query(sql:any, 		values:any[], 	callback: mysql.QueryCallback);
+	query(sql: string, 	values: any, 	callback?: any) {
+		if (callback === undefined && typeof values === 'function') {
+			callback = values;
+		}
+		if (this.con) {
+			this.con.query(sql, values, callback);
+		} else {
+			callback();
+		}
 	}
 
 	begin(callback: mysql.QueryCallback): void {
@@ -59,7 +66,10 @@ export class Database {
 
 	close(callback?: mysql.QueryCallback) {
 		callback = callback || (err, result) => {if (err) throw err;};
-		this.con.end(callback);
+		if (this.con) {
+			this.con.end(callback);
+			this.con = undefined;
+		}
 	}
 
 }

@@ -12,7 +12,14 @@ var Database = (function () {
         });
     };
     Database.prototype.query = function (sql, values, callback) {
-        this.con.query(sql, values, callback);
+        if(callback === undefined && typeof values === 'function') {
+            callback = values;
+        }
+        if(this.con) {
+            this.con.query(sql, values, callback);
+        } else {
+            callback();
+        }
     };
     Database.prototype.begin = function (callback) {
         var _this = this;
@@ -52,7 +59,10 @@ var Database = (function () {
                 throw err;
             }
         };
-        this.con.end(callback);
+        if(this.con) {
+            this.con.end(callback);
+            this.con = undefined;
+        }
     };
     return Database;
 })();
