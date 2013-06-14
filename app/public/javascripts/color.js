@@ -4,16 +4,16 @@ var ColorSets = (function () {
 		$("#menu-change-theme *").remove();
 	}
 
-	ColorSets.prototype.addTheme = function(theme) {
+	ColorSets.prototype.add = function(theme) {
 		//FIXME
 	}
 
-	ColorSets.prototype.changeTheme = function(name) {
-		return this.colorThemes[name];
+	ColorSets.prototype.get = function(name) {
+		return this.Sets[name];
 	}
 
-	ColorSets.prototype.initDefaultTheme = function() {
-		this.colorThemes = {
+	ColorSets.prototype.init = function() {
+		this.Sets = {
 			"default":
 				this.viewer.default_colorTheme,
 			"TiffanyBlue": {
@@ -55,7 +55,7 @@ var ColorSets = (function () {
 	ColorSets.prototype.createDropMenu = function() {
 		var self = this;
 		var $ul = $("#menu-change-theme");
-		$.each(this.colorThemes, function(name, theme) {
+		$.each(this.Sets, function(name, theme) {
 			var sample = "";
 			$.each(DCaseNode.TYPES, function(i, type) {
 				sample += "<span style=\"color: " + theme.fill[type] + ";\">■</span>";

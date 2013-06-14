@@ -15,11 +15,11 @@ var ADS = (function() {
 	}
 
 	function hideEditMenu() {
-		$(".ase-edit-menu").css("display", "none");
+		$(".ads-edit-menu").css("display", "none");
 	}
 
 	function hideViewMenu() {
-		$(".ase-view-menu").css("display", "none");
+		$(".ads-view-menu").css("display", "none");
 	}
 
 	function hideViewer() {
@@ -100,8 +100,8 @@ var ADS = (function() {
 			$("#selectDCase").hide();
 			var userId = getLoginUserorNull();
 
-			$(".ase-view-menu").css("display", "block");
-			$(".ase-edit-menu").css("display", "block");
+			$(".ads-view-menu").css("display", "block");
+			$(".ads-edit-menu").css("display", "block");
 
 			$("#viewer").css("display", "block");
 			var $body  = $(body);
@@ -118,12 +118,12 @@ var ADS = (function() {
 			var searchView = new SearchView();
 
 			var colorSets = new ColorSets(viewer);
-			colorSets.initDefaultTheme();
+			colorSets.init();
 			colorSets.createDropMenu();
 			// change color theme
 			var name = document.cookie.match(/colorTheme=(\w+);?/);
 			if(name != null) {
-				viewer.setColorTheme(colorSets.changeTheme(name[1]));
+				viewer.setColorTheme(colorSets.get(name[1]));
 			}
 
 			// show DCase
@@ -142,7 +142,7 @@ var ADS = (function() {
 		viewer.exportSubtree = function(type, root) {
 			self.exportTree(type, root);
 		};
-	}
+	} // function ADS
 
 	ADS.prototype.commit = function() {
 		if(this.viewer.editable) {
