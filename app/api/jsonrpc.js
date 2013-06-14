@@ -20,9 +20,9 @@ function httpHandler(req, res) {
     function onError(id, statusCode, error) {
         res.send(JSON.stringify({
             jsonrpc: '2.0',
-            error: error,
+            error: error.toStrictRPCError(),
             id: id
-        }), statusCode);
+        }), error.rpcHttpStatus);
     }
     res.header('Content-Type', 'application/json');
     if(req.body.jsonrpc !== '2.0') {
@@ -51,9 +51,9 @@ function httpHandler(req, res) {
             onFailure: function (error) {
                 res.send(JSON.stringify({
                     jsonrpc: '2.0',
-                    error: error,
+                    error: error.toStrictRPCError(),
                     id: req.body.id
-                }), 500);
+                }), error.rpcHttpStatus);
             }
         });
     });
