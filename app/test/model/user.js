@@ -1,5 +1,6 @@
 var db = require('../../db/db')
 var model_user = require('../../model/user')
+var error = require('../../api/error')
 var domain = require('domain')
 var expect = require('expect.js');
 describe('model', function () {
@@ -41,6 +42,9 @@ describe('model', function () {
             }
         });
         dom.run(function () {
+            setTimeout(function () {
+                throw 'timeout';
+            }, 1000);
             describe('register', function () {
                 it('should return User object property', function (done) {
                     var loginName = 'unittest01';
@@ -70,7 +74,28 @@ describe('model', function () {
                     });
                 });
                 it('can not register if login name is duplicated', function (done) {
-                    done();
+                    var _this = this;
+                    var loginName = 'unittest02';
+                    var pwd = 'password';
+                    con.errorHandler = {
+                        bind: function (callback) {
+                            return function (err, result) {
+                                if(err) {
+                                    console.log('==================================');
+                                    expect(err).not.to.be(null);
+                                    expect(err instanceof error.DuplicatedError).to.be(true);
+                                    _this.con.rollback();
+                                    _this.con.close();
+                                    done();
+                                }
+                                callback(err, result);
+                            };
+                        }
+                    };
+                    userDAO.register(loginName, pwd, function (result) {
+                        userDAO.register(loginName, pwd, function (result) {
+                        });
+                    });
                 });
             });
         });

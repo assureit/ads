@@ -4,6 +4,7 @@ import mysql = module('mysql')
 
 export class Database {
 	public con: mysql.Connection;
+	public errorHandler = ErrorHandler;
 
 	static getConnection() {
 		return mysql.createConnection({
@@ -26,10 +27,13 @@ export class Database {
 		if (callback === undefined && typeof values === 'function') {
 			callback = values;
 		}
+
+		callback = this.errorHandler.bind(callback);
+
 		if (this.con) {
 			this.con.query(sql, values, callback);
 		} else {
-			callback();
+			callback('Connection is closed');
 		}
 	}
 
@@ -72,4 +76,18 @@ export class Database {
 		}
 	}
 
+}
+
+export module ErrorHandler {
+	export function bind(callback: mysql.QueryCallback) {
+		return (err: any, result:any) => {
+			if (err) {
+				console.log('error handler');
+				this.con.rollback();
+				this.con.close();
+				throw err;
+			}
+			callback(err, result);
+		};
+	}
 }

@@ -2,8 +2,9 @@
 ///<reference path='../../DefinitelyTyped/node/node.d.ts'/>
 ///<reference path='../../DefinitelyTyped/expect.js/expect.js.d.ts'/>
 
-import db = module('../../db/db');
-import model_user = module('../../model/user');
+import db = module('../../db/db')
+import model_user = module('../../model/user')
+import error = module('../../api/error')
 import domain = module('domain')
 var expect = require('expect.js');	// TODO: import module化
 
@@ -50,7 +51,11 @@ describe('model', function() {
 			}
 		});
 
+
 		dom.run(() => {
+			setTimeout(() => {
+				throw 'timeout';
+			}, 1000);
 			describe('register', function() {
 				it('should return User object property', function(done) {
 					var loginName = 'unittest01';
@@ -85,7 +90,29 @@ describe('model', function() {
 
 				});
 				it('can not register if login name is duplicated', function(done) {
-					done();
+					var loginName = 'unittest02';
+					var pwd = 'password';
+
+					con.errorHandler = {
+	bind: (callback) => {
+		return (err: any, result:any) => {
+			if (err) {
+				console.log('==================================');
+				expect(err).not.to.be(null);
+				expect(err instanceof error.DuplicatedError).to.be(true);
+				this.con.rollback();
+				this.con.close();
+				done();
+			}
+			callback(err, result);
+		};
+	}
+					};
+
+					userDAO.register(loginName, pwd, (result: model_user.User) => {
+						userDAO.register(loginName, pwd, (result: model_user.User) => {
+						});
+					});
 				});
 			});
 		});

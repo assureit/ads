@@ -1,6 +1,7 @@
 var mysql = require('mysql')
 var Database = (function () {
     function Database() {
+        this.errorHandler = ErrorHandler;
         this.con = Database.getConnection();
     }
     Database.getConnection = function getConnection() {
@@ -15,10 +16,11 @@ var Database = (function () {
         if(callback === undefined && typeof values === 'function') {
             callback = values;
         }
+        callback = this.errorHandler.bind(callback);
         if(this.con) {
             this.con.query(sql, values, callback);
         } else {
-            callback();
+            callback('Connection is closed');
         }
     };
     Database.prototype.begin = function (callback) {
@@ -67,3 +69,19 @@ var Database = (function () {
     return Database;
 })();
 exports.Database = Database;
+(function (ErrorHandler) {
+    function bind(callback) {
+        var _this = this;
+        return function (err, result) {
+            if(err) {
+                console.log('error handler');
+                _this.con.rollback();
+                _this.con.close();
+                throw err;
+            }
+            callback(err, result);
+        };
+    }
+    ErrorHandler.bind = bind;
+})(exports.ErrorHandler || (exports.ErrorHandler = {}));
+var ErrorHandler = exports.ErrorHandler;
