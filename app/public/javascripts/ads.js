@@ -48,8 +48,10 @@ var ADS = (function() {
 			createDCaseView.disableSubmit();
 		}
 
-		selectDCaseView.clearTable();
-		selectDCaseView.addTable(userId, pageIndex);
+		if(selectDCaseView != null) {
+			selectDCaseView.clearTable();
+			selectDCaseView.addTable(userId, pageIndex);
+		}
 	}
 
 	function ADS(body) {
