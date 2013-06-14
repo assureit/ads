@@ -95,17 +95,3 @@ export class Database extends events.EventEmitter {
 		};
 	}
 }
-
-// export module ErrorHandler {
-// 	export function bind(callback: mysql.QueryCallback) {
-// 		return (err: any, result:any) => {
-// 			if (err) {
-// 				console.log('error handler');
-// 				this.con.rollback();
-// 				this.con.close();
-// 				throw err;
-// 			}
-// 			callback(err, result);
-// 		};
-// 	}
-// }
