@@ -59,7 +59,6 @@ var ADS = (function() {
 		this.URL_EXPORT = "cgi/view2.cgi";  //FIXME
 		this.URL_EXPORT_SVG = "cgi/svg.cgi";
 
-
 		var router = new Router();
 		router.route("new", "new", function() {
 			initDefaultScreen(getLoginUserorNull());
@@ -73,7 +72,9 @@ var ADS = (function() {
 			$("#selectDCase").show();
 			var importFile = new ImportFile();
 			importFile.readFile(function(e){
-				console.log(e.target.result); //TODO
+				var tree = JSON.parse(e.target.result); //TODO convert to Markdown
+				var r = DCaseAPI.createDCase("hoge", tree.contents);
+				location.href = "./#dcase/" + r.dcaseId;
 			});
 		});
 

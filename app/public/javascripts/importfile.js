@@ -31,7 +31,7 @@ var ImportFile = (function(){
 			}
 			return false;
 		});
-	}
+	};
 
 	return ImportFile;
 })();

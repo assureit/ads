@@ -47,10 +47,9 @@ DCaseAPI.getDCaseList = function(callback, error) {
 	}
 };
 
-DCaseAPI.createDCase = function(name, tree, userId, callback, error) {
+DCaseAPI.createDCase = function(name, tree, callback, error) {
 	return this.call("createDCase", {
-		dcaseName: name, contents: tree, userId: userId
-	}, callback, error);
+		dcaseName: name, contents: tree }, callback, error);
 };
 
 DCaseAPI.getCommitList = function(dcaseId, callback, error) {

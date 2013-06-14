@@ -29,7 +29,7 @@ var CreateDCaseView = (function() {
 				TopGoalId: id,
 				NodeCount: 1,
 			};
-			var r = DCaseAPI.createDCase(name, tree, userId);
+			var r = DCaseAPI.createDCase(name, tree);
 			location.href = "./#dcase/" + r.dcaseId;
 		});
 	};
