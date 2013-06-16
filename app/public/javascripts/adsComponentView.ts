@@ -3,9 +3,6 @@
 
 var CreateDCaseView = (function() {
 	function CreateDCaseView() {
-	}
-
-	CreateDCaseView.prototype.enableSubmit = function(userId) {
 		$("#dcase-create").click(function() {
 			var name = $("#inputDCaseName").attr("value");
 			var desc = $("#inputDesc").attr("value");
@@ -35,6 +32,12 @@ var CreateDCaseView = (function() {
 			var r = DCaseAPI.createDCase(name, tree);
 			location.href = "./#dcase/" + r.dcaseId;
 		});
+	}
+
+	CreateDCaseView.prototype.enableSubmit = function(userId) {
+		$("#dcase-create").removeClass("disabled");
+		$("#inputDCaseName").removeAttr("disabled");
+		$("#inputDesc").removeAttr("disabled");
 	};
 
 	CreateDCaseView.prototype.disableSubmit = function() {
