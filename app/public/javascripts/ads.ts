@@ -42,13 +42,6 @@ var ADS = (function() {
 		hideViewMenu();
 
 		$("#dcase-manager").css("display", "block");
-		var createDCaseView = new CreateDCaseView();
-
-		if(isLogin(userId)) {
-			createDCaseView.enableSubmit();
-		} else {
-			createDCaseView.disableSubmit();
-		}
 
 		if(selectDCaseView != null) {
 			selectDCaseView.clearTable();
@@ -63,12 +56,20 @@ var ADS = (function() {
 		this.URL_EXPORT_SVG = "cgi/svg.cgi";
 		var selectDCaseView = new SelectDCaseView();
 		selectDCaseView.initEvents();
+		var createDCaseView = new CreateDCaseView();
 
 		var router = new Router();
 		router.route("new", "new", function() {
-			initDefaultScreen(getLoginUserorNull());
+			var userId  = getLoginUserorNull();
+			initDefaultScreen(userId);
 			$("#newDCase").show();
 			$("#selectDCase").hide();
+
+			if(isLogin(userId)) {
+				createDCaseView.enableSubmit();
+			} else {
+				createDCaseView.disableSubmit();
+			}
 		});
 
 		var defaultRouter = function(pageIndex) {
