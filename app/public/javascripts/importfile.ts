@@ -1,7 +1,7 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 
-class DCaseFile{
-	constructor(result: string, name: string){}
+class DCaseFile {
+	constructor(public result: string, public name: string){}
 }
 
 class ImportFile {
@@ -27,13 +27,14 @@ class ImportFile {
 			e.preventDefault();
 			$(this).removeClass('hover');
 			var file: File = (<any>e.originalEvent.dataTransfer).files[0];
-			if(file){
+			if(file) {
 				var reader = new FileReader();
-				reader.onerror = e => {
+				reader.onerror = (e) => {
 					console.log('error', (<any>e.target).error.code);
 				}
-				reader.onload = e => {
-					callback(new DCaseFile(e.target.result, file.name));
+				reader.onload = (e) => {
+					var dcaseFile = new DCaseFile((<any>e.target).result, file.name);
+					callback(dcaseFile);
 				};
 				reader.readAsText(file, 'utf-8');
 			}

@@ -173,57 +173,6 @@ class ADS {
 		}
 	}
 
-	searchNode(text, types, beginDate, endDate, callback, callbackOnNoResult): void {
-		var dcase = this.viewer.getDCase();
-		var root = dcase ? dcase.getTopGoal() : undefined;
-		if(!root) {
-			if(callbackOnNoResult) {
-				callbackOnNoResult();
-			}
-			return;
-		}
-		root.traverse(function(node) {
-			var name = node.name;
-			var desc = node.desc;
-			var d_index = desc.toLowerCase().indexOf(text);
-			var n_index = name.toLowerCase().indexOf(text);
-			if(d_index != -1 || n_index != -1) {
-				callback(node);
-				//var ptext = getPreviewText(desc, text);
-				//callback($res, v, name, ptext);
-			}
-		});
-	}
-
-	updateSearchResult(text) {
-		$('#search-query').popover('show');
-		var $res = $("#search_result_ul");
-		$res.empty();
-		text = text.toLowerCase();
-		var result = DCaseAPI.searchDCase(text);
-		if(result.length == 0) {
-			$res.append("<li>No Results</li>");
-		} else {
-			for(var i = 0; i < result.length; ++i) {
-				var res = result[i];
-				var id = res.dcaseId;
-				$("<li>")
-					.html("<a href=\"#dcase/" + id + "\">" + id + "</a>")
-					.appendTo($res);
-			}
-		}
-		$res.append("<hr>");
-		this.searchNode(text, [], null, null, (node) => {
-			$("<li>")
-				.html("<a href=\"#\">" + node.name + "</a>")
-				.click((e) => {
-					this.viewer.centerize(node, 500);
-					e.preventDefault();
-				})
-				.appendTo($res);
-		});
-	}
-
 	foreachLine(str: string, max: number, callback) : void{
 		if(!callback) return;
 		var rest: string = str;
@@ -274,7 +223,7 @@ class ADS {
 			.appendTo($svg);
 
 		var foreachLine = this.foreachLine;
-		root.traverse(function(node) {
+		root.traverse((node) => {
 			var nodeView = nodeViewMap[node.id];
 			if(nodeView.visible == false) return;
 			var svg  = nodeView.svg[0];
@@ -294,7 +243,7 @@ class ADS {
 			$(document.createElementNS(SVG_NS, "tspan"))
 				.text(node.name).attr("font-weight", "bold").appendTo($svgtext);
 
-			foreachLine(node.desc, 1+~~(div.offsetWidth * 2 / 13), function(linetext) {
+			foreachLine(node.desc, 1+~~(div.offsetWidth * 2 / 13), (linetext) => {
 				$(document.createElementNS(SVG_NS, "tspan"))
 					.text(linetext)
 					.attr({x : div.offsetLeft, dy : 15, "font-size" : "13px"})
