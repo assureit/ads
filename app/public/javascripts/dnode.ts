@@ -120,6 +120,7 @@ class DCaseNodeModel {
     traverse(f: (i: number, v: DCaseNodeModel) => void): void {
         var traverse_ = (n: DCaseNodeModel, f: (i: number, v: DCaseNodeModel) => void)=>{
             n.eachSubNode((i, v)=>{
+                    
                     f(i, v);
                     traverse_(v, f)
                     });
@@ -128,16 +129,16 @@ class DCaseNodeModel {
         traverse_(this, f);
     }
 
-    deepCopy(): DCaseNode { //FIXME
-        node: DCaseNode = new DCaseNode(this.id, this.name, this.type, this.desc, this.metadata);
+    deepCopy(): DCaseNodeModel { //FIXME
+        node: DCaseNodeModel = new DCaseNodeModel(this.id, this.name, this.type, this.desc, this.metadata);
         this.eachNode(function (child) {
             node.insertChild(child.deepCopy());
         });
         return node;
     }
 
-    insertChild(node: DCaseNode, index: number): void {
-        a: DCaseNode = node.isContext ? this.contexts : this.children;
+    insertChild(node: DCaseNodeModel, index: number): void {
+        a: DCaseNodeModel = node.isContext ? this.contexts : this.children;
         if(index == null) {
             index = a.length;
         }
@@ -146,8 +147,8 @@ class DCaseNodeModel {
         this.updateFlags();
     }
 
-    removeChild(node: DCaseNode): void {
-        a: DcaseNode = node.isContext ? this.contexts : this.children;
+    removeChild(node: DCaseNodeModel): void {
+        a: DCaseNodeModel = node.isContext ? this.contexts : this.children;
         i: number = a.indexOf(node);
         a.splice(i, 1);
         node.parents.splice(node.parents.indexOf(this), 1);
@@ -179,11 +180,11 @@ class DCaseNodeModel {
     }
 
     appendableTypes(): string[] {
-        return DCaseNode.SELECTABLE_TYPES[this.type];
+        return DCaseNodeModel.SELECTABLE_TYPES[this.type];
     }
 
-    isTypeApendable(type; string): boolean {
-        return (DCaseNode.SELECTABLE_TYPES[this.type].indexOf(type) != -1);
+    isTypeApendable(type: string): boolean {
+        return (DCaseNodeModel.SELECTABLE_TYPES[this.type].indexOf(type) != -1);
     }
 
     toJson(): any {   //FIXME
@@ -203,11 +204,11 @@ class DCaseNodeModel {
 }
 
 class DCaseTree {
-    NodeList: DCaseNode[];
+    NodeList: DCaseNodeModel[];
     TopGoalId: number;
     NodeCount: number;
 
-    constructor(tl: DCaseNode[], id: number, nodeCount: number) {
+    constructor(tl: DCaseNodeModel[], id: number, nodeCount: number) {
         this.NodeList = tl;
         this.TopGoalId = id;
         this.NodeCount = nodeCount;
@@ -215,7 +216,7 @@ class DCaseTree {
 }
 
 class DCaseModel {
-    node: DcaseNodeModel;
+    node: DCaseNodeModel;
     commitId: number;
     argId: number;
     opQueue: any;   //FIXME
@@ -234,14 +235,14 @@ class DCaseModel {
         this.typeCount = {};
         this.view = [];
 
-        types: string[] = DCaseNodeModel.TYPES;
-        for(i: number = 0; i < types.length; i++) {
+        types: any = DCaseNodeModel.TYPES; 
+        for(var i = 0; i < types.length; i++) {
             this.typeCount[types[i]] = 1;
         }
         this.decode(tree);
     }
 
-    decode(tree): void {
+    decode(tree: DCaseTree): void {
         // function contextParams(params) {
             // var s = "";
             // for(key in params) {
@@ -252,19 +253,19 @@ class DCaseModel {
         // }
 
         self: DCaseModel = this;
-        nodes: DcaseNodeModel[] = []; 
-        for(i: number = 0; i < tree.NodeList.length; i++) {
+        nodes: any = [];  //FIXME
+        for(var i = 0; i < tree.NodeList.length; i++) {
             c: DCaseNodeModel = tree.NodeList[i];
             nodes[c.ThisNodeId] = c;
         }
 
-        create(id: number): DCaseNodeModel { //FIXME
-                data: DcaseNodeModel = nodes[id];
+        function create(id){ //FIXME
+                data: DCaseNodeModel = nodes[id];
                 type: string = data.NodeType;
                 desc: string = data.Description;
                 metadata: DCaseMetaContent = data.Metadata ? data.Metadata : null;
                 node: DCaseNodeModel = self.createNode(id, type, desc, metadata);
-            for(i: number = 0; i < data.Children.length; i++) {
+            for(var i = 0; i < data.Children.length; i++) {
                 node.insertChild(create(data.Children[i]));
             }
             return node;
@@ -276,11 +277,11 @@ class DCaseModel {
     }
 
     encode(): DCaseTree {
-        tl: DCaseNodeModel[] = [];
+        tl: any = [];  //FIXME
         node: DCaseNodeModel = this.node;
-        node.traverse(function (0, node) {
+        node.traverse((0, node) => {
             var c = [];
-            node.eachSubNode(function (0, node) {
+            node.eachSubNode((0, node) => {
                 c.push(node.id);
             });
             tl.push({
