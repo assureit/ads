@@ -21,8 +21,8 @@ class ImportFile {
 		});
 	}
 
-	read(callback: DCaseFile): void{
-		$("div.row").on('drop', e => {
+	read(callback: (DCaseFile) => void): void{
+		$("div.row").on('drop', (e) => {
 			e.stopPropagation();
 			e.preventDefault();
 			$(this).removeClass('hover');

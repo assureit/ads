@@ -21,7 +21,7 @@ var DCaseNodeModel = (function () {
         this.metadata = metadata;
         this.children = [];
         this.contexts = [];
-        this.parents = [];
+        this.parent = null;
         this.updateFlags();
         if(type == "Solution") {
             this.isDScript = true;
@@ -92,8 +92,8 @@ var DCaseNodeModel = (function () {
         }
     };
     DCaseNodeModel.prototype.eachContents = function (f) {
-        for(var i = 0; i < this.metaContents.length; ++i) {
-            f(i, this.metaContents[i]);
+        for(var i = 0; i < this.metadata.length; ++i) {
+            f(i, this.metadata[i]);
         }
     };
     DCaseNodeModel.prototype.eachSubNode = function (f) {
@@ -111,30 +111,26 @@ var DCaseNodeModel = (function () {
         traverse_(this, f);
     };
     DCaseNodeModel.prototype.deepCopy = function () {
-        node:
-DCaseNodeModel = new DCaseNodeModel(this.id, this.name, this.type, this.desc, this.metadata)
-        this.eachNode(function (child) {
-            node.insertChild(child.deepCopy());
+        var node = new DCaseNodeModel(this.id, this.name, this.type, this.desc, this.metadata);
+        this.eachSubNode(function (i, v) {
+            node.insertChild(v.deepCopy(), i);
         });
         return node;
     };
     DCaseNodeModel.prototype.insertChild = function (node, index) {
-        a:
-DCaseNodeModel = node.isContext ? this.contexts : this.children
+        var a = node.isContext ? this.contexts : this.children;
         if(index == null) {
             index = a.length;
         }
         a.splice(index, 0, node);
-        node.parents.push(this);
+        node.parent = this;
         this.updateFlags();
     };
     DCaseNodeModel.prototype.removeChild = function (node) {
-        a:
-DCaseNodeModel = node.isContext ? this.contexts : this.children
-        i:
-number = a.indexOf(node)
+        var a = node.isContext ? this.contexts : this.children;
+        var i = a.indexOf(node);
         a.splice(i, 1);
-        node.parents.splice(node.parents.indexOf(this), 1);
+        node.parent = null;
         this.updateFlags();
     };
     DCaseNodeModel.prototype.updateFlags = function () {
@@ -151,7 +147,7 @@ number = a.indexOf(node)
         }
     };
     DCaseNodeModel.prototype.getHtmlMetadata = function () {
-        var innerText = generateMetadata(this);
+        var innerText = null;
         var divText = "<div></div>";
         if(innerText != "") {
             divText = "<div>Metadata</div>";
@@ -166,7 +162,7 @@ number = a.indexOf(node)
     };
     DCaseNodeModel.prototype.toJson = function () {
         var children = [];
-        this.eachNode(function (node) {
+        this.eachSubNode(function (i, node) {
             children.push(node.toJson());
         });
         return {
@@ -195,56 +191,43 @@ var DCaseModel = (function () {
         this.argId = argId;
         this.opQueue = [];
         this.undoCount = 0;
-        this.nodeCound = 0;
+        this.nodeCount = 0;
         this.typeCount = {
         };
         this.view = [];
-        types:
-any = DCaseNodeModel.TYPES
+        var types = DCaseNodeModel.TYPES;
         for(var i = 0; i < types.length; i++) {
             this.typeCount[types[i]] = 1;
         }
         this.decode(tree);
     }
     DCaseModel.prototype.decode = function (tree) {
-        self:
-DCaseModel = this
-        nodes:
-any = []
+        var self = this;
+        var nodes = [];
         for(var i = 0; i < tree.NodeList.length; i++) {
-            c:
-DCaseNodeModel = tree.NodeList[i]
-            nodes[c.ThisNodeId] = c;
+            var c = tree.NodeList[i];
+            nodes[c.id] = c;
         }
-        function create(id) {
-            data:
-DCaseNodeModel = nodes[id]
-            type:
-string = data.NodeType
-            desc:
-string = data.Description
-            metadata:
-DCaseMetaContent = data.Metadata ? data.Metadata : null
-            node:
-DCaseNodeModel = self.createNode(id, type, desc, metadata)
-            for(var i = 0; i < data.Children.length; i++) {
-                node.insertChild(create(data.Children[i]));
+        var create = function (id) {
+            var data = nodes[id];
+            var type = data.type;
+            var desc = data.desc;
+            var metadata = data.metadata ? data.metadata : null;
+            var node = self.createNode(id, type, desc, metadata);
+            for(var i = 0; i < data.children.length; i++) {
+                node.insertChild(create(data.children[i]), i);
             }
             return node;
-        }
-        topId:
-number = tree.TopGoalId
+        };
+        var topId = tree.TopGoalId;
         this.node = create(topId);
         this.nodeCount = tree.NodeCount;
     };
     DCaseModel.prototype.encode = function () {
-        tl:
-any = []
-        node:
-DCaseNodeModel = this.node
+        var tl = [];
+        var node = this.node;
         node.traverse(function (i, v) {
-            c:
-any = []
+            var c = [];
             node.eachSubNode(function (i, v) {
                 c.push(node.id);
             });
@@ -271,92 +254,79 @@ any = []
         return this.node;
     };
     DCaseModel.prototype.createNode = function (id, type, desc, metadata) {
-        name:
-string = DCaseNodeModel.NAME_PREFIX[type] + toString(id)
+        var name = DCaseNodeModel.NAME_PREFIX[type] + id.toString();
         return new DCaseNodeModel(id, name, type, desc, metadata);
     };
     DCaseModel.prototype.copyNode = function (node) {
-        self:
-DCaseModel = this
-        newNode:
-DCaseNodeModel = self.createNode(++this.nodeCount, node.type, node.desc, node.metadata)
+        var self = this;
+        var newNode = self.createNode(++this.nodeCount, node.type, node.desc, node.metadata);
         node.eachSubNode(function (i, v) {
-            newNode.insertChild(self.copyNode(child));
+            newNode.insertChild(self.copyNode(v), i);
         });
         return newNode;
     };
     DCaseModel.prototype.insertNode = function (parent, type, desc, metadata, index) {
-        self:
-DCaseModel = this
+        var _this = this;
         if(index == null) {
             index = parent.children.length;
         }
-        id:
-number = ++this.nodeCount
-        node:
-DCaseNodeModel = this.createNode(id, type, desc, metadata)
+        var id = ++this.nodeCount;
+        var node = this.createNode(id, type, desc, metadata);
         this.applyOperation({
             redo: function () {
                 parent.insertChild(node, index);
-                self.nodeInserted(parent, node, index);
+                _this.nodeInserted(parent, node, index);
             },
             undo: function () {
                 parent.removeChild(node);
-                self.nodeRemoved(parent, node, index);
+                _this.nodeRemoved(parent, node, index);
             }
         });
         return node;
     };
     DCaseModel.prototype.pasteNode = function (parent, old_node, index) {
-        self:
-DCaseModel = this
+        var _this = this;
         if(index == null) {
             index = parent.children.length;
         }
-        node:
-DCaseNodeModel = self.copyNode(old_node)
+        var node = this.copyNode(old_node);
         this.applyOperation({
             redo: function () {
                 parent.insertChild(node, index);
-                self.structureUpdated();
+                _this.structureUpdated();
             },
             undo: function () {
                 parent.removeChild(node);
-                self.structureUpdated();
+                _this.structureUpdated();
             }
         });
     };
     DCaseModel.prototype.removeNode = function (node) {
-        self:
-DCaseModel = this
-        parent:
-DCaseNodeModel = node.parents[0]
-        index:
-number = parent.children.indexOf(node)
+        var _this = this;
+        var parent = node.parent[0];
+        var index = parent.children.indexOf(node);
         this.applyOperation({
             redo: function () {
                 parent.removeChild(node);
-                self.nodeRemoved(parent, node, index);
+                _this.nodeRemoved(parent, node, index);
             },
             undo: function () {
                 parent.insertChild(node, index);
-                self.nodeInserted(parent, node, index);
+                _this.nodeInserted(parent, node, index);
             }
         });
     };
     DCaseModel.prototype.setDescription = function (node, desc) {
-        self:
-DCaseNodeModel = this
-        oldDesc:
-string = node.desc
+        var _this = this;
+        var oldDesc = node.desc;
         this.applyOperation({
             redo: function () {
                 node.desc = desc;
-                self.nodeChanged(node);
+                _this.nodeChanged(node);
             },
             undo: function () {
                 node.desc = oldDesc;
-                self.nodeChanged(node);
+                _this.nodeChanged(node);
             }
         });
     };
@@ -365,34 +335,27 @@ string = node.desc
         node.isContext = (node.type === "Context" || node.type === "Subject" || node.type === "Rebuttal");
     };
     DCaseModel.prototype.setType = function (node, type) {
-        self:
-DCaseNodeModel = this
-        oldType:
-string = node.type
+        var _this = this;
+        var oldType = node.type;
         this.applyOperation({
             redo: function () {
                 node.type = type;
-                self.updateTypeFlag(node);
-                self.nodeChanged(node);
+                _this.updateTypeFlag(node);
+                _this.nodeChanged(node);
             },
             undo: function () {
                 node.type = oldType;
-                self.updateTypeFlag(node);
-                self.nodeChanged(node);
+                _this.updateTypeFlag(node);
+                _this.nodeChanged(node);
             }
         });
     };
     DCaseModel.prototype.setParam = function (node, type, name, desc, metadata) {
-        self:
-DCaseNodeModel = this
-        oldType:
-string = node.type
-        oldName:
-string = node.name
-        oldDesc:
-string = node.desc
-        oldMetadata:
-DCaseMetaContent = node.metadata
+        var _this = this;
+        var oldType = node.type;
+        var oldName = node.name;
+        var oldDesc = node.desc;
+        var oldMetadata = node.metadata;
         node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
         this.applyOperation({
             redo: function () {
@@ -401,8 +364,8 @@ DCaseMetaContent = node.metadata
                 node.desc = desc;
                 node.metadata = metadata;
                 node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
-                self.updateTypeFlag(node);
-                self.nodeChanged(node);
+                _this.updateTypeFlag(node);
+                _this.nodeChanged(node);
             },
             undo: function () {
                 node.type = oldType;
@@ -410,18 +373,16 @@ DCaseMetaContent = node.metadata
                 node.desc = oldDesc;
                 node.metadata = oldMetadata;
                 node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
-                self.updateTypeFlag(node);
-                self.nodeChanged(node);
+                _this.updateTypeFlag(node);
+                _this.nodeChanged(node);
             }
         });
     };
     DCaseModel.prototype.undo = function () {
-        n:
-number = this.opQueue.length
+        var n = this.opQueue.length;
         if(n > this.undoCount) {
             this.undoCount++;
-            op:
-any = this.opQueue[n - this.undoCount]
+            var op = this.opQueue[n - this.undoCount];
             op.undo();
             return true;
         } else {
@@ -430,8 +391,7 @@ any = this.opQueue[n - this.undoCount]
     };
     DCaseModel.prototype.redo = function () {
         if(this.undoCount > 0) {
-            op:
-any = this.opQueue[this.opQueue.length - this.undoCount]
+            var op = this.opQueue[this.opQueue.length - this.undoCount];
             this.undoCount--;
             op.redo();
             return true;
@@ -445,10 +405,8 @@ any = this.opQueue[this.opQueue.length - this.undoCount]
         op.redo();
     };
     DCaseModel.prototype.commit = function (msg) {
-        tree:
-DCaseTree = this.encode()
-        r:
-number = DCaseAPI.commit(tree, msg, this.commitId)
+        var tree = this.encode();
+        var r = DCaseAPI.commit(tree, msg, this.commitId);
         this.commitId = r;
         this.undoCount = 0;
         this.opQueue = [];

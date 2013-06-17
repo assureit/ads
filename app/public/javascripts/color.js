@@ -43,16 +43,16 @@ var ColorSets = (function () {
         };
     };
     ColorSets.prototype.createDropMenu = function () {
-        var self = this;
+        var _this = this;
         var $ul = $("#menu-change-theme");
         $.each(this.Sets, function (name, theme) {
             var sample = "";
-            $.each(DCaseNode.TYPES, function (i, type) {
+            $.each(DCaseNodeModel.TYPES, function (i, type) {
                 sample += "<span style=\"color: " + theme.fill[type] + ";\">■</span>";
             });
             var $li = $("<li></li>").html("<a href=\"#\">" + sample + name + "</a>").appendTo($ul);
             $li.click(function (e) {
-                self.viewer.setColorTheme(theme);
+                _this.viewer.setColorTheme(theme);
                 e.preventDefault();
                 document.cookie = "colorTheme=" + name;
             });

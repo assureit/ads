@@ -1,6 +1,7 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 ///<reference path='../../DefinitelyTyped/bootstrap/bootstrap.d.ts'/>
 ///<reference path='api.ts'/>
+///<reference path='dcaseviewer.ts'/>
 
 class CreateDCaseView {
 	constructor() {
@@ -111,21 +112,20 @@ class SelectDCaseView {
 	}
 
 	initEvents() {
-		var self = this;
-		$("#prev-page").click(e => {
-			var i = self.pageIndex - 0;
+		$("#prev-page").click((e) => {
+			var i = this.pageIndex - 0;
 			if(i > 1) {
-				self.pageIndex = i - 1;
-				location.href = "./#page/" + self.pageIndex;
+				this.pageIndex = i - 1;
+				location.href = "./#page/" + this.pageIndex;
 			}
 			e.preventDefault();
 		});
 
-		$("#next-page").click(e => {
-			var i = self.pageIndex - 0;
-			if(self.maxPageSize >= i + 1) {
-				self.pageIndex = i + 1;
-				location.href = "./#page/" + self.pageIndex;
+		$("#next-page").click((e) => {
+			var i = this.pageIndex - 0;
+			if(this.maxPageSize >= i + 1) {
+				this.pageIndex = i + 1;
+				location.href = "./#page/" + this.pageIndex;
 			}
 			e.preventDefault();
 		});
@@ -170,7 +170,7 @@ class SearchView {
 			}
 			return;
 		}
-		root.traverse(function(node) {
+		root.traverse((index, node) => {
 			var name = node.name;
 			var desc = node.desc;
 			var d_index = desc.toLowerCase().indexOf(text);

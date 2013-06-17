@@ -30,7 +30,7 @@ declare interface GestureScaleEvent extends Event {
 
 // for pointer.js -->
 
-class Rect {
+class Rectangle {
 	constructor(public l: number, public r: number, public t: number, public b: number) {}
 }
 
@@ -38,7 +38,7 @@ class PointerHandler {
 	viewer: DCaseViewer = null;
 	x0: number = 0;
 	y0: number = 0;
-	bounds: Rect = new Rect(0, 0, 0, 0);
+	bounds: Rectangle = new Rectangle(0, 0, 0, 0);
 	mainPointerId: number = null;
 	pointers: Pointer[] = [];
 	scale0: number;
@@ -61,7 +61,7 @@ class PointerHandler {
 		this.x0 = x;
 		this.y0 = y;
 		var size = this.viewer.treeSize();
-		this.bounds = new Rect(
+		this.bounds = new Rectangle(
 				20 - size.w * this.viewer.scale - this.viewer.shiftX,
 				this.viewer.$root.width() - 20 - this.viewer.shiftX,
 				20 - size.h * this.viewer.scale - this.viewer.shiftY,

@@ -99,20 +99,20 @@ var SelectDCaseView = (function () {
         });
     };
     SelectDCaseView.prototype.initEvents = function () {
-        var self = this;
+        var _this = this;
         $("#prev-page").click(function (e) {
-            var i = self.pageIndex - 0;
+            var i = _this.pageIndex - 0;
             if(i > 1) {
-                self.pageIndex = i - 1;
-                location.href = "./#page/" + self.pageIndex;
+                _this.pageIndex = i - 1;
+                location.href = "./#page/" + _this.pageIndex;
             }
             e.preventDefault();
         });
         $("#next-page").click(function (e) {
-            var i = self.pageIndex - 0;
-            if(self.maxPageSize >= i + 1) {
-                self.pageIndex = i + 1;
-                location.href = "./#page/" + self.pageIndex;
+            var i = _this.pageIndex - 0;
+            if(_this.maxPageSize >= i + 1) {
+                _this.pageIndex = i + 1;
+                location.href = "./#page/" + _this.pageIndex;
             }
             e.preventDefault();
         });
@@ -156,7 +156,7 @@ var SearchView = (function () {
             }
             return;
         }
-        root.traverse(function (node) {
+        root.traverse(function (index, node) {
             var name = node.name;
             var desc = node.desc;
             var d_index = desc.toLowerCase().indexOf(text);
