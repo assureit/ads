@@ -40,7 +40,8 @@ var ADS = (function () {
         router.route("", "", function () {
             defaultRouter(1);
         });
-        router.route("dcase/:id", "dcase", function (dcaseId) {
+        router.route("dcase/:id", "dcase", function (dcaseIdstr) {
+            var dcaseId = parseInt(dcaseIdstr);
             _this.hideViewer();
             _this.clearTimeLine();
             $("#newDCase").hide();
@@ -68,7 +69,7 @@ var ADS = (function () {
             }
             var r = DCaseAPI.getDCase(dcaseId);
             var tree = JSON.parse(r.contents);
-            var dcase = new DCaseModel(new DCaseTree(tree.NodeList, tree.TopGoalId, tree.NodeCount), dcaseId, r.commitId);
+            var dcase = new DCaseModel(tree, dcaseId, r.commitId);
             viewer.setDCase(dcase);
             _this.timelineView.repaint(dcase);
             _this.dcase_latest = dcase;
@@ -270,19 +271,19 @@ var ADS = (function () {
             e.preventDefault();
         });
         $("#menu-export-json").click(function (e) {
-            _this.exportTree("json");
+            _this.exportTree("json", null);
             e.preventDefault();
         });
         $("#menu-export-png").click(function (e) {
-            _this.exportTree("png");
+            _this.exportTree("png", null);
             e.preventDefault();
         });
         $("#menu-export-pdf").click(function (e) {
-            _this.exportTree("pdf");
+            _this.exportTree("pdf", null);
             e.preventDefault();
         });
         $("#menu-export-dscript").click(function (e) {
-            _this.exportTree("dscript");
+            _this.exportTree("dscript", null);
             e.preventDefault();
         });
         $("#lang-select-english").click(function (e) {

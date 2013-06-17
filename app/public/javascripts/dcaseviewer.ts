@@ -180,7 +180,7 @@ class DCaseViewer {
 				if(selected){
 					var node = this.clipboard;
 					if(node && selected.node.isTypeApendable(node.type)) {
-						this.getDCase().pasteNode(selected.node, node);
+						this.getDCase().pasteNode(selected.node, node, null);
 						console.log("pasted");
 					}
 				}

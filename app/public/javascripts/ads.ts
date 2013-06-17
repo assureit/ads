@@ -108,7 +108,8 @@ class ADS {
 			defaultRouter(1);
 		});
 
-		router.route("dcase/:id", "dcase", (dcaseId) => {
+		router.route("dcase/:id", "dcase", (dcaseIdstr) => {
+			var dcaseId = parseInt(dcaseIdstr);
 			this.hideViewer();
 			this.clearTimeLine();
 			$("#newDCase").hide();
@@ -143,8 +144,8 @@ class ADS {
 
 			// show DCase
 			var r:any = DCaseAPI.getDCase(dcaseId);
-			var tree:any = JSON.parse(r.contents);
-			var dcase = new DCaseModel(new DCaseTree(tree.NodeList, tree.TopGoalId, tree.NodeCount), dcaseId, r.commitId);
+			var tree = <DCaseTree>JSON.parse(r.contents);
+			var dcase = new DCaseModel(tree, <number>dcaseId, <number>r.commitId);
 			viewer.setDCase(dcase);
 			this.timelineView.repaint(dcase);
 			this.dcase_latest = dcase;
@@ -317,22 +318,22 @@ class ADS {
 		});
 
 		$("#menu-export-json").click((e)=> {
-			this.exportTree("json");
+			this.exportTree("json", null);
 			e.preventDefault();
 		});
 
 		$("#menu-export-png").click((e)=> {
-			this.exportTree("png");
+			this.exportTree("png", null);
 			e.preventDefault();
 		});
 
 		$("#menu-export-pdf").click((e)=> {
-			this.exportTree("pdf");
+			this.exportTree("pdf", null);
 			e.preventDefault();
 		});
 
 		$("#menu-export-dscript").click((e)=> {
-			this.exportTree("dscript");
+			this.exportTree("dscript", null);
 			e.preventDefault();
 		});
 

@@ -202,7 +202,7 @@ var DCaseViewer = (function () {
                 if(selected) {
                     var node = _this.clipboard;
                     if(node && selected.node.isTypeApendable(node.type)) {
-                        _this.getDCase().pasteNode(selected.node, node);
+                        _this.getDCase().pasteNode(selected.node, node, null);
                         console.log("pasted");
                     }
                 }

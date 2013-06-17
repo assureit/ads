@@ -122,11 +122,11 @@ class PointerHandler {
 		if (!this.mainPointerId && this.pointers.length > 0) {
 			var mainPointer = this.pointers[0];
 			this.mainPointerId = mainPointer.identifier;
-			this.viewer.dragStart(mainPointer.pageX, mainPointer.pageY);
+			this.dragStart(mainPointer.pageX, mainPointer.pageY);
 		} else {
 			var mainPointer = this.getMainPointer();
 			if (mainPointer) {
-				this.viewer.drag(mainPointer.pageX, mainPointer.pageY);
+				this.drag(mainPointer.pageX, mainPointer.pageY);
 			}
 		}
 	}
@@ -135,7 +135,7 @@ class PointerHandler {
 		this.pointers = e.getPointerList();
 		var mainPointer = this.getMainPointer();
 		if (this.mainPointerId && !mainPointer) {
-			this.viewer.dragEnd();
+			this.viewer.dragEnd(this.viewer);
 			this.mainPointerId = null;
 		}
 	}
@@ -152,7 +152,7 @@ class PointerHandler {
 		var y1 = cy - r.top;
 		var x = x1 - (x1 - this.viewer.shiftX) * b;
 		var y = y1 - (y1 - this.viewer.shiftY) * b;
-		this.viewer.setLocation(x, y, scale);
+		this.viewer.setLocation(x, y, scale, 0);
 	};
 
 	onScale(e: GestureScaleEvent): void {
