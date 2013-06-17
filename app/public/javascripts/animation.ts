@@ -9,7 +9,10 @@ class MoveTask {
 }
 
 class Animation {
-	constructor(public moveList: MoveTask[], public fadeInList: MoveTask[], public fadeOutList: MoveTask[]) {
+	moveList: MoveTask[];
+	fadeInList: MoveTask[];
+	fadeOutList: MoveTask[];
+	constructor() {
 		this.moveList = [];
 		this.fadeInList = [];
 		this.fadeOutList = [];
