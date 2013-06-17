@@ -1,3 +1,8 @@
+/// <reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
+/// <reference path='./api.ts'/>
+
+
+
 class DCaseMetaContent {
     constructor(public type: string, public text: string){ }
     clone(): DCaseMetaContent {
@@ -10,16 +15,16 @@ class DCaseNodeModel {
     name: string;
     type: string;
     desc: string;
-    metadata: DCaseMetaContent;
+    metadata: DCaseMetaContent[];
     children: DCaseNodeModel[];
     contexts: DCaseNodeModel[];
     parent: DCaseNodeModel;
 
-    isContext: boolean = false;
+    isContext: bool = false;
                
-    isArgument: boolean = false;
-    isUndeveloped: boolean = false;
-    isDScript: boolean = false;
+    isArgument: bool = false;
+    isUndeveloped: bool = false;
+    isDScript: bool = false;
 
     static TYPES = [
         "Goal", 
@@ -73,7 +78,7 @@ class DCaseNodeModel {
         "Monitor": "M_"
     };
 
-    constructor (id: number, name: string, type: string, desc: string, metadata) { //FIXME
+    constructor (id: number, name: string, type: string, desc: string, metadata: DCaseMetaContent[]) { //FIXME
         this.id = id;
         this.name = name;
         this.type = type;
@@ -81,7 +86,7 @@ class DCaseNodeModel {
         this.metadata = metadata;
         this.children = [];
         this.contexts = [];
-        this.parents = [];
+        this.parent = null;
         this.updateFlags();
         if(type == "Solution") {
             this.isDScript = true;
@@ -107,8 +112,8 @@ class DCaseNodeModel {
     }
 
     eachContents(f: (i: number, v: DCaseMetaContent) => void): void {
-        for(var i = 0; i < this.metaContents.length; ++i){
-            f(i, this.metaContents[i]);
+        for(var i = 0; i < this.metadata.length; ++i){
+            f(i, this.metadata[i]);
         }
     }
 
@@ -130,28 +135,28 @@ class DCaseNodeModel {
     }
 
     deepCopy(): DCaseNodeModel { //FIXME
-        node: DCaseNodeModel = new DCaseNodeModel(this.id, this.name, this.type, this.desc, this.metadata);
-        this.eachNode(function (child) {
-            node.insertChild(child.deepCopy());
+        var node: DCaseNodeModel = new DCaseNodeModel(this.id, this.name, this.type, this.desc, this.metadata);
+        this.eachSubNode((i, v) => {
+            node.insertChild(v.deepCopy(), i);
         });
         return node;
     }
 
     insertChild(node: DCaseNodeModel, index: number): void {
-        a: DCaseNodeModel = node.isContext ? this.contexts : this.children;
+        var a: DCaseNodeModel[] = node.isContext ? this.contexts : this.children;
         if(index == null) {
             index = a.length;
         }
         a.splice(index, 0, node);
-        node.parents.push(this);
+        node.parent= this; 
         this.updateFlags();
     }
 
     removeChild(node: DCaseNodeModel): void {
-        a: DCaseNodeModel = node.isContext ? this.contexts : this.children;
-        i: number = a.indexOf(node);
+        var a: DCaseNodeModel[] = node.isContext ? this.contexts : this.children;
+        var i: number = a.indexOf(node);
         a.splice(i, 1);
-        node.parents.splice(node.parents.indexOf(this), 1);
+        node.parent = null; 
         this.updateFlags();
     }
 
@@ -170,9 +175,10 @@ class DCaseNodeModel {
         }
     }
 
-    getHtmlMetadata(): JQuery { 
-        var innerText = generateMetadata(this);
-        var divText = "<div></div>";
+    getHtmlMetadata(): any { 
+        //var innerText: any = generateMetadata(this);    //FIXME
+        var innerText = null;   //FIXME
+        var divText: string = "<div></div>";
         if(innerText != "") {
             divText = "<div>Metadata</div>";
         }
@@ -183,13 +189,13 @@ class DCaseNodeModel {
         return DCaseNodeModel.SELECTABLE_TYPES[this.type];
     }
 
-    isTypeApendable(type: string): boolean {
+    isTypeApendable(type: string): bool {
         return (DCaseNodeModel.SELECTABLE_TYPES[this.type].indexOf(type) != -1);
     }
 
     toJson(): any {   //FIXME
         var children = [];
-        this.eachNode(function (node) { 
+        this.eachSubNode((i, node) => { 
             children.push(node.toJson());
         })
         return {
@@ -203,7 +209,7 @@ class DCaseNodeModel {
     }
 }
 
-class DCaseTree {
+class DCaseTree {   //FIXME
     NodeList: DCaseNodeModel[];
     TopGoalId: number;
     NodeCount: number;
@@ -231,11 +237,11 @@ class DCaseModel {
         this.argId = argId;
         this.opQueue = [];
         this.undoCount = 0;
-        this.nodeCound = 0;
+        this.nodeCount = 0;
         this.typeCount = {};
         this.view = [];
 
-        types: any = DCaseNodeModel.TYPES; 
+        var types: any = DCaseNodeModel.TYPES; 
         for(var i = 0; i < types.length; i++) {
             this.typeCount[types[i]] = 1;
         }
@@ -252,35 +258,35 @@ class DCaseModel {
             // return s;
         // }
 
-        self: DCaseModel = this;
-        nodes: any = [];  //FIXME
+        var self: DCaseModel = this;
+        var nodes: any = [];  //FIXME
         for(var i = 0; i < tree.NodeList.length; i++) {
-            c: DCaseNodeModel = tree.NodeList[i];
-            nodes[c.ThisNodeId] = c;
+            var c: DCaseNodeModel = tree.NodeList[i];
+            nodes[c.id] = c;  
         }
 
-        function create(id){ //FIXME
-                data: DCaseNodeModel = nodes[id];
-                type: string = data.NodeType;
-                desc: string = data.Description;
-                metadata: DCaseMetaContent = data.Metadata ? data.Metadata : null;
-                node: DCaseNodeModel = self.createNode(id, type, desc, metadata);
-            for(var i = 0; i < data.Children.length; i++) {
-                node.insertChild(create(data.Children[i]));
+        var create = (id: any) => { //FIXME
+            var data: DCaseNodeModel = nodes[id];
+            var type: string = data.type;
+            var desc: string = data.desc;
+            var metadata: DCaseMetaContent[] = data.metadata ? data.metadata : null;
+            var node: DCaseNodeModel = self.createNode(id, type, desc, metadata);
+            for(var i = 0; i < data.children.length; i++) {
+                node.insertChild(create(data.children[i]), i);
             }
             return node;
         }
 
-        topId: number = tree.TopGoalId;
+        var topId: number = tree.TopGoalId;
         this.node = create(topId);
         this.nodeCount = tree.NodeCount;
     }
 
     encode(): DCaseTree {
-        tl: any = [];  //FIXME
-        node: DCaseNodeModel = this.node;
+        var tl: any = [];  //FIXME
+        var node: DCaseNodeModel = this.node;
         node.traverse((i, v) => {
-            c: any = [];
+            var c: any = [];
             node.eachSubNode((i, v) => {
                 c.push(node.id);
             });
@@ -295,7 +301,7 @@ class DCaseModel {
         return new DCaseTree(tl, node.id, this.nodeCount);
     }
 
-    isChanged(): boolean {
+    isChanged(): bool {
         return this.opQueue.length - this.undoCount > 0;
     }
 
@@ -311,27 +317,27 @@ class DCaseModel {
         return this.node;
     }
 
-    createNode(id: number, type: string, desc: string, metadata: DCaseMetaContent): DCaseNodeModel {
-        name: string = DCaseNodeModel.NAME_PREFIX[type] + toString(id);
+    createNode(id: number, type: string, desc: string, metadata: DCaseMetaContent[]): DCaseNodeModel {
+        var name: string = DCaseNodeModel.NAME_PREFIX[type] + id.toString();
         return new DCaseNodeModel(id, name, type, desc, metadata);
     }
 
-    copyNode(node: DCaseNodeModel) {
-        self: DCaseModel = this;
-        newNode: DCaseNodeModel = self.createNode(++this.nodeCount, node.type, node.desc, node.metadata);
+    copyNode(node: DCaseNodeModel): DCaseNodeModel {
+        var self: DCaseModel = this;
+        var newNode: DCaseNodeModel = self.createNode(++this.nodeCount, node.type, node.desc, node.metadata);
         node.eachSubNode((i, v) => {
-            newNode.insertChild(self.copyNode(child));
+            newNode.insertChild(self.copyNode(v), i);
         });
         return newNode;
     }
 
-    insertNode(parent: DCaseNodeModel, type: string, desc: string, metadata: DCaseMetaContent, index: number): DCaseNodeModel {
-        self: DCaseModel = this;
+    insertNode(parent: DCaseNodeModel, type: string, desc: string, metadata: DCaseMetaContent[], index: number): DCaseNodeModel {
+        var self: DCaseModel = this;
         if(index == null) {
             index = parent.children.length;
         }
-        id: number = ++this.nodeCount;
-        node: DCaseNodeModel = this.createNode(id, type, desc, metadata);
+        var id: number = ++this.nodeCount;
+        var node: DCaseNodeModel = this.createNode(id, type, desc, metadata);
         this.applyOperation({
             redo: function () {
                 parent.insertChild(node, index);
@@ -346,11 +352,11 @@ class DCaseModel {
     }
 
     pasteNode(parent: DCaseNodeModel, old_node: DCaseNodeModel, index: number): void {
-        self: DCaseModel = this;
+        var self: DCaseModel = this;
         if(index == null) {
             index = parent.children.length;
         }
-        node: DCaseNodeModel = self.copyNode(old_node);
+        var node: DCaseNodeModel = self.copyNode(old_node);
         this.applyOperation({
             redo: function () {
                 parent.insertChild(node, index);
@@ -364,9 +370,9 @@ class DCaseModel {
     }
 
     removeNode(node: DCaseNodeModel): void {
-        self: DCaseModel = this;
-        parent: DCaseNodeModel = node.parents[0];
-        index: number = parent.children.indexOf(node);
+        var self: DCaseModel = this;
+        var parent: DCaseNodeModel = node.parent[0];
+        var index: number = parent.children.indexOf(node);
         this.applyOperation({
             redo: function () {
                 parent.removeChild(node);
@@ -380,8 +386,8 @@ class DCaseModel {
     }
 
     setDescription(node: DCaseNodeModel, desc: string): void {
-        self:DCaseNodeModel  = this;
-        oldDesc: string = node.desc;
+        var self: DCaseModel  = this;
+        var oldDesc: string = node.desc;
         this.applyOperation({
             redo: function () {
                 node.desc = desc;
@@ -400,8 +406,8 @@ class DCaseModel {
     }
 
     setType(node: DCaseNodeModel, type: string): void {
-        self: DCaseNodeModel = this;
-        oldType: string = node.type;
+        var self: DCaseModel = this;
+        var oldType: string = node.type;
         this.applyOperation({
             redo: function () {
                 node.type = type;
@@ -416,12 +422,12 @@ class DCaseModel {
         });
     }
 
-    setParam(node: DCaseNodeModel, type: string, name: string, desc: string, metadata: DCaseMetaContent): void {
-        self: DCaseNodeModel = this;
-        oldType: string = node.type;
-        oldName: string = node.name;
-        oldDesc: string = node.desc;
-        oldMetadata: DCaseMetaContent = node.metadata;
+    setParam(node: DCaseNodeModel, type: string, name: string, desc: string, metadata: DCaseMetaContent[]): void {
+        var self: DCaseModel = this;
+        var oldType: string = node.type;
+        var oldName: string = node.name;
+        var oldDesc: string = node.desc;
+        var oldMetadata: DCaseMetaContent[] = node.metadata;
         node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
         this.applyOperation({
             redo: function () {
@@ -445,11 +451,11 @@ class DCaseModel {
         });
     }
 
-    undo(): boolean {
-        n: number = this.opQueue.length;
+    undo(): bool {
+        var n: number = this.opQueue.length;
         if(n > this.undoCount) {
             this.undoCount++;
-            op: any = this.opQueue[n - this.undoCount]; //FIXME
+            var op: any = this.opQueue[n - this.undoCount]; //FIXME
             op.undo();
             return true;
         } else {
@@ -457,9 +463,9 @@ class DCaseModel {
         }
     }
 
-    redo(): boolean {
+    redo(): bool {
         if(this.undoCount > 0) {
-            op: any = this.opQueue[this.opQueue.length - this.undoCount];   //FIXME
+            var op: any = this.opQueue[this.opQueue.length - this.undoCount];   //FIXME
             this.undoCount--;
             op.redo();
             return true;
@@ -474,9 +480,9 @@ class DCaseModel {
         op.redo();
     }
 
-    commit(msg: string): boolean {  //FIXME
-        tree: DCaseTree = this.encode();
-        r: number = DCaseAPI.commit(tree, msg, this.commitId);
+    commit(msg: any): bool {  //FIXME
+        var tree: any = this.encode();
+        var r: number = DCaseAPI.commit(tree, msg, this.commitId);
         this.commitId = r;
         this.undoCount = 0;
         this.opQueue = [];
