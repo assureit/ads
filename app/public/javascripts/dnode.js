@@ -266,7 +266,7 @@ var DCaseModel = (function () {
         return newNode;
     };
     DCaseModel.prototype.insertNode = function (parent, type, desc, metadata, index) {
-        var self = this;
+        var _this = this;
         if(index == null) {
             index = parent.children.length;
         }
@@ -275,58 +275,58 @@ var DCaseModel = (function () {
         this.applyOperation({
             redo: function () {
                 parent.insertChild(node, index);
-                self.nodeInserted(parent, node, index);
+                _this.nodeInserted(parent, node, index);
             },
             undo: function () {
                 parent.removeChild(node);
-                self.nodeRemoved(parent, node, index);
+                _this.nodeRemoved(parent, node, index);
             }
         });
         return node;
     };
     DCaseModel.prototype.pasteNode = function (parent, old_node, index) {
-        var self = this;
+        var _this = this;
         if(index == null) {
             index = parent.children.length;
         }
-        var node = self.copyNode(old_node);
+        var node = this.copyNode(old_node);
         this.applyOperation({
             redo: function () {
                 parent.insertChild(node, index);
-                self.structureUpdated();
+                _this.structureUpdated();
             },
             undo: function () {
                 parent.removeChild(node);
-                self.structureUpdated();
+                _this.structureUpdated();
             }
         });
     };
     DCaseModel.prototype.removeNode = function (node) {
-        var self = this;
+        var _this = this;
         var parent = node.parent[0];
         var index = parent.children.indexOf(node);
         this.applyOperation({
             redo: function () {
                 parent.removeChild(node);
-                self.nodeRemoved(parent, node, index);
+                _this.nodeRemoved(parent, node, index);
             },
             undo: function () {
                 parent.insertChild(node, index);
-                self.nodeInserted(parent, node, index);
+                _this.nodeInserted(parent, node, index);
             }
         });
     };
     DCaseModel.prototype.setDescription = function (node, desc) {
-        var self = this;
+        var _this = this;
         var oldDesc = node.desc;
         this.applyOperation({
             redo: function () {
                 node.desc = desc;
-                self.nodeChanged(node);
+                _this.nodeChanged(node);
             },
             undo: function () {
                 node.desc = oldDesc;
-                self.nodeChanged(node);
+                _this.nodeChanged(node);
             }
         });
     };
@@ -335,23 +335,23 @@ var DCaseModel = (function () {
         node.isContext = (node.type === "Context" || node.type === "Subject" || node.type === "Rebuttal");
     };
     DCaseModel.prototype.setType = function (node, type) {
-        var self = this;
+        var _this = this;
         var oldType = node.type;
         this.applyOperation({
             redo: function () {
                 node.type = type;
-                self.updateTypeFlag(node);
-                self.nodeChanged(node);
+                _this.updateTypeFlag(node);
+                _this.nodeChanged(node);
             },
             undo: function () {
                 node.type = oldType;
-                self.updateTypeFlag(node);
-                self.nodeChanged(node);
+                _this.updateTypeFlag(node);
+                _this.nodeChanged(node);
             }
         });
     };
     DCaseModel.prototype.setParam = function (node, type, name, desc, metadata) {
-        var self = this;
+        var _this = this;
         var oldType = node.type;
         var oldName = node.name;
         var oldDesc = node.desc;
@@ -364,8 +364,8 @@ var DCaseModel = (function () {
                 node.desc = desc;
                 node.metadata = metadata;
                 node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
-                self.updateTypeFlag(node);
-                self.nodeChanged(node);
+                _this.updateTypeFlag(node);
+                _this.nodeChanged(node);
             },
             undo: function () {
                 node.type = oldType;
@@ -373,8 +373,8 @@ var DCaseModel = (function () {
                 node.desc = oldDesc;
                 node.metadata = oldMetadata;
                 node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
-                self.updateTypeFlag(node);
-                self.nodeChanged(node);
+                _this.updateTypeFlag(node);
+                _this.nodeChanged(node);
             }
         });
     };

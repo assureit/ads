@@ -1,18 +1,18 @@
-var Rect = (function () {
-    function Rect(l, r, t, b) {
+var Rectangle = (function () {
+    function Rectangle(l, r, t, b) {
         this.l = l;
         this.r = r;
         this.t = t;
         this.b = b;
     }
-    return Rect;
+    return Rectangle;
 })();
 var PointerHandler = (function () {
     function PointerHandler(viewer) {
         this.viewer = null;
         this.x0 = 0;
         this.y0 = 0;
-        this.bounds = new Rect(0, 0, 0, 0);
+        this.bounds = new Rectangle(0, 0, 0, 0);
         this.mainPointerId = null;
         this.pointers = [];
         this.root = null;
@@ -32,7 +32,7 @@ var PointerHandler = (function () {
         this.x0 = x;
         this.y0 = y;
         var size = this.viewer.treeSize();
-        this.bounds = new Rect(20 - size.w * this.viewer.scale - this.viewer.shiftX, this.viewer.$root.width() - 20 - this.viewer.shiftX, 20 - size.h * this.viewer.scale - this.viewer.shiftY, this.viewer.$root.height() - 20 - this.viewer.shiftY);
+        this.bounds = new Rectangle(20 - size.w * this.viewer.scale - this.viewer.shiftX, this.viewer.$root.width() - 20 - this.viewer.shiftX, 20 - size.h * this.viewer.scale - this.viewer.shiftY, this.viewer.$root.height() - 20 - this.viewer.shiftY);
         this.viewer.repaintAll(0);
     };
     PointerHandler.prototype.drag = function (x, y) {

@@ -58,18 +58,17 @@ class ColorSets {
 	};
 
 	createDropMenu():void {
-		var self = this;
 		var $ul = $("#menu-change-theme");
 		$.each(this.Sets, (name, theme) => {
 			var sample = "";
-			$.each(DCaseNode.TYPES, (i, type) => {
+			$.each(DCaseNodeModel.TYPES, (i, type) => {
 				sample += "<span style=\"color: " + theme.fill[type] + ";\">■</span>";
 			});
 			var $li = $("<li></li>")
 				.html("<a href=\"#\">" + sample + name + "</a>")
 				.appendTo($ul);
-			$li.click(e => {
-				self.viewer.setColorTheme(theme);
+			$li.click((e) => {
+				this.viewer.setColorTheme(theme);
 				e.preventDefault();
 				document.cookie="colorTheme=" + name;
 			});

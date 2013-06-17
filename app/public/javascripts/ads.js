@@ -58,7 +58,7 @@ var ADS = (function () {
                     return "未コミットの変更があります";
                 }
             });
-            var searchView = new SearchView();
+            var searchView = new SearchView(viewer);
             var colorSets = new ColorSets(viewer);
             colorSets.init();
             colorSets.createDropMenu();
@@ -67,7 +67,8 @@ var ADS = (function () {
                 _this.viewer.setColorTheme(colorSets.get(name[1]));
             }
             var r = DCaseAPI.getDCase(dcaseId);
-            var dcase = new DCaseModel(JSON.parse(r.contents), dcaseId, r.commitId);
+            var tree = JSON.parse(r.contents);
+            var dcase = new DCaseModel(new DCaseTree(tree.NodeList, tree.TopGoalId, tree.NodeCount), dcaseId, r.commitId);
             viewer.setDCase(dcase);
             _this.timelineView.repaint(dcase);
             _this.dcase_latest = dcase;
