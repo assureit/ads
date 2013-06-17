@@ -1,7 +1,7 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 ///<reference path='api.ts'/>
 
-class CreateDCaseView{
+class CreateDCaseView {
 	constructor() {
 		$("#dcase-create").click(function() {
 			var name = $("#inputDCaseName").attr("value");
@@ -47,7 +47,9 @@ class CreateDCaseView{
 	};
 }
 
-class SelectDCaseView{
+class SelectDCaseView {
+	pageIndex: number;
+	maxPageSize: number;
 
 	constructor() {
 		this.pageIndex = 1;
@@ -56,7 +58,7 @@ class SelectDCaseView{
 
 	clearTable(): void{
 		$("tbody#dcase-select-table *").remove();
-	};
+	}
 
 	addTable(userId, pageIndex): void{
 		if(pageIndex == null || pageIndex < 1) pageIndex = 1;
@@ -105,7 +107,7 @@ class SelectDCaseView{
 				});
 			}
 		});
-	};
+	}
 
 	initEvents() {
 		var self = this;
@@ -126,13 +128,14 @@ class SelectDCaseView{
 			}
 			e.preventDefault();
 		});
-	};
+	}
+
 }
 
-class SearchView{
+class SearchView {
 
-	constructor() {
-		var searchQuery: any = $('#search-query');
+	constructor(public viewer: DCaseViewer) {
+		var searchQuery = $('#search-query');
 		searchQuery.popover({
 			html: true,
 			placement: 'bottom',
@@ -148,12 +151,63 @@ class SearchView{
 				return wrapper;
 			},
 		});
-		$('#search-form').submit(function(){
+		$('#search-form').submit(()=>{
 			var query = searchQuery.val();
 			if(query.length > 0){
-				self.updateSearchResult(query);
+				this.updateSearchResult(query);
 			}
 			return false;
+		});
+	}
+
+	searchNode(text, types, beginDate, endDate, callback, callbackOnNoResult): void {
+		var dcase = this.viewer.getDCase();
+		var root = dcase ? dcase.getTopGoal() : undefined;
+		if(!root) {
+			if(callbackOnNoResult) {
+				callbackOnNoResult();
+			}
+			return;
+		}
+		root.traverse(function(node) {
+			var name = node.name;
+			var desc = node.desc;
+			var d_index = desc.toLowerCase().indexOf(text);
+			var n_index = name.toLowerCase().indexOf(text);
+			if(d_index != -1 || n_index != -1) {
+				callback(node);
+				//var ptext = getPreviewText(desc, text);
+				//callback($res, v, name, ptext);
+			}
+		});
+	}
+
+	updateSearchResult(text) {
+		$('#search-query').popover('show');
+		var $res = $("#search_result_ul");
+		$res.empty();
+		text = text.toLowerCase();
+		var result = DCaseAPI.searchDCase(text);
+		if(result.length == 0) {
+			$res.append("<li>No Results</li>");
+		} else {
+			for(var i = 0; i < result.length; ++i) {
+				var res = result[i];
+				var id = res.dcaseId;
+				$("<li>")
+					.html("<a href=\"#dcase/" + id + "\">" + id + "</a>")
+					.appendTo($res);
+			}
+		}
+		$res.append("<hr>");
+		this.searchNode(text, [], null, null, (node) => {
+			$("<li>")
+				.html("<a href=\"#\">" + node.name + "</a>")
+				.click((e) => {
+					this.viewer.centerize(node, 500);
+					e.preventDefault();
+				})
+				.appendTo($res);
 		});
 	}
 }
