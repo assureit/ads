@@ -54,7 +54,7 @@ class DCaseViewer {
 
 	//TODO
 	addEventHandler() {}
-  dragEnd(view) {}
+	dragEnd(view) {}
 	
 	constructor(public root: any, public dcase: DCaseModel, public editable: bool) {
 		this.$root = $(root);
@@ -75,27 +75,26 @@ class DCaseViewer {
 
 		//------------------------------------
 	
-		var self = this;
-		$.each(self.viewer_addons, function(i, addon) {
-			addon(self);
+		$.each(this.viewer_addons, (i, addon) => {
+			addon(this);
 		});
-		self.setDCase(dcase);
-		self.addEventHandler();
+		this.setDCase(dcase);
+		this.addEventHandler();
 	
-		self.canMoveByKeyboard = true;
+		this.canMoveByKeyboard = true;
 	
-		$(document.body).on("keydown", function(e){
+		$(document.body).on("keydown", (e) => {
 			if(e.keyCode == 39 /* RIGHT */ || e.keyCode == 37 /* LEFT */){
-				if(!self.canMoveByKeyboard) return;
+				if(!this.canMoveByKeyboard) return;
 				var isRight = (e.keyCode == 39);
-				var selected = self.getSelectedNode();
+				var selected = this.getSelectedNode();
 				if(!selected) return;
 				var children = selected.children;
 				var isContext = selected.node.isContext;
-				var isSubject = selected.node.isSubject;
+				//var isSubject = selected.node.isSubject;
 				
 				var neighbor = [];
-				var keynode = (isContext || isSubject ? selected.parentView : selected);
+				var keynode = (isContext /*|| isSubject*/ ? selected.parentView : selected);
 				
 				function push(n){
 					if(n.subject) neighbor.push(n.subject);
@@ -118,80 +117,80 @@ class DCaseViewer {
 					if(newIndex >= neighbor.length) newIndex = neighbor.length - 1;
 					if(newIndex < 0) newIndex = 0;
 					if(oldIndex != newIndex){
-						self.centerizeNodeView(neighbor[newIndex]);
+						this.centerizeNodeView(neighbor[newIndex]);
 						return;
 					}
 				}
 	
 				if(children && children.length > 1){
 					var newIndex = (isRight ? children.length - 1 : 0);
-					self.centerizeNodeView(children[newIndex]);
+					this.centerizeNodeView(children[newIndex]);
 					return;
 				}
 			};
 			if(e.keyCode == 38 /* UP */){
-				if(!self.canMoveByKeyboard) return;
-				var selected = self.getSelectedNode();
+				if(!this.canMoveByKeyboard) return;
+				var selected = this.getSelectedNode();
 				if(selected && selected.parentView){
-					self.centerizeNodeView(selected.parentView);
+					this.centerizeNodeView(selected.parentView);
 				}
 			};
 			if(e.keyCode == 40 /* DOWN */){
-				if(!self.canMoveByKeyboard) return;
-				var selected = self.getSelectedNode();
+				if(!this.canMoveByKeyboard) return;
+				var selected = this.getSelectedNode();
 				if(selected && selected.children && selected.children[0]){
-					self.centerizeNodeView(selected.children[0]);
+					this.centerizeNodeView(selected.children[0]);
 				}
 			};
 			if(e.keyCode == 13 /* ENTER */){
-				if(!self.canMoveByKeyboard) return;
-				var selected = self.getSelectedNode();
+				if(!this.canMoveByKeyboard) return;
+				var selected = this.getSelectedNode();
 				if(selected && selected.startInplaceEdit){
 					e.preventDefault(); 
 					selected.startInplaceEdit();
 				}else{
-					self.setSelectedNode(self.rootview);
+					this.setSelectedNode(this.rootview);
 				}
 			};
 			if(e.keyCode == 27 /* ESC */){
-				if(!self.canMoveByKeyboard) return;
-				self.setSelectedNode(null);
+				if(!this.canMoveByKeyboard) return;
+				this.setSelectedNode(null);
 			}
 			if(e.keyCode == 67 && e.ctrlKey /* Ctrl+C */){
-				if(!self.canMoveByKeyboard) return;
-				var selected = self.getSelectedNode();
+				if(!this.canMoveByKeyboard) return;
+				var selected = this.getSelectedNode();
 				if(selected){
-					self.clipboard = selected.node.deepCopy();
+					this.clipboard = selected.node.deepCopy();
 					console.log("copied");
 				}
 			}
 			if(e.keyCode == 88 && e.ctrlKey /* Ctrl+X */){
-				if(!self.canMoveByKeyboard) return;
-				var selected = self.getSelectedNode();
-				if(selected && selected !== self.rootview){
-					self.clipboard = selected.node.deepCopy();
-					self.setSelectedNode(selected.parentView || self.rootview);
-					self.getDCase().removeNode(selected.node);
+				if(!this.canMoveByKeyboard) return;
+				var selected = this.getSelectedNode();
+				if(selected && selected !== this.rootview){
+					this.clipboard = selected.node.deepCopy();
+					this.setSelectedNode(selected.parentView || this.rootview);
+					this.getDCase().removeNode(selected.node);
 					console.log("cut");
 				}
 			}
 			if(e.keyCode == 86 && e.ctrlKey /* Ctrl+V */){
-				if(!self.canMoveByKeyboard) return;
-				var selected = self.getSelectedNode();
+				if(!this.canMoveByKeyboard) return;
+				var selected = this.getSelectedNode();
 				if(selected){
-					var node = self.clipboard;
+					var node = this.clipboard;
 					if(node && selected.node.isTypeApendable(node.type)) {
-						self.getDCase().pasteNode(selected.node, node);
+						this.getDCase().pasteNode(selected.node, node);
 						console.log("pasted");
 					}
 				}
 			}
 			if(e.keyCode == 46 /* Delete */){
-				if(!self.canMoveByKeyboard) return;
-				var selected = self.getSelectedNode();
-				if(selected && selected !== self.rootview){
-					self.setSelectedNode(selected.parentView || self.rootview);
-					self.getDCase().removeNode(selected.node);
+				if(!this.canMoveByKeyboard) return;
+				var selected = this.getSelectedNode();
+				if(selected && selected !== this.rootview){
+					this.setSelectedNode(selected.parentView || this.rootview);
+					this.getDCase().removeNode(selected.node);
 				}
 			}
 	
@@ -236,12 +235,11 @@ class DCaseViewer {
 	};
 	
 	setDCase(dcase: DCaseModel) {
-		var self = this;
 		if(this.dcase != null) {
-			this.dcase.removeListener(self);
+			this.dcase.removeListener(this);
 		}
 		if(dcase != null) {
-			dcase.addListener(self);
+			dcase.addListener(this);
 		}
 		this.dcase = dcase;
 		this.nodeViewMap = {};
@@ -263,29 +261,29 @@ class DCaseViewer {
 		//}
 	
 		function create(node, parent) {
-			var view = new DNodeView(self, node, parent);
-			self.nodeViewMap[node.id] = view;
-			node.eachNode(function(child) {
+			var view = new DNodeView(this, node, parent);
+			this.nodeViewMap[node.id] = view;
+			node.eachNode((child) => {
 				create(child, view);
 			});
 			return view;
 		}
 		this.rootview = create(dcase.getTopGoal(), null);
 	
-		this.$dom.ready(function() {
+		this.$dom.ready(() => {
 			function f(v) {//FIXME
 				var b = v.svg.outer(DEF_WIDTH, v.$divText.height() + 60);
 				v.nodeSize.h = b.h;
-				v.forEachNode(function(e) {
+				v.forEachNode((e) => {
 					f(e);
 				});
 			}
-			f(self.rootview);
-			self.rootview.updateLocation();
-			self.shiftX = (self.$root.width() - self.treeSize().x * self.scale)/2;
-			self.shiftY = 60;
-			self.location_updated = true;
-			self.repaintAll();
+			f(this.rootview);
+			this.rootview.updateLocation();
+			this.shiftX = (this.$root.width() - this.treeSize().x * this.scale)/2;
+			this.shiftY = 60;
+			this.location_updated = true;
+			this.repaintAll();
 		});
 	};
 	
@@ -350,12 +348,11 @@ class DCaseViewer {
 	};
 	
 	nodeInserted(parent: DCaseNodeModel, node: DCaseNodeModel, index: number) {
-		var self = this;
 		var parentView = this.getNodeView(parent);
 	
 		function create(node, parent) {
-			var view = new DNodeView(self, node, parent);
-			self.nodeViewMap[node.id] = view;
+			var view = new DNodeView(this, node, parent);
+			this.nodeViewMap[node.id] = view;
 			node.eachNode(function(child) {
 				create(child, view);
 			});
@@ -365,45 +362,43 @@ class DCaseViewer {
 	
 		parentView.nodeChanged();
 	
-		self.$dom.ready(function() {
+		this.$dom.ready(() => {
 			function f(v) {//FIXME
 				var b = v.svg.outer(200, v.$divText.height() + 60);
 				v.nodeSize.h = b.h;
 			}
 			f(view);
-			self.location_updated = true;
-			self.repaintAll();
+			this.location_updated = true;
+			this.repaintAll();
 		});
 	};
 	
 	nodeRemoved(parent: DCaseNodeModel, node: DCaseNodeModel, index: number) {
-		var self = this;
 		var parentView = this.getNodeView(parent);
 		var view = this.getNodeView(node);
 		view.remove(parentView);
-		delete self.nodeViewMap[node.id];
+		delete this.nodeViewMap[node.id];
 	
 		parentView.nodeChanged();
 	
-		self.$dom.ready(function() {
-			self.location_updated = true;
-			self.repaintAll();
+		this.$dom.ready(() => {
+			this.location_updated = true;
+			this.repaintAll();
 		});
 	};
 	
 	nodeChanged(node: DCaseNodeModel) {
-		var self = this;
 		var view = this.getNodeView(node);
 	
 		view.nodeChanged();
-		self.$dom.ready(function() {
+		this.$dom.ready(() => {
 			function f(v) {//FIXME
 				var b = v.svg.outer(200, v.$divText.height() + 60);
 				v.nodeSize.h = b.h;
 			}
 			f(view);
-			self.location_updated = true;
-			self.repaintAll();
+			this.location_updated = true;
+			this.repaintAll();
 		});
 	};
 	
@@ -430,29 +425,28 @@ class DCaseViewer {
 	
 	repaintAll(ms?: number) {
 		if(this.rootview == null) return;
-		var self = this;
 	
-		var dx = Math.floor(self.shiftX + self.dragX);
-		var dy = Math.floor(self.shiftY + self.dragY);
+		var dx = Math.floor(this.shiftX + this.dragX);
+		var dy = Math.floor(this.shiftY + this.dragY);
 	
 		var a = new Animation();
-		a.moves(self.$svg[0].transform.baseVal.getItem(0).matrix, { e: dx, f: dy });
-		a.moves(self.$dom, { left: dx, top: dy });
+		a.moves(this.$svg[0].transform.baseVal.getItem(0).matrix, { e: dx, f: dy });
+		a.moves(this.$dom, { left: dx, top: dy });
 	
 		if(ms == 0 || ms == null) {
-			if(self.location_updated) {
-				self.rootview.updateLocation();
-				self.location_updated = false;
-				self.rootview.animeStart(a, 0, 0);
+			if(this.location_updated) {
+				this.rootview.updateLocation();
+				this.location_updated = false;
+				this.rootview.animeStart(a, 0, 0);
 			}
 			a.animeFinish();
 			return;
 		}
-		self.rootview.updateLocation();
-		self.rootview.animeStart(a, 0, 0);
-		self.moving = true;
+		this.rootview.updateLocation();
+		this.rootview.animeStart(a, 0, 0);
+		this.moving = true;
 		var begin = new Date();
-		var id = setInterval(function() {
+		var id = setInterval(() => {
 			var time = (<any>new Date()) - begin;
 			var r = time / ms;
 			if(r < 1.0) {
@@ -460,7 +454,7 @@ class DCaseViewer {
 			} else {
 				clearInterval(id);
 				a.animeFinish();
-				self.moving = false;
+				this.moving = false;
 			}
 		}, 1000/60);
 	};
@@ -567,7 +561,6 @@ class DNodeView {
 	
 	constructor(public viewer: DCaseViewer,
 			public node: DCaseNodeModel, public parentView: DNodeView) {
-		var self = this;
 		var $root, $rootsvg;
 		$root = viewer.$dom;
 		$rootsvg = viewer.$svg;
@@ -603,22 +596,22 @@ class DNodeView {
 			this.$rootsvg.append(this.line);
 		}
 	
-		this.$div.mouseup(function(e) {
-			self.viewer.dragEnd(self);
+		this.$div.mouseup((e) => {
+			this.viewer.dragEnd(this);
 		});
 	
-		this.$div.hover(function() {
-			self.hovered = true;
-			self.updateColor();
-		}, function() {
-			self.hovered = false;
-			self.updateColor();
+		this.$div.hover(() => {
+			this.hovered = true;
+			this.updateColor();
+		}, () => {
+			this.hovered = false;
+			this.updateColor();
 		});
 	
 		this.nodeChanged();
 	
-		$.each(viewer.nodeview_addons, function(i, addon) {
-			addon(self);
+		$.each(viewer.nodeview_addons, (i, addon) => {
+			addon(this);
 		});
 	}
 
@@ -839,7 +832,6 @@ class DNodeView {
 	}
 	
 	animeStart(a: Animation, x: number, y: number) {
-		var self = this;
 		var parent = this.parentView;
 	 	x -= this.subtreeBounds.x
 		var b = new Rect(x, y + this.nodeOffset, this.nodeSize.w, this.nodeSize.h);
@@ -924,9 +916,8 @@ class DNodeView {
 			});
 			a.show(this.argumentBorder[0], this.visible);
 		}
-		this.forEachNode(function(e) {
+		this.forEachNode((e) => {
 			e.animeStart(a, x + e.offset.x, y + e.offset.y);
 		});
 	}
 }
-

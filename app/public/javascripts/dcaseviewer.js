@@ -17,6 +17,7 @@ var DCaseViewer = (function () {
         this.root = root;
         this.dcase = dcase;
         this.editable = editable;
+        var _this = this;
         this.nodeViewMap = {
         };
         this.moving = false;
@@ -74,28 +75,26 @@ var DCaseViewer = (function () {
             "-ms-touch-action": "none"
         }).appendTo(this.$root);
         this.$dom = $("<div></div>").css("position", "absolute").appendTo(this.$root);
-        var self = this;
-        $.each(self.viewer_addons, function (i, addon) {
-            addon(self);
+        $.each(this.viewer_addons, function (i, addon) {
+            addon(_this);
         });
-        self.setDCase(dcase);
-        self.addEventHandler();
-        self.canMoveByKeyboard = true;
+        this.setDCase(dcase);
+        this.addEventHandler();
+        this.canMoveByKeyboard = true;
         $(document.body).on("keydown", function (e) {
             if(e.keyCode == 39 || e.keyCode == 37) {
-                if(!self.canMoveByKeyboard) {
+                if(!_this.canMoveByKeyboard) {
                     return;
                 }
                 var isRight = (e.keyCode == 39);
-                var selected = self.getSelectedNode();
+                var selected = _this.getSelectedNode();
                 if(!selected) {
                     return;
                 }
                 var children = selected.children;
                 var isContext = selected.node.isContext;
-                var isSubject = selected.node.isSubject;
                 var neighbor = [];
-                var keynode = (isContext || isSubject ? selected.parentView : selected);
+                var keynode = (isContext ? selected.parentView : selected);
                 function push(n) {
                     if(n.subject) {
                         neighbor.push(n.subject);
@@ -123,99 +122,99 @@ var DCaseViewer = (function () {
                         newIndex = 0;
                     }
                     if(oldIndex != newIndex) {
-                        self.centerizeNodeView(neighbor[newIndex]);
+                        _this.centerizeNodeView(neighbor[newIndex]);
                         return;
                     }
                 }
                 if(children && children.length > 1) {
                     var newIndex = (isRight ? children.length - 1 : 0);
-                    self.centerizeNodeView(children[newIndex]);
+                    _this.centerizeNodeView(children[newIndex]);
                     return;
                 }
             }
             ;
             if(e.keyCode == 38) {
-                if(!self.canMoveByKeyboard) {
+                if(!_this.canMoveByKeyboard) {
                     return;
                 }
-                var selected = self.getSelectedNode();
+                var selected = _this.getSelectedNode();
                 if(selected && selected.parentView) {
-                    self.centerizeNodeView(selected.parentView);
+                    _this.centerizeNodeView(selected.parentView);
                 }
             }
             ;
             if(e.keyCode == 40) {
-                if(!self.canMoveByKeyboard) {
+                if(!_this.canMoveByKeyboard) {
                     return;
                 }
-                var selected = self.getSelectedNode();
+                var selected = _this.getSelectedNode();
                 if(selected && selected.children && selected.children[0]) {
-                    self.centerizeNodeView(selected.children[0]);
+                    _this.centerizeNodeView(selected.children[0]);
                 }
             }
             ;
             if(e.keyCode == 13) {
-                if(!self.canMoveByKeyboard) {
+                if(!_this.canMoveByKeyboard) {
                     return;
                 }
-                var selected = self.getSelectedNode();
+                var selected = _this.getSelectedNode();
                 if(selected && selected.startInplaceEdit) {
                     e.preventDefault();
                     selected.startInplaceEdit();
                 } else {
-                    self.setSelectedNode(self.rootview);
+                    _this.setSelectedNode(_this.rootview);
                 }
             }
             ;
             if(e.keyCode == 27) {
-                if(!self.canMoveByKeyboard) {
+                if(!_this.canMoveByKeyboard) {
                     return;
                 }
-                self.setSelectedNode(null);
+                _this.setSelectedNode(null);
             }
             if(e.keyCode == 67 && e.ctrlKey) {
-                if(!self.canMoveByKeyboard) {
+                if(!_this.canMoveByKeyboard) {
                     return;
                 }
-                var selected = self.getSelectedNode();
+                var selected = _this.getSelectedNode();
                 if(selected) {
-                    self.clipboard = selected.node.deepCopy();
+                    _this.clipboard = selected.node.deepCopy();
                     console.log("copied");
                 }
             }
             if(e.keyCode == 88 && e.ctrlKey) {
-                if(!self.canMoveByKeyboard) {
+                if(!_this.canMoveByKeyboard) {
                     return;
                 }
-                var selected = self.getSelectedNode();
-                if(selected && selected !== self.rootview) {
-                    self.clipboard = selected.node.deepCopy();
-                    self.setSelectedNode(selected.parentView || self.rootview);
-                    self.getDCase().removeNode(selected.node);
+                var selected = _this.getSelectedNode();
+                if(selected && selected !== _this.rootview) {
+                    _this.clipboard = selected.node.deepCopy();
+                    _this.setSelectedNode(selected.parentView || _this.rootview);
+                    _this.getDCase().removeNode(selected.node);
                     console.log("cut");
                 }
             }
             if(e.keyCode == 86 && e.ctrlKey) {
-                if(!self.canMoveByKeyboard) {
+                if(!_this.canMoveByKeyboard) {
                     return;
                 }
-                var selected = self.getSelectedNode();
+                var selected = _this.getSelectedNode();
                 if(selected) {
-                    var node = self.clipboard;
+                    var node = _this.clipboard;
                     if(node && selected.node.isTypeApendable(node.type)) {
-                        self.getDCase().pasteNode(selected.node, node);
+                        _this.getDCase().pasteNode(selected.node, node);
                         console.log("pasted");
                     }
                 }
             }
             if(e.keyCode == 46) {
-                if(!self.canMoveByKeyboard) {
+                if(!_this.canMoveByKeyboard) {
                     return;
                 }
-                var selected = self.getSelectedNode();
-                if(selected && selected !== self.rootview) {
-                    self.setSelectedNode(selected.parentView || self.rootview);
-                    self.getDCase().removeNode(selected.node);
+                var selected = _this.getSelectedNode();
+                if(selected && selected !== _this.rootview) {
+                    _this.setSelectedNode(selected.parentView || _this.rootview);
+                    _this.getDCase().removeNode(selected.node);
                 }
             }
         });
@@ -231,12 +230,12 @@ var DCaseViewer = (function () {
         return this.dcase;
     };
     DCaseViewer.prototype.setDCase = function (dcase) {
-        var self = this;
+        var _this = this;
         if(this.dcase != null) {
-            this.dcase.removeListener(self);
+            this.dcase.removeListener(this);
         }
         if(dcase != null) {
-            dcase.addListener(self);
+            dcase.addListener(this);
         }
         this.dcase = dcase;
         this.nodeViewMap = {
@@ -247,8 +246,8 @@ var DCaseViewer = (function () {
             return;
         }
         function create(node, parent) {
-            var view = new DNodeView(self, node, parent);
-            self.nodeViewMap[node.id] = view;
+            var view = new DNodeView(this, node, parent);
+            this.nodeViewMap[node.id] = view;
             node.eachNode(function (child) {
                 create(child, view);
             });
@@ -263,12 +262,12 @@ var DCaseViewer = (function () {
                     f(e);
                 });
             }
-            f(self.rootview);
-            self.rootview.updateLocation();
-            self.shiftX = (self.$root.width() - self.treeSize().x * self.scale) / 2;
-            self.shiftY = 60;
-            self.location_updated = true;
-            self.repaintAll();
+            f(_this.rootview);
+            _this.rootview.updateLocation();
+            _this.shiftX = (_this.$root.width() - _this.treeSize().x * _this.scale) / 2;
+            _this.shiftY = 60;
+            _this.location_updated = true;
+            _this.repaintAll();
         });
     };
     DCaseViewer.prototype.setLocation = function (x, y, scale, ms) {
@@ -319,11 +318,11 @@ var DCaseViewer = (function () {
         this.setDCase(this.dcase);
     };
     DCaseViewer.prototype.nodeInserted = function (parent, node, index) {
-        var self = this;
+        var _this = this;
         var parentView = this.getNodeView(parent);
         function create(node, parent) {
-            var view = new DNodeView(self, node, parent);
-            self.nodeViewMap[node.id] = view;
+            var view = new DNodeView(this, node, parent);
+            this.nodeViewMap[node.id] = view;
             node.eachNode(function (child) {
                 create(child, view);
             });
@@ -331,40 +330,40 @@ var DCaseViewer = (function () {
         }
         var view = create(node, parentView);
         parentView.nodeChanged();
-        self.$dom.ready(function () {
+        this.$dom.ready(function () {
             function f(v) {
                 var b = v.svg.outer(200, v.$divText.height() + 60);
                 v.nodeSize.h = b.h;
             }
             f(view);
-            self.location_updated = true;
-            self.repaintAll();
+            _this.location_updated = true;
+            _this.repaintAll();
         });
     };
     DCaseViewer.prototype.nodeRemoved = function (parent, node, index) {
-        var self = this;
+        var _this = this;
         var parentView = this.getNodeView(parent);
         var view = this.getNodeView(node);
         view.remove(parentView);
-        delete self.nodeViewMap[node.id];
+        delete this.nodeViewMap[node.id];
         parentView.nodeChanged();
-        self.$dom.ready(function () {
-            self.location_updated = true;
-            self.repaintAll();
+        this.$dom.ready(function () {
+            _this.location_updated = true;
+            _this.repaintAll();
         });
     };
     DCaseViewer.prototype.nodeChanged = function (node) {
-        var self = this;
+        var _this = this;
         var view = this.getNodeView(node);
         view.nodeChanged();
-        self.$dom.ready(function () {
+        this.$dom.ready(function () {
             function f(v) {
                 var b = v.svg.outer(200, v.$divText.height() + 60);
                 v.nodeSize.h = b.h;
             }
             f(view);
-            self.location_updated = true;
-            self.repaintAll();
+            _this.location_updated = true;
+            _this.repaintAll();
         });
     };
     DCaseViewer.prototype.centerize = function (node, ms) {
@@ -389,33 +388,33 @@ var DCaseViewer = (function () {
         this.setLocation(x, y, null, ms);
     };
     DCaseViewer.prototype.repaintAll = function (ms) {
+        var _this = this;
         if(this.rootview == null) {
             return;
         }
-        var self = this;
-        var dx = Math.floor(self.shiftX + self.dragX);
-        var dy = Math.floor(self.shiftY + self.dragY);
+        var dx = Math.floor(this.shiftX + this.dragX);
+        var dy = Math.floor(this.shiftY + this.dragY);
         var a = new Animation();
-        a.moves(self.$svg[0].transform.baseVal.getItem(0).matrix, {
+        a.moves(this.$svg[0].transform.baseVal.getItem(0).matrix, {
             e: dx,
             f: dy
         });
-        a.moves(self.$dom, {
+        a.moves(this.$dom, {
             left: dx,
             top: dy
         });
         if(ms == 0 || ms == null) {
-            if(self.location_updated) {
-                self.rootview.updateLocation();
-                self.location_updated = false;
-                self.rootview.animeStart(a, 0, 0);
+            if(this.location_updated) {
+                this.rootview.updateLocation();
+                this.location_updated = false;
+                this.rootview.animeStart(a, 0, 0);
             }
             a.animeFinish();
             return;
         }
-        self.rootview.updateLocation();
-        self.rootview.animeStart(a, 0, 0);
-        self.moving = true;
+        this.rootview.updateLocation();
+        this.rootview.animeStart(a, 0, 0);
+        this.moving = true;
         var begin = new Date();
         var id = setInterval(function () {
             var time = (new Date()) - begin;
@@ -425,7 +424,7 @@ var DCaseViewer = (function () {
             } else {
                 clearInterval(id);
                 a.animeFinish();
-                self.moving = false;
+                _this.moving = false;
             }
         }, 1000 / 60);
     };
@@ -486,6 +485,7 @@ var DNodeView = (function () {
         this.viewer = viewer;
         this.node = node;
         this.parentView = parentView;
+        var _this = this;
         this.svgUndevel = null;
         this.argumentBorder = null;
         this.children = [];
@@ -502,7 +502,6 @@ var DNodeView = (function () {
         this.selected = false;
         this.hovered = false;
         this.nodeOffset = 0;
-        var self = this;
         var $root, $rootsvg;
         $root = viewer.$dom;
         $rootsvg = viewer.$svg;
@@ -528,18 +527,18 @@ var DNodeView = (function () {
             this.$rootsvg.append(this.line);
         }
         this.$div.mouseup(function (e) {
-            self.viewer.dragEnd(self);
+            _this.viewer.dragEnd(_this);
         });
         this.$div.hover(function () {
-            self.hovered = true;
-            self.updateColor();
+            _this.hovered = true;
+            _this.updateColor();
         }, function () {
-            self.hovered = false;
-            self.updateColor();
+            _this.hovered = false;
+            _this.updateColor();
         });
         this.nodeChanged();
         $.each(viewer.nodeview_addons, function (i, addon) {
-            addon(self);
+            addon(_this);
         });
     }
     DNodeView.prototype.nodeChanged = function () {
@@ -754,7 +753,6 @@ var DNodeView = (function () {
         return l;
     };
     DNodeView.prototype.animeStart = function (a, x, y) {
-        var self = this;
         var parent = this.parentView;
         x -= this.subtreeBounds.x;
         var b = new Rect(x, y + this.nodeOffset, this.nodeSize.w, this.nodeSize.h);

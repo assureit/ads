@@ -4,6 +4,7 @@
 ///<reference path='color.ts'/>
 ///<reference path='importfile.ts'/>
 ///<reference path='dcaseviewer.ts'/>
+///<reference path='timeline.ts'/>
 ///<reference path='dnode.ts'/>
 
 class ADS {
@@ -88,7 +89,7 @@ class ADS {
 			$("#newDCase").hide();
 			$("#selectDCase").show();
 			var importFile = new ImportFile();
-			importFile.read((file) => {
+			importFile.read((file: DCaseFile) => {
 				var tree = JSON.parse(file.result); //TODO convert to Markdown
 				if("contents" in tree) {
 					var r = DCaseAPI.createDCase(file.name.split(".")[0], tree.contents);
@@ -129,7 +130,7 @@ class ADS {
 					return "未コミットの変更があります";
 				}
 			});
-			var searchView = new SearchView();
+			var searchView = new SearchView(viewer);
 
 			var colorSets = new ColorSets(viewer);
 			colorSets.init();
@@ -142,7 +143,8 @@ class ADS {
 
 			// show DCase
 			var r:any = DCaseAPI.getDCase(dcaseId);
-			var dcase = new DCaseModel(JSON.parse(r.contents), dcaseId, r.commitId);
+			var tree:any = JSON.parse(r.contents);
+			var dcase = new DCaseModel(new DCaseTree(tree.NodeList, tree.TopGoalId, tree.NodeCount), dcaseId, r.commitId);
 			viewer.setDCase(dcase);
 			this.timelineView.repaint(dcase);
 			this.dcase_latest = dcase;
