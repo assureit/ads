@@ -15,10 +15,7 @@ var MoveTask = (function () {
     return MoveTask;
 })();
 var Animation = (function () {
-    function Animation(moveList, fadeInList, fadeOutList) {
-        this.moveList = moveList;
-        this.fadeInList = fadeInList;
-        this.fadeOutList = fadeOutList;
+    function Animation() {
         this.moveList = [];
         this.fadeInList = [];
         this.fadeOutList = [];
