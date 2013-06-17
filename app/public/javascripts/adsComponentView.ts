@@ -131,7 +131,7 @@ class SelectDCaseView(){
 	return SelectDCaseView;
 })();
 
-var SearchView = (function() {
+class SearchView(){
 
 	function SearchView() {
 		var searchQuery = $('#search-query');
