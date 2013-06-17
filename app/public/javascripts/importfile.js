@@ -1,5 +1,7 @@
 var DCaseFile = (function () {
     function DCaseFile(result, name) {
+        this.result = result;
+        this.name = name;
     }
     return DCaseFile;
 })();
@@ -32,7 +34,8 @@ var ImportFile = (function () {
                     console.log('error', (e.target).error.code);
                 };
                 reader.onload = function (e) {
-                    callback(new DCaseFile(e.target.result, file.name));
+                    var dcaseFile = new DCaseFile((e.target).result, file.name);
+                    callback(dcaseFile);
                 };
                 reader.readAsText(file, 'utf-8');
             }

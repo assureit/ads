@@ -2,6 +2,7 @@
 ///<reference path='dcaseviewer.ts'/>
 
 class ColorSets {
+	viewer: DCaseViewer;
 	constructor(viewer:DCaseViewer) {
 		this.viewer = viewer;
 		$("#menu-change-theme *").remove();
