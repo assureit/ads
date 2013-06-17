@@ -92,7 +92,7 @@ function findMostSimilarNodeType(query) {
     return NodeTypes[minidx];
 }
 ;
-var DNodeView_ExpandBranch = function (self) {
+function DNodeView_ExpandBranch(self) {
     var DBLTOUCH_THRESHOLD = 300;
     var count = 0;
     var time = null;
@@ -115,11 +115,12 @@ var DNodeView_ExpandBranch = function (self) {
             time = null;
         }
     });
-};
-var checkKeyValue = function (str) {
+}
+;
+function checkKeyValue(str) {
     return str.indexOf(":") != -1;
-};
-var findVaridMetaData = function (body) {
+}
+function findVaridMetaData(body) {
     body = body.join("\n").trim().split("\n");
     if(checkKeyValue(body[0])) {
         return 0;
@@ -137,8 +138,8 @@ var findVaridMetaData = function (body) {
         return emptyLineIndex + 1;
     }
     return -1;
-};
-var parseMetaData = function (data) {
+}
+function parseMetaData(data) {
     var metadata = {
     };
     var i = 0;
@@ -157,7 +158,7 @@ var parseMetaData = function (data) {
         metadata["Description"] = "";
     }
     return metadata;
-};
+}
 function generateMetadata(n) {
     var metadata = n.metadata;
     var keys = Object.keys(metadata);
@@ -175,7 +176,7 @@ function generateMetadata(n) {
     }
     return res;
 }
-var parseNodeBody = function (body) {
+function parseNodeBody(body) {
     var metadata = {
     };
     var description;
@@ -190,14 +191,15 @@ var parseNodeBody = function (body) {
         "description": description,
         "metadata": metadata
     };
-};
-var DNodeView_InplaceEdit = function (self) {
+}
+function DNodeView_InplaceEdit(self) {
     var $edit = null;
     self.$divText.addClass("node-text-editable");
     function generateMarkdownText(node) {
-        var convert = (function (n) {
+        function convert(n) {
             return ("# " + n.type + " " + n.name + " " + n.id + (n.desc.length > 0 ? ("\n" + n.desc) : "") + generateMetadata(n) + "\n\n");
-        });
+        }
+        ;
         var markdown = convert(node);
         node.eachNode(function (n) {
             markdown = markdown + convert(n);
@@ -362,8 +364,9 @@ var DNodeView_InplaceEdit = function (self) {
     self.startInplaceEdit = function () {
         showInplace();
     };
-};
-var DNodeView_ToolBox = function (self) {
+}
+;
+function DNodeView_ToolBox(self) {
     var edit_lock = false;
     var edit_hover = false;
     var edit_active = false;
@@ -556,8 +559,9 @@ var DNodeView_ToolBox = function (self) {
     }, function () {
         showToolbox(false);
     });
-};
-var DNodeView_ToolBox_uneditable = function (self) {
+}
+;
+function DNodeView_ToolBox_uneditable(self) {
     var $toolbox = null;
     function showToolbox(visible) {
         if(visible) {
@@ -607,4 +611,5 @@ var DNodeView_ToolBox_uneditable = function (self) {
     }, function () {
         showToolbox(false);
     });
-};
+}
+;
