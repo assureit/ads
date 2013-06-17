@@ -5,9 +5,6 @@ var ColorSets = (function () {
     }
     ColorSets.prototype.add = function (theme) {
     };
-    ColorSets.prototype.get = function (name) {
-        return this.Sets[name];
-    };
     ColorSets.prototype.init = function () {
         this.Sets = {
             "default": this.viewer.default_colorTheme,
@@ -41,6 +38,9 @@ var ColorSets = (function () {
             "Solution": "#000000",
             "Rebuttal": "#000000"
         };
+    };
+    ColorSets.prototype.get = function (name) {
+        return this.Sets[name];
     };
     ColorSets.prototype.createDropMenu = function () {
         var self = this;
