@@ -13,6 +13,11 @@ class ColorSets {
 		//FIXME
 	}
 
+	get(name:string) {
+		return this.Sets[name];
+	}
+
+
 	init() {
 		this.Sets = {
 			"default":
@@ -50,10 +55,6 @@ class ColorSets {
 			"Rebuttal": "#000000"
 		};
 	};
-
-	get(name:string) {
-		return this.Sets[name];
-	}
 
 	createDropMenu() {
 		var self = this;
