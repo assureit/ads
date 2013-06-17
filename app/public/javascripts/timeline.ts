@@ -65,41 +65,7 @@ class TimeLine {
 	    });
 
 	//-------------------------------------------------------
-	    function calcSize(mm, x, y, id) {
-		    var b = { w: x, h: y };
-		    var c = mm[id];
-		    if(c != null) {
-			    var b1 = calcSize(mm, x+NX, y, c[0]);
-			    b.w = Math.max(b.w, b1.w);
-			    y = b.h = Math.max(b.h, b1.h);
-			    for(var i=1; i<c.length; i++) {
-				    var b2 = calcSize(mm, x+NX, y+NY, c[i]);
-				    b.w = Math.max(b.w, b2.w);
-				    y = b.h = Math.max(b.h, b2.h);
-			    }
-		    }
-		    return b;
-	    }
-
-	    function put(ctx, mm, l, x, y, id) {
-		    addCommitMark(x, y, l, id);
-		    var c = mm[id];
-		    if(c != null) {
-			    var y0 = y;
-			    y = put(ctx, mm, l, x+NX, y, c[0]);
-			    ctx.moveTo(x+MX/2   , y0+MY/2);
-			    ctx.lineTo(x+MX/2+NX, y0+MY/2);
-			    for(var i=1; i<c.length; i++) {
-				    var y1 = y;
-				    y = put(ctx, mm, l, x+NX, y+NY, c[i]);
-				    ctx.moveTo(x+MX/2   , y0+MY/2);
-			    	ctx.lineTo(x+MX/2   , y1+NY+MY/2);
-				    ctx.lineTo(x+MX/2+NX, y1+NY+MY/2);
-			    }
-		    }
-		    return y;
-	    }
-
+	  
 	this.repaint = function(arg) {
 		self.argument = arg;
 		$container.empty();
@@ -172,6 +138,42 @@ class TimeLine {
 		this.$canvas.css("left", scroll + dragX);
     }
 
+    calcSize(mm: any, x: number, y: number, id: number): any {  //FIXME
+        var b: any = { w: x, h: y };
+		var c: any = mm[id];
+        if(c != null) {
+            var b1: any = calcSize(mm, x+NX, y, c[0]);
+            b.w = Math.max(b.w, b1.w);
+            y = b.h = Math.max(b.h, b1.h);
+            for(var i=1; i<c.length; i++) {
+                var b2 = calcSize(mm, x+NX, y+NY, c[i]);
+                b.w = Math.max(b.w, b2.w);
+                y = b.h = Math.max(b.h, b2.h);
+			}
+		}
+		return b;
+	}
+
+	put(ctx: any, mm: any, l: any, x: number, y: number, id: number): number {
+        addCommitMark(x, y, l, id);
+        var c: any = mm[id];
+        if(c != null) {
+            var y0: number = y;
+			y = put(ctx, mm, l, x+NX, y, c[0]);
+			    ctx.moveTo(x+MX/2   , y0+MY/2);
+			    ctx.lineTo(x+MX/2+NX, y0+MY/2);
+			    for(var i=1; i<c.length; i++) {
+				    var y1 = y;
+				    y = put(ctx, mm, l, x+NX, y+NY, c[i]);
+				    ctx.moveTo(x+MX/2   , y0+MY/2);
+			    	ctx.lineTo(x+MX/2   , y1+NY+MY/2);
+				    ctx.lineTo(x+MX/2+NX, y1+NY+MY/2);
+			    }
+		    }
+		    return y;
+	    }
+
+
     addCommitMark(x: number, y: number, list: any, commitId: number): void {    //FIXME
         $d: any = this.$("<div></div>").css({
             left: x, top: y, width: MX, height: MY,
@@ -207,43 +209,42 @@ class TimeLine {
 		}
     }
 
-}
-function addCommitMark(x, y, list, commitId) {
-		    var $d = $("<div></div>").css({
-			    left: x, top: y, width: MX, height: MY,
-		    }).addClass("timeline-commit")
-			    .appendTo($container)
+    addCommitMark(x, y, list, commitId) {
+        var $d = $("<div></div>").css({
+            left: x, top: y, width: MX, height: MY,
+		}).addClass("timeline-commit").appendTo($container)
 
-		    var info = list[commitId];
-		    //var timefmt = DateFormatter(info.time).format();
+        var info = list[commitId];
+		//var timefmt = DateFormatter(info.time).format();
 
-		    $d.popover({
-			    placement: "bottom",
-			    title: info.dateTime + " " + info.userName,
-			    content: info.commitMessage,
-			    trigger: "hover",
-		    });
+        $d.popover({
+            placement: "bottom",
+            title: info.dateTime + " " + info.userName,
+            content: info.commitMessage,
+			trigger: "hover",
+        });
 		
-		    $d.click(function() {
-			    console.log("arguemnt " + commitId);
-			    if(selected != $d) {
-				    var argId = self.argument.argId;
-				    if(self.onDCaseSelected(argId, commitId, info.latest)) {
-					    if(selected != null) {
-						    selected.css("border-color", "");
-						    selected = $d;
-					    }
-					    $d.css("border-color", "orange");
-				    }
-			    }
-		    });
+        $d.click(function() {
+            console.log("arguemnt " + commitId);
+		    if(selected != $d) {
+			    var argId = self.argument.argId;
+			    if(self.onDCaseSelected(argId, commitId, info.latest)) {
+                    if(selected != null) {
+                        selected.css("border-color", "");
+						selected = $d;
+					}
+					$d.css("border-color", "orange");
+				}
+			}
+		});
 
-		    if(commitId == self.argument.commitId) {
-			    $d.css("border-color", "orange");
-			    selected = $d;
-		    }
-	    }
+		if(commitId == self.argument.commitId) {
+            $d.css("border-color", "orange");
+			selected = $d;
+		}
+    }
 }
+
 function addCommitMark(x, y, list, commitId) {
 		    var $d = $("<div></div>").css({
 			    left: x, top: y, width: MX, height: MY,
