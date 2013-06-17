@@ -1,20 +1,25 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
+///<reference path='dcaseviewer.ts'/>
 
-var ColorSets = (function () {
-	function ColorSets(viewer) {
+class ColorSets {
+	viewer: DCaseViewer;
+	constructor(viewer:DCaseViewer) {
 		this.viewer = viewer;
 		$("#menu-change-theme *").remove();
 	}
 
-	ColorSets.prototype.add = function(theme) {
+	Sets: any;
+
+	add(theme) {
 		//FIXME
 	}
 
-	ColorSets.prototype.get = function(name) {
+	get(name:string): any{
 		return this.Sets[name];
 	}
 
-	ColorSets.prototype.init = function() {
+
+	init(): void{
 		this.Sets = {
 			"default":
 				this.viewer.default_colorTheme,
@@ -52,24 +57,22 @@ var ColorSets = (function () {
 		};
 	};
 
-	ColorSets.prototype.createDropMenu = function() {
+	createDropMenu():void {
 		var self = this;
 		var $ul = $("#menu-change-theme");
-		$.each(this.Sets, function(name, theme) {
+		$.each(this.Sets, (name, theme) => {
 			var sample = "";
-			$.each(DCaseNode.TYPES, function(i, type) {
+			$.each(DCaseNode.TYPES, (i, type) => {
 				sample += "<span style=\"color: " + theme.fill[type] + ";\">■</span>";
 			});
 			var $li = $("<li></li>")
 				.html("<a href=\"#\">" + sample + name + "</a>")
 				.appendTo($ul);
-			$li.click(function(e) {
+			$li.click(e => {
 				self.viewer.setColorTheme(theme);
 				e.preventDefault();
 				document.cookie="colorTheme=" + name;
 			});
 		});
 	}
-
-	return ColorSets;
-})();
+}

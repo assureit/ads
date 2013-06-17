@@ -526,7 +526,7 @@ var DNodeView = function(viewer, node, parentView) {
 
 	this.viewer = viewer;
 	this.node = node;
-	//this.svg = new GsnShape[node.type]($rootsvg);
+	//this.svg = new GsnShapeMap[node.type]($rootsvg);
 	this.$div = $("<div></div>")
 			.addClass("node-container")
 			.width(DEF_WIDTH)
@@ -623,7 +623,7 @@ DNodeView.prototype.nodeChanged = function() {
 	if(this.svg){
 		$(this.svg[0]).remove();
 	}
-	this.svg = new GsnShape[node.type](this.$rootsvg);
+	this.svg = new GsnShapeMap[node.type](this.$rootsvg);
 	//this.$div.appendTo(this.svg[1]);
 	var count = node.getNodeCount();
 	if(count != 0) {
