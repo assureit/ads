@@ -1,23 +1,25 @@
 var ImportFile = (function () {
     function ImportFile() {
+        var _this = this;
         $("div.row").on('dragenter', function (e) {
             e.stopPropagation();
             e.preventDefault();
         }).on('dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(this).addClass('hover');
+            $(_this).addClass('hover');
         }).on('dragleave', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(this).removeClass('hover');
+            $(_this).removeClass('hover');
         });
     }
     ImportFile.prototype.read = function (callback) {
+        var _this = this;
         $("div.row").on('drop', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(this).removeClass('hover');
+            $(_this).removeClass('hover');
             var file = e.originalEvent.dataTransfer.files[0];
             if(file) {
                 var reader = new FileReader();

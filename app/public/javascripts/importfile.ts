@@ -1,34 +1,34 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 
-var ImportFile = (function(){
+class ImportFile {
 
-	function ImportFile() {
-		$("div.row").on('dragenter', function (e) {
+	constructor() {
+		$("div.row").on('dragenter', e => {
 			e.stopPropagation();
 			e.preventDefault();
-		}).on('dragover', function (e) {
+		}).on('dragover', e => {
 			e.stopPropagation();
 			e.preventDefault();
 			$(this).addClass('hover');
-		}).on('dragleave', function (e) {
+		}).on('dragleave', e => {
 			e.stopPropagation();
 			e.preventDefault();
 			$(this).removeClass('hover');
 		});
 	}
 
-	ImportFile.prototype.read = function(callback) {
-		$("div.row").on('drop', function (e) {
+	read(callback) {
+		$("div.row").on('drop', e => {
 			e.stopPropagation();
 			e.preventDefault();
 			$(this).removeClass('hover');
 			var file = e.originalEvent.dataTransfer.files[0];
 			if(file) {
 				var reader = new FileReader();
-				reader.onerror = function(e) {
+				reader.onerror = e => {
 					console.log('error', (<any>e.target).error.code);
 				}
-				reader.onload = function(e){
+				reader.onload = e => {
 					callback({result: e.target.result, name: file.name});
 				};
 				reader.readAsText(file, 'utf-8');
@@ -36,6 +36,4 @@ var ImportFile = (function(){
 			return false;
 		});
 	};
-
-	return ImportFile;
-})();
+}
