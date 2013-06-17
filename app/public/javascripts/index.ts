@@ -2,22 +2,22 @@
 ///<reference path='./ads.ts'/>
 
 $(()=>{
-	ads: ADS = new ADS(document.getElementById("ase"));
+	var ads: ADS = new ADS(document.getElementById("ase"));
 	ads.initDefaultEventListeners();
 
-	$id: string    = $('#signup-userid');
-	$pass1: string = $('#signup-pass');
-	$pass2: string = $('#signup-pass2');
+	var $id: JQuery    = $('#signup-userid');
+	var $pass1: JQuery = $('#signup-pass');
+	var $pass2: JQuery = $('#signup-pass2');
 
-	varify(function(){
+	function verify(): void{
 		if($id.val().length > 0 && $pass1.val().length > 0 && $pass1.val() == $pass2.val()){
 		$('#sign-up-form .btn').removeAttr("disabled");	}else{
 		$('#sign-up-form .btn').attr("disabled", "disabled");
 		}
-	});
-	$id.keyup(varify);
-	$pass1.keyup(varify);
-	$pass2.keyup(varify);
+	};
+	$id.keyup(verify);
+	$pass1.keyup(verify);
+	$pass2.keyup(verify);
 
 // hide url bar for ipod touch
 	setTimeout(()=>{
