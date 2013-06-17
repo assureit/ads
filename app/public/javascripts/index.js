@@ -1,16 +1,20 @@
 $(function () {
-    var ads = new ADS(document.getElementById("ase"));
+    ads:
+ADS = new ADS(document.getElementById("ase"))
     ads.initDefaultEventListeners();
-    var $id = $('#signup-userid');
-    var $pass1 = $('#signup-pass');
-    var $pass2 = $('#signup-pass2');
-    var varify = function () {
+    $id:
+string = $('#signup-userid')
+    $pass1:
+string = $('#signup-pass')
+    $pass2:
+string = $('#signup-pass2')
+    varify(function () {
         if($id.val().length > 0 && $pass1.val().length > 0 && $pass1.val() == $pass2.val()) {
             $('#sign-up-form .btn').removeAttr("disabled");
         } else {
             $('#sign-up-form .btn').attr("disabled", "disabled");
         }
-    };
+    });
     $id.keyup(varify);
     $pass1.keyup(varify);
     $pass2.keyup(varify);
