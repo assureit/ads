@@ -10,17 +10,3 @@ db/db.ts
 test/db/db.ts
 test/routes/api.ts
 test/api/dcase.ts
-public/javascripts/ads.ts
-public/javascripts/adsComponentView.ts
-public/javascripts/animation.ts
-public/javascripts/api.ts
-public/javascripts/color.ts
-public/javascripts/dcaseviewer-addons.ts
-public/javascripts/dcaseviewer.ts
-public/javascripts/dnode.ts
-public/javascripts/gsnshape.ts
-public/javascripts/handler.ts
-public/javascripts/importfile.ts
-public/javascripts/index.ts
-public/javascripts/router.ts
-public/javascripts/timeline.ts
