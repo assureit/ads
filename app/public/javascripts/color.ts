@@ -67,7 +67,7 @@ class ColorSets {
 			var $li = $("<li></li>")
 				.html("<a href=\"#\">" + sample + name + "</a>")
 				.appendTo($ul);
-			$li.click((e) => {
+			$li.click(e => {
 				self.viewer.setColorTheme(theme);
 				e.preventDefault();
 				document.cookie="colorTheme=" + name;
