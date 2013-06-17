@@ -38,7 +38,6 @@ class PointerHandler {
     viewer: DCaseViewer = null;
     x0: number = 0;
     y0: number = 0;
-    isDragging: bool = false;
     bounds: Rect = new Rect(0, 0, 0, 0);
     mainPointerId: number = null;
     pointers: Pointer[] = [];
@@ -58,13 +57,9 @@ class PointerHandler {
     }
 
     dragStart(x: number, y: number): void {
-        if (this.isDragging) {
-            this.dragCancel();
-        }
         if (this.viewer.rootview == null) return;
         this.x0 = x;
         this.y0 = y;
-        this.isDragging = true;
         var size = this.viewer.treeSize();
         this.bounds = new Rect(
 			20 - size.w * this.viewer.scale - this.viewer.shiftX,
@@ -76,14 +71,12 @@ class PointerHandler {
     }
 
     drag(x: number, y: number): void {
-        if (this.isDragging) {
-            var dx = (x - this.x0);
-            var dy = (y - this.y0);
-            if (dx != 0 || dy != 0) {
-                this.viewer.dragX = Math.max(this.bounds.l, Math.min(this.bounds.r, dx));
-                this.viewer.dragY = Math.max(this.bounds.t, Math.min(this.bounds.b, dy));
-                this.viewer.repaintAll(0);
-            }
+        var dx = (x - this.x0);
+        var dy = (y - this.y0);
+        if (dx != 0 || dy != 0) {
+            this.viewer.dragX = Math.max(this.bounds.l, Math.min(this.bounds.r, dx));
+            this.viewer.dragY = Math.max(this.bounds.t, Math.min(this.bounds.b, dy));
+            this.viewer.repaintAll(0);
         }
     }
 
@@ -93,21 +86,17 @@ class PointerHandler {
         this.viewer.dragX = 0;
         this.viewer.dragY = 0;
         this.viewer.repaintAll(0);
-        this.isDragging = false;
     }
 
     dragEnd(view): void {
-        if (this.isDragging) {
-            if (this.viewer.dragX == 0 && this.viewer.dragY == 0) {
-                this.viewer.setSelectedNode(view);
-            } else {
-                this.viewer.shiftX += this.viewer.dragX;
-                this.viewer.shiftY += this.viewer.dragY;
-                this.viewer.dragX = 0;
-                this.viewer.dragY = 0;
-                this.viewer.repaintAll(0);
-            }
-            this.isDragging = false;
+        if (this.viewer.dragX == 0 && this.viewer.dragY == 0) {
+            this.viewer.setSelectedNode(view);
+        } else {
+            this.viewer.shiftX += this.viewer.dragX;
+            this.viewer.shiftY += this.viewer.dragY;
+            this.viewer.dragX = 0;
+            this.viewer.dragY = 0;
+            this.viewer.repaintAll(0);
         }
     }
 
