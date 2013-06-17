@@ -17,13 +17,13 @@ class ImportFile {
 		});
 	}
 
-	read(callback) {
+	read(callback): void{
 		$("div.row").on('drop', e => {
 			e.stopPropagation();
 			e.preventDefault();
 			$(this).removeClass('hover');
 			var file = e.originalEvent.dataTransfer.files[0];
-			if(file) {
+			if(file){
 				var reader = new FileReader();
 				reader.onerror = e => {
 					console.log('error', (<any>e.target).error.code);
