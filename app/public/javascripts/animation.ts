@@ -1,54 +1,63 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 
-var Animation = (function() {
-	function Animation() {
+class PropertyAdapter {
+	constructor(public get: (key: string) => number, public set: (key: string, value: any) => void){}
+}
+
+class MoveTask {
+	constructor (public key: string, public from: number, public to: number, public target: PropertyAdapter){}
+}
+
+class Animation {
+	constructor(public moveList: MoveTask[], public fadeInList: MoveTask[], public fadeOutList: MoveTask[]) {
 		this.moveList = [];
 		this.fadeInList = [];
 		this.fadeOutList = [];
-	}
-
-	function getAttrSetter(dom) {
-		if(dom.setAttribute != null) {//FIXME?
-			return {
-				set: function(key, value) { dom.setAttribute(key, value); },
-				get: function(key) { return dom.getAttribute(key); }
-			};
-		} else if(dom.css != undefined){
-			return {
-				set: function(key, value) { dom.css(key, value); },
-				get: function(key) { return dom.css(key); }
-			};
-		} else {
-			return {
-				set: function(key, value) { dom[key] = value; },
-				get: function(key) { return dom[key]; }
-			};
-		}
-	}
-
-	Animation.prototype.move = function(dom, key, toValue) {
-		var mtd = getAttrSetter(dom);
-		var fromValue = parseInt(mtd.get(key));
-		toValue = Math.floor(toValue);
-		if(fromValue != toValue) {
-			this.moveList.push({
-				key: key,
-				from: fromValue,
-				to: toValue,
-				set: mtd.set
-			});
-		}
-		return this;
 	};
 
-	Animation.prototype.moves = function(dom, json) {
+	private getAttrSetter(dom: HTMLElement);
+	private getAttrSetter(dom: JQuery);
+	private getAttrSetter(dom: any) {
+		if(dom.setAttribute != null) {//FIXME?
+			return new PropertyAdapter(
+					(key: string) => { return dom.getAttribute(key); },
+					(key: string, value: any) => { dom.setAttribute(key, value); }
+			);
+		} else if(dom.css != undefined){
+			return new PropertyAdapter(
+					(key: string) => { return dom.css(key); },
+					(key: string, value: any) => { dom.css(key, value); }
+			);
+		} else {
+			return new PropertyAdapter(
+					(key: string) => { return dom[key]; },
+					(key: string, value: any) => { dom[key] = value; }
+			);
+		}
+	}
+
+	public move(dom: any, key: string, toValue: number): any{
+		var target: PropertyAdapter = this.getAttrSetter(dom);
+		var fromValue: number = target.get(key);
+		toValue = Math.floor(toValue);
+		if(fromValue != toValue) {
+			this.moveList.push(new MoveTask(
+				key,
+				fromValue,
+				toValue,
+				target
+			));
+		}
+		return this;
+	}
+	public moves(dom: any, json: any) {
 		for(var key in json) {
 			this.move(dom, key, json[key]);
 		}
 		return this;
 	};
 
-	Animation.prototype.movePolygon = function(dom, points) {
+	public movePolygon(dom: any, points: any): void {
 		var from = [];
 		for(var i=0; i<dom.points.numberOfItems; i++) {
 			var p = dom.points.getItem(i);
@@ -56,50 +65,47 @@ var Animation = (function() {
 			this.move(p, "y", points[i].y);
 		}
 	};
-
-	Animation.prototype.show = function(dom, visible) {
-		var mtd = getAttrSetter(dom);
-		var disp = mtd.get("display");
+	public show(dom: any, visible: bool): any {
+		var target = this.getAttrSetter(dom);
+		var disp = target.get("display");
 		if(disp == null) {
-			mtd.set("display", visible ? "block" : "none");
+			target.set("display", visible ? "block" : "none");
 		} else if(disp == "none" && visible) {
 			// fade in
-			this.fadeInList.push(mtd.set);
-			mtd.set("opacity", 0.0);
-			mtd.set("display", "block");
+			this.fadeInList.push(target);
+			target.set("opacity", 0.0);
+			target.set("display", "block");
 		} else if(disp == "block" && !visible) {
 			// fade out
-			this.fadeOutList.push(mtd.set);
-			mtd.set("opacity", 1.0);
-			mtd.set("display", "block");
+			this.fadeOutList.push(target);
+			target.set("opacity", 1.0);
+			target.set("display", "block");
 		}
 		return this;
 	};
 
-	Animation.prototype.anime = function(r) {
+	public anime(r: number): void {
 		$.each(this.moveList, function(i, e) {
-			e.set(e.key, e.from + (e.to - e.from) * r);
+			e.target.set(e.key, e.from + (e.to - e.from) * r);
 		});
 		$.each(this.fadeInList, function(i, e) {
-			e("opacity", r);
+			e.set("opacity", r);
 		});
 		$.each(this.fadeOutList, function(i, e) {
-			e("opacity", 1.0 - r);
+			e.set("opacity", 1.0 - r);
 		});
 	};
 
-	Animation.prototype.animeFinish = function() {
-		$.each(this.moveList, function(i, e) {
-			e.set(e.key, e.to);
+	public animeFinish(): void {
+		$.each(this.moveList, function(i: number, e: MoveTask) {
+			e.target.set(e.key, e.to);
 		});
-		$.each(this.fadeInList, function(i, e) {
-			e("opacity", 1.0);
+		$.each(this.fadeInList, function(i: number, e: PropertyAdapter) {
+			e.set("opacity", 1.0);
 		});
-		$.each(this.fadeOutList, function(i, e: any) {
-			e("opacity", 1.0);
-			e("display", "none");
+		$.each(this.fadeOutList, function(i: number, e: PropertyAdapter) {
+			e.set("opacity", 1.0);
+			e.set("display", "none");
 		});
 	};
-	return Animation;
-})();
-
+}
