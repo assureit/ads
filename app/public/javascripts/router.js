@@ -6,19 +6,7 @@ var subRouter = (function () {
     return subRouter;
 })();
 var Router = (function () {
-    function Router() { }
-    Router.prototype.parseParameters = function (hash) {
-        var params = hash.split("/").filter(function (it) {
-            return it != "";
-        });
-        if(params.length == 0) {
-            params = [
-                ""
-            ];
-        }
-        return new subRouter(params[0], params.slice(1));
-    };
-    Router.prototype.Router = function () {
+    function Router() {
         this.table = {
         };
         var self = this;
@@ -32,8 +20,19 @@ var Router = (function () {
                 }
             };
         }
+    }
+    Router.prototype.parseParameters = function (hash) {
+        var params = hash.split("/").filter(function (it) {
+            return it != "";
+        });
+        if(params.length == 0) {
+            params = [
+                ""
+            ];
+        }
+        return new subRouter(params[0], params.slice(1));
     };
-    Router.prototype.router = function (router, name, callback) {
+    Router.prototype.route = function (router, name, callback) {
         this.table[name] = callback;
     };
     Router.prototype.start = function () {
