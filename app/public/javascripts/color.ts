@@ -7,12 +7,10 @@ class ColorSets {
 		$("#menu-change-theme *").remove();
 	}
 
+	Sets: any;
+
 	add(theme) {
 		//FIXME
-	}
-
-	get(name:string) {
-		return this.Sets[name];
 	}
 
 	init() {
@@ -52,6 +50,10 @@ class ColorSets {
 			"Rebuttal": "#000000"
 		};
 	};
+
+	get(name:string) {
+		return this.Sets[name];
+	}
 
 	createDropMenu() {
 		var self = this;
