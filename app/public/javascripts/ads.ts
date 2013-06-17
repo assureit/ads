@@ -64,7 +64,7 @@ class ADS {
 		}
 	}
 
-	constructor(body: string) {
+	constructor(body: HTMLElement) {
 		this.selectDCaseView = new SelectDCaseView();
 		this.selectDCaseView.initEvents();
 		this.createDCaseView = new CreateDCaseView();

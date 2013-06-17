@@ -1,145 +1,132 @@
-DCaseViewer.prototype.setDragHandler = function () {
-    var self = this;
-    var x0 = 0;
-    var y0 = 0;
-    var flag = false;
-    var bounds = {
-        l: 0,
-        r: 0,
-        t: 0,
-        b: 0
-    };
-    this.dragStart = function (x, y) {
-        if(flag) {
-            this.dragCancel();
-        }
-        if(self.rootview == null) {
+var Rect = (function () {
+    function Rect(l, r, t, b) {
+        this.l = l;
+        this.r = r;
+        this.t = t;
+        this.b = b;
+    }
+    return Rect;
+})();
+var PointerHandler = (function () {
+    function PointerHandler(viewer) {
+        this.viewer = null;
+        this.x0 = 0;
+        this.y0 = 0;
+        this.bounds = new Rect(0, 0, 0, 0);
+        this.mainPointerId = null;
+        this.pointers = [];
+        this.root = null;
+        this.viewer = viewer;
+        this.root = viewer.$dummyDivForPointer;
+        this.scale0 = this.viewer.scale;
+        this.root[0].addEventListener("pointerdown", this.onPointerDown, false);
+        this.root[0].addEventListener("pointermove", this.onPointerMove, false);
+        this.root[0].addEventListener("pointerup", this.onPointerUp, false);
+        this.root[0].addEventListener("gesturescale", this.onScale, false);
+        this.root.mousewheel(this.onWheel);
+    }
+    PointerHandler.prototype.dragStart = function (x, y) {
+        if(this.viewer.rootview == null) {
             return;
         }
-        x0 = x;
-        y0 = y;
-        flag = true;
-        var size = self.treeSize();
-        bounds = {
-            l: 20 - size.w * self.scale - self.shiftX,
-            r: self.$root.width() - 20 - self.shiftX,
-            t: 20 - size.h * self.scale - self.shiftY,
-            b: self.$root.height() - 20 - self.shiftY
-        };
-        self.repaintAll(0);
+        this.x0 = x;
+        this.y0 = y;
+        var size = this.viewer.treeSize();
+        this.bounds = new Rect(20 - size.w * this.viewer.scale - this.viewer.shiftX, this.viewer.$root.width() - 20 - this.viewer.shiftX, 20 - size.h * this.viewer.scale - this.viewer.shiftY, this.viewer.$root.height() - 20 - this.viewer.shiftY);
+        this.viewer.repaintAll(0);
     };
-    this.drag = function (x, y) {
-        if(flag) {
-            var dx = (x - x0);
-            var dy = (y - y0);
-            if(dx != 0 || dy != 0) {
-                self.dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
-                self.dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
-                self.repaintAll(0);
-            }
+    PointerHandler.prototype.drag = function (x, y) {
+        var dx = (x - this.x0);
+        var dy = (y - this.y0);
+        if(dx != 0 || dy != 0) {
+            this.viewer.dragX = Math.max(this.bounds.l, Math.min(this.bounds.r, dx));
+            this.viewer.dragY = Math.max(this.bounds.t, Math.min(this.bounds.b, dy));
+            this.viewer.repaintAll(0);
         }
     };
-    this.dragCancel = function () {
-        self.shiftX += self.dragX;
-        self.shiftY += self.dragY;
-        self.dragX = 0;
-        self.dragY = 0;
-        self.repaintAll(0);
-        flag = false;
+    PointerHandler.prototype.dragCancel = function () {
+        this.viewer.shiftX += this.viewer.dragX;
+        this.viewer.shiftY += this.viewer.dragY;
+        this.viewer.dragX = 0;
+        this.viewer.dragY = 0;
+        this.viewer.repaintAll(0);
     };
-    this.dragEnd = function (view) {
-        if(flag) {
-            if(self.dragX == 0 && self.dragY == 0) {
-                self.setSelectedNode(view);
-            } else {
-                self.shiftX += self.dragX;
-                self.shiftY += self.dragY;
-                self.dragX = 0;
-                self.dragY = 0;
-                self.repaintAll(0);
-            }
-            flag = false;
+    PointerHandler.prototype.dragEnd = function (view) {
+        if(this.viewer.dragX == 0 && this.viewer.dragY == 0) {
+            this.viewer.setSelectedNode(view);
+        } else {
+            this.viewer.shiftX += this.viewer.dragX;
+            this.viewer.shiftY += this.viewer.dragY;
+            this.viewer.dragX = 0;
+            this.viewer.dragY = 0;
+            this.viewer.repaintAll(0);
         }
     };
-};
-DCaseViewer.prototype.setPointerHandler = function () {
-    var self = this;
-    var root = this.$dummyDivForPointer;
-    var pointers = [];
-    var mainPointerId = null;
-    var scale0 = self.scale;
-    var getMainPointer = function () {
-        for(var i = 0; i < pointers.length; ++i) {
-            if(pointers[i].identifier === mainPointerId) {
-                return pointers[i];
+    PointerHandler.prototype.getMainPointer = function () {
+        for(var i = 0; i < this.pointers.length; ++i) {
+            if(this.pointers[i].identifier === this.mainPointerId) {
+                return this.pointers[i];
             }
         }
         ;
         return null;
     };
-    function onPointerDown(e) {
-        pointers = e.getPointerList();
+    PointerHandler.prototype.onPointerDown = function (e) {
+        this.pointers = e.getPointerList();
         e.preventDefault();
-        scale0 = self.scale;
-    }
-    function onPointerMove(e) {
+        this.scale0 = this.viewer.scale;
+    };
+    PointerHandler.prototype.onPointerMove = function (e) {
         e.preventDefault();
-        pointers = e.getPointerList();
-        if(!mainPointerId && pointers.length > 0) {
-            var mainPointer = pointers[0];
-            mainPointerId = mainPointer.identifier;
-            self.dragStart(mainPointer.pageX, mainPointer.pageY);
+        this.pointers = e.getPointerList();
+        if(!this.mainPointerId && this.pointers.length > 0) {
+            var mainPointer = this.pointers[0];
+            this.mainPointerId = mainPointer.identifier;
+            this.viewer.dragStart(mainPointer.pageX, mainPointer.pageY);
         } else {
-            var mainPointer = getMainPointer();
+            var mainPointer = this.getMainPointer();
             if(mainPointer) {
-                self.drag(mainPointer.pageX, mainPointer.pageY);
+                this.viewer.drag(mainPointer.pageX, mainPointer.pageY);
             }
         }
-    }
-    function onPointerUp(e) {
-        pointers = e.getPointerList();
-        var mainPointer = getMainPointer();
-        if(mainPointerId && !mainPointer) {
-            self.dragEnd();
-            mainPointerId = null;
-        }
-    }
-    var getRect = function () {
-        return root[0].getBoundingClientRect();
     };
-    var setScale = function (cx, cy, b) {
-        var scale = Math.min(Math.max(self.scale * b, SCALE_MIN), SCALE_MAX);
-        var r = getRect();
+    PointerHandler.prototype.onPointerUp = function (e) {
+        this.pointers = e.getPointerList();
+        var mainPointer = this.getMainPointer();
+        if(this.mainPointerId && !mainPointer) {
+            this.viewer.dragEnd();
+            this.mainPointerId = null;
+        }
+    };
+    PointerHandler.prototype.getRect = function () {
+        return (this.root[0]).getBoundingClientRect();
+    };
+    PointerHandler.prototype.setScale = function (cx, cy, b) {
+        var scale = Math.min(Math.max(this.viewer.scale * b, SCALE_MIN), SCALE_MAX);
+        var r = this.getRect();
         var x1 = cx - r.left;
         var y1 = cy - r.top;
-        var x = x1 - (x1 - self.shiftX) * b;
-        var y = y1 - (y1 - self.shiftY) * b;
-        self.setLocation(x, y, scale);
+        var x = x1 - (x1 - this.viewer.shiftX) * b;
+        var y = y1 - (y1 - this.viewer.shiftY) * b;
+        this.viewer.setLocation(x, y, scale);
     };
-    $(root).mousewheel(function (e, delta) {
+    PointerHandler.prototype.onScale = function (e) {
         e.preventDefault();
         e.stopPropagation();
-        if(self.moving) {
+        if(this.viewer.moving) {
+            return;
+        }
+        var b = e.scale * this.scale0 / this.viewer.scale;
+        this.setScale(e.centerX, e.centerY, b);
+    };
+    PointerHandler.prototype.onWheel = function (e, delta) {
+        e.preventDefault();
+        e.stopPropagation();
+        if(this.viewer.moving) {
             return;
         }
         var b = 1.0 + delta * 0.04;
-        setScale(e.pageX, e.pageY, b);
-    });
-    var onScale = function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if(self.moving) {
-            return;
-        }
-        var b = e.scale * scale0 / self.scale;
-        setScale(e.centerX, e.centerY, b);
+        this.setScale(e.pageX, e.pageY, b);
     };
-    root[0].addEventListener("pointerdown", onPointerDown, false);
-    root[0].addEventListener("pointermove", onPointerMove, false);
-    root[0].addEventListener("pointerup", onPointerUp, false);
-    root[0].addEventListener("gesturescale", onScale, false);
-};
-DCaseViewer.prototype.addEventHandler = function () {
-    this.setDragHandler();
-    this.setPointerHandler();
-};
+    return PointerHandler;
+})();
