@@ -1,3 +1,8 @@
+var DCaseFile = (function () {
+    function DCaseFile(result, name) {
+    }
+    return DCaseFile;
+})();
 var ImportFile = (function () {
     function ImportFile() {
         var _this = this;
@@ -20,17 +25,14 @@ var ImportFile = (function () {
             e.stopPropagation();
             e.preventDefault();
             $(_this).removeClass('hover');
-            var file = e.originalEvent.dataTransfer.files[0];
+            var file = (e.originalEvent.dataTransfer).files[0];
             if(file) {
                 var reader = new FileReader();
                 reader.onerror = function (e) {
                     console.log('error', (e.target).error.code);
                 };
                 reader.onload = function (e) {
-                    callback({
-                        result: e.target.result,
-                        name: file.name
-                    });
+                    callback(new DCaseFile(e.target.result, file.name));
                 };
                 reader.readAsText(file, 'utf-8');
             }

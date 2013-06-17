@@ -1,5 +1,9 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 
+class DCaseFile{
+	constructor(result: string, name: string){}
+}
+
 class ImportFile {
 
 	constructor() {
@@ -17,19 +21,19 @@ class ImportFile {
 		});
 	}
 
-	read(callback) {
+	read(callback: DCaseFile): void{
 		$("div.row").on('drop', e => {
 			e.stopPropagation();
 			e.preventDefault();
 			$(this).removeClass('hover');
-			var file = e.originalEvent.dataTransfer.files[0];
-			if(file) {
+			var file: File = (<any>e.originalEvent.dataTransfer).files[0];
+			if(file){
 				var reader = new FileReader();
 				reader.onerror = e => {
 					console.log('error', (<any>e.target).error.code);
 				}
 				reader.onload = e => {
-					callback({result: e.target.result, name: file.name});
+					callback(new DCaseFile(e.target.result, file.name));
 				};
 				reader.readAsText(file, 'utf-8');
 			}

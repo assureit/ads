@@ -1,8 +1,8 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 ///<reference path='api.ts'/>
 
-var CreateDCaseView = (function() {
-	function CreateDCaseView() {
+class CreateDCaseView{
+	constructor() {
 		$("#dcase-create").click(function() {
 			var name = $("#inputDCaseName").attr("value");
 			var desc = $("#inputDesc").attr("value");
@@ -34,33 +34,31 @@ var CreateDCaseView = (function() {
 		});
 	}
 
-	CreateDCaseView.prototype.enableSubmit = function(userId) {
+	enableSubmit(userId): void{
 		$("#dcase-create").removeClass("disabled");
 		$("#inputDCaseName").removeAttr("disabled");
 		$("#inputDesc").removeAttr("disabled");
 	};
 
-	CreateDCaseView.prototype.disableSubmit = function() {
+	disableSubmit(): void{
 		$("#dcase-create").addClass("disabled");
 		$("#inputDCaseName").attr("disabled", "");
 		$("#inputDesc").attr("disabled", "");
 	};
+}
 
-	return CreateDCaseView;
-})();
+class SelectDCaseView(){
 
-var SelectDCaseView = (function() {
-
-	function SelectDCaseView() {
+	constructor() {
 		this.pageIndex = 1;
 		this.maxPageSize = 2;
 	}
 
-	SelectDCaseView.prototype.clearTable = function() {
+	clearTable(): void{
 		$("tbody#dcase-select-table *").remove();
 	};
 
-	SelectDCaseView.prototype.addTable = function(userId, pageIndex) {
+	addTable(userId, pageIndex): void{
 		if(pageIndex == null || pageIndex < 1) pageIndex = 1;
 		this.pageIndex = pageIndex - 0;
 		var $tbody = $("#dcase-select-table");
@@ -133,7 +131,7 @@ var SelectDCaseView = (function() {
 	return SelectDCaseView;
 })();
 
-var SearchView = (function() {
+class SearchView(){
 
 	function SearchView() {
 		var searchQuery = $('#search-query');
