@@ -1,6 +1,7 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 
 class subRouter{
+
 	name : string;
 	args : string[];
 	constructor(name: string, args : string[]){
@@ -20,7 +21,7 @@ class Router{
 		return  new subRouter(params[0], params.slice(1));
 	}
 
-	Router() {
+	constructor Router() {
 		this.table = {};
 		var self = this;
 		if ("onhashchange" in window) { //FIXME
@@ -35,7 +36,7 @@ class Router{
 		}
 	}
 
-	router(router, name : string, callback : (args :string)=>void) : void {
+	route(router, name : string, callback : (args :string)=>void) : void {
 		this.table[name] = callback;
 	};
 
