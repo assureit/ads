@@ -29,7 +29,7 @@ class CreateDCaseView{
 				TopGoalId: id,
 				NodeCount: 1,
 			};
-			var r = DCaseAPI.createDCase(name, tree);
+			var r: any = DCaseAPI.createDCase(name, tree);
 			location.href = "./#dcase/" + r.dcaseId;
 		});
 	}
@@ -47,7 +47,7 @@ class CreateDCaseView{
 	};
 }
 
-class SelectDCaseView(){
+class SelectDCaseView{
 
 	constructor() {
 		this.pageIndex = 1;
@@ -62,19 +62,19 @@ class SelectDCaseView(){
 		if(pageIndex == null || pageIndex < 1) pageIndex = 1;
 		this.pageIndex = pageIndex - 0;
 		var $tbody = $("#dcase-select-table");
-		var searchResults = DCaseAPI.searchDCase(this.pageIndex);
-		var dcaseList     = searchResults.dcaseList;
+		var searchResults: any = DCaseAPI.searchDCase(this.pageIndex);
+		var dcaseList : any = searchResults.dcaseList;
 		this.maxPageSize  = searchResults.summary.maxPage;
 		if(dcaseList.length == 0) {
 			$("<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>")
 			.appendTo($tbody);
 		}
-		$.each(dcaseList, function(i, dcase) {
+		$.each(dcaseList, (i, dcase) => {
 			var id = dcase.dcaseId;
 			var name = dcase.dcaseName;
 			var user = dcase.userName;
-			var lastDate = dcase.latestCommit.dateTime;//new DateFormatter(dcase.latestCommit.time).format();
-			var lastUser = dcase.latestCommit.userName;
+			var lastDate: any = dcase.latestCommit.dateTime;//new DateFormatter(dcase.latestCommit.time).format();
+			var lastUser: any = dcase.latestCommit.userName;
 			var html = "<td><a href=\"#dcase/" + id + "\">" + name +
 					"</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" +
 					lastUser + "</td>";
@@ -107,9 +107,9 @@ class SelectDCaseView(){
 		});
 	};
 
-	SelectDCaseView.prototype.initEvents = function() {
+	initEvents() {
 		var self = this;
-		$("#prev-page").click(function(e) {
+		$("#prev-page").click(e => {
 			var i = self.pageIndex - 0;
 			if(i > 1) {
 				self.pageIndex = i - 1;
@@ -118,7 +118,7 @@ class SelectDCaseView(){
 			e.preventDefault();
 		});
 
-		$("#next-page").click(function(e) {
+		$("#next-page").click(e => {
 			var i = self.pageIndex - 0;
 			if(self.maxPageSize >= i + 1) {
 				self.pageIndex = i + 1;
@@ -127,14 +127,12 @@ class SelectDCaseView(){
 			e.preventDefault();
 		});
 	};
+}
 
-	return SelectDCaseView;
-})();
+class SearchView{
 
-class SearchView(){
-
-	function SearchView() {
-		var searchQuery = $('#search-query');
+	constructor() {
+		var searchQuery: any = $('#search-query');
 		searchQuery.popover({
 			html: true,
 			placement: 'bottom',
@@ -158,6 +156,4 @@ class SearchView(){
 			return false;
 		});
 	}
-
-	return SearchView;
-})();
+}
