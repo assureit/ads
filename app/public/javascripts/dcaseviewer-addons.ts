@@ -473,7 +473,7 @@ var DNodeView_ToolBox = function(self) {
 					edit_hover = false;
 					showNewNode(false);
 				})
-				.one("click", function() { edit_activate(); })
+				.one("click", function(e) { e.preventDefault(); edit_activate(); })
 				.click(function(e) { e.stopPropagation(); })
 				.appendTo(self.$div);
 

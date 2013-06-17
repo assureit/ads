@@ -1,45 +1,59 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
+///<reference path='adsComponentView.ts'/>
+///<reference path='router.ts'/>
+///<reference path='color.ts'/>
+///<reference path='importfile.ts'/>
+///<reference path='dcaseviewer.ts'/>
 
-var ADS = (function() {
+class ADS {
+	TITLE_SUFFIX:   string = " - Assurance DS";
+	URL_EXPORT:     string = "cgi/view2.cgi"; //FIXME
+	URL_EXPORT_SVG: string = "cgi/svg.cgi";
+	viewer: DCaseViewer;
+	selectDCaseView: SelectDCaseView;
+	createDCaseView: CreateDCaseView;
+	timelineView   : TimeLineView;
+	dcase_latest   : any;
 
-	function getLoginUserorNull() {
+
+	getLoginUserorNull() {
 		var matchResult = document.cookie.match(/userId=(\w+);?/);
 		var userId = matchResult ? parseInt(matchResult[1]) : null;
 		if(userId == null) { //FIXME
 			// disable edit menu when non-login
-			hideEditMenu();
+			this.hideEditMenu();
 		}
 		return userId;
 	}
 
-	function isLogin(id) {
+	isLogin(id: number) {
 		return id != null;
 	}
 
-	function hideEditMenu() {
+	hideEditMenu() {
 		$(".ads-edit-menu").css("display", "none");
 	}
 
-	function hideViewMenu() {
+	hideViewMenu() {
 		$(".ads-view-menu").css("display", "none");
 	}
 
-	function hideViewer() {
+	hideViewer() {
 		$("#viewer").hide();//.css("display", "none");
 		$("#viewer *").remove();//.css("display", "none");
 	}
 
-	function clearTimeLine() {
+	clearTimeLine() {
 		if($(".timeline").length > 0) {
 			$(".timeline").remove();
 		}
 	}
 
-	function initDefaultScreen(userId, pageIndex, selectDCaseView) { //FIXME
-		clearTimeLine();
-		hideViewer();
-		hideEditMenu();
-		hideViewMenu();
+	initDefaultScreen(userId: number, pageIndex: number, selectDCaseView: SelectDCaseView) { //FIXME
+		this.clearTimeLine();
+		this.hideViewer();
+		this.hideEditMenu();
+		this.hideViewMenu();
 
 		$("#dcase-manager").css("display", "block");
 
@@ -49,35 +63,31 @@ var ADS = (function() {
 		}
 	}
 
-	function ADS(body) {
-		var self = this;
-		this.TITLE_SUFFIX = " - Assurance DS";
-		this.URL_EXPORT = "cgi/view2.cgi";  //FIXME
-		this.URL_EXPORT_SVG = "cgi/svg.cgi";
-		var selectDCaseView = new SelectDCaseView();
-		selectDCaseView.initEvents();
-		var createDCaseView = new CreateDCaseView();
+	constructor(body: string) {
+		this.selectDCaseView = new SelectDCaseView();
+		this.selectDCaseView.initEvents();
+		this.createDCaseView = new CreateDCaseView();
 
 		var router = new Router();
 		router.route("new", "new", function() {
-			var userId  = getLoginUserorNull();
-			initDefaultScreen(userId);
+			var userId: number  = this.getLoginUserorNull();
+			this.initDefaultScreen(userId);
 			$("#newDCase").show();
 			$("#selectDCase").hide();
 
-			if(isLogin(userId)) {
-				createDCaseView.enableSubmit();
+			if(this.isLogin(userId)) {
+				this.createDCaseView.enableSubmit();
 			} else {
-				createDCaseView.disableSubmit();
+				this.createDCaseView.disableSubmit();
 			}
 		});
 
-		var defaultRouter = function(pageIndex) {
-			initDefaultScreen(getLoginUserorNull(), pageIndex, selectDCaseView);
+		var defaultRouter = (pageIndex: any) => {
+			this.initDefaultScreen(this.getLoginUserorNull(), pageIndex, this.selectDCaseView);
 			$("#newDCase").hide();
 			$("#selectDCase").show();
 			var importFile = new ImportFile();
-			importFile.read(function(file){
+			importFile.read((file) => {
 				var tree = JSON.parse(file.result); //TODO convert to Markdown
 				if("contents" in tree) {
 					var r = DCaseAPI.createDCase(file.name.split(".")[0], tree.contents);
@@ -88,20 +98,20 @@ var ADS = (function() {
 			});
 		}
 
-		router.route("page/:id", "page", function(pageIndex) {
+		router.route("page/:id", "page", (pageIndex) => {
 			defaultRouter(pageIndex);
 		});
 
-		router.route("", "", function() {
+		router.route("", "", () => {
 			defaultRouter(1);
 		});
 
-		router.route("dcase/:id", "dcase", function(dcaseId){
-			hideViewer();
-			clearTimeLine();
+		router.route("dcase/:id", "dcase", (dcaseId) => {
+			this.hideViewer();
+			this.clearTimeLine();
 			$("#newDCase").hide();
 			$("#selectDCase").hide();
-			var userId = getLoginUserorNull();
+			var userId = this.getLoginUserorNull();
 
 			$(".ads-view-menu").css("display", "block");
 			$(".ads-edit-menu").css("display", "block");
@@ -109,12 +119,12 @@ var ADS = (function() {
 			$("#viewer").css("display", "block");
 			var $body  = $(body);
 			var viewer = new DCaseViewer(document.getElementById("viewer"),
-					null, isLogin(userId));
-			var timelineView = self.timelineView = new TimeLineView($body, viewer, isLogin(userId));
-			self.dcase_latest = null;
+					null, this.isLogin(userId));
+			this.timelineView = new TimeLineView($body, viewer, this.isLogin(userId));
+			this.dcase_latest = null;
 
-			$(window).bind("beforeunload", function(e) {
-				if(dcase_latest != null && dcase_latest.isChanged()) {
+			$(window).bind("beforeunload", (e)=> {
+				if(this.dcase_latest != null && this.dcase_latest.isChanged()) {
 					return "未コミットの変更があります";
 				}
 			});
@@ -126,28 +136,28 @@ var ADS = (function() {
 			// change color theme
 			var name = document.cookie.match(/colorTheme=(\w+);?/);
 			if(name != null) {
-				viewer.setColorTheme(colorSets.get(name[1]));
+				this.viewer.setColorTheme(colorSets.get(name[1]));
 			}
 
 			// show DCase
-			var r = DCaseAPI.getDCase(dcaseId);
+			var r:any = DCaseAPI.getDCase(dcaseId);
 			var dcase = new DCase(JSON.parse(r.contents), dcaseId, r.commitId);
 			viewer.setDCase(dcase);
-			timelineView.repaint(dcase);
-			dcase_latest = dcase;
+			this.timelineView.repaint(dcase);
+			this.dcase_latest = dcase;
 			document.title = r.dcaseName + this.TITLE_SUFFIX;
 			$("#dcaseName").text(r.dcaseName);
 
-	});
+		});
 
 		router.start();
 
-		viewer.exportSubtree = function(type, root) {
-			self.exportTree(type, root);
+		this.viewer.exportSubtree = (type, root) => {
+			this.exportTree(type, root);
 		};
 	} // function ADS
 
-	ADS.prototype.commit = function() {
+	commit(): void {
 		if(this.viewer.editable) {
 			if(!this.viewer.getDCase().isChanged()) {
 				alert("変更されていません");
@@ -161,9 +171,9 @@ var ADS = (function() {
 				}
 			}
 		}
-	};
+	}
 
-	ADS.prototype.searchNode = function(text, types, beginDate, endDate, callback, callbackOnNoResult) {
+	searchNode(text, types, beginDate, endDate, callback, callbackOnNoResult): void {
 		var dcase = this.viewer.getDCase();
 		var root = dcase ? dcase.getTopGoal() : undefined;
 		if(!root) {
@@ -183,9 +193,9 @@ var ADS = (function() {
 				//callback($res, v, name, ptext);
 			}
 		});
-	};
+	}
 
-	ADS.prototype.updateSearchResult = function(text) {
+	updateSearchResult(text) {
 		$('#search-query').popover('show');
 		var $res = $("#search_result_ul");
 		$res.empty();
@@ -203,25 +213,25 @@ var ADS = (function() {
 			}
 		}
 		$res.append("<hr>");
-		self.searchNode(text, [], null, null, function(node) {
+		this.searchNode(text, [], null, null, (node) => {
 			$("<li>")
 				.html("<a href=\"#\">" + node.name + "</a>")
-				.click(function(e) {
-					viewer.centerize(node, 500);
+				.click((e) => {
+					this.viewer.centerize(node, 500);
 					e.preventDefault();
 				})
 				.appendTo($res);
 		});
-	};
+	}
 
-	ADS.prototype.foreachLine = function(str, max, callback){
+	foreachLine(str: string, max: number, callback) : void{
 		if(!callback) return;
-		var rest = str;
-		var maxLength = max || 20;
+		var rest: string = str;
+		var maxLength: number = max || 20;
 		maxLength = maxLength < 1 ? 1 : maxLength;
 		var length = 0;
 		var i = 0;
-		for(var pos = 0; pos < rest.length; ++pos){
+		for(var pos = 0; pos < rest.length; ++pos) {
 			var code = rest.charCodeAt(pos);
 			length += code < 128 ? 1 : 2;
 			if(length > maxLength || rest.charAt(pos) == "\n"){
@@ -236,15 +246,15 @@ var ADS = (function() {
 			}
 		}
 		callback(rest, i);
-	};
+	}
 
-	ADS.prototype.splitTextByLength = function(str, max){
+	splitTextByLength(str: string, max: number) : any[] {
 		var arr = [];
-		foreachLine(str, max, function(s){ arr.push(s); });
+		this.foreachLine(str, max, (s) => { arr.push(s); });
 		return arr;
 	}
 
-	ADS.prototype.createSVGDocument = function(viewer, root) {
+	createSVGDocument(viewer: DCaseViewer, root: any): any {
 		var nodeViewMap = viewer.nodeViewMap;
 		var dcase = viewer.getDCase();
 		if(root == null) {
@@ -302,7 +312,7 @@ var ADS = (function() {
 		return doc;
 	};
 
-	ADS.prototype.executePost = function(action, data) {
+	executePost(action, data): void {
 		var $body = $(document.body);
 		var $form = $("<form>").attr({
 			"action" : action,
@@ -322,74 +332,69 @@ var ADS = (function() {
 		$form.empty().remove();
 	}
 
-	ADS.prototype.exportViaSVG = function(type, root) {
-		var self = this;
-		var svg = this.createSVGDocument(self.viewer, root);
+	exportViaSVG(type, root): void {
+		var svg = this.createSVGDocument(this.viewer, root);
 		svg = svg.replace("</svg></svg>", "</svg>"); // for IE10 Bug
 		this.executePost(this.URL_EXPORT_SVG, {"type" : type, "svg" : svg});
 	}
 
-	ADS.prototype.exportTree = function(type, root) {
+	exportTree(type: string, root: any): void {
 		if(type == "png" || type == "pdf" || type == "svg"){
 			this.exportViaSVG(type, root);
 			return;
 		}
-		var commitId = viewer.getDCase().commitId;
+		var commitId = this.viewer.getDCase().commitId;
 		var url = this.URL_EXPORT + "?" + commitId + "." + type;
 		window.open(url, "_blank");
 	};
 
-	ADS.prototype.initDefaultEventListeners = function() {
-		var self = this;
-
-		$("#menu-commit").click(function(e) {
-			self.commit();
+	initDefaultEventListeners(): void {
+		$("#menu-commit").click((e)=> {
+			this.commit();
 			e.preventDefault();
 		});
 
-		$("#menu-undo").click(function(e) {
-			self.viewer.getDCase().undo();
+		$("#menu-undo").click((e)=> {
+			this.viewer.getDCase().undo();
 			e.preventDefault();
 		});
 
-		$("#menu-redo").click(function(e) {
-			self.viewer.getDCase().redo();
+		$("#menu-redo").click((e)=> {
+			this.viewer.getDCase().redo();
 			e.preventDefault();
 		});
 
-		$("#menu-export-json").click(function(e) {
-			self.exportTree("json");
+		$("#menu-export-json").click((e)=> {
+			this.exportTree("json");
 			e.preventDefault();
 		});
 
-		$("#menu-export-png").click(function(e) {
-			self.exportTree("png");
+		$("#menu-export-png").click((e)=> {
+			this.exportTree("png");
 			e.preventDefault();
 		});
 
-		$("#menu-export-pdf").click(function(e) {
-			self.exportTree("pdf");
+		$("#menu-export-pdf").click((e)=> {
+			this.exportTree("pdf");
 			e.preventDefault();
 		});
 
-		$("#menu-export-dscript").click(function(e) {
-			self.exportTree("dscript");
+		$("#menu-export-dscript").click((e)=> {
+			this.exportTree("dscript");
 			e.preventDefault();
 		});
 
-		$("#lang-select-english").click(function(e) {
+		$("#lang-select-english").click((e)=> {
 			document.cookie = "lang=en";
 			e.preventDefault();
 			location.reload(true);
 		});
 
-		$("#lang-select-japanese").click(function(e) {
+		$("#lang-select-japanese").click((e)=> {
 			document.cookie = "lang=ja";
 			e.preventDefault();
 			location.reload(true);
 		});
 
 	}
-
-	return ADS;
-})();
+}
