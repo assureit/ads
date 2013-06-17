@@ -20,7 +20,7 @@ class Router{
 		return  new subRouter(params[0], params.slice(1));
 	}
 
-	Router() {
+	constructor() {
 		this.table = {};
 		var self = this;
 		if ("onhashchange" in window) { //FIXME
@@ -35,7 +35,7 @@ class Router{
 		}
 	}
 
-	router(router, name : string, callback : (args :string)=>void) : void {
+	route(router, name : string, callback : (args :string)=>void) : void {
 		this.table[name] = callback;
 	};
 
