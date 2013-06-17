@@ -345,7 +345,7 @@ class DCaseModel {
         return node;
     }
 
-    pasteNode(parent: DCaseNodeModel, old_node: DCaseNodeModel, index: number): void {
+    pasteNode(parent: DCaseNodeModel, old_node: DCaseNodeModel, index?: number): void {
         self: DCaseModel = this;
         if(index == null) {
             index = parent.children.length;
