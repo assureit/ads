@@ -1,8 +1,8 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 ///<reference path='api.ts'/>
 
-var CreateDCaseView = (function() {
-	function CreateDCaseView() {
+class CreateDCaseView{
+	constructor() {
 		$("#dcase-create").click(function() {
 			var name = $("#inputDCaseName").attr("value");
 			var desc = $("#inputDesc").attr("value");
@@ -34,7 +34,7 @@ var CreateDCaseView = (function() {
 		});
 	}
 
-	CreateDCaseView.prototype.enableSubmit = function(userId) {
+	enableSubmit(userId) {
 		$("#dcase-create").removeClass("disabled");
 		$("#inputDCaseName").removeAttr("disabled");
 		$("#inputDesc").removeAttr("disabled");

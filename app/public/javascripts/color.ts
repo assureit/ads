@@ -13,12 +13,12 @@ class ColorSets {
 		//FIXME
 	}
 
-	get(name:string) {
+	get(name:string): any{
 		return this.Sets[name];
 	}
 
 
-	init() {
+	init(): void{
 		this.Sets = {
 			"default":
 				this.viewer.default_colorTheme,
@@ -56,7 +56,7 @@ class ColorSets {
 		};
 	};
 
-	createDropMenu() {
+	createDropMenu():void {
 		var self = this;
 		var $ul = $("#menu-change-theme");
 		$.each(this.Sets, (name, theme) => {
