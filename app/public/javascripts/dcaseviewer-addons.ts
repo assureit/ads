@@ -67,8 +67,8 @@ function levenshtein(s1: any, s2: any): number {
 	return v0[s1_len];
 }
 
-function findMostSimilarNodeType(query){
-	var NodeTypes = ["Goal", "Context", "Subject", "Strategy", "Evidence", "Rebuttal", "Solution", "Monitor"];
+function findMostSimilarNodeType(query: string): string {
+	var NodeTypes: string[] = ["Goal", "Context", "Subject", "Strategy", "Evidence", "Rebuttal", "Solution", "Monitor"];
 
 	query = query.toLowerCase();
 	if(query.charAt(0) === "s"){
@@ -91,10 +91,10 @@ function findMostSimilarNodeType(query){
 		return "Monitor";
 	}
 
-	var min = levenshtein(NodeTypes[0], query);
-	var minidx = 0;
-	for(var i = 1; i < NodeTypes.length; i++){
-		var d = levenshtein(NodeTypes[i], query);
+	var min: number = levenshtein(NodeTypes[0], query);
+	var minidx: number = 0;
+	for(var i: number = 1; i < NodeTypes.length; i++){
+		var d: number = levenshtein(NodeTypes[i], query);
 		if(min >= d){
 			minidx = i;
 		}
@@ -102,21 +102,21 @@ function findMostSimilarNodeType(query){
 	return NodeTypes[minidx];
 };
 
-var DNodeView_ExpandBranch = function(self) {
-	var DBLTOUCH_THRESHOLD = 300;
-	var count = 0;
-	var time = null;
+function DNodeView_ExpandBranch(self): void {
+	var DBLTOUCH_THRESHOLD: number = 300;
+	var count: number = 0;
+	var time: number = null;
 
-	self.$div.dblclick(function(e) {
+	self.$div.dblclick((e: JQueryEventObject) => {
 		self.viewer.expandBranch(self);
 	});
 
-	self.$div.bind("touchstart", function(e) {
-		var touches = e.originalEvent.touches;
+	self.$div.bind("touchstart", (e: any) => {
+		var touches: string = e.originalEvent.touches;
 		count = touches.length;
 	});
 	
-	self.$div.bind("touchend", function(e) {
+	self.$div.bind("touchend", (e: JQueryEventObject) => {
 		self.viewer.dragEnd(self);
 		if(time != null && (e.timeStamp - time) < DBLTOUCH_THRESHOLD) {
 			self.viewer.expandBranch(self);
@@ -133,18 +133,18 @@ var DNodeView_ExpandBranch = function(self) {
 //-----------------------------------------------------------------------------
 
 /* find first line appering key value structure */
-var checkKeyValue = function(str) {
+function checkKeyValue(str: string): bool {
 	return str.indexOf(":") != -1;
 }
 
-var findVaridMetaData = function(body) {
+function findVaridMetaData(body: string[]): number {
 	body = body.join("\n").trim().split("\n");
 
 	if (checkKeyValue(body[0])) {
 		return 0;
 	}
 
-	var emptyLineIndex;
+	var emptyLineIndex: number;
 	for (emptyLineIndex = 0; emptyLineIndex < body.length; emptyLineIndex++) {
 		if (body[emptyLineIndex] == "") {
 			while (emptyLineIndex+1 < body.length && body[emptyLineIndex+1] == "") {
@@ -158,18 +158,18 @@ var findVaridMetaData = function(body) {
 		return emptyLineIndex+1;
 	}
 
-	return -1
+	return -1;
 }
 
 
-var parseMetaData = function(data) {
-	var metadata = {};
-	var i = 0;
+function parseMetaData(data: string[]): any {
+	var metadata: any = {};
+	var i: number = 0;
 	for (; i < data.length; i++) {
 		if (data[i].indexOf(":") == -1) break;
-		var list = data[i].split(":");
-		var key = list[0].trim();
-		var value = list.slice(1).join("").trim();
+		var list: string[] = data[i].split(":");
+		var key: string = list[0].trim();
+		var value: string = list.slice(1).join("").trim();
 		metadata[key] = value;
 	}
 	if (i < data.length) {
@@ -180,12 +180,12 @@ var parseMetaData = function(data) {
 	return metadata;
 }
 
-function generateMetadata(n) {
-	var metadata = n.metadata;
-	var keys = Object.keys(metadata);
-	var res = (keys.length > 0) ? "\n" : "";
+function generateMetadata(n): string {
+	var metadata: any = n.metadata;
+	var keys: string[] = Object.keys(metadata);
+	var res: string = (keys.length > 0) ? "\n" : "";
 	for (var i = 0; i < keys.length; i++) {
-		var key = keys[i];
+		var key: string = keys[i];
 		if (key != "Description") {
 			res += key + ": " + metadata[key] + "\n";
 		}
@@ -198,10 +198,10 @@ function generateMetadata(n) {
 	return res;
 }
 
-var parseNodeBody = function(body) {
-	var metadata = {};
-	var description;
-	var metadataIndex = findVaridMetaData(body);
+function parseNodeBody(body: string[]): any {
+	var metadata: any = {};
+	var description: string;
+	var metadataIndex: number = findVaridMetaData(body);
 	if (metadataIndex != -1) {
 		description = body.slice(0, metadataIndex).join("\n");
 		metadata = parseMetaData(body.slice(metadataIndex));
@@ -212,52 +212,52 @@ var parseNodeBody = function(body) {
 	return {"description": description, "metadata": metadata};
 }
 
-var DNodeView_InplaceEdit = function(self) {
-	var $edit = null;
+function DNodeView_InplaceEdit(self): void {
+	var $edit: JQuery = null;
 
 	self.$divText.addClass("node-text-editable");
 
 
-	function generateMarkdownText(node) {
-		var convert = (function(n){
+	function generateMarkdownText(node: any): string {
+		function convert(n: any): string {
 			return ("# " + n.type + " " + n.name + " " + n.id + (n.desc.length > 0 ? ("\n" + n.desc) : "") + generateMetadata(n) + "\n\n");
-		});
+		};
 
-		var markdown = convert(node);  
-		node.eachNode(function(n){
+		var markdown: string = convert(node);
+		node.eachNode((n: any) => {
 			markdown = markdown + convert(n);
 		});
 		return markdown;
 	};
 
-	function parseMarkdownText(src) {
-		var nodesrc = src.split(/^#+/m).slice(1);
-		var nodes = [];
-		for(var i = 0; i < nodesrc.length; ++i){
+	function parseMarkdownText(src: string): any[] {
+		var nodesrc: string[] = src.split(/^#+/m).slice(1);
+		var nodes: any[] = [];
+		for(var i: number = 0; i < nodesrc.length; ++i){
 
-			var lines = nodesrc[i].split(/\r\n|\r|\n/);
-			var heads = lines[0].trim().split(/\s+/);
+			var lines: string[] = nodesrc[i].split(/\r\n|\r|\n/);
+			var heads: string[] = lines[0].trim().split(/\s+/);
 
 			/* handle metadata */
-			var body = lines.slice(1).join("\n").trim().split("\n");
-			var parsedBody = parseNodeBody(body);
+			var body: string[] = lines.slice(1).join("\n").trim().split("\n");
+			var parsedBody: any = parseNodeBody(body);
 
-			var node = {
+			var node: any = {
 				type: findMostSimilarNodeType(heads[0]),
 				name: heads[1],
 				id  : heads[2],
 				description: parsedBody.description,
 				metadata: parsedBody.metadata,
-				children: [],
+				children: []
 			};
 			nodes.push(node);
 		};
 		return nodes;
 	};
 
-	function showInplace() {
+	function showInplace(): void {
 		if($edit == null) {
-			var cc = 0;
+			var cc: number = 0;
 			self.$divText.css("display", "none");
 			self.viewer.$root.css("-moz-user-select", "text");
 			self.viewer.canMoveByKeyboard = false;
@@ -269,35 +269,35 @@ var DNodeView_InplaceEdit = function(self) {
 				.attr("value", generateMarkdownText(self.node))
 				.appendTo(self.$div)
 				.focus()
-				.mousedown(function(e) { e.stopPropagation(); })
-				.mousewheel(function(e) { e.stopPropagation(); })
-				.dblclick(function(e) {
+				.mousedown((e: JQueryEventObject) => { e.stopPropagation(); })
+				.mousewheel((e: JQueryEventObject) => { e.stopPropagation(); })
+				.dblclick((e: JQueryEventObject) => {
 					if(cc >= 2) e.stopPropagation();
 					cc = 0;
 				})
-				.click(function(e) { cc++; e.stopPropagation(); })
+				.click((e: JQueryEventObject) => { cc++; e.stopPropagation(); })
 				.blur(closingInplace)
 				.trigger("autosize")
-				.on("keydown", function(e){
+				.on("keydown", (e: JQueryEventObject) => {
 					if(e.keyCode == 27 /* ESC */){ e.stopPropagation(); closingInplace(); };
 				});
 		}
 	}
 
-	function updateNode(node, nodejson) {
-		var newDesc = nodejson.description;
-		var newType = nodejson.type;
-		var newName = nodejson.name || newType[0] + "_" + node.id;
-		var newMetadata = nodejson.metadata;
+	function updateNode(node: any, nodejson: any): any {
+		var newDesc: string = nodejson.description;
+		var newType: string = nodejson.type;
+		var newName: string = nodejson.name || newType[0] + "_" + node.id;
+		var newMetadata: any = nodejson.metadata;
 		var DCase = self.viewer.getDCase();
 		DCase.setParam(node, newType, newName, newDesc, newMetadata);
 		return node;
 	}
 
-	function closingInplace() {
-		var markdown = $edit.attr("value").trim();
-		var nodes = parseMarkdownText(markdown);
-		var node = self.node;
+	function closingInplace(): void {
+		var markdown: string = $edit.attr("value").trim();
+		var nodes: any[] = parseMarkdownText(markdown);
+		var node: any = self.node;
 		var viewer = self.viewer;
 		var DCase = viewer.getDCase();
 		var parent = node.parents[0];
@@ -314,7 +314,7 @@ var DNodeView_InplaceEdit = function(self) {
 					closeInplace();
 				}else{
 					DCase.setDescription(node, "");
-					node.eachNode(function(n){
+					node.eachNode((n) => {
 						DCase.removeNode(n);
 					});
 				}
@@ -329,11 +329,11 @@ var DNodeView_InplaceEdit = function(self) {
 			}
 			updateNode(node, nodes[0]);
 			
-			var idNodeTable = {};
-			var idIndexTable = {};
+			var idNodeTable: any = {};
+			var idIndexTable: any = {};
 
-			var ch = 0, co = 0;
-			node.eachNode(function(n){
+			var ch: number = 0, co: number = 0;
+			node.eachNode((n) => {
 				idNodeTable[n.id] = n;
 				if(n.isContext){
 					idIndexTable[n.id] = co++;
@@ -342,31 +342,31 @@ var DNodeView_InplaceEdit = function(self) {
 				}
 			});
 
-			var newChildren = [];
-			var newContexts = [];
+			var newChildren: any[] = [];
+			var newContexts: string[] = [];
 
-			var treeChanged = false;
-			for(var i = 1; i < nodes.length; ++i){
-				var nd = nodes[i];
-				var id = nd.id;
+			var treeChanged: bool = false;
+			for(var i: number = 1; i < nodes.length; ++i){
+				var nd: any = nodes[i];
+				var id: string = nd.id;
 				if(idNodeTable[id]){
 					if(!node.isTypeApendable(nd.type)){
 						nd.type = idNodeTable[id].type;
 					}
-					var newNode = updateNode(idNodeTable[id], nd);
+					var newNode: any = updateNode(idNodeTable[id], nd);
 					// check subnode swapping
 					treeChanged = idIndexTable[id] !== (newNode.isContext ? newContexts : newChildren).length;
 					delete idNodeTable[id];
 					(newNode.isContext ? newContexts : newChildren).push(newNode);
 				}else if(node.isTypeApendable(nd.type)){
 					// create new node
-					var newNode = DCase.insertNode(node, nd.type, nd.description, nd.metadata);
+					var newNode: any = DCase.insertNode(node, nd.type, nd.description, nd.metadata);
 					treeChanged = true;
 					(newNode.isContext ? newContexts : newChildren).push(newNode);
 				}
 			}
 			// if a node is left in Table, it means that the node is removed from markdown text.
-			jQuery.each(idNodeTable, function(i,v){
+			jQuery.each(idNodeTable, (i, v) => {
 				DCase.removeNode(v);
 				treeChanged = true;
 			});
@@ -387,7 +387,7 @@ var DNodeView_InplaceEdit = function(self) {
 		closeInplace();
 	};
 
-	function closeInplace() {
+	function closeInplace(): void {
 		if($edit != null) {
 			$edit.remove();
 			$edit = null;
@@ -396,15 +396,15 @@ var DNodeView_InplaceEdit = function(self) {
 		}
 	}
 
-	self.$divText.click(function() {
+	self.$divText.click(() => {
 		showInplace();
 	});
 	
-	self.$div.dblclick(function(e) {
+	self.$div.dblclick((e: JQueryEventObject) => {
 		closeInplace();
 	})
 	
-	self.startInplaceEdit = function() {
+	self.startInplaceEdit = () => {
 		showInplace();
 	};
 
@@ -412,39 +412,39 @@ var DNodeView_InplaceEdit = function(self) {
 
 //-----------------------------------------------------------------------------
 
-var DNodeView_ToolBox = function(self) {
-	var edit_lock = false;
-	var edit_hover = false;
-	var edit_active = false;
-	var $edit = null;
+function DNodeView_ToolBox(self): void {
+	var edit_lock: bool = false;
+	var edit_hover: bool = false;
+	var edit_active: bool = false;
+	var $edit: JQuery = null;
 	var timeout = null;
 
-	function showNewNode(visible) {
+	function showNewNode(visible): void {
 		var type_selected = null;
-		function edit_close() {
+		function edit_close(): void {
 			$edit.remove();
 			$edit = null;
 			self.viewer.canMoveByKeyboard = true;
 			self.viewer.$root.css("-moz-user-select", "text");
 		}
-		function edit_activate() {
+		function edit_activate(): void {
 			if(!edit_active) {
 				self.viewer.canMoveByKeyboard = false;
 				edit_active = true;
 				edit_lock = true;
 				$edit.css("opacity", 0.95);
 				self.viewer.$root.css("-moz-user-select", "text");
-				self.viewer.$root.one("click", function() {
+				self.viewer.$root.one("click", () => {
 					var text = $edit.find("textarea").attr("value");
 					if(text != "") {
-						var parsedBody = parseNodeBody(text.trim().split("\n"));
+						var parsedBody: any = parseNodeBody(text.trim().split("\n"));
 						self.viewer.getDCase().insertNode(self.node, type_selected, parsedBody.description, parsedBody.metadata);
 					}
 					edit_close();
 				});
 			}
 		}
-		function clear_timeout() {
+		function clear_timeout(): void {
 			if(timeout != null) {
 				clearTimeout(timeout);
 				timeout = null;
@@ -454,7 +454,7 @@ var DNodeView_ToolBox = function(self) {
 			var types = self.node.appendableTypes();
 			if(self.node.contexts.length > 0) {
 				types = types.slice(0);//clone
-				for(var i=0; i<self.node.contexts.length; i++) {
+				for(var i: number = 0; i < self.node.contexts.length; i++) {
 					types.splice(types.indexOf(self.node.contexts[i].type), 1);
 				}
 			}
@@ -466,22 +466,22 @@ var DNodeView_ToolBox = function(self) {
 					left: 0, top: self.$div.height(),
 					opacity: 0.6,
 				})
-				.hover(function() {
+				.hover(() => {
 					edit_hover = true;
 					clear_timeout();
-				}, function() {
+				}, () => {
 					edit_hover = false;
 					showNewNode(false);
 				})
-				.one("click", function() { edit_activate(); })
-				.click(function(e) { e.stopPropagation(); })
+				.one("click", () => { edit_activate(); })
+				.click((e: JQueryEventObject) => { e.stopPropagation(); })
 				.appendTo(self.$div);
 
-				var $ul = $edit.find("ul");
-				$.each(types, function(i, type) {
+				var $ul: JQuery = $edit.find("ul");
+				$.each(types, (i, type) => {
 					var $li = $("<li></li>")
 						.html("<a href=\"#\">" + type + "</a>")
-						.click(function() {
+						.click(() => {
 							type_selected = type;
 							$("li").removeClass("active");
 							$li.addClass("active");
@@ -495,12 +495,12 @@ var DNodeView_ToolBox = function(self) {
 				});
 				$edit.find("textarea")
 					.focus()
-					.mousedown(function(e) { e.stopPropagation(); })
-					.mousewheel(function(e) { e.stopPropagation(); })
-					.dblclick(function(e) { e.stopPropagation(); })
-					.one("keydown", function() { edit_activate(); });
+					.mousedown((e: JQueryEventObject) => { e.stopPropagation(); })
+					.mousewheel((e: JQueryEventObject) => { e.stopPropagation(); })
+					.dblclick((e: JQueryEventObject) => { e.stopPropagation(); })
+					.one("keydown", () => { edit_activate(); });
 
-				$edit.ready(function() {
+				$edit.ready(() => {
 					$("textarea").css("height", $ul.height());
 				});
 
@@ -512,7 +512,7 @@ var DNodeView_ToolBox = function(self) {
 		} else if($edit != null) {
 			if(!edit_lock && !edit_hover) {
 				if(timeout == null) {
-					timeout = setTimeout(function() {
+					timeout = setTimeout(() => {
 						edit_close();
 					}, 100);
 				}
@@ -522,7 +522,7 @@ var DNodeView_ToolBox = function(self) {
 
 	var $toolbox = null;
 	
-	function showToolbox(visible) {
+	function showToolbox(visible): void {
 		if(visible) {
 			if($toolbox != null) return;
 			$toolbox = $("<div></div>")
@@ -531,33 +531,33 @@ var DNodeView_ToolBox = function(self) {
 	
 			$("<a href=\"#\"></a>").addClass("icon-plus")
 				.css({ position: "absolute",bottom: 4, left: 4, })
-				.hover(function() {
+				.hover(() => {
 					showNewNode(true);
-				}, function() {
+				}, () => {
 					showNewNode(false);
 				})
 				.appendTo($toolbox);
 	
-			var $menu = $("#edit-menulist").clone()
+			var $menu: JQuery = $("#edit-menulist").clone()
 				.css({ position: "absolute",bottom: 4, left: 24, display: "block" })
 				.appendTo($toolbox);
 
-			$menu.find("#ml-cut").click(function(e) {
+			$menu.find("#ml-cut").click((e: JQueryEventObject) => {
 				e.preventDefault();
 				self.viewer.clipboard = self.node.deepCopy();
 				self.viewer.getDCase().removeNode(self.node);
 				console.log("cut");
 			});
 
-			$menu.find("#ml-copy").click(function(e) {
+			$menu.find("#ml-copy").click((e: JQueryEventObject) => {
 				e.preventDefault();
 				self.viewer.clipboard = self.node.deepCopy();
 				console.log("copied");
 			});
 
-			$menu.find("#ml-paste").click(function(e) {
+			$menu.find("#ml-paste").click((e: JQueryEventObject) => {
 				e.preventDefault();
-				var node = self.viewer.clipboard;
+				var node: any = self.viewer.clipboard;
 				if(node != null) {
 					if(self.node.isTypeApendable(node.type)) {
 						self.viewer.getDCase().pasteNode(self.node, node);
@@ -569,7 +569,7 @@ var DNodeView_ToolBox = function(self) {
 			});
 
 			if(self.node.parents.length != 0) {
-				$menu.find("#ml-delete").click(function(e) {
+				$menu.find("#ml-delete").click((e: JQueryEventObject) => {
 					e.preventDefault();
 					self.viewer.getDCase().removeNode(self.node);
 				});
@@ -578,29 +578,29 @@ var DNodeView_ToolBox = function(self) {
 				$menu.find("#ml-cut").parent("li").addClass("disabled");
 			}
 
-			$menu.find("#ml-export-json").click(function(e) {
+			$menu.find("#ml-export-json").click((e: JQueryEventObject) => {
 				e.preventDefault();
 				self.viewer.exportSubtree("json", self.node);
 			});
-			$menu.find("#ml-export-png").click(function(e) {
+			$menu.find("#ml-export-png").click((e: JQueryEventObject) => {
 				e.preventDefault();
 				self.viewer.exportSubtree("png", self.node);
 			});
-			$menu.find("#ml-export-pdf").click(function(e) {
+			$menu.find("#ml-export-pdf").click((e: JQueryEventObject) => {
 				e.preventDefault();
 				self.viewer.exportSubtree("pdf", self.node);
 			});
-			$menu.find("#ml-export-dscript").click(function(e) {
+			$menu.find("#ml-export-dscript").click((e: JQueryEventObject) => {
 				e.preventDefault();
 				self.viewer.exportSubtree("dscript", self.node);
 			});
 
-			$menu.find("#ml-openall").click(function(e) {
+			$menu.find("#ml-openall").click((e: JQueryEventObject) => {
 				e.preventDefault();
 				self.viewer.expandBranch(self, true, true);
 			});
 
-			$menu.find("#ml-closeall").click(function(e) {
+			$menu.find("#ml-closeall").click((e: JQueryEventObject) => {
 				e.preventDefault();
 				self.viewer.expandBranch(self, false, true);
 			});
@@ -611,27 +611,27 @@ var DNodeView_ToolBox = function(self) {
 		}
 	};
 
-	self.$div.hover(function() {
+	self.$div.hover(() => {
 		showToolbox(true);
-	}, function() {
+	}, () => {
 		showToolbox(false);
 	});
 };
 
-var DNodeView_ToolBox_uneditable = function(self) {
-	var $toolbox = null;
+function DNodeView_ToolBox_uneditable(self): void {
+	var $toolbox: JQuery = null;
 	
-	function showToolbox(visible) {
+	function showToolbox(visible): void {
 		if(visible) {
 			if($toolbox != null) return;
 			$toolbox = $("<div></div>")
 				.css("display", self.$divText.css("display"))
 				.appendTo(self.$div);
-			var $menu = $("#edit-menulist").clone()
+			var $menu: JQuery = $("#edit-menulist").clone()
 				.css({ position: "absolute",bottom: 4, left: 4, display: "block" })
 				.appendTo($toolbox);
 
-			$menu.find("#ml-copy").click(function() {
+			$menu.find("#ml-copy").click(() => {
 				self.viewer.clipboard = self.node.deepCopy();
 				console.log("copied");
 			});
@@ -640,24 +640,24 @@ var DNodeView_ToolBox_uneditable = function(self) {
 			$menu.find("#ml-paste").remove();
 			$menu.find("#ml-delete").remove();
 
-			$menu.find("#ml-export-json").click(function() {
+			$menu.find("#ml-export-json").click(() => {
 				self.viewer.exportSubtree("json", self.node);
 			});
-			$menu.find("#ml-export-png").click(function() {
+			$menu.find("#ml-export-png").click(() => {
 				self.viewer.exportSubtree("png", self.node);
 			});
-			$menu.find("#ml-export-pdf").click(function() {
+			$menu.find("#ml-export-pdf").click(() => {
 				self.viewer.exportSubtree("pdf", self.node);
 			});
-			$menu.find("#ml-export-dscript").click(function() {
+			$menu.find("#ml-export-dscript").click(() => {
 				self.viewer.exportSubtree("dscript", self.node);
 			});
 
-			$menu.find("#ml-openall").click(function() {
+			$menu.find("#ml-openall").click(() => {
 				self.viewer.expandBranch(self, true, true);
 			});
 
-			$menu.find("#ml-closeall").click(function() {
+			$menu.find("#ml-closeall").click(() => {
 				self.viewer.expandBranch(self, false, true);
 			});
 
@@ -667,9 +667,9 @@ var DNodeView_ToolBox_uneditable = function(self) {
 		}
 	};
 
-	self.$div.hover(function() {
+	self.$div.hover(() => {
 		showToolbox(true);
-	}, function() {
+	}, () => {
 		showToolbox(false);
 	});
 
