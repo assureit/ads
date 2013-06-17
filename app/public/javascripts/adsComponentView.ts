@@ -1,4 +1,5 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
+///<reference path='../../DefinitelyTyped/bootstrap/bootstrap.d.ts'/>
 ///<reference path='api.ts'/>
 
 class CreateDCaseView {
@@ -208,6 +209,6 @@ class SearchView {
 					e.preventDefault();
 				})
 				.appendTo($res);
-		});
+		}, ()=>{});
 	}
 }

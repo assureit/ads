@@ -188,6 +188,7 @@ var SearchView = (function () {
                 _this.viewer.centerize(node, 500);
                 e.preventDefault();
             }).appendTo($res);
+        }, function () {
         });
     };
     return SearchView;

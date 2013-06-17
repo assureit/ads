@@ -4,6 +4,7 @@
 ///<reference path='color.ts'/>
 ///<reference path='importfile.ts'/>
 ///<reference path='dcaseviewer.ts'/>
+///<reference path='dnode.ts'/>
 
 class ADS {
 	TITLE_SUFFIX:   string = " - Assurance DS";
@@ -141,7 +142,7 @@ class ADS {
 
 			// show DCase
 			var r:any = DCaseAPI.getDCase(dcaseId);
-			var dcase = new DCase(JSON.parse(r.contents), dcaseId, r.commitId);
+			var dcase = new DCaseModel(JSON.parse(r.contents), dcaseId, r.commitId);
 			viewer.setDCase(dcase);
 			this.timelineView.repaint(dcase);
 			this.dcase_latest = dcase;

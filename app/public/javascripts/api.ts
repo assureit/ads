@@ -12,7 +12,7 @@ module DCaseAPI {
 		alert("ajax error");
 	};
 	
-	export var call = function(method, params, callback, error_callback) {
+	export var call = function(method, params) {
 		var cmd = {
 			jsonrpc: "2.0",
 			method: method,
@@ -20,8 +20,8 @@ module DCaseAPI {
 			params: params
 		};
 		var async = callback != null;
-		if(callback == null) callback = this.default_success_callback;
-		if(error_callback == null) error_callback = this.default_error_callback;
+		var callback = this.default_success_callback;
+		var error_callback = this.default_error_callback;
 		var res = $.ajax({
 			type: "POST",
 			url: this.uri,
@@ -41,65 +41,65 @@ module DCaseAPI {
 	
 	//-------------------------------------
 	
-	export var searchDCase = function(pageIndex, callback, error) {
+	export var searchDCase = function(pageIndex) {
 		try{
-			return this.call("searchDCase", {page: pageIndex}, callback, error);
+			return this.call("searchDCase", {page: pageIndex});
 		}catch(e){
 			return [];
 		}
 	};
 	
-	export var createDCase = function(name, tree, callback, error) {
+	export var createDCase = function(name, tree) {
 		return this.call("createDCase", {
-			dcaseName: name, contents: tree }, callback, error);
+			dcaseName: name, contents: tree });
 	};
 	
-	export var getCommitList = function(dcaseId, callback, error) {
-		return this.call("getCommitList", { dcaseId:dcaseId }, callback, error).commitList;
+	export var getCommitList = function(dcaseId) {
+		return this.call("getCommitList", { dcaseId:dcaseId }).commitList;
 	};
 	
-	export var commit = function(tree, msg, commitId, callback, error) {
+	export var commit = function(tree, msg, commitId) {
 		return this.call("commit", {
 			contents: tree,
 			commitMessage: msg,
 			commitId: commitId, 
 	//		userId: userId
-		}, callback, error).commitId;
+		}).commitId;
 	};
 	
-	export var getDCase = function(dcaseId, callback, error) {
-		return this.call("getDCase", { dcaseId: dcaseId }, callback, error);
+	export var getDCase = function(dcaseId) {
+		return this.call("getDCase", { dcaseId: dcaseId });
 	};
 	
-	export var editDCase = function(dcaseId, name, callback, error) {
+	export var editDCase = function(dcaseId, name) {
 		return this.call("editDCase", {
 			dcaseId: dcaseId,
 			dcaseName: name
-		}, callback, error);
+		});
 	};
 	
-	export var deleteDCase = function(dcaseId, callback, error) {
-		return this.call("deleteDCase", { dcaseId: dcaseId }, callback, error);
+	export var deleteDCase = function(dcaseId) {
+		return this.call("deleteDCase", { dcaseId: dcaseId });
 	};
 	
-	export var getNodeTree = function(commitId, callback, error) {
-		return JSON.parse(this.call("getNodeTree", { commitId: commitId }, callback, error).contents);
+	export var getNodeTree = function(commitId) {
+		return JSON.parse(this.call("getNodeTree", { commitId: commitId }).contents);
 	};
 	
-	export var searchNode = function(text, callback, error) {
-		return this.call("searchNode", { text: text }, callback, error).searchResultList;
+	export var searchNode = function(text) {
+		return this.call("searchNode", { text: text }).searchResultList;
 	};
 	
-	export var searchDCaseHistory = function(dcaseId, text, callback, error) {
-	    return this.call("searchDCaseHistory", {dcaseId: dcaseId, text: text}, callback, error);
+	export var searchDCaseHistory = function(dcaseId, text) {
+	    return this.call("searchDCaseHistory", {dcaseId: dcaseId, text: text});
 	};
 	
-	export var createTicket = function(nodeId, subject, description, userName, callback, error) {
+	export var createTicket = function(nodeId, subject, description, userName) {
 	    return this.call("createTicket", {
 	        nodeId: nodeId,
 	        subject: subject,
 	        description: description,
 	        userName: userName
-	    }, callback, error);
+	    });
 	};
 }

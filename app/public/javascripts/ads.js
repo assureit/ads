@@ -67,7 +67,7 @@ var ADS = (function () {
                 _this.viewer.setColorTheme(colorSets.get(name[1]));
             }
             var r = DCaseAPI.getDCase(dcaseId);
-            var dcase = new DCase(JSON.parse(r.contents), dcaseId, r.commitId);
+            var dcase = new DCaseModel(JSON.parse(r.contents), dcaseId, r.commitId);
             viewer.setDCase(dcase);
             _this.timelineView.repaint(dcase);
             _this.dcase_latest = dcase;

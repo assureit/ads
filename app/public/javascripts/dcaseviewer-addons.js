@@ -423,8 +423,7 @@ function DNodeView_ToolBox(self) {
                 }, function () {
                     edit_hover = false;
                     showNewNode(false);
-                }).one("click", function (e) {
-                    e.preventDefault();
+                }).one("click", function () {
                     edit_activate();
                 }).click(function (e) {
                     e.stopPropagation();
