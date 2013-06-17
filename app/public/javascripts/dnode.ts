@@ -279,9 +279,9 @@ class DCaseModel {
     encode(): DCaseTree {
         tl: any = [];  //FIXME
         node: DCaseNodeModel = this.node;
-        node.traverse((0, node) => {
-            var c = [];
-            node.eachSubNode((0, node) => {
+        node.traverse((i, v) => {
+            c: any = [];
+            node.eachSubNode((i, v) => {
                 c.push(node.id);
             });
             tl.push({
@@ -319,7 +319,7 @@ class DCaseModel {
     copyNode(node: DCaseNodeModel) {
         self: DCaseModel = this;
         newNode: DCaseNodeModel = self.createNode(++this.nodeCount, node.type, node.desc, node.metadata);
-        node.eachSubNode(function (0, child) {
+        node.eachSubNode((i, v) => {
             newNode.insertChild(self.copyNode(child));
         });
         return newNode;
