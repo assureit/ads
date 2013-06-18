@@ -36,45 +36,42 @@ var CommitDAO = (function (_super) {
             params.message
         ], function (err, result) {
             if(err) {
-                _this.con.rollback();
-                _this.con.close();
-                throw err;
+                callback(err, null);
+                return;
             }
-            _this._clearLastUpdateFlag(params.dcaseId, result.insertId, function () {
-                callback(result.insertId);
+            _this._clearLastUpdateFlag(params.dcaseId, result.insertId, function (err) {
+                if(err) {
+                    callback(err, null);
+                }
+                callback(err, result.insertId);
             });
         });
     };
     CommitDAO.prototype._clearLastUpdateFlag = function (dcaseId, latestCommitId, callback) {
-        var _this = this;
         this.con.query('UPDATE commit SET latest_flag = FALSE WHERE dcase_id = ? AND id <> ? AND latest_flag = TRUE', [
             dcaseId, 
             latestCommitId
         ], function (err, result) {
             if(err) {
-                _this.con.rollback();
-                _this.con.close();
-                throw err;
+                callback(err);
+                return;
             }
-            callback();
+            callback(err);
         });
     };
     CommitDAO.prototype.get = function (commitId, callback) {
-        var _this = this;
         this.con.query('SELECT * FROM commit WHERE id=?', [
             commitId
         ], function (err, result) {
             if(err) {
-                _this.con.rollback();
-                _this.con.close();
-                throw err;
+                callback(err, null);
+                return;
             }
             result = result[0];
-            callback(new Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
+            callback(err, new Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
         });
     };
     CommitDAO.prototype.list = function (dcaseId, callback) {
-        var _this = this;
         this.con.query({
             sql: 'SELECT * FROM commit c, user u WHERE c.user_id = u.id AND c.dcase_id = ? ORDER BY c.id',
             nestTables: true
@@ -82,9 +79,8 @@ var CommitDAO = (function (_super) {
             dcaseId
         ], function (err, result) {
             if(err) {
-                _this.con.rollback();
-                _this.con.close();
-                throw err;
+                callback(err, null);
+                return;
             }
             var list = new Array();
             result.forEach(function (row) {
@@ -92,7 +88,7 @@ var CommitDAO = (function (_super) {
                 c.user = new model_user.User(row.u.id, row.u.name, row.u.delete_flag, row.u.system_flag);
                 list.push(c);
             });
-            callback(list);
+            callback(err, list);
         });
     };
     return CommitDAO;

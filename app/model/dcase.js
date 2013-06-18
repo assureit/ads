@@ -27,17 +27,15 @@ var DCaseDAO = (function (_super) {
 
     }
     DCaseDAO.prototype.insert = function (params, callback) {
-        var _this = this;
         this.con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [
             params.userId, 
             params.dcaseName
         ], function (err, result) {
             if(err) {
-                _this.con.rollback();
-                _this.con.close();
-                throw err;
+                callback(err, null);
+                return;
             }
-            callback(result.insertId);
+            callback(err, result.insertId);
         });
     };
     DCaseDAO.prototype.list = function (page, callback) {

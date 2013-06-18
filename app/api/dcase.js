@@ -128,16 +128,28 @@ function createDCase(params, callback) {
         dcaseDAO.insert({
             userId: userId,
             dcaseName: params.dcaseName
-        }, function (dcaseId) {
+        }, function (err, dcaseId) {
+            if(err) {
+                callback.onFailure(err);
+                return;
+            }
             var commitDAO = new model_commit.CommitDAO(con);
             commitDAO.insert({
                 data: JSON.stringify(params.contents),
                 dcaseId: dcaseId,
                 userId: userId,
                 message: 'Initial Commit'
-            }, function (commitId) {
+            }, function (err, commitId) {
+                if(err) {
+                    callback.onFailure(err);
+                    return;
+                }
                 var nodeDAO = new model_node.NodeDAO(con);
-                nodeDAO.insertList(commitId, params.contents.NodeList, function () {
+                nodeDAO.insertList(commitId, params.contents.NodeList, function (err) {
+                    if(err) {
+                        callback.onFailure(err);
+                        return;
+                    }
                     con.commit(function (err, result) {
                         callback.onSuccess({
                             dcaseId: dcaseId,
@@ -156,17 +168,33 @@ function commit(params, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
         var commitDAO = new model_commit.CommitDAO(con);
-        commitDAO.get(params.commitId, function (com) {
+        commitDAO.get(params.commitId, function (err, com) {
+            if(err) {
+                callback.onFailure(err);
+                return;
+            }
             commitDAO.insert({
                 data: JSON.stringify(params.contents),
                 prevId: params.commitId,
                 dcaseId: com.dcaseId,
                 userId: userId,
                 message: params.commitMessage
-            }, function (commitId) {
+            }, function (err, commitId) {
+                if(err) {
+                    callback.onFailure(err);
+                    return;
+                }
                 var nodeDAO = new model_node.NodeDAO(con);
-                nodeDAO.insertList(commitId, params.contents.NodeList, function () {
+                nodeDAO.insertList(commitId, params.contents.NodeList, function (err) {
+                    if(err) {
+                        callback.onFailure(err);
+                        return;
+                    }
                     con.commit(function (err, result) {
+                        if(err) {
+                            callback.onFailure(err);
+                            return;
+                        }
                         callback.onSuccess({
                             commitId: commitId
                         });
@@ -226,7 +254,11 @@ exports.editDCase = editDCase;
 function getCommitList(params, callback) {
     var con = new db.Database();
     var commitDAO = new model_commit.CommitDAO(con);
-    commitDAO.list(params.dcaseId, function (list) {
+    commitDAO.list(params.dcaseId, function (err, list) {
+        if(err) {
+            callback.onFailure(err);
+            return;
+        }
         con.close();
         var commitList = [];
         list.forEach(function (c) {
