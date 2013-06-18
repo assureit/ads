@@ -1,5 +1,8 @@
 import db = module('../db/db')
+import events = module('events')
 
-export class DAO {
-	constructor(public con: db.Database) {}
+export class DAO extends events.EventEmitter {
+	constructor(public con: db.Database) {
+		super();
+	}
 }
