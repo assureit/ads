@@ -55,7 +55,7 @@ class DCaseViewer {
 	//TODO
 	addEventHandler() {}
 	dragEnd(view) {}
-	
+
 	constructor(public root: any, public dcase: DCaseModel, public editable: bool) {
 		this.$root = $(root);
 		root.className = "viewer-root";
@@ -74,15 +74,15 @@ class DCaseViewer {
 			.appendTo(this.$root);
 
 		//------------------------------------
-	
+
 		$.each(this.viewer_addons, (i, addon) => {
 			addon(this);
 		});
 		this.setDCase(dcase);
 		this.addEventHandler();
-	
+
 		this.canMoveByKeyboard = true;
-	
+
 		$(document.body).on("keydown", (e) => {
 			if(e.keyCode == 39 /* RIGHT */ || e.keyCode == 37 /* LEFT */){
 				if(!this.canMoveByKeyboard) return;

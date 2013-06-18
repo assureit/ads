@@ -9,14 +9,14 @@ var ADS = (function () {
         this.createDCaseView = new CreateDCaseView();
         var router = new Router();
         router.route("new", "new", function () {
-            var userId = this.getLoginUserorNull();
-            this.initDefaultScreen(userId);
+            var userId = _this.getLoginUserorNull();
+            _this.initDefaultScreen(userId, 1, null);
             $("#newDCase").show();
             $("#selectDCase").hide();
-            if(this.isLogin(userId)) {
-                this.createDCaseView.enableSubmit();
+            if(_this.isLogin(userId)) {
+                _this.createDCaseView.enableSubmit();
             } else {
-                this.createDCaseView.disableSubmit();
+                _this.createDCaseView.disableSubmit();
             }
         });
         var defaultRouter = function (pageIndex) {
@@ -51,16 +51,16 @@ var ADS = (function () {
             $(".ads-edit-menu").css("display", "block");
             $("#viewer").css("display", "block");
             var $body = $(body);
-            var viewer = new DCaseViewer(document.getElementById("viewer"), null, _this.isLogin(userId));
-            _this.timelineView = new TimeLineView($body, viewer, _this.isLogin(userId));
+            _this.viewer = new DCaseViewer(document.getElementById("viewer"), null, _this.isLogin(userId));
+            _this.timelineView = new TimeLineView($body, _this.viewer, _this.isLogin(userId));
             _this.dcase_latest = null;
             $(window).bind("beforeunload", function (e) {
                 if(_this.dcase_latest != null && _this.dcase_latest.isChanged()) {
                     return "未コミットの変更があります";
                 }
             });
-            var searchView = new SearchView(viewer);
-            var colorSets = new ColorSets(viewer);
+            var searchView = new SearchView(_this.viewer);
+            var colorSets = new ColorSets(_this.viewer);
             colorSets.init();
             colorSets.createDropMenu();
             var name = document.cookie.match(/colorTheme=(\w+);?/);
@@ -70,16 +70,16 @@ var ADS = (function () {
             var r = DCaseAPI.getDCase(dcaseId);
             var tree = JSON.parse(r.contents);
             var dcase = new DCaseModel(tree, dcaseId, r.commitId);
-            viewer.setDCase(dcase);
+            _this.viewer.setDCase(dcase);
             _this.timelineView.repaint(dcase);
             _this.dcase_latest = dcase;
             document.title = r.dcaseName + _this.TITLE_SUFFIX;
             $("#dcaseName").text(r.dcaseName);
+            _this.viewer.exportSubtree = function (type, root) {
+                _this.exportTree(type, root);
+            };
         });
         router.start();
-        this.viewer.exportSubtree = function (type, root) {
-            _this.exportTree(type, root);
-        };
     }
     ADS.prototype.getLoginUserorNull = function () {
         var matchResult = document.cookie.match(/userId=(\w+);?/);

@@ -34,7 +34,7 @@ var CreateDCaseView = (function () {
             location.href = "./#dcase/" + r.dcaseId;
         });
     }
-    CreateDCaseView.prototype.enableSubmit = function (userId) {
+    CreateDCaseView.prototype.enableSubmit = function () {
         $("#dcase-create").removeClass("disabled");
         $("#inputDCaseName").removeAttr("disabled");
         $("#inputDesc").removeAttr("disabled");

@@ -71,9 +71,9 @@ class ADS {
 		this.createDCaseView = new CreateDCaseView();
 
 		var router = new Router();
-		router.route("new", "new", function() {
+		router.route("new", "new", () => {
 			var userId: number  = this.getLoginUserorNull();
-			this.initDefaultScreen(userId);
+			this.initDefaultScreen(userId, 1, null);
 			$("#newDCase").show();
 			$("#selectDCase").hide();
 
@@ -121,9 +121,9 @@ class ADS {
 
 			$("#viewer").css("display", "block");
 			var $body  = $(body);
-			var viewer = new DCaseViewer(document.getElementById("viewer"),
+			this.viewer = new DCaseViewer(document.getElementById("viewer"),
 					null, this.isLogin(userId));
-			this.timelineView = new TimeLineView($body, viewer, this.isLogin(userId));
+			this.timelineView = new TimeLineView($body, this.viewer, this.isLogin(userId));
 			this.dcase_latest = null;
 
 			$(window).bind("beforeunload", (e)=> {
@@ -131,9 +131,9 @@ class ADS {
 					return "未コミットの変更があります";
 				}
 			});
-			var searchView = new SearchView(viewer);
+			var searchView = new SearchView(this.viewer);
 
-			var colorSets = new ColorSets(viewer);
+			var colorSets = new ColorSets(this.viewer);
 			colorSets.init();
 			colorSets.createDropMenu();
 			// change color theme
@@ -146,19 +146,19 @@ class ADS {
 			var r:any = DCaseAPI.getDCase(dcaseId);
 			var tree = <DCaseTree>JSON.parse(r.contents);
 			var dcase = new DCaseModel(tree, <number>dcaseId, <number>r.commitId);
-			viewer.setDCase(dcase);
+			this.viewer.setDCase(dcase);
 			this.timelineView.repaint(dcase);
 			this.dcase_latest = dcase;
 			document.title = r.dcaseName + this.TITLE_SUFFIX;
 			$("#dcaseName").text(r.dcaseName);
+			this.viewer.exportSubtree = (type, root) => {
+				this.exportTree(type, root);
+			};
 
 		});
 
 		router.start();
 
-		this.viewer.exportSubtree = (type, root) => {
-			this.exportTree(type, root);
-		};
 	} // function ADS
 
 	commit(): void {

@@ -36,7 +36,7 @@ class CreateDCaseView {
 		});
 	}
 
-	enableSubmit(userId): void{
+	enableSubmit(): void{
 		$("#dcase-create").removeClass("disabled");
 		$("#inputDCaseName").removeAttr("disabled");
 		$("#inputDesc").removeAttr("disabled");
