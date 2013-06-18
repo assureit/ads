@@ -75,8 +75,6 @@ describe('model', function() {
 				d.add(userDAO.con);
 				// d.add(userDAO.con.con);
 				d.on('error', (err) => {
-					console.log('vvvvvvvvvvvvvvvvvvvvvvvhhhhhhhhaaaaaaaaaaaaaaaaaaaaaaa')
-					console.log(err);
 					expect(err).not.to.be(null);
 					expect(err instanceof error.DuplicatedError).to.be(true);
 					done();
