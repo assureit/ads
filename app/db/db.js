@@ -97,6 +97,8 @@ var Database = (function (_super) {
                     _this.close();
                 });
                 _this.emit('error', err);
+                console.log('throw');
+                console.log(err);
                 throw err;
             }
             callback(err, result);

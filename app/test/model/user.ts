@@ -16,10 +16,6 @@ describe('model', function() {
 		beforeEach((done) => {
 			con = new db.Database();
 			con.begin((err, result) => {
-				if (err) {
-					con.close();
-					throw err;
-				}
 				userDAO = new model_user.UserDAO(con);
 				done();
 			});
@@ -27,7 +23,6 @@ describe('model', function() {
 
 		afterEach((done) => {
 			if (con) {
-				console.log('closing');
 				con.rollback((err, result) => {
 					con.close();
 					if (err) {
@@ -75,16 +70,24 @@ describe('model', function() {
 				var loginName = 'unittest02';
 				var pwd = 'password';
 
-				con.on('error', (err: any) => {
+				var d = domain.create();
+				d.add(userDAO);
+				d.add(userDAO.con);
+				// d.add(userDAO.con.con);
+				d.on('error', (err) => {
+					console.log('vvvvvvvvvvvvvvvvvvvvvvvhhhhhhhhaaaaaaaaaaaaaaaaaaaaaaa')
+					console.log(err);
 					expect(err).not.to.be(null);
 					expect(err instanceof error.DuplicatedError).to.be(true);
 					done();
 				});
-
-				userDAO.register(loginName, pwd, (result: model_user.User) => {
+				d.run(() => {
 					userDAO.register(loginName, pwd, (result: model_user.User) => {
+						userDAO.register(loginName, pwd, (result: model_user.User) => {
+						});
 					});
 				});
+
 			});
 		});
 	});

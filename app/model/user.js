@@ -4,6 +4,8 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var model = require('./model')
+
+var error = require('../api/error')
 var User = (function () {
     function User(id, loginName, deleteFlag, systemFlag) {
         this.id = id;
@@ -24,6 +26,11 @@ var UserDAO = (function (_super) {
     };
     UserDAO.prototype.register = function (loginName, password, callback) {
         var _this = this;
+        this.con.on('error', function (err) {
+            if(err.code == 'ER_DUP_ENTRY') {
+                throw new error.DuplicatedError('The login name is already exist.');
+            }
+        });
         this.con.query('INSERT INTO user(login_name) VALUES(?) ', [
             loginName
         ], function (err, result) {

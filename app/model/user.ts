@@ -1,4 +1,6 @@
 import model = module('./model')
+import domain = module('domain')
+import error = module('../api/error')
 
 export class User {
 	constructor(public id:number, public loginName: string, public deleteFlag: bool, public systemFlag: bool) {}
@@ -10,6 +12,11 @@ export class UserDAO extends model.DAO {
 	}
 
 	register(loginName: string, password: string, callback: (user: User) => void) {
+		this.con.on('error', (err) => {
+			if (err.code == 'ER_DUP_ENTRY') {
+				throw new error.DuplicatedError('The login name is already exist.');
+			}
+		});
 		this.con.query('INSERT INTO user(login_name) VALUES(?) ', [loginName], (err, result) => {
 			if (err) {
 				this.con.rollback();

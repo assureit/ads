@@ -1,7 +1,7 @@
 var db = require('../../db/db')
 var model_user = require('../../model/user')
 var error = require('../../api/error')
-
+var domain = require('domain')
 var expect = require('expect.js');
 describe('model', function () {
     describe('user', function () {
@@ -10,17 +10,12 @@ describe('model', function () {
         beforeEach(function (done) {
             con = new db.Database();
             con.begin(function (err, result) {
-                if(err) {
-                    con.close();
-                    throw err;
-                }
                 userDAO = new model_user.UserDAO(con);
                 done();
             });
         });
         afterEach(function (done) {
             if(con) {
-                console.log('closing');
                 con.rollback(function (err, result) {
                     con.close();
                     if(err) {
@@ -61,13 +56,20 @@ describe('model', function () {
             it('can not register if login name is duplicated', function (done) {
                 var loginName = 'unittest02';
                 var pwd = 'password';
-                con.on('error', function (err) {
+                var d = domain.create();
+                d.add(userDAO);
+                d.add(userDAO.con);
+                d.on('error', function (err) {
+                    console.log('vvvvvvvvvvvvvvvvvvvvvvvhhhhhhhhaaaaaaaaaaaaaaaaaaaaaaa');
+                    console.log(err);
                     expect(err).not.to.be(null);
                     expect(err instanceof error.DuplicatedError).to.be(true);
                     done();
                 });
-                userDAO.register(loginName, pwd, function (result) {
+                d.run(function () {
                     userDAO.register(loginName, pwd, function (result) {
+                        userDAO.register(loginName, pwd, function (result) {
+                        });
                     });
                 });
             });

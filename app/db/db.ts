@@ -99,6 +99,8 @@ export class Database extends events.EventEmitter {
 					this.close();
 				});
 				this.emit('error', err);
+				console.log('throw');
+				console.log(err);
 				throw err;
 			}
 			callback(err, result);
