@@ -26,29 +26,24 @@ var UserDAO = (function (_super) {
     };
     UserDAO.prototype.register = function (loginName, password, callback) {
         var _this = this;
-        this.con.on('error', function (err) {
-            if(err.code == 'ER_DUP_ENTRY') {
-                throw new error.DuplicatedError('The login name is already exist.');
-            }
-        });
         this.con.query('INSERT INTO user(login_name) VALUES(?) ', [
             loginName
         ], function (err, result) {
             if(err) {
-                _this.con.rollback();
-                _this.con.close();
-                throw err;
+                if(err.code == 'ER_DUP_ENTRY') {
+                    err = new error.DuplicatedError('The login name is already exist.');
+                }
+                callback(err, null);
+                return;
             }
             _this.con.query('SELECT * FROM user WHERE login_name = ? ', [
                 loginName
             ], function (err, result) {
                 if(err) {
-                    _this.con.rollback();
-                    _this.con.close();
-                    throw err;
+                    callback(err, null);
                 }
                 var resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
-                callback(resultUser);
+                callback(err, resultUser);
             });
         });
     };

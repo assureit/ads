@@ -38,8 +38,9 @@ describe('model', function() {
 				var loginName = 'unittest01';
 				var pwd = 'password';
 
-				userDAO.register(loginName, pwd, (result: model_user.User) => {
-					expect(result).not.to.be(undefined);
+				userDAO.register(loginName, pwd, (err: any, result: model_user.User) => {
+					expect(err).to.be(null);
+					expect(result).not.to.be(null);
 					expect(result.loginName).to.eql(loginName);
 					done();
 				});
@@ -48,12 +49,10 @@ describe('model', function() {
 				var loginName = 'unittest01';
 				var pwd = 'password';
 
-				userDAO.register(loginName, pwd, (result: model_user.User) => {
+				userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
 
 					con.query('SELECT id, login_name, delete_flag, system_flag FROM user WHERE login_name = ? ', [loginName],(err, expectedResult) => {
-						if (err) {
-							throw err;
-						}
+						expect(err).to.be(null);
 
 						expect(result.id).to.be(expectedResult[0].id);
 						expect(result.loginName).to.be(expectedResult[0].login_name);
@@ -70,22 +69,14 @@ describe('model', function() {
 				var loginName = 'unittest02';
 				var pwd = 'password';
 
-				var d = domain.create();
-				d.add(userDAO);
-				d.add(userDAO.con);
-				// d.add(userDAO.con.con);
-				d.on('error', (err) => {
-					expect(err).not.to.be(null);
-					expect(err instanceof error.DuplicatedError).to.be(true);
-					done();
-				});
-				d.run(() => {
-					userDAO.register(loginName, pwd, (result: model_user.User) => {
-						userDAO.register(loginName, pwd, (result: model_user.User) => {
-						});
+				userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
+					expect(err).to.be(null);
+					userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
+						expect(err).not.to.be(null);
+						expect(err instanceof error.DuplicatedError).to.be(true);
+						done();
 					});
 				});
-
 			});
 		});
 	});

@@ -48,11 +48,7 @@ var Database = (function (_super) {
         });
     };
     Database.prototype.rollback = function (callback) {
-        callback = callback || function (err, result) {
-            if(err) {
-                throw err;
-            }
-        };
+        callback = callback || this._defaultCallback;
         if(this.con) {
             this.query('ROLLBACK', callback);
         } else {
@@ -60,11 +56,7 @@ var Database = (function (_super) {
         }
     };
     Database.prototype._rollback = function (callback) {
-        callback = callback || function (err, result) {
-            if(err) {
-                throw err;
-            }
-        };
+        callback = callback || this._defaultCallback;
         if(this.con) {
             this.con.query('ROLLBACK', function (err, query) {
                 callback(err, query);
@@ -79,14 +71,15 @@ var Database = (function (_super) {
         });
     };
     Database.prototype.close = function (callback) {
-        callback = callback || function (err, result) {
-            if(err) {
-                throw err;
-            }
-        };
+        callback = callback || this._defaultCallback;
         if(this.con) {
             this.con.end(callback);
             this.con = null;
+        }
+    };
+    Database.prototype._defaultCallback = function (err, result) {
+        if(err) {
+            this.emit('error', err);
         }
     };
     Database.prototype._bindErrorHandler = function (callback) {
@@ -96,10 +89,6 @@ var Database = (function (_super) {
                 _this._rollback(function (err, result) {
                     _this.close();
                 });
-                _this.emit('error', err);
-                console.log('throw');
-                console.log(err);
-                throw err;
             }
             callback(err, result);
         };

@@ -1,7 +1,7 @@
 var db = require('../../db/db')
 var model_user = require('../../model/user')
 var error = require('../../api/error')
-var domain = require('domain')
+
 var expect = require('expect.js');
 describe('model', function () {
     describe('user', function () {
@@ -29,8 +29,9 @@ describe('model', function () {
             it('should return User object property', function (done) {
                 var loginName = 'unittest01';
                 var pwd = 'password';
-                userDAO.register(loginName, pwd, function (result) {
-                    expect(result).not.to.be(undefined);
+                userDAO.register(loginName, pwd, function (err, result) {
+                    expect(err).to.be(null);
+                    expect(result).not.to.be(null);
                     expect(result.loginName).to.eql(loginName);
                     done();
                 });
@@ -38,13 +39,11 @@ describe('model', function () {
             it('should insert data to user table', function (done) {
                 var loginName = 'unittest01';
                 var pwd = 'password';
-                userDAO.register(loginName, pwd, function (result) {
+                userDAO.register(loginName, pwd, function (err, result) {
                     con.query('SELECT id, login_name, delete_flag, system_flag FROM user WHERE login_name = ? ', [
                         loginName
                     ], function (err, expectedResult) {
-                        if(err) {
-                            throw err;
-                        }
+                        expect(err).to.be(null);
                         expect(result.id).to.be(expectedResult[0].id);
                         expect(result.loginName).to.be(expectedResult[0].login_name);
                         expect(result.deleteFlag).to.eql(expectedResult[0].delete_flag);
@@ -56,18 +55,12 @@ describe('model', function () {
             it('can not register if login name is duplicated', function (done) {
                 var loginName = 'unittest02';
                 var pwd = 'password';
-                var d = domain.create();
-                d.add(userDAO);
-                d.add(userDAO.con);
-                d.on('error', function (err) {
-                    expect(err).not.to.be(null);
-                    expect(err instanceof error.DuplicatedError).to.be(true);
-                    done();
-                });
-                d.run(function () {
-                    userDAO.register(loginName, pwd, function (result) {
-                        userDAO.register(loginName, pwd, function (result) {
-                        });
+                userDAO.register(loginName, pwd, function (err, result) {
+                    expect(err).to.be(null);
+                    userDAO.register(loginName, pwd, function (err, result) {
+                        expect(err).not.to.be(null);
+                        expect(err instanceof error.DuplicatedError).to.be(true);
+                        done();
                     });
                 });
             });
