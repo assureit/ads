@@ -8,6 +8,14 @@ class DCaseMetaContent {
 		}
 }
 
+class DCaseNodeRawData {
+	/* TODO Needs to merge into DCaseNodeModel class */
+	ThisNodeId: number;
+	NodeType: string;
+	Description: string;
+	Children: number[];
+	Metadata: any[];
+}
 class DCaseNodeModel {
 	id: number;
 	name: string;
@@ -255,20 +263,21 @@ class DCaseModel {
 		// }
 
 		var self: DCaseModel = this;
-		var nodes: any = [];  //FIXME
+		var nodes: DCaseNodeRawData[] = [];
 		for(var i = 0; i < tree.NodeList.length; i++) {
-			var c: DCaseNodeModel = tree.NodeList[i];
-			nodes[c.id] = c;  
+			var c: DCaseNodeRawData = tree.NodeList[i];
+			nodes[c.ThisNodeId] = c;  
 		}
 
 		var create = (id: any) => { //FIXME
-			var data: DCaseNodeModel = nodes[id];
-			var type: string = data.type;
-			var desc: string = data.desc;
-			var metadata: DCaseMetaContent[] = data.metadata ? data.metadata : null;
+			var data: DCaseNodeRawData = nodes[id];
+			var type: string = data.NodeType;
+			var desc: string = data.Description;
+			//var metadata: DCaseMetaContent[] = data.metadata ? data.metadata : null;
+			var metadata: DCaseMetaContent[] = null; /* TODO Handle metadata */
 			var node: DCaseNodeModel = self.createNode(id, type, desc, metadata);
-			for(var i = 0; i < data.children.length; i++) {
-				node.insertChild(create(data.children[i]), i);
+			for(var i = 0; i < data.Children.length; i++) {
+				node.insertChild(create(data.Children[i]), i);
 			}
 			return node;
 		}
