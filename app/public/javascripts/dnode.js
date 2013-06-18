@@ -8,6 +8,10 @@ var DCaseMetaContent = (function () {
     };
     return DCaseMetaContent;
 })();
+var DCaseNodeRawData = (function () {
+    function DCaseNodeRawData() { }
+    return DCaseNodeRawData;
+})();
 var DCaseNodeModel = (function () {
     function DCaseNodeModel(id, name, type, desc, metadata) {
         this.isContext = false;
@@ -206,16 +210,16 @@ var DCaseModel = (function () {
         var nodes = [];
         for(var i = 0; i < tree.NodeList.length; i++) {
             var c = tree.NodeList[i];
-            nodes[c.id] = c;
+            nodes[c.ThisNodeId] = c;
         }
         var create = function (id) {
             var data = nodes[id];
-            var type = data.type;
-            var desc = data.desc;
-            var metadata = data.metadata ? data.metadata : null;
+            var type = data.NodeType;
+            var desc = data.Description;
+            var metadata = null;
             var node = self.createNode(id, type, desc, metadata);
-            for(var i = 0; i < data.children.length; i++) {
-                node.insertChild(create(data.children[i]), i);
+            for(var i = 0; i < data.Children.length; i++) {
+                node.insertChild(create(data.Children[i]), i);
             }
             return node;
         };

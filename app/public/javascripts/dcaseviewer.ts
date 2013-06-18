@@ -2,6 +2,7 @@
 ///<reference path='./dcaseviewer-addons.ts'/>
 ///<reference path='./animation.ts'/>
 ///<reference path='./gsnshape.ts'/>
+///<reference path='./dnode.ts'/>
 
 interface DCaseViewerAddon {}
 interface DNodeViewAddon {}
