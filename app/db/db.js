@@ -54,6 +54,18 @@ var Database = (function (_super) {
             }
         };
         if(this.con) {
+            this.query('ROLLBACK', callback);
+        } else {
+            callback(null, null);
+        }
+    };
+    Database.prototype._rollback = function (callback) {
+        callback = callback || function (err, result) {
+            if(err) {
+                throw err;
+            }
+        };
+        if(this.con) {
             this.con.query('ROLLBACK', function (err, query) {
                 callback(err, query);
             });
@@ -74,14 +86,14 @@ var Database = (function (_super) {
         };
         if(this.con) {
             this.con.end(callback);
-            this.con = undefined;
+            this.con = null;
         }
     };
     Database.prototype._bindErrorHandler = function (callback) {
         var _this = this;
         return function (err, result) {
             if(err) {
-                _this.rollback(function (err, result) {
+                _this._rollback(function (err, result) {
                     _this.close();
                 });
                 _this.emit('error', err);
