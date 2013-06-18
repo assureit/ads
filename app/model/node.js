@@ -24,7 +24,6 @@ var NodeDAO = (function (_super) {
 
     }
     NodeDAO.prototype.insert = function (commitId, data, callback) {
-        var _this = this;
         this.con.query('INSERT INTO node(this_node_id, description, node_type, commit_id) VALUES(?,?,?,?)', [
             data.ThisNodeId, 
             data.Description, 
@@ -32,20 +31,23 @@ var NodeDAO = (function (_super) {
             commitId
         ], function (err, result) {
             if(err) {
-                _this.con.rollback();
-                _this.con.close();
-                throw err;
+                callback(err, null);
+                return;
             }
-            callback(result.insertId);
+            callback(err, result.insertId);
         });
     };
     NodeDAO.prototype.insertList = function (commitId, list, callback) {
         var _this = this;
         if(list.length == 0) {
-            callback();
+            callback(null);
             return;
         }
-        this.insert(commitId, list[0], function (nodeId) {
+        this.insert(commitId, list[0], function (err, nodeId) {
+            if(err) {
+                callback(err);
+                return;
+            }
             _this.insertList(commitId, list.slice(1), callback);
         });
     };

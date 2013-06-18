@@ -12,25 +12,31 @@ export class Node {
 	constructor(public id: number, public commitId: number, public thisNodeId: number, public nodeType: string, public description: string) {}
 }
 export class NodeDAO extends model.DAO {
-	insert(commitId: number, data: NodeData, callback: (nodeId: number)=>void): void {
+	insert(commitId: number, data: NodeData, callback: (err:any, nodeId: number)=>void): void {
 		// TODO: node propertyをどうするべきか？TicketやMonitorに変更するべきか、meta.ticket1.id、meta.ticket1.nameなどとして並列にするか
 		this.con.query('INSERT INTO node(this_node_id, description, node_type, commit_id) VALUES(?,?,?,?)', 
 			[data.ThisNodeId, data.Description, data.NodeType, commitId], (err, result) => {
 			if (err) {
-				this.con.rollback();
-				this.con.close();
-				throw err;
+				callback(err, null);
+				return;
+				// this.con.rollback();
+				// this.con.close();
+				// throw err;
 			}
-			callback(result.insertId);
+			callback(err, result.insertId);
 		});
 	}
 
-	insertList(commitId: number, list: NodeData[], callback: ()=> void): void {
+	insertList(commitId: number, list: NodeData[], callback: (err:any)=> void): void {
 		if (list.length == 0) {
-			callback();
+			callback(null);
 			return;
 		}
-		this.insert(commitId, list[0], (nodeId: number) => {
+		this.insert(commitId, list[0], (err:any, nodeId: number) => {
+			if (err) {
+				callback(err);
+				return;
+			}
 			this.insertList(commitId, list.slice(1), callback);
 		});
 	}
