@@ -11,7 +11,11 @@ export function searchDCase(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	var dcaseDAO = new model_dcase.DCaseDAO(con);
 	params = params || {};
-	dcaseDAO.list(params.page, (pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+	dcaseDAO.list(params.page, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+		if (err) {
+			callback.onFailure(err);
+			return;
+		}
 		con.close();
 		var list = [];
 		result.forEach((val) => {
@@ -161,7 +165,11 @@ export function deleteDCase(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var dcaseDAO = new model_dcase.DCaseDAO(con);
-		dcaseDAO.remove(params.dcaseId, () => {
+		dcaseDAO.remove(params.dcaseId, (err:any) => {
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
 			con.commit((err, result) =>{
 				callback.onSuccess({dcaseId: params.dcaseId});
 				con.close();
@@ -177,8 +185,16 @@ export function editDCase(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var dcaseDAO = new model_dcase.DCaseDAO(con);
-		dcaseDAO.update(params.dcaseId, params.dcaseName, () => {
+		dcaseDAO.update(params.dcaseId, params.dcaseName, (err:any) => {
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
 			con.commit((err, result) =>{
+				if (err) {
+					callback.onFailure(err);
+					return;
+				}
 				callback.onSuccess({dcaseId: params.dcaseId});
 				con.close();
 			});

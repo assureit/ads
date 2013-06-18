@@ -51,8 +51,8 @@ var DCaseDAO = (function (_super) {
             pager.getOffset()
         ], function (err, result) {
             if(err) {
-                _this.con.close();
-                throw err;
+                callback(err, null, null);
+                return;
             }
             var list = new Array();
             result.forEach(function (row) {
@@ -64,37 +64,35 @@ var DCaseDAO = (function (_super) {
             });
             _this.con.query('SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ', function (err, countResult) {
                 if(err) {
-                    _this.con.close();
-                    throw err;
+                    callback(err, null, null);
+                    return;
                 }
                 pager.totalItems = countResult[0].cnt;
-                callback(pager, list);
+                callback(err, pager, list);
             });
         });
     };
     DCaseDAO.prototype.remove = function (dcaseId, callback) {
-        var _this = this;
         this.con.query('UPDATE dcase SET delete_flag=TRUE WHERE id = ?', [
             dcaseId
         ], function (err, result) {
             if(err) {
-                _this.con.close();
-                throw err;
+                callback(err);
+                return;
             }
-            callback();
+            callback(err);
         });
     };
     DCaseDAO.prototype.update = function (dcaseId, name, callback) {
-        var _this = this;
         this.con.query('UPDATE dcase SET name=? WHERE id = ?', [
             name, 
             dcaseId
         ], function (err, result) {
             if(err) {
-                _this.con.close();
-                throw err;
+                callback(err);
+                return;
             }
-            callback();
+            callback(err);
         });
     };
     return DCaseDAO;

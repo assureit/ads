@@ -11,7 +11,11 @@ function searchDCase(params, callback) {
     var dcaseDAO = new model_dcase.DCaseDAO(con);
     params = params || {
     };
-    dcaseDAO.list(params.page, function (pager, result) {
+    dcaseDAO.list(params.page, function (err, pager, result) {
+        if(err) {
+            callback.onFailure(err);
+            return;
+        }
         con.close();
         var list = [];
         result.forEach(function (val) {
@@ -180,7 +184,11 @@ function deleteDCase(params, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
         var dcaseDAO = new model_dcase.DCaseDAO(con);
-        dcaseDAO.remove(params.dcaseId, function () {
+        dcaseDAO.remove(params.dcaseId, function (err) {
+            if(err) {
+                callback.onFailure(err);
+                return;
+            }
             con.commit(function (err, result) {
                 callback.onSuccess({
                     dcaseId: params.dcaseId
@@ -196,8 +204,16 @@ function editDCase(params, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
         var dcaseDAO = new model_dcase.DCaseDAO(con);
-        dcaseDAO.update(params.dcaseId, params.dcaseName, function () {
+        dcaseDAO.update(params.dcaseId, params.dcaseName, function (err) {
+            if(err) {
+                callback.onFailure(err);
+                return;
+            }
             con.commit(function (err, result) {
+                if(err) {
+                    callback.onFailure(err);
+                    return;
+                }
                 callback.onSuccess({
                     dcaseId: params.dcaseId
                 });
