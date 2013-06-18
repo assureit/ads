@@ -19,9 +19,6 @@ export class NodeDAO extends model.DAO {
 			if (err) {
 				callback(err, null);
 				return;
-				// this.con.rollback();
-				// this.con.close();
-				// throw err;
 			}
 			callback(err, result.insertId);
 		});
@@ -42,16 +39,15 @@ export class NodeDAO extends model.DAO {
 	}
 
 
-	search(page: number, query: string, callback: (pager: model_pager.Pager, list: Node[]) => void) {
+	search(page: number, query: string, callback: (err:any, pager: model_pager.Pager, list: Node[]) => void) {
 		// TODO: 全文検索エンジン対応
 		var pager = new model_pager.Pager(page);
 		query = '%' + query + '%';
 		this.con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT ? OFFSET ? ', nestTables:true}, 
 			[query, pager.limit, pager.getOffset()], (err, result) => {
 			if (err) {
-				this.con.rollback();
-				this.con.close();
-				throw err;
+				callback(err, null, null);
+				return;
 			}
 			var list = new Node[];
 			result.forEach((row) => {
@@ -62,11 +58,11 @@ export class NodeDAO extends model.DAO {
 
 			this.con.query('SELECT count(d.id) as cnt from node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? ', [query], (err, countResult) => {
 				if (err) {
-					this.con.close();
-					throw err;
+					callback(err, null, null);
+					return;
 				}
 				pager.totalItems = countResult[0].cnt;
-				callback(pager, list);
+				callback(err, pager, list);
 			});
 		});
 	}

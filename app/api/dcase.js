@@ -5,6 +5,7 @@ var model_dcase = require('../model/dcase')
 var model_commit = require('../model/commit')
 var model_node = require('../model/node')
 
+
 function searchDCase(params, callback) {
     var con = new db.Database();
     var dcaseDAO = new model_dcase.DCaseDAO(con);
@@ -86,7 +87,11 @@ function searchNode(params, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
         var nodeDAO = new model_node.NodeDAO(con);
-        nodeDAO.search(params.page, params.text, function (pager, list) {
+        nodeDAO.search(params.page, params.text, function (err, pager, list) {
+            if(err) {
+                callback.onFailure(err);
+                return;
+            }
             var searchResultList = [];
             list.forEach(function (node) {
                 searchResultList.push({

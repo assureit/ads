@@ -5,6 +5,7 @@ import model_dcase = module('../model/dcase')
 import model_commit = module('../model/commit')
 import model_node = module('../model/node')
 import model_pager = module('../model/pager')
+import error = module('./error')
 
 export function searchDCase(params:any, callback: type.Callback) {
 	var con = new db.Database();
@@ -80,7 +81,11 @@ export function searchNode(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var nodeDAO = new model_node.NodeDAO(con);
-		nodeDAO.search(params.page, params.text, (pager: model_pager.Pager, list: model_node.Node[]) => {
+		nodeDAO.search(params.page, params.text, (err:any, pager: model_pager.Pager, list: model_node.Node[]) => {
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
 			var searchResultList = [];
 			list.forEach((node) => {
 				searchResultList.push({

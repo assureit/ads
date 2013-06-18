@@ -169,7 +169,7 @@ describe('api', function() {
 						expect(result.searchResultList[0].nodeType).not.to.be(undefined);
 						done();
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect(error).to.be(null);},
 				});
 			});
 			it('dcaseList should be limited length', function(done) {
@@ -178,7 +178,7 @@ describe('api', function() {
 						assert.equal(20, result.searchResultList.length);
 						done();
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect(error).to.be(null);},
 				});
 			});
 
@@ -203,7 +203,7 @@ describe('api', function() {
 							done();
 						});
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect(error).to.be(null);},
 				});
 			});
 
@@ -219,7 +219,7 @@ describe('api', function() {
 							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 						});
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect(error).to.be(null);},
 				});
 			});
 
@@ -235,7 +235,7 @@ describe('api', function() {
 							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 						});
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect(error).to.be(null);},
 				});
 			});
 
@@ -251,7 +251,7 @@ describe('api', function() {
 							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 						});
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect(error).to.be(null);},
 				});
 			});
 
@@ -276,7 +276,7 @@ describe('api', function() {
 							});
 							done();
 						}, 
-						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+						onFailure: (error: error.RPCError) => {expect(JSON.stringify(error)).to.be(null);},
 					});
 				});
 			});

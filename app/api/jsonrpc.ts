@@ -60,12 +60,15 @@ export function httpHandler(req: any, res: any) {
 					id: req.body.id
 					}), 200);
 			},
-			onFailure: function(error: error.IRPCOverHTTPError) {
+			onFailure: function(err: error.IRPCOverHTTPError) {
+				if (!(error instanceof error.RPCError && error instanceof error.ApplicationError)) {
+					err = new error.InternalError('Execution error is occured', JSON.stringify(err));
+				}
 					res.send(JSON.stringify({
 						jsonrpc: '2.0',
-						error: error.toStrictRPCError(),
+						error: err.toStrictRPCError(),
 						id: req.body.id
-						}), error.rpcHttpStatus);
+						}), err.rpcHttpStatus);
 			},
 		});
 	});

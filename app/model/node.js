@@ -64,9 +64,8 @@ var NodeDAO = (function (_super) {
             pager.getOffset()
         ], function (err, result) {
             if(err) {
-                _this.con.rollback();
-                _this.con.close();
-                throw err;
+                callback(err, null, null);
+                return;
             }
             var list = new Array();
             result.forEach(function (row) {
@@ -78,11 +77,11 @@ var NodeDAO = (function (_super) {
                 query
             ], function (err, countResult) {
                 if(err) {
-                    _this.con.close();
-                    throw err;
+                    callback(err, null, null);
+                    return;
                 }
                 pager.totalItems = countResult[0].cnt;
-                callback(pager, list);
+                callback(err, pager, list);
             });
         });
     };
