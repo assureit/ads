@@ -15,7 +15,7 @@ block bar
                             a( href="./#")= lang.home
                         li
                             a( href="./#new") new...
-                        li.dropdown.ase-edit-menu
+                        li.dropdown.ads-edit-menu
                             a.dropdown-toggle(data-toggle="dropdown", href="#")= lang.edit
                                 b.caret
                             ul.dropdown-menu
@@ -23,7 +23,7 @@ block bar
                                     a#menu-undo(href="#")= lang.undo
                                 li
                                     a#menu-redo(href="#")= lang.redo
-                           li.dropdown.ase-edit-menu.ase-view-menu
+                           li.dropdown.ads-edit-menu.ads-view-menu
                                a.dropdown-toggle(data-toggle="dropdown", href="#")= lang.export
                                    b.caret
                                ul.dropdown-menu
@@ -35,12 +35,12 @@ block bar
                                        a#menu-export-pdf(href="#")= lang.PDF
                                    li
                                        a#menu-export-dscript(href="#") D-Script
-                            li.ase-edit-menu
+                            li.ads-edit-menu
                                 a#menu-commit(href="#")= lang.commit
-                            li.dropdown.ase-edit-menu.ase-view-menu
+                            li.dropdown.ads-edit-menu.ads-view-menu
                                 a.dropdown-toggle#menu-history-toggle(href="#")= lang.commitlog
                                     b.caret
-                            li.dropdown.ase-edit-menu.ase-view-menu
+                            li.dropdown.ads-edit-menu.ads-view-menu
                                 a.dropdown-toggle(data-toggle="dropdown", href="#")= lang.config
                                     b.caret
                                 ul.dropdown-menu
@@ -57,7 +57,7 @@ block bar
                 block sign
 block content
     #ase.container
-        img#ase-logo(src="images/assuranceDS.png")
+        img#ads-logo(src="images/assuranceDS.png")
         #viewer(style="display: none;")
         #dcase-manager.container-fluid(style="display: none;")
             .row
@@ -87,6 +87,12 @@ block content
                                 th Edit
                                 th Delete
                         tbody#dcase-select-table
+                    .pagination
+                        ul
+                            li
+                                a#prev-page(href='#') &laquo;
+                            li
+                                a#next-page(href='#') &raquo;
             .dropdown#edit-menulist(style="display: none;")
                 a.dropdown-toggle(data-toggle="dropdown", href="#")
                     i.icon-list

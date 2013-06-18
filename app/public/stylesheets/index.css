@@ -2,6 +2,10 @@ body {
 	min-height: 480px;
 	margin: 0px;
 }
+div.row.hover {
+	background-color: #ddd;
+}
+
 #viewer {
 	left: 0px;
 	top : 40px;
@@ -11,7 +15,7 @@ body {
 #dcase-manager {
 	margin-top: 60px;
 }
-#ase-logo {
+#ads-logo {
 	position: absolute;
 	right: 0px;
 	top: 40px;
