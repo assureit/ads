@@ -388,7 +388,7 @@ class DCaseModel {
 	}
 
 	removeNode(node: DCaseNodeModel): void {
-		var parent: DCaseNodeModel = node.parent[0];
+		var parent: DCaseNodeModel = node.parent;
 		var index: number = parent.children.indexOf(node);
 		this.applyOperation({
 			redo: () => {
