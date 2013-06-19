@@ -251,20 +251,19 @@ class DCaseViewer {
 			return;
 		}
 	
-		//FIXME
-		//this.nodeview_addons = [];
-		//this.nodeview_addons.push(DNodeView_ExpandBranch);
-		//if(this.editable) {
-		//	this.nodeview_addons.push(DNodeView_InplaceEdit);
-		//	this.nodeview_addons.push(DNodeView_ToolBox);
-		//} else {
-		//	this.nodeview_addons.push(DNodeView_ToolBox_uneditable);
-		//}
+		this.nodeview_addons = [];
+		this.nodeview_addons.push(DNodeView_ExpandBranch);
+		if(this.editable) {
+			this.nodeview_addons.push(DNodeView_InplaceEdit);
+			this.nodeview_addons.push(DNodeView_ToolBox);
+		} else {
+			this.nodeview_addons.push(DNodeView_ToolBox_uneditable);
+		}
 	
-		function create(node, parent) {
+		var create = (node, parent) => {
 			var view = new DNodeView(this, node, parent);
 			this.nodeViewMap[node.id] = view;
-			node.eachNode((child) => {
+			node.eachSubNode((i, child) => {
 				create(child, view);
 			});
 			return view;
@@ -351,10 +350,10 @@ class DCaseViewer {
 	nodeInserted(parent: DCaseNodeModel, node: DCaseNodeModel, index: number) {
 		var parentView = this.getNodeView(parent);
 	
-		function create(node, parent) {
+		var create = (node, parent) => {
 			var view = new DNodeView(this, node, parent);
 			this.nodeViewMap[node.id] = view;
-			node.eachNode(function(child) {
+			node.eachSubNode((i, child) => {
 				create(child, view);
 			});
 			return view;
@@ -624,7 +623,7 @@ class DNodeView {
 		node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
 		if(node.isUndeveloped && this.svgUndevel == null) {
 			this.svgUndevel = createUndevelopMarkElement().appendTo(this.$rootsvg);
-		} else if(!node.isUndeveloped && this.svgUndevel() != null){
+		} else if(!node.isUndeveloped && this.svgUndevel != null){
 			this.svgUndevel.remove();
 			this.svgUndevel = null;
 		}

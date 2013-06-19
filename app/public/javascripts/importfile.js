@@ -12,17 +12,14 @@ var ImportFile = (function () {
         $(this.ase).on('dragenter', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            console.log("dragEnter");
         }).on('dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
             $(_this.ase).addClass('hover');
-            console.log("dragOver");
         }).on('dragleave', function (e) {
             e.stopPropagation();
             e.preventDefault();
             $(_this.ase).removeClass('hover');
-            console.log("dragLeave");
         });
     }
     ImportFile.prototype.read = function (callback) {
@@ -31,7 +28,6 @@ var ImportFile = (function () {
             e.stopPropagation();
             e.preventDefault();
             $(_this.ase).removeClass('hover');
-            console.log("drop");
             var file = (e.originalEvent.dataTransfer).files[0];
             if(file) {
                 var reader = new FileReader();
