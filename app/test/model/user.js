@@ -76,7 +76,7 @@ describe('model', function () {
                 });
             });
             it('login user not found', function (done) {
-                var loginName = 'system';
+                var loginName = 'NoSetData';
                 var pwd = 'password';
                 userDAO.login(loginName, pwd, function (err, result) {
                     expect(err).not.to.be(null);
