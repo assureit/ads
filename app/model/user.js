@@ -23,6 +23,20 @@ var UserDAO = (function (_super) {
 
     }
     UserDAO.prototype.login = function (loginName, password, callback) {
+        this.con.query('SELECT * FROM user WHERE login_name = ? ', [
+            loginName
+        ], function (err, result) {
+            if(err) {
+                callback(err, null);
+            }
+            var resultUser = null;
+            if(result.length == 0) {
+                err = new error.LoginError('The login name is not exist.');
+            } else {
+                resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
+            }
+            callback(err, resultUser);
+        });
     };
     UserDAO.prototype.register = function (loginName, password, callback) {
         var _this = this;
