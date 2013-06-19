@@ -91,6 +91,14 @@ var DuplicatedError = (function (_super) {
     return DuplicatedError;
 })(ApplicationError);
 exports.DuplicatedError = DuplicatedError;
+var LoginError = (function (_super) {
+    __extends(LoginError, _super);
+    function LoginError(msg, data) {
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.NOT_DEFINED, msg, data);
+    }
+    return LoginError;
+})(ApplicationError);
+exports.LoginError = LoginError;
 var RPC_ERROR;
 (function (RPC_ERROR) {
     RPC_ERROR._map = [];

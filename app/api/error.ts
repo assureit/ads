@@ -67,6 +67,12 @@ export class DuplicatedError extends ApplicationError {
 	}
 }
 
+export class LoginError extends ApplicationError {
+	constructor(msg:string, data?:any) {
+		super(HTTP_STATUS.OK, RPC_ERROR.NOT_DEFINED, msg, data);
+	}
+}
+
 enum RPC_ERROR {
 	INVALID_REQUEST = -32600,
 	METHOD_NOT_FOUND = -32601,

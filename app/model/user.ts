@@ -8,6 +8,19 @@ export class User {
 
 export class UserDAO extends model.DAO {
 	login(loginName: string, password: string, callback: (err:any, user: User) => void) {
+		this.con.query('SELECT * FROM user WHERE login_name = ? ', [loginName], (err, result) => {
+			if (err) {
+				callback(err, null);
+				return;
+			}
+			var resultUser : User = null;
+			if (result.length == 0) {
+				err = new error.LoginError('Login name or Password is invalid.');
+			} else {
+				resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
+			}	
+			callback(err, resultUser);
+		});
 
 	}
 

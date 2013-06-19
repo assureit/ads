@@ -79,5 +79,27 @@ describe('model', function() {
 				});
 			});
 		});
+		describe('login', function() {
+			it('should return User object property', function(done) {
+				var loginName = 'system';
+				var pwd = 'password';
+
+				userDAO.login(loginName, pwd, (err:any, result: model_user.User) => {
+					expect(result).not.to.be(undefined);
+					expect(result.loginName).to.eql(loginName);
+					done();
+				});
+			});
+			it('login user not found', function(done) {
+				var loginName = 'NoSetData';
+				var pwd = 'password';
+
+				userDAO.login(loginName, pwd, (err:any, result: model_user.User) => {
+					expect(err).not.to.be(null);
+					expect(err instanceof error.LoginError).to.be(true);
+					done();
+				});
+			});
+		});
 	});
 });
