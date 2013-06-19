@@ -93,7 +93,7 @@ class ADS {
 				var tree = JSON.parse(file.result); //TODO convert to Markdown
 				if("contents" in tree) {
 					var r = DCaseAPI.createDCase(file.name.split(".")[0], tree.contents);
-					location.href = "./#dcase/" + r.dcaseId;
+					location.href = "./dcase/" + r.dcaseId;
 				} else {
 					alert("Invalid File");
 				}

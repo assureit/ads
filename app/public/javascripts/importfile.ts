@@ -5,27 +5,28 @@ class DCaseFile {
 }
 
 class ImportFile {
+	ase: string = "#ase";
 
 	constructor() {
-		$("div.row").on('dragenter', e => {
+		$(this.ase).on('dragenter', e => {
 			e.stopPropagation();
 			e.preventDefault();
 		}).on('dragover', e => {
 			e.stopPropagation();
 			e.preventDefault();
-			$(this).addClass('hover');
+			$(this.ase).addClass('hover');
 		}).on('dragleave', e => {
 			e.stopPropagation();
 			e.preventDefault();
-			$(this).removeClass('hover');
+			$(this.ase).removeClass('hover');
 		});
 	}
 
 	read(callback: (DCaseFile) => void): void{
-		$("div.row").on('drop', (e) => {
+		$("#ase").on('drop', (e) => {
 			e.stopPropagation();
 			e.preventDefault();
-			$(this).removeClass('hover');
+			$(this.ase).removeClass('hover');
 			var file: File = (<any>e.originalEvent.dataTransfer).files[0];
 			if(file) {
 				var reader = new FileReader();
