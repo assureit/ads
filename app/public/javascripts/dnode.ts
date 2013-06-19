@@ -1,5 +1,6 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 ///<reference path='./api.ts'/>
+///<reference path='./dcaseviewer-addons.ts'/>
 
 class DCaseMetaContent {
 	constructor(public type: string, public text: string){ }
@@ -180,8 +181,7 @@ class DCaseNodeModel {
 	}
 
 	getHtmlMetadata(): any { 
-		//var innerText: any = generateMetadata(this);    //FIXME
-		var innerText = null;   //FIXME
+		var innerText: any = generateMetadata(this).join("\n");    //FIXME
 		var divText: string = "<div></div>";
 		if(innerText != "") {
 			divText = "<div>Metadata</div>";
@@ -275,6 +275,14 @@ class DCaseModel {
 			var desc: string = data.Description;
 			//var metadata: DCaseMetaContent[] = data.metadata ? data.metadata : null;
 			var metadata: DCaseMetaContent[] = null; /* TODO Handle metadata */
+			var metadata_raw: any = data.metadata;
+			if (metadata_raw instanceof Array) {
+				metadata = metadata_raw;
+			} else if (metadata_raw != null) {
+				metadata = [metadata_raw]
+			} else {
+				metadata = [];
+			}
 			var node: DCaseNodeModel = self.createNode(id, type, desc, metadata);
 			for(var i = 0; i < data.Children.length; i++) {
 				node.insertChild(create(data.Children[i]), i);
@@ -292,14 +300,15 @@ class DCaseModel {
 		var node: DCaseNodeModel = this.node;
 		node.traverse((i, v) => {
 			var c: any = [];
-			node.eachSubNode((i, v) => {
-				c.push(node.id);
+			v.eachSubNode((i, v) => {
+				console.log(v.id);
+				c.push(v.id);
 			});
 			tl.push({
-				ThisNodeId: node.id,
-				NodeType: node.type,
-				Description: node.desc,
-				Metadata: node.metadata,
+				ThisNodeId: v.id,
+				NodeType: v.type,
+				Description: v.desc,
+				Metadata: v.metadata,
 				Children: c
 			});
 		});

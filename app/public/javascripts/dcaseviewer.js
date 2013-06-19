@@ -245,14 +245,22 @@ var DCaseViewer = (function () {
         if(dcase == null) {
             return;
         }
-        function create(node, parent) {
-            var view = new DNodeView(this, node, parent);
-            this.nodeViewMap[node.id] = view;
-            node.eachNode(function (child) {
+        this.nodeview_addons = [];
+        this.nodeview_addons.push(DNodeView_ExpandBranch);
+        if(this.editable) {
+            this.nodeview_addons.push(DNodeView_InplaceEdit);
+            this.nodeview_addons.push(DNodeView_ToolBox);
+        } else {
+            this.nodeview_addons.push(DNodeView_ToolBox_uneditable);
+        }
+        var create = function (node, parent) {
+            var view = new DNodeView(_this, node, parent);
+            _this.nodeViewMap[node.id] = view;
+            node.eachSubNode(function (i, child) {
                 create(child, view);
             });
             return view;
-        }
+        };
         this.rootview = create(dcase.getTopGoal(), null);
         this.$dom.ready(function () {
             function f(v) {
@@ -320,14 +328,14 @@ var DCaseViewer = (function () {
     DCaseViewer.prototype.nodeInserted = function (parent, node, index) {
         var _this = this;
         var parentView = this.getNodeView(parent);
-        function create(node, parent) {
-            var view = new DNodeView(this, node, parent);
-            this.nodeViewMap[node.id] = view;
-            node.eachNode(function (child) {
+        var create = function (node, parent) {
+            var view = new DNodeView(_this, node, parent);
+            _this.nodeViewMap[node.id] = view;
+            node.eachSubNode(function (i, child) {
                 create(child, view);
             });
             return view;
-        }
+        };
         var view = create(node, parentView);
         parentView.nodeChanged();
         this.$dom.ready(function () {
@@ -547,7 +555,7 @@ var DNodeView = (function () {
         node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
         if(node.isUndeveloped && this.svgUndevel == null) {
             this.svgUndevel = createUndevelopMarkElement().appendTo(this.$rootsvg);
-        } else if(!node.isUndeveloped && this.svgUndevel() != null) {
+        } else if(!node.isUndeveloped && this.svgUndevel != null) {
             this.svgUndevel.remove();
             this.svgUndevel = null;
         }

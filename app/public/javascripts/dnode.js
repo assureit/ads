@@ -151,7 +151,7 @@ var DCaseNodeModel = (function () {
         }
     };
     DCaseNodeModel.prototype.getHtmlMetadata = function () {
-        var innerText = null;
+        var innerText = generateMetadata(this).join("\n");
         var divText = "<div></div>";
         if(innerText != "") {
             divText = "<div>Metadata</div>";
@@ -217,6 +217,16 @@ var DCaseModel = (function () {
             var type = data.NodeType;
             var desc = data.Description;
             var metadata = null;
+            var metadata_raw = data.metadata;
+            if(metadata_raw instanceof Array) {
+                metadata = metadata_raw;
+            } else if(metadata_raw != null) {
+                metadata = [
+                    metadata_raw
+                ];
+            } else {
+                metadata = [];
+            }
             var node = self.createNode(id, type, desc, metadata);
             for(var i = 0; i < data.Children.length; i++) {
                 node.insertChild(create(data.Children[i]), i);
@@ -232,14 +242,15 @@ var DCaseModel = (function () {
         var node = this.node;
         node.traverse(function (i, v) {
             var c = [];
-            node.eachSubNode(function (i, v) {
-                c.push(node.id);
+            v.eachSubNode(function (i, v) {
+                console.log(v.id);
+                c.push(v.id);
             });
             tl.push({
-                ThisNodeId: node.id,
-                NodeType: node.type,
-                Description: node.desc,
-                Metadata: node.metadata,
+                ThisNodeId: v.id,
+                NodeType: v.type,
+                Description: v.desc,
+                Metadata: v.metadata,
                 Children: c
             });
         });

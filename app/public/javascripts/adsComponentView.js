@@ -31,7 +31,7 @@ var CreateDCaseView = (function () {
                 NodeCount: 1
             };
             var r = DCaseAPI.createDCase(name, tree);
-            location.href = "./#dcase/" + r.dcaseId;
+            location.href = "./dcase/" + r.dcaseId;
         });
     }
     CreateDCaseView.prototype.enableSubmit = function () {

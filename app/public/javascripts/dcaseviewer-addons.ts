@@ -182,20 +182,24 @@ function parseMetaData(data: string[]): any {
 
 function generateMetadata(n): string {
 	var metadata: any = n.metadata;
-	var keys: string[] = Object.keys(metadata);
-	var res: string = (keys.length > 0) ? "\n" : "";
-	for (var i = 0; i < keys.length; i++) {
-		var key: string = keys[i];
-		if (key != "Description") {
-			res += key + ": " + metadata[key] + "\n";
+	var list = [];
+	for (var i = 0; i < metadata.length; i++) {
+		var keys: string[] = Object.keys(metadata[i]);
+		var data: string = (keys.length > 0) ? "\n" : "";
+		for (var j = 0; j < keys.length; j++) {
+			var key: string = keys[j];
+			if (key != "Description") {
+				data += key + ": " + metadata[i][key] + "\n";
+			}
 		}
+		if (metadata[i]["Description"]) {
+			data += metadata[i]["Description"];
+		} else {
+			data = data.substr(0, data.length-1);
+		}
+		list.push(data);
 	}
-	if (metadata["Description"]) {
-		res += metadata["Description"];
-	} else {
-		res = res.substr(0, res.length-1);
-	}
-	return res;
+	return list;
 }
 
 function parseNodeBody(body: string[]): any {
@@ -209,7 +213,7 @@ function parseNodeBody(body: string[]): any {
 		description = body.join("\n").trim();
 	}
 
-	return {"description": description, "metadata": metadata};
+	return {"description": description, "metadata": [metadata]}; //FIXME 
 }
 
 function DNodeView_InplaceEdit(self): void {
@@ -224,7 +228,7 @@ function DNodeView_InplaceEdit(self): void {
 		};
 
 		var markdown: string = convert(node);
-		node.eachNode((n: any) => {
+		node.eachSubNode((n: any) => {
 			markdown = markdown + convert(n);
 		});
 		return markdown;
@@ -242,14 +246,13 @@ function DNodeView_InplaceEdit(self): void {
 			var body: string[] = lines.slice(1).join("\n").trim().split("\n");
 			var parsedBody: any = parseNodeBody(body);
 
-			var node: any = {
-				type: findMostSimilarNodeType(heads[0]),
-				name: heads[1],
-				id  : heads[2],
-				description: parsedBody.description,
-				metadata: parsedBody.metadata,
-				children: []
-			};
+			var node: DCaseNodeModel = new DCaseNodeModel(
+				heads[2],
+				heads[1],
+				findMostSimilarNodeType(heads[0]),
+				parsedBody.description,
+				parsedBody.metadata
+			);
 			nodes.push(node);
 		};
 		return nodes;
@@ -285,7 +288,7 @@ function DNodeView_InplaceEdit(self): void {
 	}
 
 	function updateNode(node: any, nodejson: any): any {
-		var newDesc: string = nodejson.description;
+		var newDesc: string = nodejson.desc;
 		var newType: string = nodejson.type;
 		var newName: string = nodejson.name || newType[0] + "_" + node.id;
 		var newMetadata: any = nodejson.metadata;
@@ -300,7 +303,7 @@ function DNodeView_InplaceEdit(self): void {
 		var node: any = self.node;
 		var viewer = self.viewer;
 		var DCase = viewer.getDCase();
-		var parent = node.parents[0];
+		var parent = node.parent;
 		
 		viewer.canMoveByKeyboard = true;
 				
@@ -314,7 +317,7 @@ function DNodeView_InplaceEdit(self): void {
 					closeInplace();
 				}else{
 					DCase.setDescription(node, "");
-					node.eachNode((n) => {
+					node.eachSubNode((n) => {
 						DCase.removeNode(n);
 					});
 				}
@@ -333,7 +336,7 @@ function DNodeView_InplaceEdit(self): void {
 			var idIndexTable: any = {};
 
 			var ch: number = 0, co: number = 0;
-			node.eachNode((n) => {
+			node.eachSubNode((n) => {
 				idNodeTable[n.id] = n;
 				if(n.isContext){
 					idIndexTable[n.id] = co++;
@@ -360,7 +363,7 @@ function DNodeView_InplaceEdit(self): void {
 					(newNode.isContext ? newContexts : newChildren).push(newNode);
 				}else if(node.isTypeApendable(nd.type)){
 					// create new node
-					var newNode: any = DCase.insertNode(node, nd.type, nd.description, nd.metadata);
+					var newNode: any = DCase.insertNode(node, nd.type, nd.desc, nd.metadata);
 					treeChanged = true;
 					(newNode.isContext ? newContexts : newChildren).push(newNode);
 				}
@@ -568,7 +571,7 @@ function DNodeView_ToolBox(self): void {
 				}
 			});
 
-			if(self.node.parents.length != 0) {
+			if(self.node.parent != null) {
 				$menu.find("#ml-delete").click((e: JQueryEventObject) => {
 					e.preventDefault();
 					self.viewer.getDCase().removeNode(self.node);

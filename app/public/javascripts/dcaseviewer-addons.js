@@ -161,20 +161,24 @@ function parseMetaData(data) {
 }
 function generateMetadata(n) {
     var metadata = n.metadata;
-    var keys = Object.keys(metadata);
-    var res = (keys.length > 0) ? "\n" : "";
-    for(var i = 0; i < keys.length; i++) {
-        var key = keys[i];
-        if(key != "Description") {
-            res += key + ": " + metadata[key] + "\n";
+    var list = [];
+    for(var i = 0; i < metadata.length; i++) {
+        var keys = Object.keys(metadata[i]);
+        var data = (keys.length > 0) ? "\n" : "";
+        for(var j = 0; j < keys.length; j++) {
+            var key = keys[j];
+            if(key != "Description") {
+                data += key + ": " + metadata[i][key] + "\n";
+            }
         }
+        if(metadata[i]["Description"]) {
+            data += metadata[i]["Description"];
+        } else {
+            data = data.substr(0, data.length - 1);
+        }
+        list.push(data);
     }
-    if(metadata["Description"]) {
-        res += metadata["Description"];
-    } else {
-        res = res.substr(0, res.length - 1);
-    }
-    return res;
+    return list;
 }
 function parseNodeBody(body) {
     var metadata = {
@@ -189,7 +193,9 @@ function parseNodeBody(body) {
     }
     return {
         "description": description,
-        "metadata": metadata
+        "metadata": [
+            metadata
+        ]
     };
 }
 function DNodeView_InplaceEdit(self) {
@@ -201,7 +207,7 @@ function DNodeView_InplaceEdit(self) {
         }
         ;
         var markdown = convert(node);
-        node.eachNode(function (n) {
+        node.eachSubNode(function (n) {
             markdown = markdown + convert(n);
         });
         return markdown;
@@ -215,14 +221,7 @@ function DNodeView_InplaceEdit(self) {
             var heads = lines[0].trim().split(/\s+/);
             var body = lines.slice(1).join("\n").trim().split("\n");
             var parsedBody = parseNodeBody(body);
-            var node = {
-                type: findMostSimilarNodeType(heads[0]),
-                name: heads[1],
-                id: heads[2],
-                description: parsedBody.description,
-                metadata: parsedBody.metadata,
-                children: []
-            };
+            var node = new DCaseNodeModel(heads[2], heads[1], findMostSimilarNodeType(heads[0]), parsedBody.description, parsedBody.metadata);
             nodes.push(node);
         }
         ;
@@ -257,7 +256,7 @@ function DNodeView_InplaceEdit(self) {
         }
     }
     function updateNode(node, nodejson) {
-        var newDesc = nodejson.description;
+        var newDesc = nodejson.desc;
         var newType = nodejson.type;
         var newName = nodejson.name || newType[0] + "_" + node.id;
         var newMetadata = nodejson.metadata;
@@ -271,7 +270,7 @@ function DNodeView_InplaceEdit(self) {
         var node = self.node;
         var viewer = self.viewer;
         var DCase = viewer.getDCase();
-        var parent = node.parents[0];
+        var parent = node.parent;
         viewer.canMoveByKeyboard = true;
         if(nodes.length === 0) {
             if(markdown.length === 0) {
@@ -281,7 +280,7 @@ function DNodeView_InplaceEdit(self) {
                     closeInplace();
                 } else {
                     DCase.setDescription(node, "");
-                    node.eachNode(function (n) {
+                    node.eachSubNode(function (n) {
                         DCase.removeNode(n);
                     });
                 }
@@ -298,7 +297,7 @@ function DNodeView_InplaceEdit(self) {
             var idIndexTable = {
             };
             var ch = 0, co = 0;
-            node.eachNode(function (n) {
+            node.eachSubNode(function (n) {
                 idNodeTable[n.id] = n;
                 if(n.isContext) {
                     idIndexTable[n.id] = co++;
@@ -321,7 +320,7 @@ function DNodeView_InplaceEdit(self) {
                     delete idNodeTable[id];
                     (newNode.isContext ? newContexts : newChildren).push(newNode);
                 } else if(node.isTypeApendable(nd.type)) {
-                    var newNode = DCase.insertNode(node, nd.type, nd.description, nd.metadata);
+                    var newNode = DCase.insertNode(node, nd.type, nd.desc, nd.metadata);
                     treeChanged = true;
                     (newNode.isContext ? newContexts : newChildren).push(newNode);
                 }
@@ -514,7 +513,7 @@ function DNodeView_ToolBox(self) {
                     }
                 }
             });
-            if(self.node.parents.length != 0) {
+            if(self.node.parent != null) {
                 $menu.find("#ml-delete").click(function (e) {
                     e.preventDefault();
                     self.viewer.getDCase().removeNode(self.node);
