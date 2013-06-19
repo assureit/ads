@@ -314,7 +314,7 @@ var DCaseModel = (function () {
     };
     DCaseModel.prototype.removeNode = function (node) {
         var _this = this;
-        var parent = node.parent[0];
+        var parent = node.parent;
         var index = parent.children.indexOf(node);
         this.applyOperation({
             redo: function () {
