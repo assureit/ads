@@ -7,7 +7,7 @@ export class User {
 }
 
 export class UserDAO extends model.DAO {
-	login(loginName: string, password: string, callback: (user: User) => void) {
+	login(loginName: string, password: string, callback: (err:any, user: User) => void) {
 
 	}
 
