@@ -1,63 +1,26 @@
 var ADS = (function () {
-    function getLoginUserorNull() {
-        var matchResult = document.cookie.match(/userId=(\w+);?/);
-        var userId = matchResult ? parseInt(matchResult[1]) : null;
-        if(userId == null) {
-            hideEditMenu();
-        }
-        return userId;
-    }
-    function isLogin(id) {
-        return id != null;
-    }
-    function hideEditMenu() {
-        $(".ads-edit-menu").css("display", "none");
-    }
-    function hideViewMenu() {
-        $(".ads-view-menu").css("display", "none");
-    }
-    function hideViewer() {
-        $("#viewer").hide();
-        $("#viewer *").remove();
-    }
-    function clearTimeLine() {
-        if($(".timeline").length > 0) {
-            $(".timeline").remove();
-        }
-    }
-    function initDefaultScreen(userId, pageIndex, selectDCaseView) {
-        clearTimeLine();
-        hideViewer();
-        hideEditMenu();
-        hideViewMenu();
-        $("#dcase-manager").css("display", "block");
-        if(selectDCaseView != null) {
-            selectDCaseView.clearTable();
-            selectDCaseView.addTable(userId, pageIndex);
-        }
-    }
     function ADS(body) {
-        var self = this;
+        var _this = this;
         this.TITLE_SUFFIX = " - Assurance DS";
         this.URL_EXPORT = "cgi/view2.cgi";
-        this.URL_EXPORT_SVG = "cgi/svg.cgi";
-        var selectDCaseView = new SelectDCaseView();
-        selectDCaseView.initEvents();
-        var createDCaseView = new CreateDCaseView();
+        this.URL_EXPORT_SVG = "/export";
+        this.selectDCaseView = new SelectDCaseView();
+        this.selectDCaseView.initEvents();
+        this.createDCaseView = new CreateDCaseView();
         var router = new Router();
         router.route("new", "new", function () {
-            var userId = getLoginUserorNull();
-            initDefaultScreen(userId);
+            var userId = _this.getLoginUserorNull();
+            _this.initDefaultScreen(userId, 1, null);
             $("#newDCase").show();
             $("#selectDCase").hide();
-            if(isLogin(userId)) {
-                createDCaseView.enableSubmit();
+            if(_this.isLogin(userId)) {
+                _this.createDCaseView.enableSubmit();
             } else {
-                createDCaseView.disableSubmit();
+                _this.createDCaseView.disableSubmit();
             }
         });
         var defaultRouter = function (pageIndex) {
-            initDefaultScreen(getLoginUserorNull(), pageIndex, selectDCaseView);
+            _this.initDefaultScreen(_this.getLoginUserorNull(), pageIndex, _this.selectDCaseView);
             $("#newDCase").hide();
             $("#selectDCase").show();
             var importFile = new ImportFile();
@@ -65,7 +28,7 @@ var ADS = (function () {
                 var tree = JSON.parse(file.result);
                 if("contents" in tree) {
                     var r = DCaseAPI.createDCase(file.name.split(".")[0], tree.contents);
-                    location.href = "./#dcase/" + r.dcaseId;
+                    location.href = "./dcase/" + r.dcaseId;
                 } else {
                     alert("Invalid File");
                 }
@@ -77,45 +40,77 @@ var ADS = (function () {
         router.route("", "", function () {
             defaultRouter(1);
         });
-        router.route("dcase/:id", "dcase", function (dcaseId) {
-            hideViewer();
-            clearTimeLine();
+        router.route("dcase/:id", "dcase", function (dcaseIdstr) {
+            var dcaseId = parseInt(dcaseIdstr);
+            _this.hideViewer();
+            _this.clearTimeLine();
             $("#newDCase").hide();
             $("#selectDCase").hide();
-            var userId = getLoginUserorNull();
+            var userId = _this.getLoginUserorNull();
             $(".ads-view-menu").css("display", "block");
             $(".ads-edit-menu").css("display", "block");
             $("#viewer").css("display", "block");
             var $body = $(body);
-            var viewer = new DCaseViewer(document.getElementById("viewer"), null, isLogin(userId));
-            var timelineView = self.timelineView = new TimeLineView($body, viewer, isLogin(userId));
-            self.dcase_latest = null;
+            _this.viewer = new DCaseViewer(document.getElementById("viewer"), null, _this.isLogin(userId));
+            _this.timelineView = new TimeLineView($body, _this.viewer, _this.isLogin(userId));
+            _this.viewer.dcase_latest = null;
             $(window).bind("beforeunload", function (e) {
-                if(dcase_latest != null && dcase_latest.isChanged()) {
+                if(_this.viewer.dcase_latest != null && _this.viewer.dcase_latest.isChanged()) {
                     return "未コミットの変更があります";
                 }
             });
-            var searchView = new SearchView();
-            var colorSets = new ColorSets(viewer);
-            colorSets.init();
-            colorSets.createDropMenu();
-            var name = document.cookie.match(/colorTheme=(\w+);?/);
-            if(name != null) {
-                viewer.setColorTheme(colorSets.get(name[1]));
-            }
+            var searchView = new SearchView(_this.viewer);
             var r = DCaseAPI.getDCase(dcaseId);
-            var dcase = new DCase(JSON.parse(r.contents), dcaseId, r.commitId);
-            viewer.setDCase(dcase);
-            timelineView.repaint(dcase);
-            dcase_latest = dcase;
-            document.title = r.dcaseName + this.TITLE_SUFFIX;
+            var tree = JSON.parse(r.contents);
+            var dcase = new DCaseModel(tree, dcaseId, r.commitId);
+            _this.viewer.setDCase(dcase);
+            _this.timelineView.repaint(dcase);
+            _this.viewer.dcase_latest = dcase;
+            document.title = r.dcaseName + _this.TITLE_SUFFIX;
             $("#dcaseName").text(r.dcaseName);
+            _this.viewer.exportSubtree = function (type, root) {
+                _this.exportTree(type, root);
+            };
         });
         router.start();
-        viewer.exportSubtree = function (type, root) {
-            self.exportTree(type, root);
-        };
     }
+    ADS.prototype.getLoginUserorNull = function () {
+        var matchResult = document.cookie.match(/userId=(\w+);?/);
+        var userId = matchResult ? parseInt(matchResult[1]) : null;
+        if(userId == null) {
+            this.hideEditMenu();
+        }
+        return userId;
+    };
+    ADS.prototype.isLogin = function (id) {
+        return id != null;
+    };
+    ADS.prototype.hideEditMenu = function () {
+        $(".ads-edit-menu").css("display", "none");
+    };
+    ADS.prototype.hideViewMenu = function () {
+        $(".ads-view-menu").css("display", "none");
+    };
+    ADS.prototype.hideViewer = function () {
+        $("#viewer").hide();
+        $("#viewer *").remove();
+    };
+    ADS.prototype.clearTimeLine = function () {
+        if($(".timeline").length > 0) {
+            $(".timeline").remove();
+        }
+    };
+    ADS.prototype.initDefaultScreen = function (userId, pageIndex, selectDCaseView) {
+        this.clearTimeLine();
+        this.hideViewer();
+        this.hideEditMenu();
+        this.hideViewMenu();
+        $("#dcase-manager").css("display", "block");
+        if(selectDCaseView != null) {
+            selectDCaseView.clearTable();
+            selectDCaseView.addTable(userId, pageIndex);
+        }
+    };
     ADS.prototype.commit = function () {
         if(this.viewer.editable) {
             if(!this.viewer.getDCase().isChanged()) {
@@ -130,48 +125,6 @@ var ADS = (function () {
                 }
             }
         }
-    };
-    ADS.prototype.searchNode = function (text, types, beginDate, endDate, callback, callbackOnNoResult) {
-        var dcase = this.viewer.getDCase();
-        var root = dcase ? dcase.getTopGoal() : undefined;
-        if(!root) {
-            if(callbackOnNoResult) {
-                callbackOnNoResult();
-            }
-            return;
-        }
-        root.traverse(function (node) {
-            var name = node.name;
-            var desc = node.desc;
-            var d_index = desc.toLowerCase().indexOf(text);
-            var n_index = name.toLowerCase().indexOf(text);
-            if(d_index != -1 || n_index != -1) {
-                callback(node);
-            }
-        });
-    };
-    ADS.prototype.updateSearchResult = function (text) {
-        $('#search-query').popover('show');
-        var $res = $("#search_result_ul");
-        $res.empty();
-        text = text.toLowerCase();
-        var result = DCaseAPI.searchDCase(text);
-        if(result.length == 0) {
-            $res.append("<li>No Results</li>");
-        } else {
-            for(var i = 0; i < result.length; ++i) {
-                var res = result[i];
-                var id = res.dcaseId;
-                $("<li>").html("<a href=\"#dcase/" + id + "\">" + id + "</a>").appendTo($res);
-            }
-        }
-        $res.append("<hr>");
-        self.searchNode(text, [], null, null, function (node) {
-            $("<li>").html("<a href=\"#\">" + node.name + "</a>").click(function (e) {
-                viewer.centerize(node, 500);
-                e.preventDefault();
-            }).appendTo($res);
-        });
     };
     ADS.prototype.foreachLine = function (str, max, callback) {
         if(!callback) {
@@ -200,7 +153,7 @@ var ADS = (function () {
     };
     ADS.prototype.splitTextByLength = function (str, max) {
         var arr = [];
-        foreachLine(str, max, function (s) {
+        this.foreachLine(str, max, function (s) {
             arr.push(s);
         });
         return arr;
@@ -280,8 +233,7 @@ var ADS = (function () {
         $form.empty().remove();
     };
     ADS.prototype.exportViaSVG = function (type, root) {
-        var self = this;
-        var svg = this.createSVGDocument(self.viewer, root);
+        var svg = this.createSVGDocument(this.viewer, root);
         svg = svg.replace("</svg></svg>", "</svg>");
         this.executePost(this.URL_EXPORT_SVG, {
             "type": type,
@@ -293,38 +245,38 @@ var ADS = (function () {
             this.exportViaSVG(type, root);
             return;
         }
-        var commitId = viewer.getDCase().commitId;
+        var commitId = this.viewer.getDCase().commitId;
         var url = this.URL_EXPORT + "?" + commitId + "." + type;
         window.open(url, "_blank");
     };
     ADS.prototype.initDefaultEventListeners = function () {
-        var self = this;
+        var _this = this;
         $("#menu-commit").click(function (e) {
-            self.commit();
+            _this.commit();
             e.preventDefault();
         });
         $("#menu-undo").click(function (e) {
-            self.viewer.getDCase().undo();
+            _this.viewer.getDCase().undo();
             e.preventDefault();
         });
         $("#menu-redo").click(function (e) {
-            self.viewer.getDCase().redo();
+            _this.viewer.getDCase().redo();
             e.preventDefault();
         });
         $("#menu-export-json").click(function (e) {
-            self.exportTree("json");
+            _this.exportTree("json", null);
             e.preventDefault();
         });
         $("#menu-export-png").click(function (e) {
-            self.exportTree("png");
+            _this.exportTree("png", null);
             e.preventDefault();
         });
         $("#menu-export-pdf").click(function (e) {
-            self.exportTree("pdf");
+            _this.exportTree("pdf", null);
             e.preventDefault();
         });
         $("#menu-export-dscript").click(function (e) {
-            self.exportTree("dscript");
+            _this.exportTree("dscript", null);
             e.preventDefault();
         });
         $("#lang-select-english").click(function (e) {

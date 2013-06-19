@@ -6,7 +6,7 @@ var DCaseAPI;
     DCaseAPI.default_error_callback = function (req, stat, err) {
         alert("ajax error");
     };
-    DCaseAPI.call = function (method, params, callback, error_callback) {
+    DCaseAPI.call = function (method, params) {
         var cmd = {
             jsonrpc: "2.0",
             method: method,
@@ -14,12 +14,8 @@ var DCaseAPI;
             params: params
         };
         var async = callback != null;
-        if(callback == null) {
-            callback = this.default_success_callback;
-        }
-        if(error_callback == null) {
-            error_callback = this.default_error_callback;
-        }
+        var callback = this.default_success_callback;
+        var error_callback = this.default_error_callback;
         var res = $.ajax({
             type: "POST",
             url: this.uri,
@@ -36,71 +32,71 @@ var DCaseAPI;
             return JSON.parse(res.responseText).result;
         }
     };
-    DCaseAPI.searchDCase = function (pageIndex, callback, error) {
+    DCaseAPI.searchDCase = function (pageIndex) {
         try  {
             return this.call("searchDCase", {
                 page: pageIndex
-            }, callback, error);
+            });
         } catch (e) {
             return [];
         }
     };
-    DCaseAPI.createDCase = function (name, tree, callback, error) {
+    DCaseAPI.createDCase = function (name, tree) {
         return this.call("createDCase", {
             dcaseName: name,
             contents: tree
-        }, callback, error);
+        });
     };
-    DCaseAPI.getCommitList = function (dcaseId, callback, error) {
+    DCaseAPI.getCommitList = function (dcaseId) {
         return this.call("getCommitList", {
             dcaseId: dcaseId
-        }, callback, error).commitList;
+        }).commitList;
     };
-    DCaseAPI.commit = function (tree, msg, commitId, callback, error) {
+    DCaseAPI.commit = function (tree, msg, commitId) {
         return this.call("commit", {
             contents: tree,
             commitMessage: msg,
             commitId: commitId
-        }, callback, error).commitId;
+        }).commitId;
     };
-    DCaseAPI.getDCase = function (dcaseId, callback, error) {
+    DCaseAPI.getDCase = function (dcaseId) {
         return this.call("getDCase", {
             dcaseId: dcaseId
-        }, callback, error);
+        });
     };
-    DCaseAPI.editDCase = function (dcaseId, name, callback, error) {
+    DCaseAPI.editDCase = function (dcaseId, name) {
         return this.call("editDCase", {
             dcaseId: dcaseId,
             dcaseName: name
-        }, callback, error);
+        });
     };
-    DCaseAPI.deleteDCase = function (dcaseId, callback, error) {
+    DCaseAPI.deleteDCase = function (dcaseId) {
         return this.call("deleteDCase", {
             dcaseId: dcaseId
-        }, callback, error);
+        });
     };
-    DCaseAPI.getNodeTree = function (commitId, callback, error) {
+    DCaseAPI.getNodeTree = function (commitId) {
         return JSON.parse(this.call("getNodeTree", {
             commitId: commitId
-        }, callback, error).contents);
+        }).contents);
     };
-    DCaseAPI.searchNode = function (text, callback, error) {
+    DCaseAPI.searchNode = function (text) {
         return this.call("searchNode", {
             text: text
-        }, callback, error).searchResultList;
+        }).searchResultList;
     };
-    DCaseAPI.searchDCaseHistory = function (dcaseId, text, callback, error) {
+    DCaseAPI.searchDCaseHistory = function (dcaseId, text) {
         return this.call("searchDCaseHistory", {
             dcaseId: dcaseId,
             text: text
-        }, callback, error);
+        });
     };
-    DCaseAPI.createTicket = function (nodeId, subject, description, userName, callback, error) {
+    DCaseAPI.createTicket = function (nodeId, subject, description, userName) {
         return this.call("createTicket", {
             nodeId: nodeId,
             subject: subject,
             description: description,
             userName: userName
-        }, callback, error);
+        });
     };
 })(DCaseAPI || (DCaseAPI = {}));

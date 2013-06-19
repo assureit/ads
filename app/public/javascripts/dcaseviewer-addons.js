@@ -92,7 +92,7 @@ function findMostSimilarNodeType(query) {
     return NodeTypes[minidx];
 }
 ;
-var DNodeView_ExpandBranch = function (self) {
+function DNodeView_ExpandBranch(self) {
     var DBLTOUCH_THRESHOLD = 300;
     var count = 0;
     var time = null;
@@ -115,11 +115,12 @@ var DNodeView_ExpandBranch = function (self) {
             time = null;
         }
     });
-};
-var checkKeyValue = function (str) {
+}
+;
+function checkKeyValue(str) {
     return str.indexOf(":") != -1;
-};
-var findVaridMetaData = function (body) {
+}
+function findVaridMetaData(body) {
     body = body.join("\n").trim().split("\n");
     if(checkKeyValue(body[0])) {
         return 0;
@@ -137,8 +138,8 @@ var findVaridMetaData = function (body) {
         return emptyLineIndex + 1;
     }
     return -1;
-};
-var parseMetaData = function (data) {
+}
+function parseMetaData(data) {
     var metadata = {
     };
     var i = 0;
@@ -157,25 +158,29 @@ var parseMetaData = function (data) {
         metadata["Description"] = "";
     }
     return metadata;
-};
+}
 function generateMetadata(n) {
     var metadata = n.metadata;
-    var keys = Object.keys(metadata);
-    var res = (keys.length > 0) ? "\n" : "";
-    for(var i = 0; i < keys.length; i++) {
-        var key = keys[i];
-        if(key != "Description") {
-            res += key + ": " + metadata[key] + "\n";
+    var list = [];
+    for(var i = 0; i < metadata.length; i++) {
+        var keys = Object.keys(metadata[i]);
+        var data = (keys.length > 0) ? "\n" : "";
+        for(var j = 0; j < keys.length; j++) {
+            var key = keys[j];
+            if(key != "Description") {
+                data += key + ": " + metadata[i][key] + "\n";
+            }
         }
+        if(metadata[i]["Description"]) {
+            data += metadata[i]["Description"];
+        } else {
+            data = data.substr(0, data.length - 1);
+        }
+        list.push(data);
     }
-    if(metadata["Description"]) {
-        res += metadata["Description"];
-    } else {
-        res = res.substr(0, res.length - 1);
-    }
-    return res;
+    return list;
 }
-var parseNodeBody = function (body) {
+function parseNodeBody(body) {
     var metadata = {
     };
     var description;
@@ -188,18 +193,21 @@ var parseNodeBody = function (body) {
     }
     return {
         "description": description,
-        "metadata": metadata
+        "metadata": [
+            metadata
+        ]
     };
-};
-var DNodeView_InplaceEdit = function (self) {
+}
+function DNodeView_InplaceEdit(self) {
     var $edit = null;
     self.$divText.addClass("node-text-editable");
     function generateMarkdownText(node) {
-        var convert = (function (n) {
+        function convert(n) {
             return ("# " + n.type + " " + n.name + " " + n.id + (n.desc.length > 0 ? ("\n" + n.desc) : "") + generateMetadata(n) + "\n\n");
-        });
+        }
+        ;
         var markdown = convert(node);
-        node.eachNode(function (n) {
+        node.eachSubNode(function (i, n) {
             markdown = markdown + convert(n);
         });
         return markdown;
@@ -213,14 +221,7 @@ var DNodeView_InplaceEdit = function (self) {
             var heads = lines[0].trim().split(/\s+/);
             var body = lines.slice(1).join("\n").trim().split("\n");
             var parsedBody = parseNodeBody(body);
-            var node = {
-                type: findMostSimilarNodeType(heads[0]),
-                name: heads[1],
-                id: heads[2],
-                description: parsedBody.description,
-                metadata: parsedBody.metadata,
-                children: []
-            };
+            var node = new DCaseNodeModel(parseInt(heads[2]), heads[1], findMostSimilarNodeType(heads[0]), parsedBody.description, parsedBody.metadata);
             nodes.push(node);
         }
         ;
@@ -255,7 +256,7 @@ var DNodeView_InplaceEdit = function (self) {
         }
     }
     function updateNode(node, nodejson) {
-        var newDesc = nodejson.description;
+        var newDesc = nodejson.desc;
         var newType = nodejson.type;
         var newName = nodejson.name || newType[0] + "_" + node.id;
         var newMetadata = nodejson.metadata;
@@ -269,7 +270,7 @@ var DNodeView_InplaceEdit = function (self) {
         var node = self.node;
         var viewer = self.viewer;
         var DCase = viewer.getDCase();
-        var parent = node.parents[0];
+        var parent = node.parent;
         viewer.canMoveByKeyboard = true;
         if(nodes.length === 0) {
             if(markdown.length === 0) {
@@ -279,7 +280,7 @@ var DNodeView_InplaceEdit = function (self) {
                     closeInplace();
                 } else {
                     DCase.setDescription(node, "");
-                    node.eachNode(function (n) {
+                    node.eachSubNode(function (i, n) {
                         DCase.removeNode(n);
                     });
                 }
@@ -296,7 +297,7 @@ var DNodeView_InplaceEdit = function (self) {
             var idIndexTable = {
             };
             var ch = 0, co = 0;
-            node.eachNode(function (n) {
+            node.eachSubNode(function (i, n) {
                 idNodeTable[n.id] = n;
                 if(n.isContext) {
                     idIndexTable[n.id] = co++;
@@ -319,7 +320,7 @@ var DNodeView_InplaceEdit = function (self) {
                     delete idNodeTable[id];
                     (newNode.isContext ? newContexts : newChildren).push(newNode);
                 } else if(node.isTypeApendable(nd.type)) {
-                    var newNode = DCase.insertNode(node, nd.type, nd.description, nd.metadata);
+                    var newNode = DCase.insertNode(node, nd.type, nd.desc, nd.metadata);
                     treeChanged = true;
                     (newNode.isContext ? newContexts : newChildren).push(newNode);
                 }
@@ -362,8 +363,9 @@ var DNodeView_InplaceEdit = function (self) {
     self.startInplaceEdit = function () {
         showInplace();
     };
-};
-var DNodeView_ToolBox = function (self) {
+}
+;
+function DNodeView_ToolBox(self) {
     var edit_lock = false;
     var edit_hover = false;
     var edit_active = false;
@@ -511,7 +513,7 @@ var DNodeView_ToolBox = function (self) {
                     }
                 }
             });
-            if(self.node.parents.length != 0) {
+            if(self.node.parent != null) {
                 $menu.find("#ml-delete").click(function (e) {
                     e.preventDefault();
                     self.viewer.getDCase().removeNode(self.node);
@@ -555,8 +557,9 @@ var DNodeView_ToolBox = function (self) {
     }, function () {
         showToolbox(false);
     });
-};
-var DNodeView_ToolBox_uneditable = function (self) {
+}
+;
+function DNodeView_ToolBox_uneditable(self) {
     var $toolbox = null;
     function showToolbox(visible) {
         if(visible) {
@@ -606,4 +609,5 @@ var DNodeView_ToolBox_uneditable = function (self) {
     }, function () {
         showToolbox(false);
     });
-};
+}
+;

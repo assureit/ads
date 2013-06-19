@@ -1,50 +1,52 @@
+var PropertyAdapter = (function () {
+    function PropertyAdapter(get, set) {
+        this.get = get;
+        this.set = set;
+    }
+    return PropertyAdapter;
+})();
+var MoveTask = (function () {
+    function MoveTask(key, from, to, target) {
+        this.key = key;
+        this.from = from;
+        this.to = to;
+        this.target = target;
+    }
+    return MoveTask;
+})();
 var Animation = (function () {
     function Animation() {
         this.moveList = [];
         this.fadeInList = [];
         this.fadeOutList = [];
     }
-    function getAttrSetter(dom) {
+    Animation.prototype.getAttrSetter = function (dom) {
         if(dom.setAttribute != null) {
-            return {
-                set: function (key, value) {
-                    dom.setAttribute(key, value);
-                },
-                get: function (key) {
-                    return dom.getAttribute(key);
-                }
-            };
+            return new PropertyAdapter(function (key) {
+                return dom.getAttribute(key);
+            }, function (key, value) {
+                dom.setAttribute(key, value);
+            });
         } else if(dom.css != undefined) {
-            return {
-                set: function (key, value) {
-                    dom.css(key, value);
-                },
-                get: function (key) {
-                    return dom.css(key);
-                }
-            };
+            return new PropertyAdapter(function (key) {
+                return dom.css(key);
+            }, function (key, value) {
+                dom.css(key, value);
+            });
         } else {
-            return {
-                set: function (key, value) {
-                    dom[key] = value;
-                },
-                get: function (key) {
-                    return dom[key];
-                }
-            };
+            return new PropertyAdapter(function (key) {
+                return dom[key];
+            }, function (key, value) {
+                dom[key] = value;
+            });
         }
-    }
+    };
     Animation.prototype.move = function (dom, key, toValue) {
-        var mtd = getAttrSetter(dom);
-        var fromValue = parseInt(mtd.get(key));
+        var target = this.getAttrSetter(dom);
+        var fromValue = target.get(key);
         toValue = Math.floor(toValue);
         if(fromValue != toValue) {
-            this.moveList.push({
-                key: key,
-                from: fromValue,
-                to: toValue,
-                set: mtd.set
-            });
+            this.moveList.push(new MoveTask(key, fromValue, toValue, target));
         }
         return this;
     };
@@ -63,42 +65,42 @@ var Animation = (function () {
         }
     };
     Animation.prototype.show = function (dom, visible) {
-        var mtd = getAttrSetter(dom);
-        var disp = mtd.get("display");
+        var target = this.getAttrSetter(dom);
+        var disp = target.get("display");
         if(disp == null) {
-            mtd.set("display", visible ? "block" : "none");
+            target.set("display", visible ? "block" : "none");
         } else if(disp == "none" && visible) {
-            this.fadeInList.push(mtd.set);
-            mtd.set("opacity", 0.0);
-            mtd.set("display", "block");
+            this.fadeInList.push(target);
+            target.set("opacity", 0.0);
+            target.set("display", "block");
         } else if(disp == "block" && !visible) {
-            this.fadeOutList.push(mtd.set);
-            mtd.set("opacity", 1.0);
-            mtd.set("display", "block");
+            this.fadeOutList.push(target);
+            target.set("opacity", 1.0);
+            target.set("display", "block");
         }
         return this;
     };
     Animation.prototype.anime = function (r) {
         $.each(this.moveList, function (i, e) {
-            e.set(e.key, e.from + (e.to - e.from) * r);
+            e.target.set(e.key, e.from + (e.to - e.from) * r);
         });
         $.each(this.fadeInList, function (i, e) {
-            e("opacity", r);
+            e.set("opacity", r);
         });
         $.each(this.fadeOutList, function (i, e) {
-            e("opacity", 1.0 - r);
+            e.set("opacity", 1.0 - r);
         });
     };
     Animation.prototype.animeFinish = function () {
         $.each(this.moveList, function (i, e) {
-            e.set(e.key, e.to);
+            e.target.set(e.key, e.to);
         });
         $.each(this.fadeInList, function (i, e) {
-            e("opacity", 1.0);
+            e.set("opacity", 1.0);
         });
         $.each(this.fadeOutList, function (i, e) {
-            e("opacity", 1.0);
-            e("display", "none");
+            e.set("opacity", 1.0);
+            e.set("display", "none");
         });
     };
     return Animation;
