@@ -140,7 +140,7 @@ class PointerHandler {
 			this.pointers = e.getPointerList();
 			var mainPointer = this.getMainPointer();
 			if (this.mainPointerId && !mainPointer) {
-				this.dragEnd(this.viewer);
+				this.dragEnd(this.viewer.rootview);
 				this.mainPointerId = null;
 			}
 		};

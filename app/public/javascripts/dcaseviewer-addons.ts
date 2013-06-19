@@ -180,7 +180,7 @@ function parseMetaData(data: string[]): any {
 	return metadata;
 }
 
-function generateMetadata(n): string {
+function generateMetadata(n): any { //FIXME return type is string or Array?
 	var metadata: any = n.metadata;
 	var list = [];
 	for (var i = 0; i < metadata.length; i++) {
@@ -247,7 +247,7 @@ function DNodeView_InplaceEdit(self): void {
 			var parsedBody: any = parseNodeBody(body);
 
 			var node: DCaseNodeModel = new DCaseNodeModel(
-				heads[2],
+				parseInt(heads[2]),
 				heads[1],
 				findMostSimilarNodeType(heads[0]),
 				parsedBody.description,

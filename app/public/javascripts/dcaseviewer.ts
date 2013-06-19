@@ -6,8 +6,8 @@
 ///<reference path='./handler.ts'/>
 ///<reference path='./color.ts'/>
 
-interface DCaseViewerAddon {}
-interface DNodeViewAddon {}
+//interface DCaseViewerAddon {}
+//interface DNodeViewAddon {} //FIXME
 interface DCaseTheme {
 	selected: string;
 	hovered: string;
@@ -45,15 +45,11 @@ class DCaseViewer {
 	rootview  :DNodeView= null;
 	clipboard :DCaseNodeModel= null;
 	dcase_latest   : any;
-<<<<<<< HEAD
 	handler   :PointerHandler = null;
-
-=======
 	colorSets: ColorSets;
-	
->>>>>>> client_porting_typescript
-	viewer_addons   : DCaseViewerAddon[] = [];
-	nodeview_addons : DNodeViewAddon[]   = [];
+
+	viewer_addons   : any[] = [];
+	nodeview_addons : any[]   = [];
 
 	$root;
 	$svg;

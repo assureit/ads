@@ -9,7 +9,7 @@ class DCaseMetaContent {
 		}
 }
 
-class DCaseNodeRawData {
+interface DCaseNodeRawData {
 	/* TODO Needs to merge into DCaseNodeModel class */
 	ThisNodeId: number;
 	NodeType: string;
@@ -213,6 +213,12 @@ class DCaseNodeModel {
 	}
 }
 
+interface DCaseTreeRawData {
+	NodeList: DCaseNodeRawData[];
+	TopGoalId: number;
+	NodeCount: number;
+}
+
 class DCaseTree {   //FIXME
 	NodeList: DCaseNodeModel[];
 	TopGoalId: number;
@@ -235,7 +241,7 @@ class DCaseModel {
 	typeCount: any;
 	view: any;  //FIXME
 
-	constructor(tree: DCaseTree, argId: number, commitId: number) { 
+	constructor(tree: DCaseTreeRawData, argId: number, commitId: number) { 
 		this.node = null;
 		this.commitId = commitId;
 		this.argId = argId;
@@ -252,7 +258,7 @@ class DCaseModel {
 		this.decode(tree);
 	}
 
-	decode(tree: DCaseTree): void {
+	decode(tree: DCaseTreeRawData): void {
 		// function contextParams(params) {
 		// var s = "";
 		// for(key in params) {
@@ -275,7 +281,7 @@ class DCaseModel {
 			var desc: string = data.Description;
 			//var metadata: DCaseMetaContent[] = data.metadata ? data.metadata : null;
 			var metadata: DCaseMetaContent[] = null; /* TODO Handle metadata */
-			var metadata_raw: any = data.metadata;
+			var metadata_raw: any = data.Metadata;
 			if (metadata_raw instanceof Array) {
 				metadata = metadata_raw;
 			} else if (metadata_raw != null) {

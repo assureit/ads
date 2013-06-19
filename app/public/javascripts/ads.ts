@@ -134,7 +134,7 @@ class ADS {
 
 			// show DCase
 			var r:any = DCaseAPI.getDCase(dcaseId);
-			var tree = <DCaseTree>JSON.parse(r.contents);
+			var tree = <DCaseTreeRawData>JSON.parse(r.contents);
 			var dcase = new DCaseModel(tree, dcaseId, r.commitId);
 			this.viewer.setDCase(dcase);
 			this.timelineView.repaint(dcase);

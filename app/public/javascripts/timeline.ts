@@ -21,6 +21,7 @@ class TimeLine {
 	NY: number = 30;
 
 	argument: any = null;   //FIXME
+	onDCaseSelected: (dcaseId: any, commitId: any, isLatest: any) => bool;
 
 
 	constructor($root: string) {
@@ -64,11 +65,6 @@ class TimeLine {
 	}
 
 	//-------------------------------------------------------
-
-	//onDCaseSelected(dcaseId: any, commitId: any, isLatest: any) : bool {
-	//	var dcase = vi
-	//	return true;
-	//}//FIXME
 
 	repaint(arg) {
 		this.argument = arg;
@@ -130,8 +126,7 @@ class TimeLine {
 		this.drag();
 	}
 
-//	visible(b: bool): void {
-	visible(b: bool): void {
+	visible(b?: bool): void {
 		if(b == null) {
 		this.visibleFlag = !this.visibleFlag;
 		} else {

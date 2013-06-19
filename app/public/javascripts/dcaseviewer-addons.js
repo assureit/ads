@@ -221,7 +221,7 @@ function DNodeView_InplaceEdit(self) {
             var heads = lines[0].trim().split(/\s+/);
             var body = lines.slice(1).join("\n").trim().split("\n");
             var parsedBody = parseNodeBody(body);
-            var node = new DCaseNodeModel(heads[2], heads[1], findMostSimilarNodeType(heads[0]), parsedBody.description, parsedBody.metadata);
+            var node = new DCaseNodeModel(parseInt(heads[2]), heads[1], findMostSimilarNodeType(heads[0]), parsedBody.description, parsedBody.metadata);
             nodes.push(node);
         }
         ;
