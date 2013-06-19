@@ -26,7 +26,6 @@ var PointerHandler = (function () {
         this.root.mousewheel(this.onWheel);
     }
     PointerHandler.prototype.dragStart = function (x, y) {
-        console.log("dragStart");
         if(this.viewer.rootview == null) {
             return;
         }
@@ -37,7 +36,6 @@ var PointerHandler = (function () {
         this.viewer.repaintAll(0);
     };
     PointerHandler.prototype.drag = function (x, y) {
-        console.log("drag");
         var dx = (x - this.x0);
         var dy = (y - this.y0);
         if(dx != 0 || dy != 0) {
@@ -47,7 +45,6 @@ var PointerHandler = (function () {
         }
     };
     PointerHandler.prototype.dragCancel = function () {
-        console.log("dragCansel");
         this.viewer.shiftX += this.viewer.dragX;
         this.viewer.shiftY += this.viewer.dragY;
         this.viewer.dragX = 0;
@@ -55,7 +52,6 @@ var PointerHandler = (function () {
         this.viewer.repaintAll(0);
     };
     PointerHandler.prototype.dragEnd = function (view) {
-        console.log("dragEnd");
         if(this.viewer.dragX == 0 && this.viewer.dragY == 0) {
             this.viewer.setSelectedNode(view);
         } else {

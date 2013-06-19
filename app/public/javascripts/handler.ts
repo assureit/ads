@@ -57,7 +57,6 @@ class PointerHandler {
 	}
 
 	dragStart(x: number, y: number): void {
-		console.log("dragStart");
 		if (this.viewer.rootview == null) return;
 		this.x0 = x;
 		this.y0 = y;
@@ -72,7 +71,6 @@ class PointerHandler {
 	}
 
 	drag(x: number, y: number): void {
-		console.log("drag");
 		var dx = (x - this.x0);
 		var dy = (y - this.y0);
 		if (dx != 0 || dy != 0) {
@@ -83,7 +81,6 @@ class PointerHandler {
 	}
 
 	dragCancel(): void {
-		console.log("dragCansel");
 		this.viewer.shiftX += this.viewer.dragX;
 		this.viewer.shiftY += this.viewer.dragY;
 		this.viewer.dragX = 0;
@@ -92,7 +89,6 @@ class PointerHandler {
 	}
 
 	dragEnd(view): void {
-		console.log("dragEnd");
 		if (this.viewer.dragX == 0 && this.viewer.dragY == 0) {
 			this.viewer.setSelectedNode(view);
 		} else {
