@@ -7,7 +7,7 @@ class TimeLine {
 	$timeline: any;  //FIXME
 	$canvas: any;    //FIXME
 	$container: any; //FIXME
-	$title : any = $("<div></div>"); //FIXME
+	titleString : string = "";//FIXME
 
 	visibleFlag: bool = false;
 	scrollX: number = 0;
@@ -24,18 +24,19 @@ class TimeLine {
 
 
 	constructor($root: string) {
-		this.$timeline = $("<div></div>")    //FIXME
+		this.titleString = "<div></div>";
+		this.$timeline = $(this.titleString)    //FIXME
 			.addClass("timeline")
 			.css("display", "none")
 			.appendTo($root);
 		this.$canvas = $("<canvas></canvas>")
 			.css("position", "absolute")
 			.appendTo(this.$timeline);
-		this.$container = $("<div></div>").css({
+		this.$container = $(this.titleString).css({
 			position: "absolute", left: 0, top: 0,
 		}).appendTo(this.$timeline);
 
-		this.$title
+		$(this.titleString)
 			.addClass("timeline-title")
 			.html("Commit History")
 			.appendTo(this.$timeline);
@@ -64,9 +65,10 @@ class TimeLine {
 
 	//-------------------------------------------------------
 
-	onDCaseSelected(dcaseId: any, commitId: any, isLatest: any) : bool {
-		return true;
-	}//FIXME
+	//onDCaseSelected(dcaseId: any, commitId: any, isLatest: any) : bool {
+	//	var dcase = vi
+	//	return true;
+	//}//FIXME
 
 	repaint(arg) {
 		this.argument = arg;
@@ -129,12 +131,12 @@ class TimeLine {
 	}
 
 //	visible(b: bool): void {
-	visible(): void {
-//		if(b == null) {
+	visible(b: bool): void {
+		if(b == null) {
 		this.visibleFlag = !this.visibleFlag;
-//		} else {
-//			this.visibleFlag = b;
-//		}
+		} else {
+			this.visibleFlag = b;
+		}
 		this.$timeline.css("display", this.visibleFlag ? "block" : "none");
 	}
 
@@ -180,7 +182,7 @@ class TimeLine {
 	}
 
 	addCommitMark(x: number, y: number, list: any, commitId: number): void {    //FIXME
-		var $d: any = this.$title.css({
+		var $d: any = $(this.titleString).css({
 			left: x, top: y, width: this.MX, height: this.MY,
 		}).addClass("timeline-commit").appendTo(this.$container);
 
@@ -229,13 +231,13 @@ class TimeLineView {
 
 		this.timeline.onDCaseSelected = (dcaseId, commitId, isLatest) => {
 			var dcase = viewer.getDCase();
-			var dcase_latest = dcase;
+			//var dcase_latest = dcase;
 			if(dcase != null && dcase.isChanged()) {
-				dcase_latest = dcase;
+				viewer.dcase_latest = dcase;
 			}
 			viewer.editable = isLatest && isLogin;//FIXME
-			if(isLatest && dcase_latest != null) {
-				viewer.setDCase(dcase_latest);
+			if(isLatest && viewer.dcase_latest != null) {
+				viewer.setDCase(viewer.dcase_latest);
 			} else {
 				var tree = (<any>DCaseAPI).getNodeTree(commitId);
 				viewer.setDCase(new DCaseModel(tree, dcaseId, commitId));

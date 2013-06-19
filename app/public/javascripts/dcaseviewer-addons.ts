@@ -228,7 +228,7 @@ function DNodeView_InplaceEdit(self): void {
 		};
 
 		var markdown: string = convert(node);
-		node.eachSubNode((n: any) => {
+		node.eachSubNode((i: number, n: DCaseNodeModel) => {
 			markdown = markdown + convert(n);
 		});
 		return markdown;
@@ -317,7 +317,7 @@ function DNodeView_InplaceEdit(self): void {
 					closeInplace();
 				}else{
 					DCase.setDescription(node, "");
-					node.eachSubNode((n) => {
+					node.eachSubNode((i: number, n: DCaseNodeModel) => {
 						DCase.removeNode(n);
 					});
 				}
@@ -336,7 +336,7 @@ function DNodeView_InplaceEdit(self): void {
 			var idIndexTable: any = {};
 
 			var ch: number = 0, co: number = 0;
-			node.eachSubNode((n) => {
+			node.eachSubNode((i: number, n: DCaseNodeModel) => {
 				idNodeTable[n.id] = n;
 				if(n.isContext){
 					idIndexTable[n.id] = co++;

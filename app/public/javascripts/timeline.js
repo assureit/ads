@@ -1,7 +1,7 @@
 var TimeLine = (function () {
     function TimeLine($root) {
         var _this = this;
-        this.$title = $("<div></div>");
+        this.titleString = "";
         this.visibleFlag = false;
         this.scrollX = 0;
         this.mouseX = null;
@@ -12,14 +12,15 @@ var TimeLine = (function () {
         this.NX = 50;
         this.NY = 30;
         this.argument = null;
-        this.$timeline = $("<div></div>").addClass("timeline").css("display", "none").appendTo($root);
+        this.titleString = "<div></div>";
+        this.$timeline = $(this.titleString).addClass("timeline").css("display", "none").appendTo($root);
         this.$canvas = $("<canvas></canvas>").css("position", "absolute").appendTo(this.$timeline);
-        this.$container = $("<div></div>").css({
+        this.$container = $(this.titleString).css({
             position: "absolute",
             left: 0,
             top: 0
         }).appendTo(this.$timeline);
-        this.$title.addClass("timeline-title").html("Commit History").appendTo(this.$timeline);
+        $(this.titleString).addClass("timeline-title").html("Commit History").appendTo(this.$timeline);
         this.$timeline.mousedown(function (e) {
             _this.mouseX = e.pageX;
         });
@@ -36,9 +37,6 @@ var TimeLine = (function () {
             _this.drag();
         });
     }
-    TimeLine.prototype.onDCaseSelected = function (dcaseId, commitId, isLatest) {
-        return true;
-    };
     TimeLine.prototype.repaint = function (arg) {
         this.argument = arg;
         this.$container.empty();
@@ -86,8 +84,12 @@ var TimeLine = (function () {
         this.scrollX = (this.$timeline.width() - b.w) / 2;
         this.drag();
     };
-    TimeLine.prototype.visible = function () {
-        this.visibleFlag = !this.visibleFlag;
+    TimeLine.prototype.visible = function (b) {
+        if(b == null) {
+            this.visibleFlag = !this.visibleFlag;
+        } else {
+            this.visibleFlag = b;
+        }
         this.$timeline.css("display", this.visibleFlag ? "block" : "none");
     };
     TimeLine.prototype.drag = function () {
@@ -133,7 +135,7 @@ var TimeLine = (function () {
     };
     TimeLine.prototype.addCommitMark = function (x, y, list, commitId) {
         var _this = this;
-        var $d = this.$title.css({
+        var $d = $(this.titleString).css({
             left: x,
             top: y,
             width: this.MX,
@@ -176,13 +178,12 @@ var TimeLineView = (function () {
         });
         this.timeline.onDCaseSelected = function (dcaseId, commitId, isLatest) {
             var dcase = viewer.getDCase();
-            var dcase_latest = dcase;
             if(dcase != null && dcase.isChanged()) {
-                dcase_latest = dcase;
+                viewer.dcase_latest = dcase;
             }
             viewer.editable = isLatest && isLogin;
-            if(isLatest && dcase_latest != null) {
-                viewer.setDCase(dcase_latest);
+            if(isLatest && viewer.dcase_latest != null) {
+                viewer.setDCase(viewer.dcase_latest);
             } else {
                 var tree = (DCaseAPI).getNodeTree(commitId);
                 viewer.setDCase(new DCaseModel(tree, dcaseId, commitId));
