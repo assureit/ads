@@ -3,6 +3,7 @@
 ///<reference path='./animation.ts'/>
 ///<reference path='./gsnshape.ts'/>
 ///<reference path='./dnode.ts'/>
+///<reference path='./color.ts'/>
 
 interface DCaseViewerAddon {}
 interface DNodeViewAddon {}
@@ -43,6 +44,7 @@ class DCaseViewer {
 	rootview  :DNodeView= null;
 	clipboard :DCaseNodeModel= null;
 	dcase_latest   : any;
+	colorSets: ColorSets;
 	
 	viewer_addons   : DCaseViewerAddon[] = [];
 	nodeview_addons : DNodeViewAddon[]   = [];
@@ -74,6 +76,16 @@ class DCaseViewer {
 		this.$dom = $("<div></div>")
 			.css("position", "absolute")
 			.appendTo(this.$root);
+
+		//------------------------------------
+
+		this.colorSets = new ColorSets(this);
+		this.colorSets.createDropMenu();
+		// change color theme
+		var name = document.cookie.match(/colorTheme=(\w+);?/);
+		if(name != null) {
+			this.setColorTheme(this.colorSets.get(name[1]));
+		}
 
 		//------------------------------------
 
@@ -203,33 +215,6 @@ class DCaseViewer {
 		alert("");
 	}
 	
-	default_colorTheme = {
-		stroke: {
-			"Goal"    : "none",
-			"Context" : "none",
-			"Subject" : "none",
-			"Strategy": "none",
-			"Evidence": "none",
-			"Solution": "none",
-			"Rebuttal": "none",
-			"Monitor" : "none",
-		},
-		fill: {
-			"Goal"    : "#E0E0E0",
-			"Context" : "#C0C0C0",
-			"Subject" : "#C0C0C0",
-			"Strategy": "#B0B0B0",
-			"Evidence": "#D0D0D0",
-			"Solution": "#D0D0D0",
-			"Rebuttal": "#EEAAAA",
-			"Monitor" : "#D0D0D0",
-		},
-		selected: "#F08080",
-		hovered : "#8080F0",
-	}
-	
-	colorTheme = this.default_colorTheme;
-
 	//-----------------------------------------------------------------------------
 
 	getDCase(): DCaseModel {
@@ -334,9 +319,9 @@ class DCaseViewer {
 	
 	setColorTheme(theme: DCaseTheme) {
 		if(theme != null) {
-			this.colorTheme = theme;
+			this.colorSets.colorTheme = theme;
 		} else {
-			delete this.colorTheme;
+			delete this.colorSets.colorTheme;
 		}
 		this.location_updated = true;
 		this.repaintAll();
@@ -657,13 +642,13 @@ class DNodeView {
 	updateColor() {
 		var stroke;
 		if(this.selected) {
-			stroke = this.viewer.colorTheme.selected;
+			stroke = this.viewer.colorSets.colorTheme.selected;
 		} else if(this.hovered) {
-			stroke = this.viewer.colorTheme.hovered;
+			stroke = this.viewer.colorSets.colorTheme.hovered;
 		} else {
-			stroke = this.viewer.colorTheme.stroke[this.node.type];
+			stroke = this.viewer.colorSets.colorTheme.stroke[this.node.type];
 		}
-		var fill = this.viewer.colorTheme.fill[this.node.type];
+		var fill = this.viewer.colorSets.colorTheme.fill[this.node.type];
 		this.svg[0].setAttribute("stroke", stroke);
 		this.svg[0].setAttribute("fill", fill);
 	}

@@ -132,15 +132,6 @@ class ADS {
 			});
 			var searchView = new SearchView(this.viewer);
 
-			var colorSets = new ColorSets(this.viewer);
-			colorSets.init();
-			colorSets.createDropMenu();
-			// change color theme
-			var name = document.cookie.match(/colorTheme=(\w+);?/);
-			if(name != null) {
-				this.viewer.setColorTheme(colorSets.get(name[1]));
-			}
-
 			// show DCase
 			var r:any = DCaseAPI.getDCase(dcaseId);
 			var tree = <DCaseTree>JSON.parse(r.contents);

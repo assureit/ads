@@ -60,13 +60,6 @@ var ADS = (function () {
                 }
             });
             var searchView = new SearchView(_this.viewer);
-            var colorSets = new ColorSets(_this.viewer);
-            colorSets.init();
-            colorSets.createDropMenu();
-            var name = document.cookie.match(/colorTheme=(\w+);?/);
-            if(name != null) {
-                _this.viewer.setColorTheme(colorSets.get(name[1]));
-            }
             var r = DCaseAPI.getDCase(dcaseId);
             var tree = JSON.parse(r.contents);
             var dcase = new DCaseModel(tree, dcaseId, r.commitId);
