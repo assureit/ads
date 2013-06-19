@@ -36,6 +36,8 @@ app.configure('production', function() {
 
 app.post('/api/1.0', api.httpHandler);
 app.get('/', client.index);
+app.get('/new', client.index);
+app.get('/dcase/:id', client.index);
 
 if (!module.parent) {
 	http.createServer(app).listen(app.get('port'), function(){

@@ -7,19 +7,15 @@ var subRouter = (function () {
 })();
 var Router = (function () {
     function Router() {
+        var _this = this;
         this.table = {
         };
-        var self = this;
-        if("onhashchange" in window) {
-            window.onhashchange = function () {
-                var hash = self.parseParameters(window.location.hash.slice(1));
-                if(hash.name in self.table) {
-                    self.table[hash.name](hash.args[0]);
-                } else {
-                    window.location.hash = "";
-                }
-            };
-        }
+        this.onChange = function () {
+            var hash = _this.parseParameters(window.location.pathname);
+            if(hash.name in _this.table) {
+                _this.table[hash.name](hash.args[0]);
+            }
+        };
     }
     Router.prototype.parseParameters = function (hash) {
         var params = hash.split("/").filter(function (it) {
@@ -36,7 +32,7 @@ var Router = (function () {
         this.table[name] = callback;
     };
     Router.prototype.start = function () {
-        (window).onhashchange();
+        this.onChange();
     };
     return Router;
 })();

@@ -11,6 +11,7 @@ class subRouter{
 
 class Router{
 	table: { [key : string ] : (args :string)=>void;};
+	onChange: ()=>void;
 	parseParameters(hash : string) {
 
 		var params: string[] = hash.split("/").filter(function(it){ return it != ""});
@@ -22,17 +23,24 @@ class Router{
 
 	constructor() {
 		this.table = {};
-		var self = this;
-		if ("onhashchange" in window) { //FIXME
-			window.onhashchange = function () {
-				var hash : subRouter = self.parseParameters(window.location.hash.slice(1));
-				if(hash.name in self.table) {
-					self.table[hash.name](hash.args[0]);
-				} else {
-					window.location.hash = "";
-				}
-			};
-		}
+		this.onChange = () => {
+			var hash : subRouter = this.parseParameters(window.location.pathname);
+			if(hash.name in this.table) {
+				this.table[hash.name](hash.args[0]);
+			}
+		};
+
+		//var self = this;
+		//if ("onhashchange" in window) { //FIXME
+		//	window.onhashchange = function () {
+		//		var hash : subRouter = self.parseParameters(window.location.hash.slice(1));
+		//		if(hash.name in self.table) {
+		//			self.table[hash.name](hash.args[0]);
+		//		} else {
+		//			window.location.hash = "";
+		//		}
+		//	};
+		//}
 	}
 
 	route(router, name : string, callback : (args :string)=>void) : void {
@@ -40,6 +48,6 @@ class Router{
 	};
 
 	start() : void {
-		(<any>window).onhashchange();
+		this.onChange();
 	};
 };
