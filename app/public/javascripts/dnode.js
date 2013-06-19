@@ -242,14 +242,15 @@ var DCaseModel = (function () {
         var node = this.node;
         node.traverse(function (i, v) {
             var c = [];
-            node.eachSubNode(function (i, v) {
-                c.push(node.id);
+            v.eachSubNode(function (i, v) {
+                console.log(v.id);
+                c.push(v.id);
             });
             tl.push({
-                ThisNodeId: node.id,
-                NodeType: node.type,
-                Description: node.desc,
-                Metadata: node.metadata,
+                ThisNodeId: v.id,
+                NodeType: v.type,
+                Description: v.desc,
+                Metadata: v.metadata,
                 Children: c
             });
         });

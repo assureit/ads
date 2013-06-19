@@ -300,14 +300,15 @@ class DCaseModel {
 		var node: DCaseNodeModel = this.node;
 		node.traverse((i, v) => {
 			var c: any = [];
-			node.eachSubNode((i, v) => {
-				c.push(node.id);
+			v.eachSubNode((i, v) => {
+				console.log(v.id);
+				c.push(v.id);
 			});
 			tl.push({
-				ThisNodeId: node.id,
-				NodeType: node.type,
-				Description: node.desc,
-				Metadata: node.metadata,
+				ThisNodeId: v.id,
+				NodeType: v.type,
+				Description: v.desc,
+				Metadata: v.metadata,
 				Children: c
 			});
 		});
