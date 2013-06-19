@@ -31,6 +31,7 @@ var DCaseViewer = (function () {
         this.selectedNode = null;
         this.rootview = null;
         this.clipboard = null;
+        this.handler = null;
         this.viewer_addons = [];
         this.nodeview_addons = [];
         this.canMoveByKeyboard = true;
@@ -66,7 +67,7 @@ var DCaseViewer = (function () {
             height: "100%"
         }).appendTo(this.$root);
         this.$svg = $(document.createElementNS(SVG_NS, "g")).attr("transform", "translate(0, 0)").appendTo($svgroot);
-        this.$dummyDivForPointer = $("<div>").css({
+        this.$dummyDivForPointer = $("<div></div>").css({
             width: "100%",
             height: "100%",
             position: "absolute",
@@ -220,6 +221,7 @@ var DCaseViewer = (function () {
         });
     }
     DCaseViewer.prototype.addEventHandler = function () {
+        this.handler = new PointerHandler(this);
     };
     DCaseViewer.prototype.dragEnd = function (view) {
     };

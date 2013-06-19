@@ -49,14 +49,15 @@ class PointerHandler {
 		this.root = viewer.$dummyDivForPointer;
 		this.scale0 = this.viewer.scale;
 
-		this.root[0].addEventListener("pointerdown", this.onPointerDown, false);
-		this.root[0].addEventListener("pointermove", this.onPointerMove, false);
-		this.root[0].addEventListener("pointerup", this.onPointerUp, false);
-		this.root[0].addEventListener("gesturescale", this.onScale, false);
+		this.root[0].addEventListener("pointerdown", this.onPointerDown(), false);
+		this.root[0].addEventListener("pointermove", this.onPointerMove(), false);
+		this.root[0].addEventListener("pointerup", this.onPointerUp(), false);
+		this.root[0].addEventListener("gesturescale", this.onScale(), false);
 		this.root.mousewheel(this.onWheel);
 	}
 
 	dragStart(x: number, y: number): void {
+		console.log("dragStart");
 		if (this.viewer.rootview == null) return;
 		this.x0 = x;
 		this.y0 = y;
@@ -71,6 +72,7 @@ class PointerHandler {
 	}
 
 	drag(x: number, y: number): void {
+		console.log("drag");
 		var dx = (x - this.x0);
 		var dy = (y - this.y0);
 		if (dx != 0 || dy != 0) {
@@ -81,6 +83,7 @@ class PointerHandler {
 	}
 
 	dragCancel(): void {
+		console.log("dragCansel");
 		this.viewer.shiftX += this.viewer.dragX;
 		this.viewer.shiftY += this.viewer.dragY;
 		this.viewer.dragX = 0;
@@ -89,6 +92,7 @@ class PointerHandler {
 	}
 
 	dragEnd(view): void {
+		console.log("dragEnd");
 		if (this.viewer.dragX == 0 && this.viewer.dragY == 0) {
 			this.viewer.setSelectedNode(view);
 		} else {
@@ -109,40 +113,46 @@ class PointerHandler {
 		return null;
 	}
 
-	onPointerDown(e: PointerEvent): void {
-		this.pointers = e.getPointerList();
-		e.preventDefault();
-		this.scale0 = this.viewer.scale;
+	onPointerDown(): (e: PointerEvent) => void {
+		return (e: PointerEvent) => {
+			this.pointers = e.getPointerList();
+			e.preventDefault();
+			this.scale0 = this.viewer.scale;
+		}
 	}
 
-	onPointerMove(e: PointerEvent): void {
+	onPointerMove(): (e: PointerEvent) => void {
 		// Prevent the browser from doing its default thing (scroll, zoom)
-		e.preventDefault();
-		this.pointers = e.getPointerList();
-		if (!this.mainPointerId && this.pointers.length > 0) {
-			var mainPointer = this.pointers[0];
-			this.mainPointerId = mainPointer.identifier;
-			this.dragStart(mainPointer.pageX, mainPointer.pageY);
-		} else {
-			var mainPointer = this.getMainPointer();
-			if (mainPointer) {
-				this.drag(mainPointer.pageX, mainPointer.pageY);
+		return (e: PointerEvent) => {
+			e.preventDefault();
+			this.pointers = e.getPointerList();
+			if (!this.mainPointerId && this.pointers.length > 0) {
+				var mainPointer = this.pointers[0];
+				this.mainPointerId = mainPointer.identifier;
+				this.dragStart(mainPointer.pageX, mainPointer.pageY);
+			} else {
+				var mainPointer = this.getMainPointer();
+				if (mainPointer) {
+					this.drag(mainPointer.pageX, mainPointer.pageY);
+				}
 			}
-		}
+		};
 	}
 
-	onPointerUp(e: PointerEvent): void {
-		this.pointers = e.getPointerList();
-		var mainPointer = this.getMainPointer();
-		if (this.mainPointerId && !mainPointer) {
-			this.viewer.dragEnd(this.viewer);
-			this.mainPointerId = null;
-		}
+	onPointerUp(): (e: PointerEvent) => void {
+		return (e: PointerEvent) => {
+			this.pointers = e.getPointerList();
+			var mainPointer = this.getMainPointer();
+			if (this.mainPointerId && !mainPointer) {
+				this.viewer.dragEnd(this.viewer);
+				this.mainPointerId = null;
+			}
+		};
 	}
 
 	getRect(): ClientRect {
 		return (<HTMLElement>this.root[0]).getBoundingClientRect();
-	};
+	}
 
 	setScale(cx: number, cy: number, b: number): void {
 		//console.log("{" + cx + ", " + cy + "} , x"+b);
@@ -153,22 +163,26 @@ class PointerHandler {
 		var x = x1 - (x1 - this.viewer.shiftX) * b;
 		var y = y1 - (y1 - this.viewer.shiftY) * b;
 		this.viewer.setLocation(x, y, scale, 0);
-	};
+	}
 
-	onScale(e: GestureScaleEvent): void {
-		e.preventDefault();
-		e.stopPropagation();
-		if (this.viewer.moving) return;
-		var b = e.scale * this.scale0 / this.viewer.scale;
-		this.setScale(e.centerX, e.centerY, b);
-	};
+	onScale(): (e: GestureScaleEvent) => void {
+		return (e: GestureScaleEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
+			if (this.viewer.moving) return;
+			var b = e.scale * this.scale0 / this.viewer.scale;
+			this.setScale(e.centerX, e.centerY, b);
+		};
+	}
 
-	onWheel(e: MouseEvent, delta: number): void {
-		e.preventDefault();
-		e.stopPropagation();
-		if (this.viewer.moving) return;
-		var b = 1.0 + delta * 0.04;
-		this.setScale(e.pageX, e.pageY, b);
+	onWheel(): (e: MouseEvent, delta: number) => void {
+		return (e: MouseEvent, delta: number) => {
+			e.preventDefault();
+			e.stopPropagation();
+			if (this.viewer.moving) return;
+			var b = 1.0 + delta * 0.04;
+			this.setScale(e.pageX, e.pageY, b);
+		};
 	}
 }
 

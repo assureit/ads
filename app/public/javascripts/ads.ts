@@ -10,7 +10,7 @@
 class ADS {
 	TITLE_SUFFIX:   string = " - Assurance DS";
 	URL_EXPORT:     string = "cgi/view2.cgi"; //FIXME
-	URL_EXPORT_SVG: string = "cgi/svg.cgi";
+	URL_EXPORT_SVG: string = "/export";
 	viewer: DCaseViewer;
 	selectDCaseView: SelectDCaseView;
 	createDCaseView: CreateDCaseView;
@@ -123,10 +123,10 @@ class ADS {
 			this.viewer = new DCaseViewer(document.getElementById("viewer"),
 					null, this.isLogin(userId));
 			this.timelineView = new TimeLineView($body, this.viewer, this.isLogin(userId));
-			viewer.dcase_latest = null;
+			this.viewer.dcase_latest = null;
 
 			$(window).bind("beforeunload", (e)=> {
-				if(viewer.dcase_latest != null && viewer.dcase_latest.isChanged()) {
+				if(this.viewer.dcase_latest != null && this.viewer.dcase_latest.isChanged()) {
 					return "未コミットの変更があります";
 				}
 			});
@@ -147,7 +147,7 @@ class ADS {
 			var dcase = new DCaseModel(tree, dcaseId, r.commitId);
 			this.viewer.setDCase(dcase);
 			this.timelineView.repaint(dcase);
-			viewer.dcase_latest = dcase;
+			this.viewer.dcase_latest = dcase;
 			document.title = r.dcaseName + this.TITLE_SUFFIX;
 			$("#dcaseName").text(r.dcaseName);
 			this.viewer.exportSubtree = (type, root) => {

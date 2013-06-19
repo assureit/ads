@@ -3,6 +3,7 @@
 ///<reference path='./animation.ts'/>
 ///<reference path='./gsnshape.ts'/>
 ///<reference path='./dnode.ts'/>
+///<reference path='./handler.ts'/>
 
 interface DCaseViewerAddon {}
 interface DNodeViewAddon {}
@@ -43,7 +44,8 @@ class DCaseViewer {
 	rootview  :DNodeView= null;
 	clipboard :DCaseNodeModel= null;
 	dcase_latest   : any;
-	
+	handler   :PointerHandler = null;
+
 	viewer_addons   : DCaseViewerAddon[] = [];
 	nodeview_addons : DNodeViewAddon[]   = [];
 
@@ -55,7 +57,9 @@ class DCaseViewer {
 	canMoveByKeyboard: bool = true;
 
 	//TODO
-	addEventHandler() {}
+	addEventHandler() {
+		this.handler = new PointerHandler(this);
+	}
 	dragEnd(view) {}
 
 	constructor(public root: any, public dcase: DCaseModel, public editable: bool) {
@@ -68,7 +72,7 @@ class DCaseViewer {
 		this.$svg = $(document.createElementNS(SVG_NS, "g"))
 			.attr("transform", "translate(0, 0)")
 			.appendTo($svgroot);
-		this.$dummyDivForPointer = $("<div>")
+		this.$dummyDivForPointer = $("<div></div>")
 			.css({ width: "100%", height: "100%" , position: "absolute", top: "0px", left: "0px", "-ms-touch-action": "none" })
 			.appendTo(this.$root);
 		this.$dom = $("<div></div>")
@@ -82,7 +86,6 @@ class DCaseViewer {
 		});
 		this.setDCase(dcase);
 		this.addEventHandler();
-
 		this.canMoveByKeyboard = true;
 
 		$(document.body).on("keydown", (e) => {

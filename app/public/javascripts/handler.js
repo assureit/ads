@@ -19,13 +19,14 @@ var PointerHandler = (function () {
         this.viewer = viewer;
         this.root = viewer.$dummyDivForPointer;
         this.scale0 = this.viewer.scale;
-        this.root[0].addEventListener("pointerdown", this.onPointerDown, false);
-        this.root[0].addEventListener("pointermove", this.onPointerMove, false);
-        this.root[0].addEventListener("pointerup", this.onPointerUp, false);
-        this.root[0].addEventListener("gesturescale", this.onScale, false);
+        this.root[0].addEventListener("pointerdown", this.onPointerDown(), false);
+        this.root[0].addEventListener("pointermove", this.onPointerMove(), false);
+        this.root[0].addEventListener("pointerup", this.onPointerUp(), false);
+        this.root[0].addEventListener("gesturescale", this.onScale(), false);
         this.root.mousewheel(this.onWheel);
     }
     PointerHandler.prototype.dragStart = function (x, y) {
+        console.log("dragStart");
         if(this.viewer.rootview == null) {
             return;
         }
@@ -36,6 +37,7 @@ var PointerHandler = (function () {
         this.viewer.repaintAll(0);
     };
     PointerHandler.prototype.drag = function (x, y) {
+        console.log("drag");
         var dx = (x - this.x0);
         var dy = (y - this.y0);
         if(dx != 0 || dy != 0) {
@@ -45,6 +47,7 @@ var PointerHandler = (function () {
         }
     };
     PointerHandler.prototype.dragCancel = function () {
+        console.log("dragCansel");
         this.viewer.shiftX += this.viewer.dragX;
         this.viewer.shiftY += this.viewer.dragY;
         this.viewer.dragX = 0;
@@ -52,6 +55,7 @@ var PointerHandler = (function () {
         this.viewer.repaintAll(0);
     };
     PointerHandler.prototype.dragEnd = function (view) {
+        console.log("dragEnd");
         if(this.viewer.dragX == 0 && this.viewer.dragY == 0) {
             this.viewer.setSelectedNode(view);
         } else {
@@ -71,32 +75,41 @@ var PointerHandler = (function () {
         ;
         return null;
     };
-    PointerHandler.prototype.onPointerDown = function (e) {
-        this.pointers = e.getPointerList();
-        e.preventDefault();
-        this.scale0 = this.viewer.scale;
+    PointerHandler.prototype.onPointerDown = function () {
+        var _this = this;
+        return function (e) {
+            _this.pointers = e.getPointerList();
+            e.preventDefault();
+            _this.scale0 = _this.viewer.scale;
+        };
     };
-    PointerHandler.prototype.onPointerMove = function (e) {
-        e.preventDefault();
-        this.pointers = e.getPointerList();
-        if(!this.mainPointerId && this.pointers.length > 0) {
-            var mainPointer = this.pointers[0];
-            this.mainPointerId = mainPointer.identifier;
-            this.dragStart(mainPointer.pageX, mainPointer.pageY);
-        } else {
-            var mainPointer = this.getMainPointer();
-            if(mainPointer) {
-                this.drag(mainPointer.pageX, mainPointer.pageY);
+    PointerHandler.prototype.onPointerMove = function () {
+        var _this = this;
+        return function (e) {
+            e.preventDefault();
+            _this.pointers = e.getPointerList();
+            if(!_this.mainPointerId && _this.pointers.length > 0) {
+                var mainPointer = _this.pointers[0];
+                _this.mainPointerId = mainPointer.identifier;
+                _this.dragStart(mainPointer.pageX, mainPointer.pageY);
+            } else {
+                var mainPointer = _this.getMainPointer();
+                if(mainPointer) {
+                    _this.drag(mainPointer.pageX, mainPointer.pageY);
+                }
             }
-        }
+        };
     };
-    PointerHandler.prototype.onPointerUp = function (e) {
-        this.pointers = e.getPointerList();
-        var mainPointer = this.getMainPointer();
-        if(this.mainPointerId && !mainPointer) {
-            this.viewer.dragEnd(this.viewer);
-            this.mainPointerId = null;
-        }
+    PointerHandler.prototype.onPointerUp = function () {
+        var _this = this;
+        return function (e) {
+            _this.pointers = e.getPointerList();
+            var mainPointer = _this.getMainPointer();
+            if(_this.mainPointerId && !mainPointer) {
+                _this.viewer.dragEnd(_this.viewer);
+                _this.mainPointerId = null;
+            }
+        };
     };
     PointerHandler.prototype.getRect = function () {
         return (this.root[0]).getBoundingClientRect();
@@ -110,23 +123,29 @@ var PointerHandler = (function () {
         var y = y1 - (y1 - this.viewer.shiftY) * b;
         this.viewer.setLocation(x, y, scale, 0);
     };
-    PointerHandler.prototype.onScale = function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if(this.viewer.moving) {
-            return;
-        }
-        var b = e.scale * this.scale0 / this.viewer.scale;
-        this.setScale(e.centerX, e.centerY, b);
+    PointerHandler.prototype.onScale = function () {
+        var _this = this;
+        return function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if(_this.viewer.moving) {
+                return;
+            }
+            var b = e.scale * _this.scale0 / _this.viewer.scale;
+            _this.setScale(e.centerX, e.centerY, b);
+        };
     };
-    PointerHandler.prototype.onWheel = function (e, delta) {
-        e.preventDefault();
-        e.stopPropagation();
-        if(this.viewer.moving) {
-            return;
-        }
-        var b = 1.0 + delta * 0.04;
-        this.setScale(e.pageX, e.pageY, b);
+    PointerHandler.prototype.onWheel = function () {
+        var _this = this;
+        return function (e, delta) {
+            e.preventDefault();
+            e.stopPropagation();
+            if(_this.viewer.moving) {
+                return;
+            }
+            var b = 1.0 + delta * 0.04;
+            _this.setScale(e.pageX, e.pageY, b);
+        };
     };
     return PointerHandler;
 })();
