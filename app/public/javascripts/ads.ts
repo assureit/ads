@@ -125,7 +125,6 @@ class ADS {
 					null, this.isLogin(userId));
 			this.timelineView = new TimeLineView($body, this.viewer, this.isLogin(userId));
 			this.dcase_latest = null;
-			this.viewer = viewer;
 
 			$(window).bind("beforeunload", (e)=> {
 				if(this.dcase_latest != null && this.dcase_latest.isChanged()) {
