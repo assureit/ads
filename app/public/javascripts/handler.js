@@ -23,7 +23,7 @@ var PointerHandler = (function () {
         this.root[0].addEventListener("pointermove", this.onPointerMove(), false);
         this.root[0].addEventListener("pointerup", this.onPointerUp(), false);
         this.root[0].addEventListener("gesturescale", this.onScale(), false);
-        this.root.mousewheel(this.onWheel);
+        this.root.mousewheel(this.onWheel());
     }
     PointerHandler.prototype.dragStart = function (x, y) {
         if(this.viewer.rootview == null) {
