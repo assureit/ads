@@ -72,7 +72,7 @@ var SelectDCaseView = (function () {
             var user = dcase.userName;
             var lastDate = dcase.latestCommit.dateTime;
             var lastUser = dcase.latestCommit.userName;
-            var html = "<td><a href=\"#dcase/" + id + "\">" + name + "</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" + lastUser + "</td>";
+            var html = "<td><a href=\"dcase/" + id + "\">" + name + "</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" + lastUser + "</td>";
             if(userId != null) {
                 html += "<td><a id=\"e" + id + "\" href=\"#\">Edit</a></td>" + "<td><a id=\"d" + id + "\" href=\"#\">Delete</a></td>";
             }

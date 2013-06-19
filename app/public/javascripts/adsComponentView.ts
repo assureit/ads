@@ -79,7 +79,7 @@ class SelectDCaseView {
 			var user = dcase.userName;
 			var lastDate: any = dcase.latestCommit.dateTime;//new DateFormatter(dcase.latestCommit.time).format();
 			var lastUser: any = dcase.latestCommit.userName;
-			var html = "<td><a href=\"#dcase/" + id + "\">" + name +
+			var html = "<td><a href=\"dcase/" + id + "\">" + name +
 					"</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" +
 					lastUser + "</td>";
 			if(userId != null) {

@@ -12,9 +12,9 @@ block bar
                 .nav-collapse.collapse
                     ul.nav
                         li
-                            a( href="./#")= lang.home
+                            a( href="/#")= lang.home
                         li
-                            a( href="./#new") new...
+                            a( href="/new") new...
                         li.dropdown.ads-edit-menu
                             a.dropdown-toggle(data-toggle="dropdown", href="#")= lang.edit
                                 b.caret
@@ -57,7 +57,7 @@ block bar
                 block sign
 block content
     #ase.container
-        img#ads-logo(src="images/assuranceDS.png")
+        img#ads-logo(src="/images/assuranceDS.png")
         #viewer(style="display: none;")
         #dcase-manager.container-fluid(style="display: none;")
             .row
