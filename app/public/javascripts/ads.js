@@ -53,9 +53,9 @@ var ADS = (function () {
             var $body = $(body);
             _this.viewer = new DCaseViewer(document.getElementById("viewer"), null, _this.isLogin(userId));
             _this.timelineView = new TimeLineView($body, _this.viewer, _this.isLogin(userId));
-            _this.dcase_latest = null;
+            viewer.dcase_latest = null;
             $(window).bind("beforeunload", function (e) {
-                if(_this.dcase_latest != null && _this.dcase_latest.isChanged()) {
+                if(viewer.dcase_latest != null && viewer.dcase_latest.isChanged()) {
                     return "未コミットの変更があります";
                 }
             });
@@ -72,7 +72,7 @@ var ADS = (function () {
             var dcase = new DCaseModel(tree, dcaseId, r.commitId);
             _this.viewer.setDCase(dcase);
             _this.timelineView.repaint(dcase);
-            _this.dcase_latest = dcase;
+            viewer.dcase_latest = dcase;
             document.title = r.dcaseName + _this.TITLE_SUFFIX;
             $("#dcaseName").text(r.dcaseName);
             _this.viewer.exportSubtree = function (type, root) {
