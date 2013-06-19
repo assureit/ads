@@ -33,7 +33,7 @@ exports.exporter = function (req, res) {
         var filename = stdout;
         var svgname = filename;
         var resname = filename + "." + type;
-        fs.writeFile(svgname, req.body.svg, "w", function (err) {
+        fs.writeFile(svgname, req.body.svg, function (err) {
             if(err) {
                 throw err;
             }

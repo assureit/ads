@@ -38,8 +38,8 @@ export var exporter = function(req: any, res: any) {
 	}
 
 	exec("/bin/mktemp -q /tmp/svg.XXXXXX", (error, stdout, stderr) => {
-		var filename = stdout;
-		var svgname = filename;
+		var filename :string = stdout;
+		var svgname  :string = filename;
 		var resname = filename + "." + type;
 		fs.writeFile(svgname, req.body.svg, (err) => {
 			if (err) throw err;
