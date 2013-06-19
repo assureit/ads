@@ -102,7 +102,7 @@ var PointerHandler = (function () {
             _this.pointers = e.getPointerList();
             var mainPointer = _this.getMainPointer();
             if(_this.mainPointerId && !mainPointer) {
-                _this.viewer.dragEnd(_this.viewer);
+                _this.dragEnd(_this.viewer);
                 _this.mainPointerId = null;
             }
         };
