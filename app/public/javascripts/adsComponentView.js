@@ -31,10 +31,10 @@ var CreateDCaseView = (function () {
                 NodeCount: 1
             };
             var r = DCaseAPI.createDCase(name, tree);
-            location.href = "./#dcase/" + r.dcaseId;
+            location.href = "./dcase/" + r.dcaseId;
         });
     }
-    CreateDCaseView.prototype.enableSubmit = function (userId) {
+    CreateDCaseView.prototype.enableSubmit = function () {
         $("#dcase-create").removeClass("disabled");
         $("#inputDCaseName").removeAttr("disabled");
         $("#inputDesc").removeAttr("disabled");
@@ -72,7 +72,7 @@ var SelectDCaseView = (function () {
             var user = dcase.userName;
             var lastDate = dcase.latestCommit.dateTime;
             var lastUser = dcase.latestCommit.userName;
-            var html = "<td><a href=\"#dcase/" + id + "\">" + name + "</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" + lastUser + "</td>";
+            var html = "<td><a href=\"dcase/" + id + "\">" + name + "</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" + lastUser + "</td>";
             if(userId != null) {
                 html += "<td><a id=\"e" + id + "\" href=\"#\">Edit</a></td>" + "<td><a id=\"d" + id + "\" href=\"#\">Delete</a></td>";
             }
@@ -99,20 +99,20 @@ var SelectDCaseView = (function () {
         });
     };
     SelectDCaseView.prototype.initEvents = function () {
-        var self = this;
+        var _this = this;
         $("#prev-page").click(function (e) {
-            var i = self.pageIndex - 0;
+            var i = _this.pageIndex - 0;
             if(i > 1) {
-                self.pageIndex = i - 1;
-                location.href = "./#page/" + self.pageIndex;
+                _this.pageIndex = i - 1;
+                location.href = "./#page/" + _this.pageIndex;
             }
             e.preventDefault();
         });
         $("#next-page").click(function (e) {
-            var i = self.pageIndex - 0;
-            if(self.maxPageSize >= i + 1) {
-                self.pageIndex = i + 1;
-                location.href = "./#page/" + self.pageIndex;
+            var i = _this.pageIndex - 0;
+            if(_this.maxPageSize >= i + 1) {
+                _this.pageIndex = i + 1;
+                location.href = "./#page/" + _this.pageIndex;
             }
             e.preventDefault();
         });
@@ -120,7 +120,9 @@ var SelectDCaseView = (function () {
     return SelectDCaseView;
 })();
 var SearchView = (function () {
-    function SearchView() {
+    function SearchView(viewer) {
+        this.viewer = viewer;
+        var _this = this;
         var searchQuery = $('#search-query');
         searchQuery.popover({
             html: true,
@@ -140,10 +142,54 @@ var SearchView = (function () {
         $('#search-form').submit(function () {
             var query = searchQuery.val();
             if(query.length > 0) {
-                self.updateSearchResult(query);
+                _this.updateSearchResult(query);
             }
             return false;
         });
     }
+    SearchView.prototype.searchNode = function (text, types, beginDate, endDate, callback, callbackOnNoResult) {
+        var dcase = this.viewer.getDCase();
+        var root = dcase ? dcase.getTopGoal() : undefined;
+        if(!root) {
+            if(callbackOnNoResult) {
+                callbackOnNoResult();
+            }
+            return;
+        }
+        root.traverse(function (index, node) {
+            var name = node.name;
+            var desc = node.desc;
+            var d_index = desc.toLowerCase().indexOf(text);
+            var n_index = name.toLowerCase().indexOf(text);
+            if(d_index != -1 || n_index != -1) {
+                callback(node);
+            }
+        });
+    };
+    SearchView.prototype.updateSearchResult = function (text) {
+        var _this = this;
+        $('#search-query').popover('show');
+        var $res = $("#search_result_ul");
+        $res.empty();
+        text = text.toLowerCase();
+        var result = DCaseAPI.searchDCase(text);
+        if(result.length == 0) {
+            $res.append("<li>No Results</li>");
+        } else {
+            for(var i = 0; i < result.length; ++i) {
+                var res = result[i];
+                var id = res.dcaseId;
+                $("<li>").html("<a href=\"#dcase/" + id + "\">" + id + "</a>").appendTo($res);
+            }
+        }
+        $res.append("<hr>");
+        this.searchNode(text, [], null, null, function (node) {
+            $("<li>").html("<a href=\"#\">" + node.name + "</a>").click(function (e) {
+                _this.viewer.centerize(node, 500);
+                e.preventDefault();
+            }).appendTo($res);
+        }, function () {
+        });
+    };
     return SearchView;
 })();

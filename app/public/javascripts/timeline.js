@@ -1,124 +1,45 @@
-var TimeLine = function ($root) {
-    var self = this;
-    var $timeline = $("<div></div>").addClass("timeline").css("display", "none").appendTo($root);
-    var $canvas = $("<canvas></canvas>").css("position", "absolute").appendTo($timeline);
-    var $container = $("<div></div>").css({
-        position: "absolute",
-        left: 0,
-        top: 0
-    }).appendTo($timeline);
-    $("<div></div>").addClass("timeline-title").html("Commit History").appendTo($timeline);
-    this.onArgumentSelected = function (argId) {
-    };
-    var scroll = 0;
-    var mouseX = null;
-    var dragX = 0;
-    $timeline.mousedown(function (e) {
-        mouseX = e.pageX;
-    });
-    $timeline.mousemove(function (e) {
-        if(mouseX != null) {
-            dragX = e.pageX - mouseX;
-            self.drag();
-        }
-    });
-    $timeline.mouseup(function (e) {
-        scroll += dragX;
-        dragX = 0;
-        mouseX = null;
-        self.drag();
-    });
-    var visible = false;
-    this.visible = function (b) {
-        if(b == null) {
-            visible = !visible;
-        } else {
-            visible = b;
-        }
-        $timeline.css("display", visible ? "block" : "none");
-    };
-    var selected = null;
-    var MX = 24;
-    var MY = 24;
-    var NX = 50;
-    var NY = 30;
-    this.argument = null;
-    this.drag = function () {
-        $container.css("left", scroll + dragX);
-        $canvas.attr("left", scroll + dragX);
-        $canvas.css("left", scroll + dragX);
-    };
-    function addCommitMark(x, y, list, commitId) {
-        var $d = $("<div></div>").css({
-            left: x,
-            top: y,
-            width: MX,
-            height: MY
-        }).addClass("timeline-commit").appendTo($container);
-        var info = list[commitId];
-        $d.popover({
-            placement: "bottom",
-            title: info.dateTime + " " + info.userName,
-            content: info.commitMessage,
-            trigger: "hover"
+var TimeLine = (function () {
+    function TimeLine($root) {
+        var _this = this;
+        this.titleString = "";
+        this.visibleFlag = false;
+        this.scrollX = 0;
+        this.mouseX = null;
+        this.dragX = 0;
+        this.selected = null;
+        this.MX = 24;
+        this.MY = 24;
+        this.NX = 50;
+        this.NY = 30;
+        this.argument = null;
+        this.titleString = "<div></div>";
+        this.$timeline = $(this.titleString).addClass("timeline").css("display", "none").appendTo($root);
+        this.$canvas = $("<canvas></canvas>").css("position", "absolute").appendTo(this.$timeline);
+        this.$container = $(this.titleString).css({
+            position: "absolute",
+            left: 0,
+            top: 0
+        }).appendTo(this.$timeline);
+        $(this.titleString).addClass("timeline-title").html("Commit History").appendTo(this.$timeline);
+        this.$timeline.mousedown(function (e) {
+            _this.mouseX = e.pageX;
         });
-        $d.click(function () {
-            console.log("arguemnt " + commitId);
-            if(selected != $d) {
-                var argId = self.argument.argId;
-                if(self.onDCaseSelected(argId, commitId, info.latest)) {
-                    if(selected != null) {
-                        selected.css("border-color", "");
-                        selected = $d;
-                    }
-                    $d.css("border-color", "orange");
-                }
+        this.$timeline.mousemove(function (e) {
+            if(_this.mouseX != null) {
+                _this.dragX = e.pageX - _this.mouseX;
+                _this.drag();
             }
         });
-        if(commitId == self.argument.commitId) {
-            $d.css("border-color", "orange");
-            selected = $d;
-        }
+        this.$timeline.mouseup(function (e) {
+            _this.scrollX += _this.dragX;
+            _this.dragX = 0;
+            _this.mouseX = null;
+            _this.drag();
+        });
     }
-    function calcSize(mm, x, y, id) {
-        var b = {
-            w: x,
-            h: y
-        };
-        var c = mm[id];
-        if(c != null) {
-            var b1 = calcSize(mm, x + NX, y, c[0]);
-            b.w = Math.max(b.w, b1.w);
-            y = b.h = Math.max(b.h, b1.h);
-            for(var i = 1; i < c.length; i++) {
-                var b2 = calcSize(mm, x + NX, y + NY, c[i]);
-                b.w = Math.max(b.w, b2.w);
-                y = b.h = Math.max(b.h, b2.h);
-            }
-        }
-        return b;
-    }
-    function put(ctx, mm, l, x, y, id) {
-        addCommitMark(x, y, l, id);
-        var c = mm[id];
-        if(c != null) {
-            var y0 = y;
-            y = put(ctx, mm, l, x + NX, y, c[0]);
-            ctx.moveTo(x + MX / 2, y0 + MY / 2);
-            ctx.lineTo(x + MX / 2 + NX, y0 + MY / 2);
-            for(var i = 1; i < c.length; i++) {
-                var y1 = y;
-                y = put(ctx, mm, l, x + NX, y + NY, c[i]);
-                ctx.moveTo(x + MX / 2, y0 + MY / 2);
-                ctx.lineTo(x + MX / 2, y1 + NY + MY / 2);
-                ctx.lineTo(x + MX / 2 + NX, y1 + NY + MY / 2);
-            }
-        }
-        return y;
-    }
-    this.repaint = function (arg) {
-        self.argument = arg;
-        $container.empty();
+    TimeLine.prototype.repaint = function (arg) {
+        this.argument = arg;
+        this.$container.empty();
         if(arg == null) {
             return;
         }
@@ -142,47 +63,130 @@ var TimeLine = function ($root) {
         for(var i = 0; i < l.length; i++) {
             ci[l[i].commitId] = l[i];
         }
-        selected = null;
-        var b = calcSize(mm, 0, 0, l[0].commitId);
-        b.w += MX * 2;
-        b.h += MY * 2;
-        $timeline.height(b.h);
-        b.h -= MX / 2;
-        $canvas.css("width", b.w);
-        $canvas.attr("width", b.w);
-        $canvas.css("height", b.h);
-        $canvas.attr("height", b.h);
-        $container.css("top", MX / 2);
-        $canvas.attr("top", MX / 2);
-        $canvas.css("top", MX / 2);
-        var ctx = ($canvas[0]).getContext("2d");
-        ctx.clearRect(0, 0, $canvas.width(), $canvas.height());
+        this.selected = null;
+        var b = this.calcSize(mm, 0, 0, l[0].commitId);
+        b.w += this.MX * 2;
+        b.h += this.MY * 2;
+        this.$timeline.height(b.h);
+        b.h -= this.MX / 2;
+        this.$canvas.css("width", b.w);
+        this.$canvas.attr("width", b.w);
+        this.$canvas.css("height", b.h);
+        this.$canvas.attr("height", b.h);
+        this.$container.css("top", this.MX / 2);
+        this.$canvas.attr("top", this.MX / 2);
+        this.$canvas.css("top", this.MX / 2);
+        var ctx = (this.$canvas[0]).getContext("2d");
+        ctx.clearRect(0, 0, this.$canvas.width(), this.$canvas.height());
         ctx.beginPath();
-        var y = put(ctx, mm, ci, 0, 0, l[0].commitId);
+        var y = this.put(ctx, mm, ci, 0, 0, l[0].commitId);
         ctx.stroke();
-        scroll = ($timeline.width() - b.w) / 2;
-        self.drag();
+        this.scrollX = (this.$timeline.width() - b.w) / 2;
+        this.drag();
     };
-};
+    TimeLine.prototype.visible = function (b) {
+        if(b == null) {
+            this.visibleFlag = !this.visibleFlag;
+        } else {
+            this.visibleFlag = b;
+        }
+        this.$timeline.css("display", this.visibleFlag ? "block" : "none");
+    };
+    TimeLine.prototype.drag = function () {
+        this.$container.css("left", this.scrollX + this.dragX);
+        this.$canvas.attr("left", this.scrollX + this.dragX);
+        this.$canvas.css("left", this.scrollX + this.dragX);
+    };
+    TimeLine.prototype.calcSize = function (mm, x, y, id) {
+        var b = {
+            w: x,
+            h: y
+        };
+        var c = mm[id];
+        if(c != null) {
+            var b1 = this.calcSize(mm, x + this.NX, y, c[0]);
+            b.w = Math.max(b.w, b1.w);
+            y = b.h = Math.max(b.h, b1.h);
+            for(var i = 1; i < c.length; i++) {
+                var b2 = this.calcSize(mm, x + this.NX, y + this.NY, c[i]);
+                b.w = Math.max(b.w, b2.w);
+                y = b.h = Math.max(b.h, b2.h);
+            }
+        }
+        return b;
+    };
+    TimeLine.prototype.put = function (ctx, mm, l, x, y, id) {
+        this.addCommitMark(x, y, l, id);
+        var c = mm[id];
+        if(c != null) {
+            var y0 = y;
+            y = this.put(ctx, mm, l, x + this.NX, y, c[0]);
+            ctx.moveTo(x + this.MX / 2, y0 + this.MY / 2);
+            ctx.lineTo(x + this.MX / 2 + this.NX, y0 + this.MY / 2);
+            for(var i = 1; i < c.length; i++) {
+                var y1 = y;
+                y = this.put(ctx, mm, l, x + this.NX, y + this.NY, c[i]);
+                ctx.moveTo(x + this.MX / 2, y0 + this.MY / 2);
+                ctx.lineTo(x + this.MX / 2, y1 + this.NY + this.MY / 2);
+                ctx.lineTo(x + this.MX / 2 + this.NX, y1 + this.NY + this.MY / 2);
+            }
+        }
+        return y;
+    };
+    TimeLine.prototype.addCommitMark = function (x, y, list, commitId) {
+        var _this = this;
+        var $d = $(this.titleString).css({
+            left: x,
+            top: y,
+            width: this.MX,
+            height: this.MY
+        }).addClass("timeline-commit").appendTo(this.$container);
+        var info = list[commitId];
+        $d.popover({
+            placement: "bottom",
+            title: info.dateTime + " " + info.userName,
+            content: info.commitMessage,
+            trigger: "hover"
+        });
+        $d.click(function () {
+            console.log("arguemnt " + commitId);
+            if(_this.selected != $d) {
+                var argId = _this.argument.argId;
+                if(_this.onDCaseSelected(argId, commitId, info.latest)) {
+                    if(_this.selected != null) {
+                        _this.selected.css("border-color", "");
+                        _this.selected = $d;
+                    }
+                    $d.css("border-color", "orange");
+                }
+            }
+        });
+        if(commitId == this.argument.commitId) {
+            $d.css("border-color", "orange");
+            this.selected = $d;
+        }
+    };
+    return TimeLine;
+})();
 var TimeLineView = (function () {
     function TimeLineView($body, viewer, isLogin) {
-        var self = this;
+        var _this = this;
         this.timeline = new TimeLine($body);
         $("#menu-history-toggle").click(function (e) {
-            self.timeline.visible();
+            _this.timeline.visible();
             e.preventDefault();
         });
         this.timeline.onDCaseSelected = function (dcaseId, commitId, isLatest) {
             var dcase = viewer.getDCase();
             if(dcase != null && dcase.isChanged()) {
-                dcase_latest = dcase;
+                viewer.dcase_latest = dcase;
             }
             viewer.editable = isLatest && isLogin;
-            if(isLatest && dcase_latest != null) {
-                viewer.setDCase(dcase_latest);
+            if(isLatest && viewer.dcase_latest != null) {
+                viewer.setDCase(viewer.dcase_latest);
             } else {
                 var tree = (DCaseAPI).getNodeTree(commitId);
-                viewer.setDCase(new DCase(tree, dcaseId, commitId));
+                viewer.setDCase(new DCaseModel(tree, dcaseId, commitId));
             }
             return true;
         };

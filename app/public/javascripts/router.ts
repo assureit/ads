@@ -1,37 +1,53 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 
-var Router = (function(){
+class subRouter{
+	name : string;
+	args : string[];
+	constructor(name: string, args : string[]){
+		this.name = name;
+		this.args = args;
+	}
+}
 
-	function parseParameters(hash) {
-		var params = hash.split("/").filter(function(it){ return it != ""});
+class Router{
+	table: { [key : string ] : (args :string)=>void;};
+	onChange: ()=>void;
+	parseParameters(hash : string) {
+
+		var params: string[] = hash.split("/").filter(function(it){ return it != ""});
 		if(params.length == 0) {
 			params = [""];
 		}
-		return { name: params[0], args: params.slice(1)};
+		return  new subRouter(params[0], params.slice(1));
 	}
 
-	function Router() {
+	constructor() {
 		this.table = {};
-		var self = this;
-		if ("onhashchange" in window) { //FIXME
-			window.onhashchange = function () {
-				var hash = parseParameters(window.location.hash.slice(1));
-				if(hash.name in self.table) {
-					self.table[hash.name](hash.args[0]);
-				} else {
-					window.location.hash = "";
-				}
-			};
-		}
+		this.onChange = () => {
+			var hash : subRouter = this.parseParameters(window.location.pathname);
+			if(hash.name in this.table) {
+				this.table[hash.name](hash.args[0]);
+			}
+		};
+
+		//var self = this;
+		//if ("onhashchange" in window) { //FIXME
+		//	window.onhashchange = function () {
+		//		var hash : subRouter = self.parseParameters(window.location.hash.slice(1));
+		//		if(hash.name in self.table) {
+		//			self.table[hash.name](hash.args[0]);
+		//		} else {
+		//			window.location.hash = "";
+		//		}
+		//	};
+		//}
 	}
 
-	Router.prototype.route = function(route, name, callback) {
+	route(router, name : string, callback : (args :string)=>void) : void {
 		this.table[name] = callback;
 	};
 
-	Router.prototype.start = function() {
-		(<any>window).onhashchange();
-	}
-
-	return Router;
-})();
+	start() : void {
+		this.onChange();
+	};
+};

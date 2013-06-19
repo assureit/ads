@@ -1,41 +1,45 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
 
-var ImportFile = (function(){
+class DCaseFile {
+	constructor(public result: string, public name: string){}
+}
 
-	function ImportFile() {
-		$("div.row").on('dragenter', function (e) {
+class ImportFile {
+	ase: string = "#ase";
+
+	constructor() {
+		$(this.ase).on('dragenter', e => {
 			e.stopPropagation();
 			e.preventDefault();
-		}).on('dragover', function (e) {
+		}).on('dragover', e => {
 			e.stopPropagation();
 			e.preventDefault();
-			$(this).addClass('hover');
-		}).on('dragleave', function (e) {
+			$(this.ase).addClass('hover');
+		}).on('dragleave', e => {
 			e.stopPropagation();
 			e.preventDefault();
-			$(this).removeClass('hover');
+			$(this.ase).removeClass('hover');
 		});
 	}
 
-	ImportFile.prototype.read = function(callback) {
-		$("div.row").on('drop', function (e) {
+	read(callback: (DCaseFile) => void): void{
+		$("#ase").on('drop', (e) => {
 			e.stopPropagation();
 			e.preventDefault();
-			$(this).removeClass('hover');
-			var file = e.originalEvent.dataTransfer.files[0];
+			$(this.ase).removeClass('hover');
+			var file: File = (<any>e.originalEvent.dataTransfer).files[0];
 			if(file) {
 				var reader = new FileReader();
-				reader.onerror = function(e) {
+				reader.onerror = (e) => {
 					console.log('error', (<any>e.target).error.code);
 				}
-				reader.onload = function(e){
-					callback({result: e.target.result, name: file.name});
+				reader.onload = (e) => {
+					var dcaseFile = new DCaseFile((<any>e.target).result, file.name);
+					callback(dcaseFile);
 				};
 				reader.readAsText(file, 'utf-8');
 			}
 			return false;
 		});
 	};
-
-	return ImportFile;
-})();
+}

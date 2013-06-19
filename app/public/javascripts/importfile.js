@@ -1,34 +1,42 @@
+var DCaseFile = (function () {
+    function DCaseFile(result, name) {
+        this.result = result;
+        this.name = name;
+    }
+    return DCaseFile;
+})();
 var ImportFile = (function () {
     function ImportFile() {
-        $("div.row").on('dragenter', function (e) {
+        var _this = this;
+        this.ase = "#ase";
+        $(this.ase).on('dragenter', function (e) {
             e.stopPropagation();
             e.preventDefault();
         }).on('dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(this).addClass('hover');
+            $(_this.ase).addClass('hover');
         }).on('dragleave', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(this).removeClass('hover');
+            $(_this.ase).removeClass('hover');
         });
     }
     ImportFile.prototype.read = function (callback) {
-        $("div.row").on('drop', function (e) {
+        var _this = this;
+        $("#ase").on('drop', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(this).removeClass('hover');
-            var file = e.originalEvent.dataTransfer.files[0];
+            $(_this.ase).removeClass('hover');
+            var file = (e.originalEvent.dataTransfer).files[0];
             if(file) {
                 var reader = new FileReader();
                 reader.onerror = function (e) {
                     console.log('error', (e.target).error.code);
                 };
                 reader.onload = function (e) {
-                    callback({
-                        result: e.target.result,
-                        name: file.name
-                    });
+                    var dcaseFile = new DCaseFile((e.target).result, file.name);
+                    callback(dcaseFile);
                 };
                 reader.readAsText(file, 'utf-8');
             }
