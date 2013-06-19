@@ -42,6 +42,7 @@ class DCaseViewer {
 	selectedNode: DNodeView = null;
 	rootview  :DNodeView= null;
 	clipboard :DCaseNodeModel= null;
+	dcase_latest   : any;
 	
 	viewer_addons   : DCaseViewerAddon[] = [];
 	nodeview_addons : DNodeViewAddon[]   = [];
@@ -263,7 +264,7 @@ class DCaseViewer {
 		var create = (node, parent) => {
 			var view = new DNodeView(this, node, parent);
 			this.nodeViewMap[node.id] = view;
-			node.eachSubNode((i, child) => {
+			node.eachSubNode((i: number, child: DCaseNodeModel) => {
 				create(child, view);
 			});
 			return view;
@@ -353,7 +354,7 @@ class DCaseViewer {
 		var create = (node, parent) => {
 			var view = new DNodeView(this, node, parent);
 			this.nodeViewMap[node.id] = view;
-			node.eachSubNode((i, child) => {
+			node.eachSubNode((i: number, child: DCaseNodeModel) => {
 				create(child, view);
 			});
 			return view;

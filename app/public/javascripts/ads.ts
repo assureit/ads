@@ -15,7 +15,6 @@ class ADS {
 	selectDCaseView: SelectDCaseView;
 	createDCaseView: CreateDCaseView;
 	timelineView   : TimeLineView;
-	dcase_latest   : any;
 
 
 	getLoginUserorNull() {
@@ -124,10 +123,10 @@ class ADS {
 			this.viewer = new DCaseViewer(document.getElementById("viewer"),
 					null, this.isLogin(userId));
 			this.timelineView = new TimeLineView($body, this.viewer, this.isLogin(userId));
-			this.dcase_latest = null;
+			viewer.dcase_latest = null;
 
 			$(window).bind("beforeunload", (e)=> {
-				if(this.dcase_latest != null && this.dcase_latest.isChanged()) {
+				if(viewer.dcase_latest != null && viewer.dcase_latest.isChanged()) {
 					return "未コミットの変更があります";
 				}
 			});
@@ -148,7 +147,7 @@ class ADS {
 			var dcase = new DCaseModel(tree, dcaseId, r.commitId);
 			this.viewer.setDCase(dcase);
 			this.timelineView.repaint(dcase);
-			this.dcase_latest = dcase;
+			viewer.dcase_latest = dcase;
 			document.title = r.dcaseName + this.TITLE_SUFFIX;
 			$("#dcaseName").text(r.dcaseName);
 			this.viewer.exportSubtree = (type, root) => {

@@ -207,7 +207,7 @@ function DNodeView_InplaceEdit(self) {
         }
         ;
         var markdown = convert(node);
-        node.eachSubNode(function (n) {
+        node.eachSubNode(function (i, n) {
             markdown = markdown + convert(n);
         });
         return markdown;
@@ -280,7 +280,7 @@ function DNodeView_InplaceEdit(self) {
                     closeInplace();
                 } else {
                     DCase.setDescription(node, "");
-                    node.eachSubNode(function (n) {
+                    node.eachSubNode(function (i, n) {
                         DCase.removeNode(n);
                     });
                 }
@@ -297,7 +297,7 @@ function DNodeView_InplaceEdit(self) {
             var idIndexTable = {
             };
             var ch = 0, co = 0;
-            node.eachSubNode(function (n) {
+            node.eachSubNode(function (i, n) {
                 idNodeTable[n.id] = n;
                 if(n.isContext) {
                     idIndexTable[n.id] = co++;
