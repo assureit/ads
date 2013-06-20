@@ -548,9 +548,10 @@ var DNodeView = (function () {
         this.$divText.html(node.getHtmlDescription());
         this.$divText.append(node.getHtmlMetadata());
         if(this.svgShape) {
-            $(this.svgShape[0]).remove();
+            this.svgShape.$g.remove();
         }
-        this.svgShape = new GsnShapeMap[node.type](this.$rootsvg);
+        this.svgShape = new GsnShapeMap[node.type]();
+        this.$rootsvg.append(this.svgShape.$g);
         var count = node.getNodeCount();
         if(count != 0) {
             this.$divNodes.html(count + " nodes...");
@@ -568,8 +569,10 @@ var DNodeView = (function () {
             stroke = this.viewer.colorSets.colorTheme.stroke[this.node.type];
         }
         var fill = this.viewer.colorSets.colorTheme.fill[this.node.type];
-        this.svgShape[0].setAttribute("stroke", stroke);
-        this.svgShape[0].setAttribute("fill", fill);
+        this.svgShape.$g.attr({
+            "stroke": stroke,
+            "fill": fill
+        });
     };
     DNodeView.prototype.remove = function (parentView) {
         if(this.context != null) {
@@ -584,7 +587,7 @@ var DNodeView = (function () {
         while(this.children.length != 0) {
             this.children[0].remove(this);
         }
-        $(this.svgShape[0]).remove();
+        this.svgShape.$g.remove();
         this.$div.remove();
         if(this.$undevel != null) {
             this.$undevel.remove();
@@ -738,7 +741,7 @@ var DNodeView = (function () {
         var parent = this.parentView;
         x -= this.subtreeBounds.x;
         var b = new Rect(x, y + this.nodeOffset, this.nodeSize.w, this.nodeSize.h);
-        a.show(this.svgShape[0], this.visible);
+        a.show(this.svgShape.$g[0], this.visible);
         a.show(this.$div, this.visible);
         a.show(this.$divNodes, !this.childVisible);
         this.updateColor();
