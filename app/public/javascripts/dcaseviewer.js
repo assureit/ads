@@ -477,33 +477,29 @@ var DNodeView = (function () {
         this.node = node;
         this.parentView = parentView;
         var _this = this;
-        this.svgUndevel = null;
-        this.argumentBorder = null;
+        this.$div = $("<div></div>").addClass("node-container");
+        this.$divName = $("<div></div>").addClass("node-name").appendTo(this.$div);
+        this.$divText = $("<div></div>").addClass("node-text").appendTo(this.$div);
+        this.$divNodes = $("<div></div>").addClass("node-closednodes").appendTo(this.$div);
         this.children = [];
         this.context = null;
         this.subject = null;
         this.rebuttal = null;
-        this.line = null;
         this.offset = new Point(0, 0);
         this.nodeSize = new Point(DEF_WIDTH, 100);
         this.subtreeBounds = new Rect(0, 0, 0, 0);
         this.subtreeSize = new Point(0, 0);
+        this.nodeOffset = 0;
         this.visible = true;
         this.childVisible = true;
         this.selected = false;
         this.hovered = false;
-        this.nodeOffset = 0;
-        var $root, $rootsvg;
-        $root = viewer.$dom;
-        $rootsvg = viewer.$svg;
-        this.$rootsvg = $rootsvg;
-        this.$div = $("<div></div>").addClass("node-container").width(DEF_WIDTH).css("left", $(document).width() / viewer.scale).appendTo($root);
-        this.$divName = $("<div></div>").addClass("node-name").appendTo(this.$div);
-        this.$divText = $("<div></div>").addClass("node-text").appendTo(this.$div);
-        this.$divNodes = $("<div></div>").addClass("node-closednodes").appendTo(this.$div);
+        var $root = viewer.$dom;
+        this.$rootsvg = viewer.$svg;
+        this.$div.width(DEF_WIDTH).css("left", $(document).width() / viewer.scale).appendTo($root);
         if(parentView != null) {
             if(node.isContext) {
-                this.line = createContextLineElement()[0];
+                this.$line = createContextLineElement();
                 if(this.node.type == "Subject") {
                     parentView.subject = this;
                 } else if(this.node.type == "Rebuttal") {
@@ -512,10 +508,10 @@ var DNodeView = (function () {
                     parentView.context = this;
                 }
             } else {
-                this.line = createChildLineElement()[0];
+                this.$line = createChildLineElement();
                 parentView.children.push(this);
             }
-            this.$rootsvg.append(this.line);
+            this.$rootsvg.append(this.$line);
         }
         this.$div.mouseup(function (e) {
             _this.viewer.dragEnd(_this);
@@ -536,17 +532,17 @@ var DNodeView = (function () {
         var node = this.node;
         var viewer = this.viewer;
         node.isUndeveloped = (node.type === "Goal" && node.children.length == 0);
-        if(node.isUndeveloped && this.svgUndevel == null) {
-            this.svgUndevel = createUndevelopMarkElement().appendTo(this.$rootsvg);
-        } else if(!node.isUndeveloped && this.svgUndevel != null) {
-            this.svgUndevel.remove();
-            this.svgUndevel = null;
+        if(node.isUndeveloped && this.$undevel == null) {
+            this.$undevel = createUndevelopMarkElement().appendTo(this.$rootsvg);
+        } else if(!node.isUndeveloped && this.$undevel != null) {
+            this.$undevel.remove();
+            this.$undevel = null;
         }
-        if(node.isArgument && this.argumentBorder == null) {
-            this.argumentBorder = createArgumentBorderElement().appendTo(this.$rootsvg);
-        } else if(!node.isArgument && this.argumentBorder != null) {
-            this.argumentBorder.remove();
-            this.argumentBorder = null;
+        if(node.isArgument && this.$argBorder == null) {
+            this.$argBorder = createArgumentBorderElement().appendTo(this.$rootsvg);
+        } else if(!node.isArgument && this.$argBorder != null) {
+            this.$argBorder.remove();
+            this.$argBorder = null;
         }
         this.$divName.html(node.name);
         this.$divText.html(node.getHtmlDescription());
@@ -590,14 +586,14 @@ var DNodeView = (function () {
         }
         $(this.svg[0]).remove();
         this.$div.remove();
-        if(this.svgUndevel != null) {
-            $(this.svgUndevel).remove();
+        if(this.$undevel != null) {
+            this.$undevel.remove();
         }
-        if(this.argumentBorder != null) {
-            $(this.argumentBorder).remove();
+        if(this.$argBorder != null) {
+            this.$argBorder.remove();
         }
-        if(this.line != null) {
-            $(this.line).remove();
+        if(this.$line != null) {
+            this.$line.remove();
         }
         if(this.node.isContext) {
             if(this.node.type == "Subject") {
@@ -622,7 +618,7 @@ var DNodeView = (function () {
             f(this.rebuttal);
         }
         $.each(this.children, function (i, view) {
-            f(view);
+            return f(view);
         });
     };
     DNodeView.prototype.setChildVisible = function (b) {
@@ -634,27 +630,25 @@ var DNodeView = (function () {
     DNodeView.prototype.setChildVisibleAll = function (b) {
         this.setChildVisible(b);
         this.forEachNode(function (view) {
-            view.setChildVisibleAll(b);
+            return view.setChildVisibleAll(b);
         });
     };
     DNodeView.prototype.updateLocation = function (visible) {
+        if (typeof visible === "undefined") { visible = true; }
         var ARG_MARGIN = 4;
         var X_MARGIN = 30;
         var Y_MARGIN = 100;
-        if(visible == null) {
-            visible = true;
-        }
         this.visible = visible;
         var childVisible = visible && this.childVisible;
         this.forEachNode(function (view) {
-            view.updateLocation(childVisible);
+            return view.updateLocation(childVisible);
         });
         if(!visible) {
             this.subtreeBounds = new Rect(0, 0, 0, 0);
             this.subtreeSize = new Point(0, 0);
             this.nodeOffset = 0;
             this.forEachNode(function (view) {
-                view.offset = new Point(0, 0);
+                return view.offset = new Point(0, 0);
             });
             return;
         }
@@ -663,7 +657,7 @@ var DNodeView = (function () {
         var offY = 0;
         if(!childVisible) {
             this.forEachNode(function (view) {
-                view.offset = new Point(0, 0);
+                return view.offset = new Point(0, 0);
             });
         } else {
             if(this.subject != null) {
@@ -712,10 +706,7 @@ var DNodeView = (function () {
                 if(i != 0) {
                     x += X_MARGIN;
                 }
-                view.offset = {
-                    x: x,
-                    y: y
-                };
+                view.offset = new Point(x, y);
                 x += view.subtreeSize.w;
                 x1 = Math.max(x1, x);
                 y1 = Math.max(y1, y + view.subtreeSize.h);
@@ -743,11 +734,10 @@ var DNodeView = (function () {
         }
         return l;
     };
-    DNodeView.prototype.animeStart = function (a, x, y) {
+    DNodeView.prototype.animeStart = function (a, x, y, pb) {
         var parent = this.parentView;
         x -= this.subtreeBounds.x;
         var b = new Rect(x, y + this.nodeOffset, this.nodeSize.w, this.nodeSize.h);
-        this.bounds = b;
         a.show(this.svg[0], this.visible);
         a.show(this.$div, this.visible);
         a.show(this.$divNodes, !this.childVisible);
@@ -759,9 +749,8 @@ var DNodeView = (function () {
             width: (b.w - offset.x * 2),
             height: (b.h - offset.y * 2)
         });
-        if(this.line != null) {
-            var l = this.line;
-            var pb = parent.bounds;
+        if(this.$line != null) {
+            var l = this.$line[0];
             if(!this.node.isContext) {
                 var start = l.pathSegList.getItem(0);
                 var curve = l.pathSegList.getItem(1);
@@ -802,12 +791,12 @@ var DNodeView = (function () {
                 a.show(l, this.visible);
             }
         }
-        if(this.svgUndevel != null) {
+        if(this.$undevel != null) {
             var sx = b.x + b.w / 2;
             var sy = b.y + b.h;
             var n = 20;
-            a.show(this.svgUndevel[0], this.visible);
-            a.movePolygon(this.svgUndevel[0], [
+            a.show(this.$undevel[0], this.visible);
+            a.movePolygon(this.$undevel[0], [
                 {
                     x: sx,
                     y: sy
@@ -827,19 +816,19 @@ var DNodeView = (function () {
                 
             ]);
         }
-        if(this.argumentBorder != null) {
+        if(this.$argBorder != null) {
             var n = 10;
-            var b = this.subtreeBounds;
-            a.moves(this.argumentBorder[0], {
-                x: b.x + x,
-                y: b.y + y,
-                width: b.w - b.x,
-                height: b.h - b.y
+            var sb = this.subtreeBounds;
+            a.moves(this.$argBorder[0], {
+                x: sb.x + x,
+                y: sb.y + y,
+                width: sb.w - sb.x,
+                height: sb.h - sb.y
             });
-            a.show(this.argumentBorder[0], this.visible);
+            a.show(this.$argBorder[0], this.visible);
         }
         this.forEachNode(function (e) {
-            e.animeStart(a, x + e.offset.x, y + e.offset.y);
+            e.animeStart(a, x + e.offset.x, y + e.offset.y, b);
         });
     };
     return DNodeView;
