@@ -47,6 +47,7 @@ class DCaseViewer {
 	dcase_latest   : any;
 	handler   :PointerHandler = null;
 	colorSets: ColorSets;
+	dcaseName: string;
 
 	viewer_addons   : any[] = [];
 	nodeview_addons : any[]   = [];
@@ -224,6 +225,14 @@ class DCaseViewer {
 		return this.dcase;
 	};
 	
+	setDCaseName(name: string): void {
+		this.dcaseName = name;
+	}
+
+	getDCaseName(): string {
+		return this.dcaseName;
+	}
+
 	setDCase(dcase: DCaseModel) {
 		if(this.dcase != null) {
 			this.dcase.removeListener(this);
