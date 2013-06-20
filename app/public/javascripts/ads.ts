@@ -9,8 +9,7 @@
 
 class ADS {
 	TITLE_SUFFIX:   string = " - Assurance DS";
-	URL_EXPORT:     string = "cgi/view2.cgi"; //FIXME
-	URL_EXPORT_SVG: string = "/export";
+	URL_EXPORT: string = "/export";
 	viewer: DCaseViewer;
 	selectDCaseView: SelectDCaseView;
 	createDCaseView: CreateDCaseView;
@@ -217,7 +216,7 @@ class ADS {
 			.appendTo($svg);
 
 		var foreachLine = this.foreachLine;
-		root.traverse((node) => {
+		root.traverse((i, node) => {
 			var nodeView = nodeViewMap[node.id];
 			if(nodeView.visible == false) return;
 			var svg  = nodeView.svg[0];
@@ -278,17 +277,24 @@ class ADS {
 	exportViaSVG(type, root): void {
 		var svg = this.createSVGDocument(this.viewer, root);
 		svg = svg.replace("</svg></svg>", "</svg>"); // for IE10 Bug
-		this.executePost(this.URL_EXPORT_SVG, {"type" : type, "svg" : svg});
+		this.executePost(this.URL_EXPORT, {"type" : type, "svg" : svg});
+	}
+
+	exportViaJson(type, root): void {
+		var json = JSON.stringify(this.viewer.getDCase().encode());
+		this.executePost(this.URL_EXPORT, {"type" : type, "json" : json});
 	}
 
 	exportTree(type: string, root: any): void {
-		if(type == "png" || type == "pdf" || type == "svg"){
+		if(type == "png" || type == "pdf" || type == "svg") {
 			this.exportViaSVG(type, root);
 			return;
+		} else {
+			this.exportViaJson(type, root);
 		}
-		var commitId = this.viewer.getDCase().commitId;
-		var url = this.URL_EXPORT + "?" + commitId + "." + type;
-		window.open(url, "_blank");
+		//var commitId = this.viewer.getDCase().commitId;
+		//var url = this.URL_EXPORT + "?" + commitId + "." + type;
+		//window.open(url, "_blank");
 	};
 
 	initDefaultEventListeners(): void {
