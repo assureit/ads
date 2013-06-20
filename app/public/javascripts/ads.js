@@ -2,8 +2,7 @@ var ADS = (function () {
     function ADS(body) {
         var _this = this;
         this.TITLE_SUFFIX = " - Assurance DS";
-        this.URL_EXPORT = "cgi/view2.cgi";
-        this.URL_EXPORT_SVG = "/export";
+        this.URL_EXPORT = "/export";
         this.selectDCaseView = new SelectDCaseView();
         this.selectDCaseView.initEvents();
         this.createDCaseView = new CreateDCaseView();
@@ -174,7 +173,7 @@ var ADS = (function () {
         $svg.append($("svg defs").clone(false));
         var $target = $(document.createElementNS(SVG_NS, "g")).attr("transform", "translate(" + shiftX + ", " + shiftY + ")").appendTo($svg);
         var foreachLine = this.foreachLine;
-        root.traverse(function (node) {
+        root.traverse(function (i, node) {
             var nodeView = nodeViewMap[node.id];
             if(nodeView.visible == false) {
                 return;
@@ -235,19 +234,25 @@ var ADS = (function () {
     ADS.prototype.exportViaSVG = function (type, root) {
         var svg = this.createSVGDocument(this.viewer, root);
         svg = svg.replace("</svg></svg>", "</svg>");
-        this.executePost(this.URL_EXPORT_SVG, {
+        this.executePost(this.URL_EXPORT, {
             "type": type,
             "svg": svg
+        });
+    };
+    ADS.prototype.exportViaJson = function (type, root) {
+        var json = JSON.stringify(this.viewer.getDCase().encode());
+        this.executePost(this.URL_EXPORT, {
+            "type": type,
+            "json": json
         });
     };
     ADS.prototype.exportTree = function (type, root) {
         if(type == "png" || type == "pdf" || type == "svg") {
             this.exportViaSVG(type, root);
             return;
+        } else {
+            this.exportViaJson(type, root);
         }
-        var commitId = this.viewer.getDCase().commitId;
-        var url = this.URL_EXPORT + "?" + commitId + "." + type;
-        window.open(url, "_blank");
     };
     ADS.prototype.initDefaultEventListeners = function () {
         var _this = this;
