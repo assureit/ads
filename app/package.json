@@ -17,6 +17,7 @@
   "devDependencies": {
     "typescript": "0.8.3",
     "mocha": "1.10.0",
+    "node-inspector": "0.2.0beta4",
     "expect.js": "0.2.0",
     "supertest": "0.6.0"
   }
