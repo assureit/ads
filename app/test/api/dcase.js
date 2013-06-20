@@ -198,7 +198,7 @@ describe('api', function () {
                         done();
                     },
                     onFailure: function (error) {
-                        expect().fail(JSON.stringify(error));
+                        expect(error).to.be(null);
                     }
                 });
             });
@@ -212,7 +212,7 @@ describe('api', function () {
                         done();
                     },
                     onFailure: function (error) {
-                        expect().fail(JSON.stringify(error));
+                        expect(error).to.be(null);
                     }
                 });
             });
@@ -241,7 +241,7 @@ describe('api', function () {
                         });
                     },
                     onFailure: function (error) {
-                        expect().fail(JSON.stringify(error));
+                        expect(error).to.be(null);
                     }
                 });
             });
@@ -266,7 +266,7 @@ describe('api', function () {
                         });
                     },
                     onFailure: function (error) {
-                        expect().fail(JSON.stringify(error));
+                        expect(error).to.be(null);
                     }
                 });
             });
@@ -291,7 +291,7 @@ describe('api', function () {
                         });
                     },
                     onFailure: function (error) {
-                        expect().fail(JSON.stringify(error));
+                        expect(error).to.be(null);
                     }
                 });
             });
@@ -316,7 +316,7 @@ describe('api', function () {
                         });
                     },
                     onFailure: function (error) {
-                        expect().fail(JSON.stringify(error));
+                        expect(error).to.be(null);
                     }
                 });
             });
@@ -348,7 +348,7 @@ describe('api', function () {
                             done();
                         },
                         onFailure: function (error) {
-                            expect().fail(JSON.stringify(error));
+                            expect(JSON.stringify(error)).to.be(null);
                         }
                     });
                 });

@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "tsc @compile_list; mocha --recursive",
+    "test_debug": "sh ../scripts/test_debug.sh",
+    "make": "tsc @compile_list"
   },
   "dependencies": {
     "express": "3.2.5",
