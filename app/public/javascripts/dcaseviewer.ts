@@ -215,7 +215,7 @@ class DCaseViewer {
 
 	getDCase(): DCaseModel {
 		return this.dcase;
-	};
+	}
 	
 	setDCase(dcase: DCaseModel) {
 		if(this.dcase != null) {
@@ -267,7 +267,7 @@ class DCaseViewer {
 			this.location_updated = true;
 			this.repaintAll();
 		});
-	};
+	}
 	
 	//-----------------------------------------------------------------------------
 	
@@ -282,7 +282,7 @@ class DCaseViewer {
 			this.$dom.css("-webkit-transform", "scale(" + scale + ")");
 		}
 		this.repaintAll(ms);
-	};
+	}
 	
 	//-----------------------------------------------------------------------------
 	
@@ -353,7 +353,7 @@ class DCaseViewer {
 			this.location_updated = true;
 			this.repaintAll();
 		});
-	};
+	}
 	
 	nodeRemoved(parent: DCaseNodeModel, node: DCaseNodeModel, index: number) {
 		var parentView = this.getNodeView(parent);
@@ -367,7 +367,7 @@ class DCaseViewer {
 			this.location_updated = true;
 			this.repaintAll();
 		});
-	};
+	}
 	
 	nodeChanged(node: DCaseNodeModel) {
 		var view = this.getNodeView(node);
@@ -382,7 +382,7 @@ class DCaseViewer {
 			this.location_updated = true;
 			this.repaintAll();
 		});
-	};
+	}
 	
 	//-----------------------------------------------------------------------------
 	
@@ -394,7 +394,7 @@ class DCaseViewer {
 		var x = -b.x * this.scale + (this.$root.width() - view.nodeSize.w * this.scale) / 2;
 		var y = -b.y * this.scale + this.$root.height() / 5 * this.scale;
 		this.setLocation(x, y, null, ms);
-	};
+	}
 	
 	centerizeNodeView(view: DNodeView, ms: number = 0) {
 		if(this.rootview == null) return;
@@ -403,7 +403,7 @@ class DCaseViewer {
 		var x = -b.x * this.scale + (this.$root.width() - view.nodeSize.w * this.scale) / 2;
 		var y = -b.y * this.scale + this.$root.height() / 5 * this.scale;
 		this.setLocation(x, y, null, ms);
-	};
+	}
 	
 	repaintAll(ms: number = 0) {
 		if(this.rootview == null) return;
@@ -439,7 +439,7 @@ class DCaseViewer {
 				this.moving = false;
 			}
 		}, 1000/60);
-	};
+	}
 	
 	expandBranch(view: DNodeView, b: bool, isAll: bool) {
 		if(b == null) b = !view.childVisible;
@@ -456,7 +456,7 @@ class DCaseViewer {
 		this.shiftY -= (b1.y-b0.y) * this.scale;
 		this.location_updated = true;
 		this.repaintAll(ANIME_MSEC);
-	};
+	}
 	
 	//fit(ms) {
 	//	if(this.rootview == null) return;
@@ -468,7 +468,7 @@ class DCaseViewer {
 	//	this.shiftX = -b.x * this.scale + (this.$root.width() - b.w * this.scale) / 2;
 	//	this.shiftY = -b.y * this.scale + (this.$root.height() - size.y * this.scale) / 2;
 	//	this.repaintAll(ms);
-	//};
+	//}
 
 }
 
