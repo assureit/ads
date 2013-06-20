@@ -3,25 +3,31 @@
 var SVG_NS = "http://www.w3.org/2000/svg";
 
 class Point {
-	public w: number;
-	public h: number;
 	constructor (
 		public x: number,
 		public y: number
-	) {
-		this.w = x;	//TODO
-		this.h = y;
-	}
+	) {}
 }
 
-interface Animation {
-	moves(dom: any, map: any);
-	movePolygon(dom: any, map: any);
+class Size {
+	constructor (
+		public w: number,
+		public h: number
+	) {}
+}
+
+class Rect {
+	constructor(
+		public x: number,
+		public y: number,
+		public w: number,
+		public h: number,
+	) {}
 }
 
 interface GsnShape {
-	animate(a: Animation, x: number, y: number, w: number, h: number): Point;
-	outer(w: number, h: number): Point;
+	animate(a: Animation, x: number, y: number, w: number, h: number): Size;
+	outer(w: number, h: number): Size;
 }
 
 class GoalShape implements GsnShape {
@@ -37,14 +43,14 @@ class GoalShape implements GsnShape {
 		this[0].setAttribute("transform", "translate(0,0)");
 	}
 
-	animate(a: Animation, x: number, y: number, w: number, h: number): Point {
+	animate(a: Animation, x: number, y: number, w: number, h: number): Size {
 		a.moves(this[0].transform.baseVal.getItem(0).matrix, { e: x, f: y });
 		a.moves(this[2], { x: 0, y: 0, width : w, height: h });
-		return new Point(this.N, this.N);
+		return new Size(this.N, this.N);
 	}
 
-	outer(w: number, h: number): Point {
-		return new Point(w + this.N*2, h + this.N*2);
+	outer(w: number, h: number): Size {
+		return new Size(w + this.N*2, h + this.N*2);
 	}
 }
 
@@ -60,16 +66,16 @@ class ContextShape implements GsnShape {
 		this[0].setAttribute("transform", "translate(0,0)");
 	}
 
-	animate(a: Animation, x: number, y: number, w: number, h: number): Point {
+	animate(a: Animation, x: number, y: number, w: number, h: number): Size {
 		a.moves(this[0].transform.baseVal.getItem(0).matrix, { e: x, f: y });
 		a.moves(this[2], {
 			rx: this.N, ry: this.N, x: 0, y: 0, width: w, height: h
 		});
-		return new Point(this.N/2, this.N/2);
+		return new Size(this.N/2, this.N/2);
 	}
 
-	outer(w: number, h: number): Point {
-		return new Point(w + this.N, h + this.N);
+	outer(w: number, h: number): Size {
+		return new Size(w + this.N, h + this.N);
 	}
 }
 
@@ -87,7 +93,7 @@ class SubjectShape implements GsnShape {
 		this[0].appendChild(this[3]);
 		this[0].setAttribute("transform", "translate(0,0)");
 	}
-	animate(a: Animation, x: number, y: number, w: number, h: number): Point {
+	animate(a: Animation, x: number, y: number, w: number, h: number): Size {
 		a.moves(this[0].transform.baseVal.getItem(0).matrix, { e: x, f: y });
 		a.moves(this[2], {
 			rx: this.N, ry: this.N, x : 0, y : 0, width : w, height: h
@@ -97,10 +103,10 @@ class SubjectShape implements GsnShape {
 			{ x: w*5/8, y:+this.N },
 			{ x: w*5/8+this.N*2, y:0 },
 		]);
-		return new Point(this.N/2, this.N/2);
+		return new Size(this.N/2, this.N/2);
 	}
-	outer(w: number, h: number): Point {
-		return new Point(w + this.N, h + this.N);
+	outer(w: number, h: number): Size {
+		return new Size(w + this.N, h + this.N);
 	}
 }
 
@@ -116,7 +122,7 @@ class StrategyShape implements GsnShape {
 		this[0].appendChild(this[2]);
 		this[0].setAttribute("transform", "translate(0,0)");
 	}
-	animate(a: Animation, x: number, y: number, w: number, h: number): Point {
+	animate(a: Animation, x: number, y: number, w: number, h: number): Size {
 		a.moves(this[0].transform.baseVal.getItem(0).matrix, { e: x, f: y });
 		a.movePolygon(this[2], [
 			{ x: this.N, y: 0 },
@@ -124,10 +130,10 @@ class StrategyShape implements GsnShape {
 			{ x: w-this.N, y: h },
 			{ x: 0, y: h }
 		]);
-		return new Point(this.N * 1.5, this.N / 2);
+		return new Size(this.N * 1.5, this.N / 2);
 	}
-	outer(w: number, h: number): Point {
-		return new Point(w + this.N*2, h + this.N);
+	outer(w: number, h: number): Size {
+		return new Size(w + this.N*2, h + this.N);
 	}
 }
 
@@ -142,17 +148,17 @@ class EvidenceShape implements GsnShape {
 		this[0].setAttribute("transform", "translate(0,0)");
 	}
 
-	animate(a: Animation, x: number, y: number, w: number, h: number): Point {
+	animate(a: Animation, x: number, y: number, w: number, h: number): Size {
 		a.moves(this[0].transform.baseVal.getItem(0).matrix, { e: x, f: y });
 		a.moves(this[2], {
 			cx: w/2, cy: h/2,
 			rx: w/2, ry: h/2,
 		});
-		return new Point(w/6, h/6);
+		return new Size(w/6, h/6);
 	}
 
-	outer(w: number, h: number): Point {
-		return new Point(w*8/6, h*8/6);
+	outer(w: number, h: number): Size {
+		return new Size(w*8/6, h*8/6);
 	}
 }
 
@@ -170,7 +176,7 @@ class SolutionShape implements GsnShape {
 		this[0].appendChild(this[3]);
 		this[0].setAttribute("transform", "translate(0,0)");
 	}
-	animate(a: Animation, x: number, y: number, w: number, h: number): Point {
+	animate(a: Animation, x: number, y: number, w: number, h: number): Size {
 		a.moves(this[0].transform.baseVal.getItem(0).matrix, { e: x, f: y });
 		a.moves(this[2], {
 			cx: w/2, cy: h/2,
@@ -181,10 +187,10 @@ class SolutionShape implements GsnShape {
 			{ x: w*5/8, y:this.N },
 			{ x: w*5/8+this.N*2, y:0 },
 		]);
-		return new Point(w/6, h/6);
+		return new Size(w/6, h/6);
 	}
-	outer(w: number, h: number): Point {
-		return new Point(w*8/6, h*8/6);
+	outer(w: number, h: number): Size {
+		return new Size(w*8/6, h*8/6);
 	}
 }
 
@@ -203,17 +209,17 @@ class MonitorShape implements GsnShape {
 		this[0].appendChild(this[3]);
 		this[0].setAttribute("transform", "translate(0,0)");
 	}
-	animate(a: Animation, x: number, y: number, w: number, h: number): Point {
+	animate(a: Animation, x: number, y: number, w: number, h: number): Size {
 		a.moves(this[0].transform.baseVal.getItem(0).matrix, { e: x, f: y });
 		a.moves(this[2], {
 			cx: w/2, cy: h/2,
 			rx: w/2, ry: h/2,
 		});
 		a.moves(this[3], { x: w*5/8, y:this.N });
-		return new Point(w/6, h/6);
+		return new Size(w/6, h/6);
 	}
-	outer(w: number, h: number): Point {
-		return new Point(w*8/6, h*8/6);
+	outer(w: number, h: number): Size {
+		return new Size(w*8/6, h*8/6);
 	}
 }
 

@@ -3,10 +3,24 @@ var Point = (function () {
     function Point(x, y) {
         this.x = x;
         this.y = y;
-        this.w = x;
-        this.h = y;
     }
     return Point;
+})();
+var Size = (function () {
+    function Size(w, h) {
+        this.w = w;
+        this.h = h;
+    }
+    return Size;
+})();
+var Rect = (function () {
+    function Rect(x, y, w, h) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
+    return Rect;
 })();
 var GoalShape = (function () {
     function GoalShape($svg) {
@@ -30,10 +44,10 @@ var GoalShape = (function () {
             width: w,
             height: h
         });
-        return new Point(this.N, this.N);
+        return new Size(this.N, this.N);
     };
     GoalShape.prototype.outer = function (w, h) {
-        return new Point(w + this.N * 2, h + this.N * 2);
+        return new Size(w + this.N * 2, h + this.N * 2);
     };
     return GoalShape;
 })();
@@ -61,10 +75,10 @@ var ContextShape = (function () {
             width: w,
             height: h
         });
-        return new Point(this.N / 2, this.N / 2);
+        return new Size(this.N / 2, this.N / 2);
     };
     ContextShape.prototype.outer = function (w, h) {
-        return new Point(w + this.N, h + this.N);
+        return new Size(w + this.N, h + this.N);
     };
     return ContextShape;
 })();
@@ -110,10 +124,10 @@ var SubjectShape = (function () {
             }, 
             
         ]);
-        return new Point(this.N / 2, this.N / 2);
+        return new Size(this.N / 2, this.N / 2);
     };
     SubjectShape.prototype.outer = function (w, h) {
-        return new Point(w + this.N, h + this.N);
+        return new Size(w + this.N, h + this.N);
     };
     return SubjectShape;
 })();
@@ -152,10 +166,10 @@ var StrategyShape = (function () {
                 y: h
             }
         ]);
-        return new Point(this.N * 1.5, this.N / 2);
+        return new Size(this.N * 1.5, this.N / 2);
     };
     StrategyShape.prototype.outer = function (w, h) {
-        return new Point(w + this.N * 2, h + this.N);
+        return new Size(w + this.N * 2, h + this.N);
     };
     return StrategyShape;
 })();
@@ -180,10 +194,10 @@ var EvidenceShape = (function () {
             rx: w / 2,
             ry: h / 2
         });
-        return new Point(w / 6, h / 6);
+        return new Size(w / 6, h / 6);
     };
     EvidenceShape.prototype.outer = function (w, h) {
-        return new Point(w * 8 / 6, h * 8 / 6);
+        return new Size(w * 8 / 6, h * 8 / 6);
     };
     return EvidenceShape;
 })();
@@ -227,10 +241,10 @@ var SolutionShape = (function () {
             }, 
             
         ]);
-        return new Point(w / 6, h / 6);
+        return new Size(w / 6, h / 6);
     };
     SolutionShape.prototype.outer = function (w, h) {
-        return new Point(w * 8 / 6, h * 8 / 6);
+        return new Size(w * 8 / 6, h * 8 / 6);
     };
     return SolutionShape;
 })();
@@ -263,10 +277,10 @@ var MonitorShape = (function () {
             x: w * 5 / 8,
             y: this.N
         });
-        return new Point(w / 6, h / 6);
+        return new Size(w / 6, h / 6);
     };
     MonitorShape.prototype.outer = function (w, h) {
-        return new Point(w * 8 / 6, h * 8 / 6);
+        return new Size(w * 8 / 6, h * 8 / 6);
     };
     return MonitorShape;
 })();

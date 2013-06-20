@@ -1,12 +1,3 @@
-var Rect = (function () {
-    function Rect(x, y, w, h) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-    }
-    return Rect;
-})();
 var ANIME_MSEC = 250;
 var SCALE_MIN = 0.1;
 var SCALE_MAX = 6.0;
@@ -14,7 +5,6 @@ var MIN_DISP_SCALE = 0.25;
 var DEF_WIDTH = 200;
 var DCaseViewer = (function () {
     function DCaseViewer(root, dcase, editable) {
-        this.root = root;
         this.dcase = dcase;
         this.editable = editable;
         var _this = this;
@@ -255,7 +245,7 @@ var DCaseViewer = (function () {
             }
             f(_this.rootview);
             _this.rootview.updateLocation();
-            _this.shiftX = (_this.$root.width() - _this.treeSize().x * _this.scale) / 2;
+            _this.shiftX = (_this.$root.width() - _this.treeSize().w * _this.scale) / 2;
             _this.shiftY = 60;
             _this.location_updated = true;
             _this.repaintAll();
@@ -386,7 +376,7 @@ var DCaseViewer = (function () {
         var dx = Math.floor(this.shiftX + this.dragX);
         var dy = Math.floor(this.shiftY + this.dragY);
         var a = new Animation();
-        a.moves(this.$svg[0].transform.baseVal.getItem(0).matrix, {
+        a.moves((this.$svg[0]).transform.baseVal.getItem(0).matrix, {
             e: dx,
             f: dy
         });
@@ -486,9 +476,9 @@ var DNodeView = (function () {
         this.subject = null;
         this.rebuttal = null;
         this.offset = new Point(0, 0);
-        this.nodeSize = new Point(DEF_WIDTH, 100);
+        this.nodeSize = new Size(DEF_WIDTH, 100);
         this.subtreeBounds = new Rect(0, 0, 0, 0);
-        this.subtreeSize = new Point(0, 0);
+        this.subtreeSize = new Size(0, 0);
         this.nodeOffset = 0;
         this.visible = true;
         this.childVisible = true;
@@ -645,7 +635,7 @@ var DNodeView = (function () {
         });
         if(!visible) {
             this.subtreeBounds = new Rect(0, 0, 0, 0);
-            this.subtreeSize = new Point(0, 0);
+            this.subtreeSize = new Size(0, 0);
             this.nodeOffset = 0;
             this.forEachNode(function (view) {
                 return view.offset = new Point(0, 0);
@@ -722,7 +712,7 @@ var DNodeView = (function () {
             y1 += 40;
         }
         this.subtreeBounds = new Rect(x0, y0, x1, y1);
-        this.subtreeSize = new Point(x1 - x0, y1 - y0);
+        this.subtreeSize = new Size(x1 - x0, y1 - y0);
         this.nodeOffset = offY;
     };
     DNodeView.prototype.getLocation = function () {
@@ -744,10 +734,10 @@ var DNodeView = (function () {
         this.updateColor();
         var offset = this.svg.animate(a, b.x, b.y, b.w, b.h);
         a.moves(this.$div, {
-            left: (b.x + offset.x),
-            top: (b.y + offset.y),
-            width: (b.w - offset.x * 2),
-            height: (b.h - offset.y * 2)
+            left: (b.x + offset.w),
+            top: (b.y + offset.h),
+            width: (b.w - offset.w * 2),
+            height: (b.h - offset.h * 2)
         });
         if(this.$line != null) {
             var l = this.$line[0];

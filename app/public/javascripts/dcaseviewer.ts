@@ -14,14 +14,6 @@ interface DCaseTheme {
 	stroke;
 	fill;
 }
-class Rect {
-	constructor(
-		public x: number,
-		public y: number,
-		public w: number,
-		public h: number,
-	) {}
-}
 
 var ANIME_MSEC = 250;
 var SCALE_MIN = 0.1;
@@ -51,10 +43,10 @@ class DCaseViewer {
 	viewer_addons   : any[] = [];
 	nodeview_addons : any[]   = [];
 
-	$root;
-	$svg;
-	$dom;
-	$dummyDivForPointer;
+	$root: JQuery;
+	$svg : JQuery;
+	$dom : JQuery;
+	$dummyDivForPointer: JQuery;
 
 	canMoveByKeyboard: bool = true;
 
@@ -64,7 +56,7 @@ class DCaseViewer {
 	}
 	dragEnd(view) {}
 
-	constructor(public root: any, public dcase: DCaseModel, public editable: bool) {
+	constructor(root: any, public dcase: DCaseModel, public editable: bool) {
 		this.$root = $(root);
 		root.className = "viewer-root";
 
@@ -269,7 +261,7 @@ class DCaseViewer {
 			}
 			f(this.rootview);
 			this.rootview.updateLocation();
-			this.shiftX = (this.$root.width() - this.treeSize().x * this.scale)/2;
+			this.shiftX = (this.$root.width() - this.treeSize().w * this.scale)/2;
 			this.shiftY = 60;
 			this.location_updated = true;
 			this.repaintAll();
@@ -316,7 +308,7 @@ class DCaseViewer {
 		return this.selectedNode;
 	};
 	
-	treeSize(): Point {
+	treeSize(): Size {
 		return this.rootview.subtreeSize;
 	};
 	
@@ -419,7 +411,7 @@ class DCaseViewer {
 		var dy = Math.floor(this.shiftY + this.dragY);
 	
 		var a = new Animation();
-		a.moves(this.$svg[0].transform.baseVal.getItem(0).matrix, { e: dx, f: dy });
+		a.moves((<any>this.$svg[0]).transform.baseVal.getItem(0).matrix, { e: dx, f: dy });
 		a.moves(this.$dom, { left: dx, top: dy });
 	
 		if(ms == 0 || ms == null) {
@@ -532,9 +524,9 @@ class DNodeView {
 	rebuttal: DNodeView = null;
 	
 	offset  : Point = new Point(0, 0);
-	nodeSize: Point = new Point(DEF_WIDTH, 100);
+	nodeSize: Size = new Size(DEF_WIDTH, 100);
 	subtreeBounds: Rect = new Rect(0, 0, 0, 0);
-	subtreeSize: Point = new Point(0, 0);
+	subtreeSize: Size = new Size(0, 0);
 	nodeOffset: number = 0;
 	
 	visible: bool = true;
@@ -697,7 +689,7 @@ class DNodeView {
 	
 		if(!visible) {
 			this.subtreeBounds = new Rect(0, 0, 0, 0);
-			this.subtreeSize = new Point(0, 0);
+			this.subtreeSize = new Size(0, 0);
 			this.nodeOffset = 0;
 			this.forEachNode((view: DNodeView) => view.offset = new Point(0, 0));
 			return;
@@ -779,7 +771,7 @@ class DNodeView {
 			y1 += 40;
 		}
 		this.subtreeBounds = new Rect(x0, y0, x1, y1);
-		this.subtreeSize = new Point(x1-x0, y1-y0);
+		this.subtreeSize = new Size(x1-x0, y1-y0);
 		this.nodeOffset = offY;
 	}
 	
@@ -805,10 +797,10 @@ class DNodeView {
 	
 		var offset = this.svg.animate(a, b.x, b.y, b.w, b.h);
 		a.moves(this.$div, {
-			left  : (b.x + offset.x),
-			top   : (b.y + offset.y),
-			width : (b.w - offset.x*2),
-			height: (b.h - offset.y*2),
+			left  : (b.x + offset.w),
+			top   : (b.y + offset.h),
+			width : (b.w - offset.w*2),
+			height: (b.h - offset.h*2),
 		});
 	
 		if(this.$line != null) {
