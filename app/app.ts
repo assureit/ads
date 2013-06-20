@@ -6,6 +6,7 @@ import express = module('express')
 import api = module('./routes/api')
 import client = module('./routes/index')
 import path = module('path')
+import file = module('./routes/upload')
 
 var app = exports.app = <Express> express();
 
@@ -15,7 +16,7 @@ app.configure(function() {
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
 	app.use(express.favicon());
-	app.use(express.bodyParser());
+	app.use(express.bodyParser({uploadDir:'./upload'}));
 	app.use(express.cookieParser());
 	app.use(express.methodOverride());
 	app.use(app.router);
@@ -40,6 +41,8 @@ app.get('/page/:id', client.index);
 app.get('/new', client.index);
 app.get('/dcase/:id', client.index);
 app.post('/export', client.exporter);
+
+app.post('/upload', file.upload);
 
 if (!module.parent) {
 	http.createServer(app).listen(app.get('port'), function(){

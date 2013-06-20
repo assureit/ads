@@ -9,6 +9,7 @@ api/dcase.ts
 db/db.ts
 test/db/db.ts
 test/routes/api.ts
+test/routes/upload.ts
 test/api/dcase.ts
 test/model/user.ts
 public/javascripts/ads.ts
