@@ -25,32 +25,41 @@ export var exporter = function(req: any, res: any) {
 	var type = req.body.type;
 	var mime = "text/plain";
 
-	if(type == "png") {
-		mime = "image/png";
-	}
-	if(type == "pdf") {
-		mime = "application/pdf";
-	}
-	if(type == "svg") {
-		res.set('Content-type','image/svg+xml');
-		res.send(req.body.svg);
-		process.exit();
+	switch(type) {
+		case "png":
+			mime = "image/png";
+			break;
+		case "pdf":
+			mime = "application/pdf";
+			break;
+		case "svg":
+			res.set('Content-type','image/svg+xml');
+			res.send(req.body.svg);
+			return;
+		case "json":
+			res.set('Content-type','application/json');
+			res.send(req.body.json);
+			return;
+		default:
+			res.send(400, "Bad Request");
+			return;
 	}
 
 	exec("/bin/mktemp -q /tmp/svg.XXXXXX", (error, stdout, stderr) => {
 		var filename :string = stdout;
-		var svgname  :string = filename;
-		var resname = filename + "." + type;
+		var svgname  :string = filename.trim();
+		var resname = filename.trim() + "." + type;
 		fs.writeFile(svgname, req.body.svg, (err) => {
 			if (err) throw err;
+
 			var rsvg_convert = "rsvg-convert " + svgname + " -f " + type + " -o " + resname;
-			exec(rsvg_convert, (error, stdout, stderr) => {
-				if(error) throw error;
+			exec(rsvg_convert, (r_error, r_stdout, r_stderr) => {
+				if(r_error) throw r_error;
+
 				var stat = fs.statSync(resname);
 				res.set("Content-Length", stat.size);
 				res.set("Content-type", mime);
-
-				res.send(fs.readFileSync(resname, "rb"));
+				res.send(fs.readFileSync(resname));
 			});
 		});
 	});
