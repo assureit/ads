@@ -25,6 +25,7 @@ export var exporter = function(req: any, res: any) {
 	var type = req.body.type;
 	var mime = "text/plain";
 
+	res.set('Content-type','application/octet-stream; charset=utf-8');
 	switch(type) {
 		case "png":
 			mime = "image/png";
@@ -37,7 +38,6 @@ export var exporter = function(req: any, res: any) {
 			res.send(req.body.svg);
 			return;
 		case "json":
-			res.set('Content-type','application/json');
 			res.send(req.body.json);
 			return;
 		default:

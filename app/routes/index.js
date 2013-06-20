@@ -18,6 +18,7 @@ exports.exporter = function (req, res) {
     var exec = childProcess.exec;
     var type = req.body.type;
     var mime = "text/plain";
+    res.set('Content-type', 'application/octet-stream; charset=utf-8');
     switch(type) {
         case "png":
             mime = "image/png";
@@ -30,7 +31,6 @@ exports.exporter = function (req, res) {
             res.send(req.body.svg);
             return;
         case "json":
-            res.set('Content-type', 'application/json');
             res.send(req.body.json);
             return;
         default:

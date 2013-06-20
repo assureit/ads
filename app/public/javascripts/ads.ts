@@ -90,7 +90,7 @@ class ADS {
 			importFile.read((file: DCaseFile) => {
 				var tree = JSON.parse(file.result); //TODO convert to Markdown
 				if("contents" in tree) {
-					var r = DCaseAPI.createDCase(file.name.split(".")[0], tree.contents);
+					var r = DCaseAPI.createDCase(tree.contents.DCaseName, tree.contents);
 					location.href = "./dcase/" + r.dcaseId;
 				} else {
 					alert("Invalid File");
@@ -136,6 +136,7 @@ class ADS {
 			var tree = <DCaseTreeRawData>JSON.parse(r.contents);
 			var dcase = new DCaseModel(tree, dcaseId, r.commitId);
 			this.viewer.setDCase(dcase);
+			this.viewer.setDCaseName(r.dcaseName);
 			this.timelineView.repaint(dcase);
 			this.viewer.dcase_latest = dcase;
 			document.title = r.dcaseName + this.TITLE_SUFFIX;
@@ -277,12 +278,15 @@ class ADS {
 	exportViaSVG(type, root): void {
 		var svg = this.createSVGDocument(this.viewer, root);
 		svg = svg.replace("</svg></svg>", "</svg>"); // for IE10 Bug
-		this.executePost(this.URL_EXPORT, {"type" : type, "svg" : svg});
+		this.executePost(this.URL_EXPORT + '.' + type, {"type" : type, "svg" : svg});
 	}
 
 	exportViaJson(type, root): void {
-		var json = JSON.stringify(this.viewer.getDCase().encode());
-		this.executePost(this.URL_EXPORT, {"type" : type, "json" : json});
+		var json = {
+				"contents": this.viewer.getDCase().encode()
+		};
+		json.contents.DCaseName = this.viewer.getDCaseName();
+		this.executePost(this.URL_EXPORT + '.' + type, {"type" : type, "json" : JSON.stringify(json)});
 	}
 
 	exportTree(type: string, root: any): void {
