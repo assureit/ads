@@ -30,7 +30,7 @@ app.get('/', client.index);
 app.get('/page/:id', client.index);
 app.get('/new', client.index);
 app.get('/dcase/:id', client.index);
-app.post('/export', client.exporter);
+app.post('/export.*', client.exporter);
 if(!module.parent) {
     http.createServer(app).listen(app.get('port'), function () {
         console.log('Express server listening on port ' + app.get('port'));
