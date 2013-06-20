@@ -104,7 +104,7 @@ var SelectDCaseView = (function () {
             var i = _this.pageIndex - 0;
             if(i > 1) {
                 _this.pageIndex = i - 1;
-                location.href = "./#page/" + _this.pageIndex;
+                location.href = "/page/" + _this.pageIndex;
             }
             e.preventDefault();
         });
@@ -112,7 +112,7 @@ var SelectDCaseView = (function () {
             var i = _this.pageIndex - 0;
             if(_this.maxPageSize >= i + 1) {
                 _this.pageIndex = i + 1;
-                location.href = "./#page/" + _this.pageIndex;
+                location.href = "/page/" + _this.pageIndex;
             }
             e.preventDefault();
         });
@@ -179,7 +179,7 @@ var SearchView = (function () {
             for(var i = 0; i < result.length; ++i) {
                 var res = result[i];
                 var id = res.dcaseId;
-                $("<li>").html("<a href=\"#dcase/" + id + "\">" + id + "</a>").appendTo($res);
+                $("<li>").html("<a href=\"dcase/" + id + "\">" + id + "</a>").appendTo($res);
             }
         }
         $res.append("<hr>");
