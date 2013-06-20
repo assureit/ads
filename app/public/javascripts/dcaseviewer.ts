@@ -53,12 +53,13 @@ class DCaseViewer {
 			});
 
 	canMoveByKeyboard: bool = true;
+	dragEnd: (view: DNodeView) => void;
 
 	//TODO
 	addEventHandler() {
 		this.handler = new PointerHandler(this);
+		this.dragEnd = (view: DNodeView) => this.handler.dragEnd(view);
 	}
-	dragEnd(view) {}
 
 	constructor(root: any, public dcase: DCaseModel, public editable: bool) {
 		this.$root = $(root);
@@ -86,11 +87,11 @@ class DCaseViewer {
 		$.each(this.viewer_addons, (i, addon) => {
 			addon(this);
 		});
-		this.setDCase(dcase);
 		this.addEventHandler();
-		this.canMoveByKeyboard = true;
-
 		this.initKeyHandler();
+
+		this.setDCase(dcase);
+		this.canMoveByKeyboard = true;
 	}
 
 	initKeyHandler() {
@@ -562,9 +563,7 @@ class DNodeView {
 			this.$rootsvg.append(this.$line);
 		}
 	
-		this.$div.mouseup((e) => {
-			this.viewer.dragEnd(this);
-		});
+		this.$div.mouseup((e) => this.viewer.dragEnd(this));
 	
 		this.$div.hover(() => {
 			this.hovered = true;

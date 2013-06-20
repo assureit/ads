@@ -52,15 +52,17 @@ var DCaseViewer = (function () {
         $.each(this.viewer_addons, function (i, addon) {
             addon(_this);
         });
-        this.setDCase(dcase);
         this.addEventHandler();
-        this.canMoveByKeyboard = true;
         this.initKeyHandler();
+        this.setDCase(dcase);
+        this.canMoveByKeyboard = true;
     }
     DCaseViewer.prototype.addEventHandler = function () {
+        var _this = this;
         this.handler = new PointerHandler(this);
-    };
-    DCaseViewer.prototype.dragEnd = function (view) {
+        this.dragEnd = function (view) {
+            return _this.handler.dragEnd(view);
+        };
     };
     DCaseViewer.prototype.initKeyHandler = function () {
         var _this = this;
@@ -514,7 +516,7 @@ var DNodeView = (function () {
             this.$rootsvg.append(this.$line);
         }
         this.$div.mouseup(function (e) {
-            _this.viewer.dragEnd(_this);
+            return _this.viewer.dragEnd(_this);
         });
         this.$div.hover(function () {
             _this.hovered = true;
