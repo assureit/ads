@@ -34,8 +34,8 @@ class DCaseViewer {
 	location_updated: bool = false;
 	drag_flag: bool = true;
 	selectedNode: DNodeView = null;
-	rootview  :DNodeView= null;
-	clipboard :DCaseNodeModel= null;
+	rootview  :DNodeView = null;
+	clipboard :DCaseNodeModel = null;
 	dcase_latest   : any;
 	handler   :PointerHandler = null;
 	colorSets: ColorSets;
@@ -44,9 +44,13 @@ class DCaseViewer {
 	nodeview_addons : any[]   = [];
 
 	$root: JQuery;
-	$svg : JQuery;
-	$dom : JQuery;
-	$dummyDivForPointer: JQuery;
+	$svg : JQuery = $(document.createElementNS(SVG_NS, "g"))
+			.attr("transform", "translate(0, 0)");
+	$dom : JQuery = $("<div></div>").css("position", "absolute");
+	$dummyDivForPointer: JQuery = $("<div></div>").css({
+				width: "100%", height: "100%" , position: "absolute",
+				top: "0px", left: "0px", "-ms-touch-action": "none"
+			});
 
 	canMoveByKeyboard: bool = true;
 
@@ -63,15 +67,9 @@ class DCaseViewer {
 		var $svgroot = $(document.createElementNS(SVG_NS, "svg"))
 			.attr({ width: "100%", height: "100%" })
 			.appendTo(this.$root);
-		this.$svg = $(document.createElementNS(SVG_NS, "g"))
-			.attr("transform", "translate(0, 0)")
-			.appendTo($svgroot);
-		this.$dummyDivForPointer = $("<div></div>")
-			.css({ width: "100%", height: "100%" , position: "absolute", top: "0px", left: "0px", "-ms-touch-action": "none" })
-			.appendTo(this.$root);
-		this.$dom = $("<div></div>")
-			.css("position", "absolute")
-			.appendTo(this.$root);
+		this.$svg.appendTo($svgroot);
+
+		this.$root.append(this.$dummyDivForPointer).append(this.$dom);
 
 		//------------------------------------
 
@@ -92,6 +90,10 @@ class DCaseViewer {
 		this.addEventHandler();
 		this.canMoveByKeyboard = true;
 
+		this.initKeyHandler();
+	}
+
+	initKeyHandler() {
 		$(document.body).on("keydown", (e) => {
 			if(e.keyCode == 39 /* RIGHT */ || e.keyCode == 37 /* LEFT */){
 				if(!this.canMoveByKeyboard) return;
@@ -202,7 +204,6 @@ class DCaseViewer {
 					this.getDCase().removeNode(selected.node);
 				}
 			}
-	
 		});
 	}
 	
@@ -253,7 +254,7 @@ class DCaseViewer {
 	
 		this.$dom.ready(() => {
 			function f(v) {//FIXME
-				var b = v.svg.outer(DEF_WIDTH, v.$divText.height() + 60);
+				var b = v.svgShape.outer(DEF_WIDTH, v.$divText.height() + 60);
 				v.nodeSize.h = b.h;
 				v.forEachNode((e) => {
 					f(e);
@@ -270,7 +271,7 @@ class DCaseViewer {
 	
 	//-----------------------------------------------------------------------------
 	
-	setLocation(x: number, y: number, scale: number, ms: number) {
+	setLocation(x: number, y: number, scale: number, ms: number = 0) {
 		this.shiftX = x;
 		this.shiftY = y;
 		if(scale != null) {
@@ -287,7 +288,7 @@ class DCaseViewer {
 	
 	getNodeView(node: DCaseNodeModel): DNodeView {
 		return this.nodeViewMap[node.id];
-	};
+	}
 	
 	setSelectedNode(view: DNodeView) {
 		if(view != null) {
@@ -302,15 +303,15 @@ class DCaseViewer {
 			this.selectedNode.updateColor();
 		}
 		this.selectedNode = view;
-	};
+	}
 	
 	getSelectedNode(): DNodeView {
 		return this.selectedNode;
-	};
+	}
 	
 	treeSize(): Size {
 		return this.rootview.subtreeSize;
-	};
+	}
 	
 	setColorTheme(theme: DCaseTheme) {
 		if(theme != null) {
@@ -320,11 +321,11 @@ class DCaseViewer {
 		}
 		this.location_updated = true;
 		this.repaintAll();
-	};
+	}
 	
 	//-----------------------------------------------------------------------------
 	
-	structureUpdated(ms: number) {
+	structureUpdated() {
 		this.setDCase(this.dcase);
 	};
 	
@@ -345,7 +346,7 @@ class DCaseViewer {
 	
 		this.$dom.ready(() => {
 			function f(v) {//FIXME
-				var b = v.svg.outer(200, v.$divText.height() + 60);
+				var b = v.svgShape.outer(200, v.$divText.height() + 60);
 				v.nodeSize.h = b.h;
 			}
 			f(view);
@@ -374,7 +375,7 @@ class DCaseViewer {
 		view.nodeChanged();
 		this.$dom.ready(() => {
 			function f(v) {//FIXME
-				var b = v.svg.outer(200, v.$divText.height() + 60);
+				var b = v.svgShape.outer(200, v.$divText.height() + 60);
 				v.nodeSize.h = b.h;
 			}
 			f(view);
@@ -385,7 +386,7 @@ class DCaseViewer {
 	
 	//-----------------------------------------------------------------------------
 	
-	centerize(node: DCaseNodeModel, ms?: number) {
+	centerize(node: DCaseNodeModel, ms: number = 0) {
 		if(this.rootview == null) return;
 		var view = this.getNodeView(node);
 		this.setSelectedNode(view);
@@ -395,7 +396,7 @@ class DCaseViewer {
 		this.setLocation(x, y, null, ms);
 	};
 	
-	centerizeNodeView(view: DNodeView, ms?: number) {
+	centerizeNodeView(view: DNodeView, ms: number = 0) {
 		if(this.rootview == null) return;
 		this.setSelectedNode(view);
 		var b = view.getLocation();
@@ -404,7 +405,7 @@ class DCaseViewer {
 		this.setLocation(x, y, null, ms);
 	};
 	
-	repaintAll(ms?: number) {
+	repaintAll(ms: number = 0) {
 		if(this.rootview == null) return;
 	
 		var dx = Math.floor(this.shiftX + this.dragX);
@@ -414,7 +415,7 @@ class DCaseViewer {
 		a.moves((<any>this.$svg[0]).transform.baseVal.getItem(0).matrix, { e: dx, f: dy });
 		a.moves(this.$dom, { left: dx, top: dy });
 	
-		if(ms == 0 || ms == null) {
+		if(ms == 0) {
 			if(this.location_updated) {
 				this.rootview.updateLocation();
 				this.location_updated = false;
@@ -508,7 +509,7 @@ function createArgumentBorderElement(){
 }
 
 class DNodeView {
-	svg: GsnShape;
+	svgShape: GsnShape;
 	$rootsvg: JQuery;
 	$div    : JQuery = $("<div></div>").addClass("node-container");
 	$undevel: JQuery;
@@ -605,10 +606,10 @@ class DNodeView {
 		this.$divName.html(node.name);
 		this.$divText.html(node.getHtmlDescription());
 		this.$divText.append(node.getHtmlMetadata());
-		if(this.svg){
-			$(this.svg[0]).remove();
+		if(this.svgShape){
+			$(this.svgShape[0]).remove();
 		}
-		this.svg = new GsnShapeMap[node.type](this.$rootsvg);
+		this.svgShape = new GsnShapeMap[node.type](this.$rootsvg);
 
 		var count = node.getNodeCount();
 		if(count != 0) {
@@ -628,8 +629,8 @@ class DNodeView {
 			stroke = this.viewer.colorSets.colorTheme.stroke[this.node.type];
 		}
 		var fill = this.viewer.colorSets.colorTheme.fill[this.node.type];
-		this.svg[0].setAttribute("stroke", stroke);
-		this.svg[0].setAttribute("fill", fill);
+		this.svgShape[0].setAttribute("stroke", stroke);
+		this.svgShape[0].setAttribute("fill", fill);
 	}
 	
 	remove(parentView: DNodeView) {
@@ -645,7 +646,7 @@ class DNodeView {
 		while(this.children.length != 0) {
 			this.children[0].remove(this);
 		}
-		$(this.svg[0]).remove();
+		$(this.svgShape[0]).remove();
 		this.$div.remove();
 		if(this.$undevel != null) this.$undevel.remove();
 		if(this.$argBorder != null) this.$argBorder.remove();
@@ -790,12 +791,12 @@ class DNodeView {
 	 	x -= this.subtreeBounds.x
 		var b = new Rect(x, y + this.nodeOffset, this.nodeSize.w, this.nodeSize.h);
 	
-		a.show(this.svg[0], this.visible);
+		a.show(this.svgShape[0], this.visible);
 		a.show(this.$div, this.visible);
 		a.show(this.$divNodes, !this.childVisible);
 		this.updateColor();
 	
-		var offset = this.svg.animate(a, b.x, b.y, b.w, b.h);
+		var offset = this.svgShape.animate(a, b.x, b.y, b.w, b.h);
 		a.moves(this.$div, {
 			left  : (b.x + offset.w),
 			top   : (b.y + offset.h),
