@@ -116,7 +116,7 @@ class SelectDCaseView {
 			var i = this.pageIndex - 0;
 			if(i > 1) {
 				this.pageIndex = i - 1;
-				location.href = "./#page/" + this.pageIndex;
+				location.href = "/page/" + this.pageIndex;
 			}
 			e.preventDefault();
 		});
@@ -125,7 +125,7 @@ class SelectDCaseView {
 			var i = this.pageIndex - 0;
 			if(this.maxPageSize >= i + 1) {
 				this.pageIndex = i + 1;
-				location.href = "./#page/" + this.pageIndex;
+				location.href = "/page/" + this.pageIndex;
 			}
 			e.preventDefault();
 		});
@@ -196,7 +196,7 @@ class SearchView {
 				var res = result[i];
 				var id = res.dcaseId;
 				$("<li>")
-					.html("<a href=\"#dcase/" + id + "\">" + id + "</a>")
+					.html("<a href=\"dcase/" + id + "\">" + id + "</a>")
 					.appendTo($res);
 			}
 		}
