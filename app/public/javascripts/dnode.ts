@@ -223,6 +223,7 @@ class DCaseTree {   //FIXME
 	NodeList: DCaseNodeModel[];
 	TopGoalId: number;
 	NodeCount: number;
+	DCaseName: string;
 
 	constructor(tl: DCaseNodeModel[], id: number, nodeCount: number) {
 		this.NodeList = tl;

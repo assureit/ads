@@ -210,6 +210,12 @@ var DCaseViewer = (function () {
     DCaseViewer.prototype.getDCase = function () {
         return this.dcase;
     };
+    DCaseViewer.prototype.setDCaseName = function (name) {
+        this.dcaseName = name;
+    };
+    DCaseViewer.prototype.getDCaseName = function () {
+        return this.dcaseName;
+    };
     DCaseViewer.prototype.setDCase = function (dcase) {
         var _this = this;
         if(this.dcase != null) {
