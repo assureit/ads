@@ -12,7 +12,8 @@ import error = module('./error')
  */
 export interface Callback {
 	onSuccess(result: any) : void;
-	onFailure(error: error.RPCError) : void;
+	onFailure(error: error.IRPCOverHTTPError) : void;
+	onFailure(error: any) : void;
 }
 
 /**

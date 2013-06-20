@@ -10,7 +10,9 @@ db/db.ts
 test/db/db.ts
 test/routes/api.ts
 test/api/dcase.ts
+<<<<<<< HEAD
 test/model/user.ts
+=======
 public/javascripts/ads.ts
 public/javascripts/adsComponentView.ts
 public/javascripts/animation.ts
@@ -25,3 +27,4 @@ public/javascripts/importfile.ts
 public/javascripts/index.ts
 public/javascripts/router.ts
 public/javascripts/timeline.ts
+>>>>>>> master

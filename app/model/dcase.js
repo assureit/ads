@@ -27,17 +27,15 @@ var DCaseDAO = (function (_super) {
 
     }
     DCaseDAO.prototype.insert = function (params, callback) {
-        var _this = this;
         this.con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [
             params.userId, 
             params.dcaseName
         ], function (err, result) {
             if(err) {
-                _this.con.rollback();
-                _this.con.close();
-                throw err;
+                callback(err, null);
+                return;
             }
-            callback(result.insertId);
+            callback(err, result.insertId);
         });
     };
     DCaseDAO.prototype.list = function (page, callback) {
@@ -51,8 +49,8 @@ var DCaseDAO = (function (_super) {
             pager.getOffset()
         ], function (err, result) {
             if(err) {
-                _this.con.close();
-                throw err;
+                callback(err, null, null);
+                return;
             }
             var list = new Array();
             result.forEach(function (row) {
@@ -64,39 +62,37 @@ var DCaseDAO = (function (_super) {
             });
             _this.con.query('SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ', function (err, countResult) {
                 if(err) {
-                    _this.con.close();
-                    throw err;
+                    callback(err, null, null);
+                    return;
                 }
                 pager.totalItems = countResult[0].cnt;
-                callback(pager, list);
+                callback(err, pager, list);
             });
         });
     };
     DCaseDAO.prototype.remove = function (dcaseId, callback) {
-        var _this = this;
         this.con.query('UPDATE dcase SET delete_flag=TRUE WHERE id = ?', [
             dcaseId
         ], function (err, result) {
             if(err) {
-                _this.con.close();
-                throw err;
+                callback(err);
+                return;
             }
-            callback();
+            callback(err);
         });
     };
     DCaseDAO.prototype.update = function (dcaseId, name, callback) {
-        var _this = this;
         this.con.query('UPDATE dcase SET name=? WHERE id = ?', [
             name, 
             dcaseId
         ], function (err, result) {
             if(err) {
-                _this.con.close();
-                throw err;
+                callback(err);
+                return;
             }
-            callback();
+            callback(err);
         });
     };
     return DCaseDAO;
-})(model.Model);
+})(model.DAO);
 exports.DCaseDAO = DCaseDAO;

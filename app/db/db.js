@@ -1,6 +1,14 @@
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var mysql = require('mysql')
-var Database = (function () {
+var events = require('events')
+var Database = (function (_super) {
+    __extends(Database, _super);
     function Database() {
+        _super.call(this);
         this.con = Database.getConnection();
     }
     Database.getConnection = function getConnection() {
@@ -12,7 +20,15 @@ var Database = (function () {
         });
     };
     Database.prototype.query = function (sql, values, callback) {
-        this.con.query(sql, values, callback);
+        if(callback === undefined && typeof values === 'function') {
+            callback = values;
+        }
+        callback = this._bindErrorHandler(callback);
+        if(this.con) {
+            this.con.query(sql, values, callback);
+        } else {
+            callback('Connection is closed');
+        }
     };
     Database.prototype.begin = function (callback) {
         var _this = this;
@@ -32,14 +48,22 @@ var Database = (function () {
         });
     };
     Database.prototype.rollback = function (callback) {
-        callback = callback || function (err, result) {
-            if(err) {
-                throw err;
-            }
-        };
-        this.query('ROLLBACK', function (err, query) {
-            callback(err, query);
-        });
+        callback = callback || this._defaultCallback;
+        if(this.con) {
+            this.query('ROLLBACK', callback);
+        } else {
+            callback(null, null);
+        }
+    };
+    Database.prototype._rollback = function (callback) {
+        callback = callback || this._defaultCallback;
+        if(this.con) {
+            this.con.query('ROLLBACK', function (err, query) {
+                callback(err, query);
+            });
+        } else {
+            callback(null, null);
+        }
     };
     Database.prototype.endTransaction = function (callback) {
         this.query('SET autocommit=1', function (err, query) {
@@ -47,13 +71,28 @@ var Database = (function () {
         });
     };
     Database.prototype.close = function (callback) {
-        callback = callback || function (err, result) {
+        callback = callback || this._defaultCallback;
+        if(this.con) {
+            this.con.end(callback);
+            this.con = null;
+        }
+    };
+    Database.prototype._defaultCallback = function (err, result) {
+        if(err) {
+            this.emit('error', err);
+        }
+    };
+    Database.prototype._bindErrorHandler = function (callback) {
+        var _this = this;
+        return function (err, result) {
             if(err) {
-                throw err;
+                _this._rollback(function (err, result) {
+                    _this.close();
+                });
             }
+            callback(err, result);
         };
-        this.con.end(callback);
     };
     return Database;
-})();
+})(events.EventEmitter);
 exports.Database = Database;

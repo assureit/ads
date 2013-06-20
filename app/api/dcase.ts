@@ -5,23 +5,28 @@ import model_dcase = module('../model/dcase')
 import model_commit = module('../model/commit')
 import model_node = module('../model/node')
 import model_pager = module('../model/pager')
+import error = module('./error')
 
 export function searchDCase(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	var dcaseDAO = new model_dcase.DCaseDAO(con);
 	params = params || {};
-	dcaseDAO.list(params.page, (pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+	dcaseDAO.list(params.page, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+		if (err) {
+			callback.onFailure(err);
+			return;
+		}
 		con.close();
 		var list = [];
 		result.forEach((val) => {
 			list.push({
 				dcaseId: val.id, 
 				dcaseName: val.name,
-				userName: val.user.name,
+				userName: val.user.loginName,
 				latestCommit: {
 					dateTime: val.latestCommit.dateTime,
 					commitId: val.latestCommit.id,
-					userName: val.latestCommit.user.name,
+					userName: val.latestCommit.user.loginName,
 					userId: val.latestCommit.userId,
 					commitMessage: val.latestCommit.message
 				}
@@ -80,7 +85,11 @@ export function searchNode(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var nodeDAO = new model_node.NodeDAO(con);
-		nodeDAO.search(params.page, params.text, (pager: model_pager.Pager, list: model_node.Node[]) => {
+		nodeDAO.search(params.page, params.text, (err:any, pager: model_pager.Pager, list: model_node.Node[]) => {
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
 			var searchResultList = [];
 			list.forEach((node) => {
 				searchResultList.push({
@@ -112,11 +121,23 @@ export function createDCase(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var dcaseDAO = new model_dcase.DCaseDAO(con);
-		dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName}, (dcaseId:number) => {
+		dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName}, (err:any, dcaseId:number) => {
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
 			var commitDAO = new model_commit.CommitDAO(con);
-			commitDAO.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (commitId) => {
+			commitDAO.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (err:any, commitId:number) => {
+				if (err) {
+					callback.onFailure(err);
+					return;
+				}
 				var nodeDAO = new model_node.NodeDAO(con);
-				nodeDAO.insertList(commitId, params.contents.NodeList, () => {
+				nodeDAO.insertList(commitId, params.contents.NodeList, (err:any) => {
+					if (err) {
+						callback.onFailure(err);
+						return;
+					}
 					con.commit((err, result) =>{
 						callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
 						con.close();
@@ -134,11 +155,27 @@ export function commit(params: any, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var commitDAO = new model_commit.CommitDAO(con);
-		commitDAO.get(params.commitId, (com: model_commit.Commit) => {
-			commitDAO.insert({data: JSON.stringify(params.contents), prevId: params.commitId, dcaseId: com.dcaseId, userId: userId, message: params.commitMessage}, (commitId) => {
+		commitDAO.get(params.commitId, (err:any, com: model_commit.Commit) => {
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
+			commitDAO.insert({data: JSON.stringify(params.contents), prevId: params.commitId, dcaseId: com.dcaseId, userId: userId, message: params.commitMessage}, (err:any, commitId) => {
+				if (err) {
+					callback.onFailure(err);
+					return;
+				}
 				var nodeDAO = new model_node.NodeDAO(con);
-				nodeDAO.insertList(commitId, params.contents.NodeList, () => {
+				nodeDAO.insertList(commitId, params.contents.NodeList, (err:any) => {
+					if (err) {
+						callback.onFailure(err);
+						return;
+					}
 					con.commit((err, result) =>{
+						if (err) {
+							callback.onFailure(err);
+							return;
+						}
 						callback.onSuccess({commitId: commitId});
 						con.close();
 					});
@@ -156,7 +193,11 @@ export function deleteDCase(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var dcaseDAO = new model_dcase.DCaseDAO(con);
-		dcaseDAO.remove(params.dcaseId, () => {
+		dcaseDAO.remove(params.dcaseId, (err:any) => {
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
 			con.commit((err, result) =>{
 				callback.onSuccess({dcaseId: params.dcaseId});
 				con.close();
@@ -172,8 +213,16 @@ export function editDCase(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var dcaseDAO = new model_dcase.DCaseDAO(con);
-		dcaseDAO.update(params.dcaseId, params.dcaseName, () => {
+		dcaseDAO.update(params.dcaseId, params.dcaseName, (err:any) => {
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
 			con.commit((err, result) =>{
+				if (err) {
+					callback.onFailure(err);
+					return;
+				}
 				callback.onSuccess({dcaseId: params.dcaseId});
 				con.close();
 			});
@@ -184,11 +233,15 @@ export function editDCase(params:any, callback: type.Callback) {
 export function getCommitList(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	var commitDAO = new model_commit.CommitDAO(con);
-	commitDAO.list(params.dcaseId, (list: model_commit.Commit[]) => {
+	commitDAO.list(params.dcaseId, (err:any, list: model_commit.Commit[]) => {
+		if (err) {
+			callback.onFailure(err);
+			return;
+		}
 		con.close();
 		var commitList = [];
 		list.forEach((c: model_commit.Commit) => {
-			commitList.push({commitId: c.id, dateTime: c.dateTime, commitMessage: c.message, userId: c.userId, userName: c.user.name});
+			commitList.push({commitId: c.id, dateTime: c.dateTime, commitMessage: c.message, userId: c.userId, userName: c.user.loginName});
 		});
 		callback.onSuccess({
 			commitList: commitList

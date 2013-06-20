@@ -20,9 +20,9 @@ function httpHandler(req, res) {
     function onError(id, statusCode, error) {
         res.send(JSON.stringify({
             jsonrpc: '2.0',
-            error: error,
+            error: error.toStrictRPCError(),
             id: id
-        }), statusCode);
+        }), error.rpcHttpStatus);
     }
     res.header('Content-Type', 'application/json');
     if(req.body.jsonrpc !== '2.0') {
@@ -48,12 +48,15 @@ function httpHandler(req, res) {
                     id: req.body.id
                 }), 200);
             },
-            onFailure: function (error) {
+            onFailure: function (err) {
+                if(!(error instanceof error.RPCError && error instanceof error.ApplicationError)) {
+                    err = new error.InternalError('Execution error is occured', JSON.stringify(err));
+                }
                 res.send(JSON.stringify({
                     jsonrpc: '2.0',
-                    error: error,
+                    error: err.toStrictRPCError(),
                     id: req.body.id
-                }), 500);
+                }), err.rpcHttpStatus);
             }
         });
     });
