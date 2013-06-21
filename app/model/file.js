@@ -5,7 +5,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var model = require('./model')
 
-
+var error = require('../api/error')
 var FileDAO = (function (_super) {
     __extends(FileDAO, _super);
     function FileDAO() {
@@ -36,6 +36,21 @@ var FileDAO = (function (_super) {
                 return;
             }
             callback(err);
+        });
+    };
+    FileDAO.prototype.select = function (id, callback) {
+        this.con.query('SELECT path, name from file where id = ?', [
+            id
+        ], function (err, result) {
+            if(err) {
+                callback(err, null, null);
+                return;
+            }
+            if(result.length == 0) {
+                callback(new error.NotFoundError('The information on the target file was not found.'), null, null);
+                return;
+            }
+            callback(err, result[0].path, result[0].name);
         });
     };
     return FileDAO;

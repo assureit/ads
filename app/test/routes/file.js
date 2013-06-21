@@ -72,4 +72,25 @@ describe('api', function () {
             });
         });
     });
+    describe('download', function () {
+        it('not exist file', function (done) {
+            request(app['app']).get('/file/111').expect(404).end(function (err, res) {
+                done();
+            });
+        });
+        it('not exist DB data', function (done) {
+            request(app['app']).get('/file/10000').expect(200).end(function (err, res) {
+                assert.equal(res.body.rpcHttpStatus, 200);
+                assert.equal(res.body.code, 19999);
+                done();
+            });
+        });
+        it('should return name and fileBody', function (done) {
+            request(app['app']).get('/file/110').end(function (err, res) {
+                assert.notStrictEqual(undefined, res.body.name);
+                assert.notStrictEqual(undefined, res.body.fileBody);
+                done();
+            });
+        });
+    });
 });

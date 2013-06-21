@@ -27,7 +27,6 @@ export var upload = function(req: any, res: any){
 
 	var upfile = req.files.upfile
 	if (upfile) {
-
 		var con = new db.Database();
 		con.begin((err, result) => {
 			var fileDAO = new model_file.FileDAO(con);
@@ -53,26 +52,38 @@ export var upload = function(req: any, res: any){
 							fs.mkdirSync(despath);
 						}
 						fs.renameSync(upfile.path, despath + '/' + fileId);
-						var body: any = {URL: 'http://tekitou.com/file/' + fileId};
+						var url = req.protocol + '://' + req.host + '/file/';
+						var body: any = {URL: url + fileId};
 						con.close();
 						res.send(body, 200);
 					});
 				});
 			});
 		});
-	} else {
-
 	}
 }
 
 export var download = function(req: any, res: any) {
-	console.log('*** download ***');
-	console.log(req.params.idi);
-	res.send(200);
+
+	var con = new db.Database();
+	var fileDAO = new model_file.FileDAO(con);
+	fileDAO.select(req.params.id, (err: any, path: string, name: string) => {
+		if (err) {
+			res.send(err);
+			return;
+		}
+		fs.exists(path, (exists) => {
+			if (exists) {
+				fs.readFile(path, (err, data) => {
+					var responseFile = data.toString('base64');
+					var body: any = {name: name, fileBody: responseFile};
+					res.send(body, 200);
+					return;
+				});
+			} else {
+				res.send(404, 'File Not Found');
+			}
+		});
+	});
 }
 
-
-export var test = function(req: any, res: any) {
-	res.end('request end');
-	console.log('hoge');
-}
