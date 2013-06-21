@@ -6,10 +6,15 @@ import fs = module('fs')
 export var upload = function(req: any, res: any){
 
 	function onError(err: any, upfile: any) :void {
-		if (fs.existsSync(upfile.path)) {
-			fs.unlinkSync(upfile.path);
+		if fs.existsSync(upfile.path) {
+			fs.unlink(upfile.path, (err) => {
+				if (err) throw err;
+				res.send(err);
+			});
+		} else {
+			res.send(err);
 		}
-		res.send(err);
+		
 	}
 
 	function getDestinationDirectory() : string {
@@ -48,6 +53,7 @@ export var upload = function(req: any, res: any){
 							onError(err, upfile);
 							return;
 						}
+
 						if (!fs.existsSync(despath)) {
 							fs.mkdirSync(despath);
 						}
@@ -55,7 +61,7 @@ export var upload = function(req: any, res: any){
 						var url = req.protocol + '://' + req.host + '/file/';
 						var body: any = {URL: url + fileId};
 						con.close();
-						res.send(body, 200);
+						res.send(body);
 					});
 				});
 			});

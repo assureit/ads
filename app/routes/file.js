@@ -4,10 +4,16 @@ var model_file = require('../model/file')
 var fs = require('fs')
 exports.upload = function (req, res) {
     function onError(err, upfile) {
-        if(fs.existsSync(upfile.path)) {
-            fs.unlinkSync(upfile.path);
-        }
-        res.send(err);
+        fs.exists(upfile.path, function (exists) {
+            if(exists) {
+                fs.unlink(upfile.path, function (err) {
+                    if(err) {
+                        throw err;
+                    }
+                });
+            }
+            res.send(err);
+        });
     }
     function getDestinationDirectory() {
         var d = new Date();
@@ -53,7 +59,7 @@ exports.upload = function (req, res) {
                             URL: url + fileId
                         };
                         con.close();
-                        res.send(body, 200);
+                        res.send(body);
                     });
                 });
             });
