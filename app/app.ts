@@ -6,7 +6,7 @@ import express = module('express')
 import api = module('./routes/api')
 import client = module('./routes/index')
 import path = module('path')
-import file = module('./routes/upload')
+import file = module('./routes/file')
 
 var app = exports.app = <Express> express();
 
@@ -43,6 +43,7 @@ app.get('/dcase/:id', client.index);
 app.post('/export', client.exporter);
 
 app.post('/file', file.upload);
+app.post('/file/:id', file.download);
 
 if (!module.parent) {
 	http.createServer(app).listen(app.get('port'), function(){

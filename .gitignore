@@ -2,3 +2,4 @@ app/node_modules
 .DS_Store
 db/ER.mwb.bak
 app/npm-debug.log
+upload

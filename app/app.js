@@ -3,7 +3,7 @@ var express = require('express')
 var api = require('./routes/api')
 var client = require('./routes/index')
 var path = require('path')
-var file = require('./routes/upload')
+var file = require('./routes/file')
 var app = exports.app = express();
 app.configure(function () {
     app.set('port', process.env.PORT || 3000);
@@ -35,6 +35,7 @@ app.get('/new', client.index);
 app.get('/dcase/:id', client.index);
 app.post('/export', client.exporter);
 app.post('/file', file.upload);
+app.post('/file/:id', file.download);
 if(!module.parent) {
     http.createServer(app).listen(app.get('port'), function () {
         console.log('Express server listening on port ' + app.get('port'));

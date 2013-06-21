@@ -65,6 +65,13 @@ export var upload = function(req: any, res: any){
 	}
 }
 
+export var download = function(req: any, res: any) {
+	console.log('*** download ***');
+	console.log(req.params.idi);
+	res.send(200);
+}
+
+
 export var test = function(req: any, res: any) {
 	res.end('request end');
 	console.log('hoge');
