@@ -13,21 +13,29 @@ var FileDAO = (function (_super) {
 
     }
     FileDAO.prototype.insert = function (name, userId, callback) {
-        console.log(name);
-        console.log(userId);
         var path = "dummy";
         this.con.query('INSERT INTO file(name, path, user_id) VALUES(?,?,?) ', [
             name, 
             path, 
             userId
         ], function (err, result) {
-            console.log(err);
             if(err) {
                 callback(err, null);
                 return;
             }
-            console.log('file:ccc');
-            callback(err, 1);
+            callback(err, result.insertId);
+        });
+    };
+    FileDAO.prototype.update = function (id, path, callback) {
+        this.con.query('UPDATE file SET path = ? where id = ?', [
+            path, 
+            id
+        ], function (err, result) {
+            if(err) {
+                callback(err);
+                return;
+            }
+            callback(err);
         });
     };
     return FileDAO;
