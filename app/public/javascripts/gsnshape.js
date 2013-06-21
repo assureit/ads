@@ -3,57 +3,63 @@ var Point = (function () {
     function Point(x, y) {
         this.x = x;
         this.y = y;
-        this.w = x;
-        this.h = y;
     }
     return Point;
 })();
+var Size = (function () {
+    function Size(w, h) {
+        this.w = w;
+        this.h = h;
+    }
+    return Size;
+})();
+var Rect = (function () {
+    function Rect(x, y, w, h) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
+    return Rect;
+})();
 var GoalShape = (function () {
-    function GoalShape($svg) {
+    function GoalShape() {
         this.N = 10;
-        this[0] = document.createElementNS(SVG_NS, "g");
-        this[1] = document.createElementNS(SVG_NS, "foreignObject");
-        this[2] = document.createElementNS(SVG_NS, "rect");
-        $svg.append(this[0]);
-        this[0].appendChild(this[1]);
-        this[0].appendChild(this[2]);
-        this[0].setAttribute("transform", "translate(0,0)");
+        this.$g = $(document.createElementNS(SVG_NS, "g")).attr("transform", "translate(0,0)");
+        this.$rect = $(document.createElementNS(SVG_NS, "rect"));
+        this.$g.append(this.$rect);
     }
     GoalShape.prototype.animate = function (a, x, y, w, h) {
-        a.moves(this[0].transform.baseVal.getItem(0).matrix, {
+        a.moves((this.$g[0]).transform.baseVal.getItem(0).matrix, {
             e: x,
             f: y
         });
-        a.moves(this[2], {
+        a.moves(this.$rect[0], {
             x: 0,
             y: 0,
             width: w,
             height: h
         });
-        return new Point(this.N, this.N);
+        return new Size(this.N, this.N);
     };
     GoalShape.prototype.outer = function (w, h) {
-        return new Point(w + this.N * 2, h + this.N * 2);
+        return new Size(w + this.N * 2, h + this.N * 2);
     };
     return GoalShape;
 })();
 var ContextShape = (function () {
-    function ContextShape($svg) {
+    function ContextShape() {
         this.N = 20;
-        this[0] = document.createElementNS(SVG_NS, "g");
-        this[1] = document.createElementNS(SVG_NS, "foreignObject");
-        this[2] = document.createElementNS(SVG_NS, "rect");
-        $svg.append(this[0]);
-        this[0].appendChild(this[1]);
-        this[0].appendChild(this[2]);
-        this[0].setAttribute("transform", "translate(0,0)");
+        this.$g = $(document.createElementNS(SVG_NS, "g")).attr("transform", "translate(0,0)");
+        this.$rect = $(document.createElementNS(SVG_NS, "rect"));
+        this.$g.append(this.$rect);
     }
     ContextShape.prototype.animate = function (a, x, y, w, h) {
-        a.moves(this[0].transform.baseVal.getItem(0).matrix, {
+        a.moves((this.$g[0]).transform.baseVal.getItem(0).matrix, {
             e: x,
             f: y
         });
-        a.moves(this[2], {
+        a.moves(this.$rect[0], {
             rx: this.N,
             ry: this.N,
             x: 0,
@@ -61,33 +67,27 @@ var ContextShape = (function () {
             width: w,
             height: h
         });
-        return new Point(this.N / 2, this.N / 2);
+        return new Size(this.N / 2, this.N / 2);
     };
     ContextShape.prototype.outer = function (w, h) {
-        return new Point(w + this.N, h + this.N);
+        return new Size(w + this.N, h + this.N);
     };
     return ContextShape;
 })();
 var SubjectShape = (function () {
-    function SubjectShape($svg) {
+    function SubjectShape() {
         this.N = 20;
-        this[0] = document.createElementNS(SVG_NS, "g");
-        this[1] = document.createElementNS(SVG_NS, "foreignObject");
-        this[2] = document.createElementNS(SVG_NS, "rect");
-        this[3] = document.createElementNS(SVG_NS, "polygon");
-        $svg.append(this[0]);
-        $(this[3]).attr("fill", "gray").attr("points", "0,0 0,0 0,0");
-        this[0].appendChild(this[1]);
-        this[0].appendChild(this[2]);
-        this[0].appendChild(this[3]);
-        this[0].setAttribute("transform", "translate(0,0)");
+        this.$g = $(document.createElementNS(SVG_NS, "g")).attr("transform", "translate(0,0)");
+        this.$rect = $(document.createElementNS(SVG_NS, "rect"));
+        this.$poly = $(document.createElementNS(SVG_NS, "polygon")).attr("fill", "gray").attr("points", "0,0 0,0 0,0");
+        this.$g.append(this.$rect).append(this.$poly);
     }
     SubjectShape.prototype.animate = function (a, x, y, w, h) {
-        a.moves(this[0].transform.baseVal.getItem(0).matrix, {
+        a.moves((this.$g[0]).transform.baseVal.getItem(0).matrix, {
             e: x,
             f: y
         });
-        a.moves(this[2], {
+        a.moves(this.$rect[0], {
             rx: this.N,
             ry: this.N,
             x: 0,
@@ -95,7 +95,7 @@ var SubjectShape = (function () {
             width: w,
             height: h
         });
-        a.movePolygon(this[3], [
+        a.movePolygon(this.$poly[0], [
             {
                 x: w * 5 / 8,
                 y: -this.N
@@ -110,31 +110,26 @@ var SubjectShape = (function () {
             }, 
             
         ]);
-        return new Point(this.N / 2, this.N / 2);
+        return new Size(this.N / 2, this.N / 2);
     };
     SubjectShape.prototype.outer = function (w, h) {
-        return new Point(w + this.N, h + this.N);
+        return new Size(w + this.N, h + this.N);
     };
     return SubjectShape;
 })();
 var StrategyShape = (function () {
-    function StrategyShape($svg) {
+    function StrategyShape() {
         this.N = 20;
-        this[0] = document.createElementNS(SVG_NS, "g");
-        this[1] = document.createElementNS(SVG_NS, "foreignObject");
-        this[2] = document.createElementNS(SVG_NS, "polygon");
-        $(this[2]).attr("points", "0,0 0,0 0,0 0,0");
-        $svg.append(this[0]);
-        this[0].appendChild(this[1]);
-        this[0].appendChild(this[2]);
-        this[0].setAttribute("transform", "translate(0,0)");
+        this.$g = $(document.createElementNS(SVG_NS, "g")).attr("transform", "translate(0,0)");
+        this.$poly = $(document.createElementNS(SVG_NS, "polygon")).attr("points", "0,0 0,0 0,0 0,0");
+        this.$g.append(this.$poly);
     }
     StrategyShape.prototype.animate = function (a, x, y, w, h) {
-        a.moves(this[0].transform.baseVal.getItem(0).matrix, {
+        a.moves((this.$g[0]).transform.baseVal.getItem(0).matrix, {
             e: x,
             f: y
         });
-        a.movePolygon(this[2], [
+        a.movePolygon(this.$poly[0], [
             {
                 x: this.N,
                 y: 0
@@ -152,67 +147,57 @@ var StrategyShape = (function () {
                 y: h
             }
         ]);
-        return new Point(this.N * 1.5, this.N / 2);
+        return new Size(this.N * 1.5, this.N / 2);
     };
     StrategyShape.prototype.outer = function (w, h) {
-        return new Point(w + this.N * 2, h + this.N);
+        return new Size(w + this.N * 2, h + this.N);
     };
     return StrategyShape;
 })();
 var EvidenceShape = (function () {
-    function EvidenceShape($svg) {
-        this[0] = document.createElementNS(SVG_NS, "g");
-        this[1] = document.createElementNS(SVG_NS, "foreignObject");
-        this[2] = document.createElementNS(SVG_NS, "ellipse");
-        $svg.append(this[0]);
-        this[0].appendChild(this[1]);
-        this[0].appendChild(this[2]);
-        this[0].setAttribute("transform", "translate(0,0)");
+    function EvidenceShape() {
+        this.$g = $(document.createElementNS(SVG_NS, "g")).attr("transform", "translate(0,0)");
+        this.$ellipse = $(document.createElementNS(SVG_NS, "ellipse"));
+        this.$g.append(this.$ellipse);
     }
     EvidenceShape.prototype.animate = function (a, x, y, w, h) {
-        a.moves(this[0].transform.baseVal.getItem(0).matrix, {
+        a.moves((this.$g[0]).transform.baseVal.getItem(0).matrix, {
             e: x,
             f: y
         });
-        a.moves(this[2], {
+        a.moves(this.$ellipse[0], {
             cx: w / 2,
             cy: h / 2,
             rx: w / 2,
             ry: h / 2
         });
-        return new Point(w / 6, h / 6);
+        return new Size(w / 6, h / 6);
     };
     EvidenceShape.prototype.outer = function (w, h) {
-        return new Point(w * 8 / 6, h * 8 / 6);
+        return new Size(w * 8 / 6, h * 8 / 6);
     };
     return EvidenceShape;
 })();
 var SolutionShape = (function () {
-    function SolutionShape($svg) {
+    function SolutionShape() {
         this.N = 20;
-        this[0] = document.createElementNS(SVG_NS, "g");
-        this[1] = document.createElementNS(SVG_NS, "foreignObject");
-        this[2] = document.createElementNS(SVG_NS, "ellipse");
-        this[3] = document.createElementNS(SVG_NS, "polygon");
-        $svg.append(this[0]);
-        $(this[3]).attr("fill", "gray").attr("points", "0,0 0,0 0,0");
-        this[0].appendChild(this[1]);
-        this[0].appendChild(this[2]);
-        this[0].appendChild(this[3]);
-        this[0].setAttribute("transform", "translate(0,0)");
+        this.$g = $(document.createElementNS(SVG_NS, "g")).attr("transform", "translate(0,0)");
+        this.$ellipse = $(document.createElementNS(SVG_NS, "ellipse"));
+        this.$poly = $(document.createElementNS(SVG_NS, "polygon")).attr("fill", "gray").attr("points", "0,0 0,0 0,0");
+        this.$g.append(this.$ellipse).append(this.$poly);
     }
     SolutionShape.prototype.animate = function (a, x, y, w, h) {
-        a.moves(this[0].transform.baseVal.getItem(0).matrix, {
+        a.moves((this.$g[0]).transform.baseVal.getItem(0).matrix, {
             e: x,
             f: y
         });
-        a.moves(this[2], {
+        a.moves(this.$ellipse[0], {
             cx: w / 2,
             cy: h / 2,
             rx: w / 2,
             ry: h / 2
         });
-        a.movePolygon(this[3], [
+        a.movePolygon(this.$poly[0], [
             {
                 x: w * 5 / 8,
                 y: -this.N
@@ -227,46 +212,40 @@ var SolutionShape = (function () {
             }, 
             
         ]);
-        return new Point(w / 6, h / 6);
+        return new Size(w / 6, h / 6);
     };
     SolutionShape.prototype.outer = function (w, h) {
-        return new Point(w * 8 / 6, h * 8 / 6);
+        return new Size(w * 8 / 6, h * 8 / 6);
     };
     return SolutionShape;
 })();
 var MonitorShape = (function () {
-    function MonitorShape($svg) {
+    function MonitorShape() {
         this.N = 20;
-        this[0] = document.createElementNS(SVG_NS, "g");
-        this[1] = document.createElementNS(SVG_NS, "foreignObject");
-        this[2] = document.createElementNS(SVG_NS, "ellipse");
-        this[3] = document.createElementNS(SVG_NS, "text");
-        $svg.append(this[0]);
-        $(this[3]).attr("fill", "gray").attr("font-size", "50").text("M");
-        this[0].appendChild(this[1]);
-        this[0].appendChild(this[2]);
-        this[0].appendChild(this[3]);
-        this[0].setAttribute("transform", "translate(0,0)");
+        this.$g = $(document.createElementNS(SVG_NS, "g")).attr("transform", "translate(0,0)");
+        this.$ellipse = $(document.createElementNS(SVG_NS, "ellipse"));
+        this.$text = $(document.createElementNS(SVG_NS, "text")).attr("fill", "gray").attr("font-size", "50").text("M");
+        this.$g.append(this.$ellipse).append(this.$text);
     }
     MonitorShape.prototype.animate = function (a, x, y, w, h) {
-        a.moves(this[0].transform.baseVal.getItem(0).matrix, {
+        a.moves((this.$g[0]).transform.baseVal.getItem(0).matrix, {
             e: x,
             f: y
         });
-        a.moves(this[2], {
+        a.moves(this.$ellipse[0], {
             cx: w / 2,
             cy: h / 2,
             rx: w / 2,
             ry: h / 2
         });
-        a.moves(this[3], {
+        a.moves(this.$text[0], {
             x: w * 5 / 8,
             y: this.N
         });
-        return new Point(w / 6, h / 6);
+        return new Size(w / 6, h / 6);
     };
     MonitorShape.prototype.outer = function (w, h) {
-        return new Point(w * 8 / 6, h * 8 / 6);
+        return new Size(w * 8 / 6, h * 8 / 6);
     };
     return MonitorShape;
 })();
