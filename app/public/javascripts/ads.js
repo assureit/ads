@@ -2,7 +2,7 @@ var ADS = (function () {
     function ADS(body) {
         var _this = this;
         this.TITLE_SUFFIX = " - Assurance DS";
-        this.URL_EXPORT = "/export";
+        this.URL_EXPORT = "/ait-test/export";
         this.selectDCaseView = new SelectDCaseView();
         this.selectDCaseView.initEvents();
         this.createDCaseView = new CreateDCaseView();

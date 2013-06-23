@@ -9,7 +9,7 @@
 
 class ADS {
 	TITLE_SUFFIX:   string = " - Assurance DS";
-	URL_EXPORT: string = "/export";
+	URL_EXPORT: string = "/ait-test/export";
 	viewer: DCaseViewer;
 	selectDCaseView: SelectDCaseView;
 	createDCaseView: CreateDCaseView;

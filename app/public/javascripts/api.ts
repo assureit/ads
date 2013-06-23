@@ -2,7 +2,7 @@
 
 module DCaseAPI {
 
-	export var uri = "/api/1.0/";
+	export var uri = "/ait-test/api/1.0/";
 	
 	export var default_success_callback = function(result) {
 		// do nothing

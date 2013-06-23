@@ -14,7 +14,7 @@ class Router{
 	onChange: ()=>void;
 	parseParameters(hash : string) {
 
-		var params: string[] = hash.split("/").filter(function(it){ return it != ""});
+		var params: string[] = hash.split("/").filter(function(it){ return it != "" && it != "ait-test"});
 		if(params.length == 0) {
 			params = [""];
 		}
