@@ -1,6 +1,7 @@
 $(function () {
     var ads = new ADS(document.getElementById("ase"));
     ads.initDefaultEventListeners();
+    var sidemenu = new SideMenu();
     var $id = $('#signup-userid');
     var $pass1 = $('#signup-pass');
     var $pass2 = $('#signup-pass2');

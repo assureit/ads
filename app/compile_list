@@ -26,6 +26,7 @@ public/javascripts/adsComponentView.ts
 public/javascripts/animation.ts
 public/javascripts/api.ts
 public/javascripts/color.ts
+public/javascripts/config.ts
 public/javascripts/dcaseviewer-addons.ts
 public/javascripts/dcaseviewer.ts
 public/javascripts/dnode.ts
@@ -34,5 +35,5 @@ public/javascripts/handler.ts
 public/javascripts/importfile.ts
 public/javascripts/index.ts
 public/javascripts/router.ts
+public/javascripts/sidemenu.ts
 public/javascripts/timeline.ts
-public/javascripts/config.ts

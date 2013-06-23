@@ -2,7 +2,7 @@ extends index
 
 block sign
     ul.nav.pull-right
-        li.dropdown
+        li.line.dropdown
             a.dropdown-toggle(data-toggle="dropdown", href="#") Sign Up
                 strong.caret
             .dropdown-menu(style="padding: 15px; padding-bottom: 0px;")
@@ -11,8 +11,7 @@ block sign
                         input#signup-pass.span2(type="password", placeholder="password", name="password", style="margin-bottom: 15px;")
                         input#signup-pass2.span2(type="password", placeholder="confirm password", name="password2", style="margin-bottom: 15px;")
                         input.btn.btn-primary(type="submit", style="margin-bottom: 15px; width: 100%; height: 32px; font-size: 13px;", value="Sign Up", disabled)
-                    li.divider-vertical
-                    li.dropdown
+                    li.line.dropdown
                         a.dropdown-toggle(href="#", data-toggle="dropdown") Sign In
                             strong.caret
                         .dropdown-menu(style="padding: 15px; padding-bottom: 0px;")
