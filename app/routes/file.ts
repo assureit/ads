@@ -2,11 +2,12 @@ import db = module('../db/db')
 import constant = module('../constant')
 import model_file = module('../model/file')
 import fs = module('fs')
+import utilFs = module('../util/fs')
 
 export var upload = function(req: any, res: any){
 
 	function onError(err: any, upfile: any) :void {
-		if fs.existsSync(upfile.path) {
+		if(fs.existsSync(upfile.path)) {
 			fs.unlink(upfile.path, (err) => {
 				if (err) throw err;
 				res.send(err);
@@ -25,7 +26,7 @@ export var upload = function(req: any, res: any){
 		if (mm.length == 1) mm = '0' + mm;
 		if (dd.length == 1) dd = '0' + dd;
 		
-		return 'upload/' + yy + mm + dd;	// TODO: 'upload'をconstantへ入れるか？
+		return 'upload/' + yy + '/' + mm + '/' + dd;	// TODO: 'upload'をconstantへ入れるか？
 	}
 
 	var userId = constant.SYSTEM_USER_ID;	// TODO:ログインユーザーIDに変更
@@ -42,6 +43,7 @@ export var upload = function(req: any, res: any){
 				}
 
 				var despath = getDestinationDirectory();
+				utilFs.mkdirpSync(despath);
 	
 				fileDAO.update(fileId, despath + '/' + fileId, (err: any) => {
 					if (err) {
@@ -54,9 +56,9 @@ export var upload = function(req: any, res: any){
 							return;
 						}
 
-						if (!fs.existsSync(despath)) {
-							fs.mkdirSync(despath);
-						}
+						// if (!fs.existsSync(despath)) {
+						// 	fs.mkdirSync(despath);
+						// }
 						fs.renameSync(upfile.path, despath + '/' + fileId);
 						var url = req.protocol + '://' + req.host + '/file/';
 						var body: any = {URL: url + fileId};

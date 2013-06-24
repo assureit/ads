@@ -2,18 +2,19 @@ var db = require('../db/db')
 var constant = require('../constant')
 var model_file = require('../model/file')
 var fs = require('fs')
+var utilFs = require('../util/fs')
 exports.upload = function (req, res) {
     function onError(err, upfile) {
-        fs.exists(upfile.path, function (exists) {
-            if(exists) {
-                fs.unlink(upfile.path, function (err) {
-                    if(err) {
-                        throw err;
-                    }
-                });
-            }
+        if(fs.existsSync(upfile.path)) {
+            fs.unlink(upfile.path, function (err) {
+                if(err) {
+                    throw err;
+                }
+                res.send(err);
+            });
+        } else {
             res.send(err);
-        });
+        }
     }
     function getDestinationDirectory() {
         var d = new Date();
@@ -26,7 +27,7 @@ exports.upload = function (req, res) {
         if(dd.length == 1) {
             dd = '0' + dd;
         }
-        return 'upload/' + yy + mm + dd;
+        return 'upload/' + yy + '/' + mm + '/' + dd;
     }
     var userId = constant.SYSTEM_USER_ID;
     var upfile = req.files.upfile;
@@ -40,6 +41,7 @@ exports.upload = function (req, res) {
                     return;
                 }
                 var despath = getDestinationDirectory();
+                utilFs.mkdirpSync(despath);
                 fileDAO.update(fileId, despath + '/' + fileId, function (err) {
                     if(err) {
                         onError(err, upfile);
@@ -49,9 +51,6 @@ exports.upload = function (req, res) {
                         if(err) {
                             onError(err, upfile);
                             return;
-                        }
-                        if(!fs.existsSync(despath)) {
-                            fs.mkdirSync(despath);
                         }
                         fs.renameSync(upfile.path, despath + '/' + fileId);
                         var url = req.protocol + '://' + req.host + '/file/';

@@ -7,6 +7,8 @@ import api = module('./routes/api')
 import client = module('./routes/index')
 import path = module('path')
 import file = module('./routes/file')
+import constant = module('./constant')
+import utilFs = module('./util/fs')
 
 var app = exports.app = <Express> express();
 
@@ -16,7 +18,11 @@ app.configure(function() {
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
 	app.use(express.favicon());
-	app.use(express.bodyParser({uploadDir:'./upload'}));
+	var uploadDir = path.join(__dirname, constant.UPLOAD_DIR);
+	console.log(uploadDir);
+	utilFs.mkdirpSync(uploadDir);
+	app.use(express.bodyParser({uploadDir: uploadDir}));
+	// app.use(express.bodyParser({uploadDir:'./upload'}));
 	app.use(express.cookieParser());
 	app.use(express.methodOverride());
 	app.use(app.router);

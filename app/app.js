@@ -4,14 +4,19 @@ var api = require('./routes/api')
 var client = require('./routes/index')
 var path = require('path')
 var file = require('./routes/file')
+var constant = require('./constant')
+var utilFs = require('./util/fs')
 var app = exports.app = express();
 app.configure(function () {
     app.set('port', process.env.PORT || 3000);
     app.set('views', __dirname + '/views');
     app.set('view engine', 'jade');
     app.use(express.favicon());
+    var uploadDir = path.join(__dirname, constant.UPLOAD_DIR);
+    console.log(uploadDir);
+    utilFs.mkdirpSync(uploadDir);
     app.use(express.bodyParser({
-        uploadDir: './upload'
+        uploadDir: uploadDir
     }));
     app.use(express.cookieParser());
     app.use(express.methodOverride());

@@ -8,9 +8,11 @@ describe('api', function () {
     describe('upload', function () {
         it('should return HTTP200 return URL ', function (done) {
             request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
+                console.log(err);
                 if(err) {
                     throw err;
                 }
+                console.log(res.body);
                 assert.notStrictEqual(undefined, res.body.URL);
                 done();
             });
