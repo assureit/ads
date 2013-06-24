@@ -1,6 +1,6 @@
 var DCaseAPI;
 (function (DCaseAPI) {
-    DCaseAPI.uri = "/api/1.0/";
+    DCaseAPI.uri = Config.BASEPATH + "/api/1.0/";
     DCaseAPI.default_success_callback = function (result) {
     };
     DCaseAPI.default_error_callback = function (req, stat, err) {

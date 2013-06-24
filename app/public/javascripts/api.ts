@@ -2,16 +2,16 @@
 
 module DCaseAPI {
 
-	export var uri = "/api/1.0/";
-	
+	export var uri = Config.BASEPATH + "/api/1.0/";
+
 	export var default_success_callback = function(result) {
 		// do nothing
 	};
-	
+
 	export var default_error_callback = function(req, stat, err) {
 		alert("ajax error");
 	};
-	
+
 	export var call = function(method, params) {
 		var cmd = {
 			jsonrpc: "2.0",
@@ -38,9 +38,9 @@ module DCaseAPI {
 			return JSON.parse(res.responseText).result;
 		}
 	};
-	
+
 	//-------------------------------------
-	
+
 	export var searchDCase = function(pageIndex) {
 		try{
 			return this.call("searchDCase", {page: pageIndex});
@@ -48,16 +48,16 @@ module DCaseAPI {
 			return [];
 		}
 	};
-	
+
 	export var createDCase = function(name, tree) {
 		return this.call("createDCase", {
 			dcaseName: name, contents: tree });
 	};
-	
+
 	export var getCommitList = function(dcaseId) {
 		return this.call("getCommitList", { dcaseId:dcaseId }).commitList;
 	};
-	
+
 	export var commit = function(tree, msg, commitId) {
 		return this.call("commit", {
 			contents: tree,
