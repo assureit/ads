@@ -9,12 +9,11 @@
 
 class ADS {
 	TITLE_SUFFIX:   string = " - Assurance DS";
-	URL_EXPORT: string = "/ait-test/export";
+	URL_EXPORT: string = Config.BASEPATH + "/export";
 	viewer: DCaseViewer;
 	selectDCaseView: SelectDCaseView;
 	createDCaseView: CreateDCaseView;
 	timelineView   : TimeLineView;
-
 
 	getLoginUserorNull() {
 		var matchResult = document.cookie.match(/userId=(\w+);?/);

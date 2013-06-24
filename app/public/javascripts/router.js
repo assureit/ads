@@ -19,7 +19,7 @@ var Router = (function () {
     }
     Router.prototype.parseParameters = function (hash) {
         var params = hash.split("/").filter(function (it) {
-            return it != "" && it != "ait-test";
+            return it != "" && it != Config.BASEPATH.replace(/\//g, "");
         });
         if(params.length == 0) {
             params = [
