@@ -83,12 +83,13 @@ export var download = function(req: any, res: any) {
 		}
 		fs.exists(path, (exists) => {
 			if (exists) {
-				fs.readFile(path, (err, data) => {
-					var responseFile = data.toString('base64');
-					var body: any = {name: name, fileBody: responseFile};
-					res.send(body, 200);
-					return;
-				});
+				res.download(path, name);
+				// fs.readFile(path, (err, data) => {
+				// 	var responseFile = data.toString('base64');
+				// 	var body: any = {name: name, fileBody: responseFile};
+				// 	res.send(body, 200);
+				// 	return;
+				// });
 			} else {
 				res.send(404, 'File Not Found');
 			}

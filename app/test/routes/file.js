@@ -87,9 +87,11 @@ describe('api', function () {
             });
         });
         it('should return name and fileBody', function (done) {
-            request(app['app']).get('/file/110').end(function (err, res) {
-                assert.notStrictEqual(undefined, res.body.name);
-                assert.notStrictEqual(undefined, res.body.fileBody);
+            request(app['app']).get('/file/110').expect(200).end(function (err, res) {
+                console.log(res);
+                assert.equal(res.header['content-type'], 'application/octet-stream');
+                assert.equal(res.header['content-disposition'], 'attachment; filename="uptest.txt"');
+                assert.equal(res.text, 'アップロードテスト用のファイルです\n');
                 done();
             });
         });
