@@ -60,9 +60,10 @@ export var upload = function(req: any, res: any){
 						// 	fs.mkdirSync(despath);
 						// }
 						fs.renameSync(upfile.path, despath + '/' + fileId);
-						var url = req.protocol + '://' + req.host + '/file/';
-						var body: any = {URL: url + fileId};
+						// var url = req.protocol + '://' + req.host + '/file/';
+						var body: any = 'URL=' + 'file/' + fileId;
 						con.close();
+						res.header('Content-Type', 'text/html');
 						res.send(body);
 					});
 				});

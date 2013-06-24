@@ -53,11 +53,9 @@ exports.upload = function (req, res) {
                             return;
                         }
                         fs.renameSync(upfile.path, despath + '/' + fileId);
-                        var url = req.protocol + '://' + req.host + '/file/';
-                        var body = {
-                            URL: url + fileId
-                        };
+                        var body = 'URL=' + 'file/' + fileId;
                         con.close();
+                        res.header('Content-Type', 'text/html');
                         res.send(body);
                     });
                 });

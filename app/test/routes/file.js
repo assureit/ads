@@ -11,7 +11,9 @@ describe('api', function () {
                 if(err) {
                     throw err;
                 }
-                assert.notStrictEqual(undefined, res.body.URL);
+                assert.notStrictEqual(undefined, res.text);
+                assert.notStrictEqual(null, res.text);
+                assert.notEqual('', res.text);
                 done();
             });
         });
@@ -31,7 +33,7 @@ describe('api', function () {
                     dd = '0' + dd;
                 }
                 var todayDir = yy + '/' + mm + '/' + dd;
-                var url = res.body.URL;
+                var url = res.text.split('=')[1];
                 var filename = url.substr(url.lastIndexOf('/'), url.length - url.lastIndexOf('/'));
                 assert.equal(true, fs.existsSync('upload/' + todayDir + filename));
                 done();
@@ -42,7 +44,7 @@ describe('api', function () {
                 if(err) {
                     throw err;
                 }
-                var url = res.body.URL;
+                var url = res.text.split('=')[1];
                 var fileId = url.substr(url.lastIndexOf('/') + 1, url.length - url.lastIndexOf('/'));
                 var con = new db.Database();
                 con.query('select path from file where id = ?', [
@@ -63,7 +65,6 @@ describe('api', function () {
                         dd = '0' + dd;
                     }
                     var todayDir = yy + '/' + mm + '/' + dd;
-                    var url = res.body.URL;
                     var filename = 'upload/' + todayDir + '/' + fileId;
                     assert.equal(expectedResult[0].path, filename);
                     con.close();
