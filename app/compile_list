@@ -3,12 +3,14 @@ constant.ts
 routes/api.ts
 routes/index.ts
 routes/lang.ts
+routes/file.ts
 api/error.ts
 api/jsonrpc.ts
 api/dcase.ts
 db/db.ts
 test/db/db.ts
 test/routes/api.ts
+test/routes/file.ts
 test/api/dcase.ts
 test/model/user.ts
 public/javascripts/ads.ts
