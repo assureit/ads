@@ -1,10 +1,12 @@
 var childProcess = require('child_process')
 var fs = require('fs')
 var lang = require('./lang')
+var cons = require('../constant')
 exports.index = function (req, res) {
     res.cookie('userId', '1');
     res.cookie('userName', 'System');
     var params = {
+        basepath: cons.basepath,
         title: 'Assurance DS',
         lang: lang.lang.ja,
         userName: 'System'
