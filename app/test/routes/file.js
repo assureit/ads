@@ -8,11 +8,9 @@ describe('api', function () {
     describe('upload', function () {
         it('should return HTTP200 return URL ', function (done) {
             request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
-                console.log(err);
                 if(err) {
                     throw err;
                 }
-                console.log(res.body);
                 assert.notStrictEqual(undefined, res.body.URL);
                 done();
             });
@@ -32,7 +30,7 @@ describe('api', function () {
                 if(dd.length == 1) {
                     dd = '0' + dd;
                 }
-                var todayDir = yy + mm + dd;
+                var todayDir = yy + '/' + mm + '/' + dd;
                 var url = res.body.URL;
                 var filename = url.substr(url.lastIndexOf('/'), url.length - url.lastIndexOf('/'));
                 assert.equal(true, fs.existsSync('upload/' + todayDir + filename));
@@ -64,7 +62,7 @@ describe('api', function () {
                     if(dd.length == 1) {
                         dd = '0' + dd;
                     }
-                    var todayDir = yy + mm + dd;
+                    var todayDir = yy + '/' + mm + '/' + dd;
                     var url = res.body.URL;
                     var filename = 'upload/' + todayDir + '/' + fileId;
                     assert.equal(expectedResult[0].path, filename);

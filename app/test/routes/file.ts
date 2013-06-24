@@ -38,7 +38,7 @@ describe('api', function() {
 					var dd: string = String(d.getDate());
 					if (mm.length == 1) mm = '0' + mm;
 					if (dd.length == 1) dd = '0' + dd;
-					var todayDir: string = yy + mm + dd;
+					var todayDir: string = yy + '/' + mm + '/' + dd;
 					var url = res.body.URL;
 					var filename = url.substr(url.lastIndexOf('/'), url.length - url.lastIndexOf('/') );
 					assert.equal(true, fs.existsSync('upload/' + todayDir + filename)); 	
@@ -68,7 +68,7 @@ describe('api', function() {
 						var dd: string = String(d.getDate());
 						if (mm.length == 1) mm = '0' + mm;
 						if (dd.length == 1) dd = '0' + dd;
-						var todayDir: string = yy + mm + dd;
+						var todayDir: string = yy + '/' + mm + '/' + dd;
 						var url = res.body.URL;
 						var filename = 'upload/' + todayDir + '/' + fileId;
 						assert.equal(expectedResult[0].path, filename); 
