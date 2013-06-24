@@ -2,7 +2,7 @@ var ADS = (function () {
     function ADS(body) {
         var _this = this;
         this.TITLE_SUFFIX = " - Assurance DS";
-        this.URL_EXPORT = "/export";
+        this.URL_EXPORT = Config.BASEPATH + "/export";
         this.selectDCaseView = new SelectDCaseView();
         this.selectDCaseView.initEvents();
         this.createDCaseView = new CreateDCaseView();
@@ -26,7 +26,7 @@ var ADS = (function () {
             importFile.read(function (file) {
                 var tree = JSON.parse(file.result);
                 if("contents" in tree) {
-                    var r = DCaseAPI.createDCase(file.name.split(".")[0], tree.contents);
+                    var r = DCaseAPI.createDCase(tree.contents.DCaseName, tree.contents);
                     location.href = "./dcase/" + r.dcaseId;
                 } else {
                     alert("Invalid File");
@@ -63,6 +63,7 @@ var ADS = (function () {
             var tree = JSON.parse(r.contents);
             var dcase = new DCaseModel(tree, dcaseId, r.commitId);
             _this.viewer.setDCase(dcase);
+            _this.viewer.setDCaseName(r.dcaseName);
             _this.timelineView.repaint(dcase);
             _this.viewer.dcase_latest = dcase;
             document.title = r.dcaseName + _this.TITLE_SUFFIX;
@@ -234,16 +235,19 @@ var ADS = (function () {
     ADS.prototype.exportViaSVG = function (type, root) {
         var svg = this.createSVGDocument(this.viewer, root);
         svg = svg.replace("</svg></svg>", "</svg>");
-        this.executePost(this.URL_EXPORT, {
+        this.executePost(this.URL_EXPORT + '.' + type, {
             "type": type,
             "svg": svg
         });
     };
     ADS.prototype.exportViaJson = function (type, root) {
-        var json = JSON.stringify(this.viewer.getDCase().encode());
-        this.executePost(this.URL_EXPORT, {
+        var json = {
+            "contents": this.viewer.getDCase().encode()
+        };
+        json.contents.DCaseName = this.viewer.getDCaseName();
+        this.executePost(this.URL_EXPORT + '.' + type, {
             "type": type,
-            "json": json
+            "json": JSON.stringify(json)
         });
     };
     ADS.prototype.exportTree = function (type, root) {

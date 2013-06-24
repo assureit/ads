@@ -27,3 +27,4 @@ public/javascripts/importfile.ts
 public/javascripts/index.ts
 public/javascripts/router.ts
 public/javascripts/timeline.ts
+public/javascripts/config.ts

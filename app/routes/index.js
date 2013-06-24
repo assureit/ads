@@ -1,10 +1,12 @@
 var childProcess = require('child_process')
 var fs = require('fs')
 var lang = require('./lang')
+var cons = require('../constant')
 exports.index = function (req, res) {
     res.cookie('userId', '1');
     res.cookie('userName', 'System');
     var params = {
+        basepath: cons.basepath,
         title: 'Assurance DS',
         lang: lang.lang.ja,
         userName: 'System'
@@ -18,6 +20,7 @@ exports.exporter = function (req, res) {
     var exec = childProcess.exec;
     var type = req.body.type;
     var mime = "text/plain";
+    res.set('Content-type', 'application/octet-stream; charset=utf-8');
     switch(type) {
         case "png":
             mime = "image/png";
@@ -30,7 +33,6 @@ exports.exporter = function (req, res) {
             res.send(req.body.svg);
             return;
         case "json":
-            res.set('Content-type', 'application/json');
             res.send(req.body.json);
             return;
         default:

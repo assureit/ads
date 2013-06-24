@@ -2,6 +2,7 @@
 import childProcess = module('child_process')
 import fs           = module('fs')
 import lang = module('./lang')
+import cons = module('../constant')
 //import ex = module('./exporter')
 
 export var index = function(req: any, res: any) {
@@ -10,7 +11,7 @@ export var index = function(req: any, res: any) {
 	//}else {
 	res.cookie('userId','1');
 	res.cookie('userName','System');
-	var params = {title: 'Assurance DS', lang: lang.lang.ja, userName: 'System' };
+	var params = {basepath: cons.basepath, title: 'Assurance DS', lang: lang.lang.ja, userName: 'System' };
 	if( req.cookies.lang == 'en') {
 		params.lang = lang.lang.en;
 	}
@@ -25,6 +26,7 @@ export var exporter = function(req: any, res: any) {
 	var type = req.body.type;
 	var mime = "text/plain";
 
+	res.set('Content-type','application/octet-stream; charset=utf-8');
 	switch(type) {
 		case "png":
 			mime = "image/png";
@@ -37,7 +39,6 @@ export var exporter = function(req: any, res: any) {
 			res.send(req.body.svg);
 			return;
 		case "json":
-			res.set('Content-type','application/json');
 			res.send(req.body.json);
 			return;
 		default:

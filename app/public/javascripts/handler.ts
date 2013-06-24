@@ -88,7 +88,7 @@ class PointerHandler {
 		this.viewer.repaintAll(0);
 	}
 
-	dragEnd(view): void {
+	dragEnd(view: DNodeView): void {
 		if (this.viewer.dragX == 0 && this.viewer.dragY == 0) {
 			this.viewer.setSelectedNode(view);
 		} else {
