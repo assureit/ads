@@ -6,28 +6,28 @@ var DCaseFile = (function () {
     return DCaseFile;
 })();
 var ImportFile = (function () {
-    function ImportFile() {
+    function ImportFile(selector) {
         var _this = this;
-        this.ase = "#ase";
-        $(this.ase).on('dragenter', function (e) {
+        this.selector = selector;
+        $(this.selector).on('dragenter', function (e) {
             e.stopPropagation();
             e.preventDefault();
         }).on('dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(_this.ase).addClass('hover');
+            $(_this.selector).addClass('hover');
         }).on('dragleave', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(_this.ase).removeClass('hover');
+            $(_this.selector).removeClass('hover');
         });
     }
     ImportFile.prototype.read = function (callback) {
         var _this = this;
-        $("#ase").on('drop', function (e) {
+        $(this.selector).on('drop', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(_this.ase).removeClass('hover');
+            $(_this.selector).removeClass('hover');
             var file = (e.originalEvent.dataTransfer).files[0];
             if(file) {
                 var reader = new FileReader();
