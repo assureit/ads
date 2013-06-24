@@ -1,0 +1,95 @@
+import db = module('../db/db')
+import constant = module('../constant')
+import model_file = module('../model/file')
+import fs = module('fs')
+
+export var upload = function(req: any, res: any){
+
+	function onError(err: any, upfile: any) :void {
+		if fs.existsSync(upfile.path) {
+			fs.unlink(upfile.path, (err) => {
+				if (err) throw err;
+				res.send(err);
+			});
+		} else {
+			res.send(err);
+		}
+		
+	}
+
+	function getDestinationDirectory() : string {
+		var d = new Date();
+		var yy: string = String(d.getFullYear());
+		var mm: string = String(d.getMonth() + 1);
+		var dd: string = String(d.getDate());
+		if (mm.length == 1) mm = '0' + mm;
+		if (dd.length == 1) dd = '0' + dd;
+		
+		return 'upload/' + yy + mm + dd;	// TODO: 'upload'をconstantへ入れるか？
+	}
+
+	var userId = constant.SYSTEM_USER_ID;	// TODO:ログインユーザーIDに変更
+
+	var upfile = req.files.upfile
+	if (upfile) {
+		var con = new db.Database();
+		con.begin((err, result) => {
+			var fileDAO = new model_file.FileDAO(con);
+			fileDAO.insert(upfile.name, userId, (err: any, fileId: number) => {
+				if (err) {
+					onError(err, upfile);
+					return;
+				}
+
+				var despath = getDestinationDirectory();
+	
+				fileDAO.update(fileId, despath + '/' + fileId, (err: any) => {
+					if (err) {
+						onError(err, upfile);
+						return;
+					}
+					con.commit((err, result) => {
+						if (err) {
+							onError(err, upfile);
+							return;
+						}
+
+						if (!fs.existsSync(despath)) {
+							fs.mkdirSync(despath);
+						}
+						fs.renameSync(upfile.path, despath + '/' + fileId);
+						var url = req.protocol + '://' + req.host + '/file/';
+						var body: any = {URL: url + fileId};
+						con.close();
+						res.send(body);
+					});
+				});
+			});
+		});
+	}
+}
+
+export var download = function(req: any, res: any) {
+
+	var con = new db.Database();
+	var fileDAO = new model_file.FileDAO(con);
+	fileDAO.select(req.params.id, (err: any, path: string, name: string) => {
+		if (err) {
+			res.send(err);
+			return;
+		}
+		fs.exists(path, (exists) => {
+			if (exists) {
+				fs.readFile(path, (err, data) => {
+					var responseFile = data.toString('base64');
+					var body: any = {name: name, fileBody: responseFile};
+					res.send(body, 200);
+					return;
+				});
+			} else {
+				res.send(404, 'File Not Found');
+			}
+		});
+	});
+}
+
