@@ -357,6 +357,7 @@ describe('api', function() {
 		///////////////////////////////////////////////
 		describe('commit', function() {
 			it('should return result', function(done) {
+				this.timeout(15000);
 				dcase.commit(
 					{
 						commitId: 12,

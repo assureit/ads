@@ -5,6 +5,7 @@ var model_dcase = require('../model/dcase')
 var model_commit = require('../model/commit')
 var model_node = require('../model/node')
 
+var model_issue = require('../model/issue')
 
 function searchDCase(params, callback) {
     var con = new db.Database();
@@ -196,10 +197,18 @@ function commit(params, callback) {
                                 callback.onFailure(err);
                                 return;
                             }
-                            callback.onSuccess({
-                                commitId: commitId
+                            var issueDAO = new model_issue.IssueDAO(con);
+                            issueDAO.publish(com.dcaseId, function (err) {
+                                con.commit(function (err, result) {
+                                    if(err) {
+                                        return;
+                                    }
+                                    callback.onSuccess({
+                                        commitId: commitId
+                                    });
+                                    con.close();
+                                });
                             });
-                            con.close();
                         });
                     });
                 });

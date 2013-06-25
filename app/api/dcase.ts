@@ -5,6 +5,7 @@ import model_dcase = module('../model/dcase')
 import model_commit = module('../model/commit')
 import model_node = module('../model/node')
 import model_pager = module('../model/pager')
+import model_issue = module('../model/issue')
 import error = module('./error')
 
 export function searchDCase(params:any, callback: type.Callback) {
@@ -177,8 +178,20 @@ export function commit(params: any, callback: type.Callback) {
 								callback.onFailure(err);
 								return;
 							}
+							// callback.onSuccess({commitId: commitId});
+
+							var issueDAO = new model_issue.IssueDAO(con);
+							issueDAO.publish(com.dcaseId, (err:any) => {
+								// TODO: 管理者にエラー通知などのエラー処理
+								con.commit((err, result) =>{
+									if (err) {
+										// TODO: 管理者にエラー通知などのエラー処理
+										return;
+									}
 							callback.onSuccess({commitId: commitId});
-							con.close();
+									con.close();
+								});
+							});
 						});
 					});
 				});
