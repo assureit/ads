@@ -14,8 +14,8 @@ describe('net', () => {
 		describe('createSimple', () => {
 			it('should create new issue', function(done) {
 				issue.createSimple('test', 'contents', (err:any, result:any) => {
-					console.log(err);
-					console.log(result);
+					// console.log(err);
+					// console.log(result);
 					done();
 				});
 			});

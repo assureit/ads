@@ -47,6 +47,14 @@ var CommitDAO = (function (_super) {
             });
         });
     };
+    CommitDAO.prototype.update = function (id, data, callback) {
+        this.con.query('UPDATE commit SET data=? WHERE id=?', [
+            data, 
+            id
+        ], function (err, result) {
+            callback(err);
+        });
+    };
     CommitDAO.prototype._clearLastUpdateFlag = function (dcaseId, latestCommitId, callback) {
         this.con.query('UPDATE commit SET latest_flag = FALSE WHERE dcase_id = ? AND id <> ? AND latest_flag = TRUE', [
             dcaseId, 

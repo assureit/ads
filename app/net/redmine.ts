@@ -29,10 +29,6 @@ export class Redmine {
 		};
 
 		var req = http.request(options, (res) => {
-			console.log('STATUS: ' + res.statusCode);
-			console.log('HEADERS: ' + JSON.stringify(res.headers));
-			// console.log(res);
-
 			if (res.statusCode != 200 && res.statusCode != 201) {
 				callback(new error.InternalError('Failed to access redmine: ' + res.statusCode, res), null);
 				return ;

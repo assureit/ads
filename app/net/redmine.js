@@ -22,10 +22,7 @@ var Redmine = (function () {
                 'X-Redmine-API-Key': CONFIG.redmine.apiKey
             }
         };
-        console.log(jsonParams);
         var req = http.request(options, function (res) {
-            console.log('STATUS: ' + res.statusCode);
-            console.log('HEADERS: ' + JSON.stringify(res.headers));
             if(res.statusCode != 200 && res.statusCode != 201) {
                 callback(new error.InternalError('Failed to access redmine: ' + res.statusCode, res), null);
                 return;
@@ -33,11 +30,9 @@ var Redmine = (function () {
             res.setEncoding('utf8');
             var body = "";
             res.on('data', function (chunk) {
-                console.log('1 ============');
                 body += chunk;
             });
             res.on('end', function (event) {
-                console.log('2 ============');
                 callback(null, JSON.parse(body));
             });
         });

@@ -6,8 +6,6 @@ describe('net', function () {
         describe('createSimple', function () {
             it('should create new issue', function (done) {
                 issue.createSimple('test', 'contents', function (err, result) {
-                    console.log(err);
-                    console.log(result);
                     done();
                 });
             });

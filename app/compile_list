@@ -13,6 +13,7 @@ test/routes/api.ts
 test/routes/file.ts
 test/api/dcase.ts
 test/model/user.ts
+test/model/node.ts
 test/net/redmine.ts
 public/javascripts/ads.ts
 public/javascripts/adsComponentView.ts

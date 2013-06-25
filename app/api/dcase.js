@@ -145,7 +145,7 @@ function createDCase(params, callback) {
                     return;
                 }
                 var nodeDAO = new model_node.NodeDAO(con);
-                nodeDAO.insertList(commitId, params.contents.NodeList, function (err) {
+                nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, function (err) {
                     if(err) {
                         callback.onFailure(err);
                         return;
@@ -185,20 +185,22 @@ function commit(params, callback) {
                     return;
                 }
                 var nodeDAO = new model_node.NodeDAO(con);
-                nodeDAO.insertList(commitId, params.contents.NodeList, function (err) {
+                nodeDAO.insertList(com.dcaseId, commitId, params.contents.NodeList, function (err) {
                     if(err) {
                         callback.onFailure(err);
                         return;
                     }
-                    con.commit(function (err, result) {
-                        if(err) {
-                            callback.onFailure(err);
-                            return;
-                        }
-                        callback.onSuccess({
-                            commitId: commitId
+                    commitDAO.update(commitId, JSON.stringify(params.contents), function (err) {
+                        con.commit(function (err, result) {
+                            if(err) {
+                                callback.onFailure(err);
+                                return;
+                            }
+                            callback.onSuccess({
+                                commitId: commitId
+                            });
+                            con.close();
                         });
-                        con.close();
                     });
                 });
             });
