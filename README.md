@@ -6,8 +6,8 @@ AssureIt
 
 ```
 mysql -u root -p < db/create_user_test.sql
-mysql -u root -p < db/create_tables.sql
-mysql -u root -p < db/initial_data.sql
+mysql -u root -p ads < db/create_tables.sql
+mysql -u root -p ads < db/initial_data.sql
  
 cd app
 // TODO: 下記のinstall -g作業を不要にする
