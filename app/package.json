@@ -12,6 +12,8 @@
     "express": "3.2.5",
     "mysql": "2.0.0-alpha8",
     "fibers": "1.0.0",
+    "config": "0.4.27",
+    "js-yaml": "0.3.x",
     "jade": "*"
   },
   "devDependencies": {
