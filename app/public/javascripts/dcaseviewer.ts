@@ -277,6 +277,15 @@ class DCaseViewer {
 			this.location_updated = true;
 			this.repaintAll();
 		});
+		var importFile = new ImportFile(".node-container");
+		importFile.upload((data: any, target: HTMLElement)=>{
+			/*TODO write down URL in the node.*/
+			var selected = this.getSelectedNode();
+			selected.node.desc += "\n"+data;
+			//this.viewer.repaintAll();
+			this.setDCase(this.dcase);
+			this.location_updated = true;
+		});
 	}
 	
 	//-----------------------------------------------------------------------------
