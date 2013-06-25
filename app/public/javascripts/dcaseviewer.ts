@@ -277,6 +277,14 @@ class DCaseViewer {
 			this.location_updated = true;
 			this.repaintAll();
 		});
+		var importFile = new ImportFile(".node-container");
+		importFile.upload((data: any, target: HTMLElement)=>{
+			var selected = this.getSelectedNode();
+			selected.node.desc += "\n"+data; //FIXME use MetaData instead of desc
+
+			this.setDCase(this.dcase);
+			this.location_updated = true;
+		});
 	}
 	
 	//-----------------------------------------------------------------------------
@@ -547,7 +555,7 @@ class DNodeView {
 
 	//TODO
 	startInplaceEdit: ()=>void;
-	
+
 	constructor(
 			public viewer: DCaseViewer,
 			public node: DCaseNodeModel,
@@ -571,8 +579,16 @@ class DNodeView {
 			}
 			this.$rootsvg.append(this.$line);
 		}
-	
+
 		this.$div.mouseup((e) => this.viewer.dragEnd(this));
+
+		this.$div[0].ondragenter = (e) => {
+			this.viewer.setSelectedNode(this);
+		};
+
+		this.$div[0].ondragleave = (e) => {
+			this.viewer.setSelectedNode(null);
+		};
 	
 		this.$div.hover(() => {
 			this.hovered = true;
@@ -581,9 +597,9 @@ class DNodeView {
 			this.hovered = false;
 			this.updateColor();
 		});
-	
+
 		this.nodeChanged();
-	
+
 		$.each(viewer.nodeview_addons, (i, addon) => {
 			addon(this);
 		});

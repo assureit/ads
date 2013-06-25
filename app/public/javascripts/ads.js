@@ -22,7 +22,7 @@ var ADS = (function () {
             _this.initDefaultScreen(_this.getLoginUserorNull(), pageIndex, _this.selectDCaseView);
             $("#newDCase").hide();
             $("#selectDCase").show();
-            var importFile = new ImportFile();
+            var importFile = new ImportFile("#ase");
             importFile.read(function (file) {
                 var tree = JSON.parse(file.result);
                 if("contents" in tree) {

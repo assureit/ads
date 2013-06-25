@@ -61,6 +61,8 @@ exports.upload = function (req, res) {
                 });
             });
         });
+    } else {
+        res.send(401, "Bad Request");
     }
 };
 exports.download = function (req, res) {

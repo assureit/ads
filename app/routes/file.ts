@@ -69,6 +69,8 @@ export var upload = function(req: any, res: any){
 				});
 			});
 		});
+	} else {
+		res.send(401, "Bad Request");
 	}
 }
 
