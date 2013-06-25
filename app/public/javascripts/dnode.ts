@@ -2,11 +2,12 @@
 ///<reference path='./api.ts'/>
 ///<reference path='./dcaseviewer-addons.ts'/>
 
-class DCaseMetaContent {
-	constructor(public type: string, public text: string){ }
-		clone(): DCaseMetaContent {
-			return new DCaseMetaContent(this.type, this.text);
-		}
+interface DCaseMetaContent {
+}
+
+interface DCaseParsedNodeBody {
+	description: string;
+	metadata: DCaseMetaContent[];
 }
 
 interface DCaseNodeRawData {
@@ -352,7 +353,7 @@ class DCaseModel {
 		return newNode;
 	}
 
-	insertNode(parent: DCaseNodeModel, type: string, desc: string, metadata: DCaseMetaContent[], index: number): DCaseNodeModel {
+	insertNode(parent: DCaseNodeModel, type: string, desc: string, metadata: DCaseMetaContent[], index?: number): DCaseNodeModel {
 		if(index == null) {
 			index = parent.children.length;
 		}
@@ -371,7 +372,7 @@ class DCaseModel {
 		return node;
 	}
 
-	pasteNode(parent: DCaseNodeModel, old_node: DCaseNodeModel, index: number): void {
+	pasteNode(parent: DCaseNodeModel, old_node: DCaseNodeModel, index?: number): void {
 		if(index == null) {
 			index = parent.children.length;
 		}

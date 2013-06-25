@@ -102,7 +102,7 @@ function findMostSimilarNodeType(query: string): string {
 	return NodeTypes[minidx];
 };
 
-function DNodeView_ExpandBranch(self): void {
+function DNodeView_ExpandBranch(self: DNodeView): void {
 	var DBLTOUCH_THRESHOLD: number = 300;
 	var count: number = 0;
 	var time: number = null;
@@ -162,8 +162,8 @@ function findVaridMetaData(body: string[]): number {
 }
 
 
-function parseMetaData(data: string[]): any {
-	var metadata: any = {};
+function parseMetaData(data: string[]): DCaseMetaContent {
+	var metadata: DCaseMetaContent = {};
 	var i: number = 0;
 	for (; i < data.length; i++) {
 		if (data[i].indexOf(":") == -1) break;
@@ -180,13 +180,13 @@ function parseMetaData(data: string[]): any {
 	return metadata;
 }
 
-function generateMetadata(n): any { //FIXME return type is string or Array?
-	var metadata: any = n.metadata;
-	var list = [];
+function generateMetadata(n: DCaseNodeModel): string[] {
+	var metadata: DCaseMetaContent[] = n.metadata;
+	var list: string[] = [];
 	for (var i = 0; i < metadata.length; i++) {
 		var keys: string[] = Object.keys(metadata[i]);
 		var data: string = (keys.length > 0) ? "\n" : "";
-		for (var j = 0; j < keys.length; j++) {
+		for (var j: number = 0; j < keys.length; j++) {
 			var key: string = keys[j];
 			if (key != "Description") {
 				data += key + ": " + metadata[i][key] + "\n";
@@ -202,8 +202,8 @@ function generateMetadata(n): any { //FIXME return type is string or Array?
 	return list;
 }
 
-function parseNodeBody(body: string[]): any {
-	var metadata: any = {};
+function parseNodeBody(body: string[]): DCaseParsedNodeBody {
+	var metadata: DCaseMetaContent = {};
 	var description: string;
 	var metadataIndex: number = findVaridMetaData(body);
 	if (metadataIndex != -1) {
@@ -213,17 +213,17 @@ function parseNodeBody(body: string[]): any {
 		description = body.join("\n").trim();
 	}
 
-	return {"description": description, "metadata": [metadata]}; //FIXME 
+	return {description: description, metadata: [metadata]};
 }
 
-function DNodeView_InplaceEdit(self): void {
+function DNodeView_InplaceEdit(self: DNodeView): void {
 	var $edit: JQuery = null;
 
 	self.$divText.addClass("node-text-editable");
 
 
-	function generateMarkdownText(node: any): string {
-		function convert(n: any): string {
+	function generateMarkdownText(node: DCaseNodeModel): string {
+		function convert(n: DCaseNodeModel): string {
 			return ("# " + n.type + " " + n.name + " " + n.id + (n.desc.length > 0 ? ("\n" + n.desc) : "") + generateMetadata(n) + "\n\n");
 		};
 
@@ -234,9 +234,9 @@ function DNodeView_InplaceEdit(self): void {
 		return markdown;
 	};
 
-	function parseMarkdownText(src: string): any[] {
+	function parseMarkdownText(src: string): DCaseNodeModel[] {
 		var nodesrc: string[] = src.split(/^#+/m).slice(1);
-		var nodes: any[] = [];
+		var nodes: DCaseNodeModel[] = [];
 		for(var i: number = 0; i < nodesrc.length; ++i){
 
 			var lines: string[] = nodesrc[i].split(/\r\n|\r|\n/);
@@ -244,7 +244,7 @@ function DNodeView_InplaceEdit(self): void {
 
 			/* handle metadata */
 			var body: string[] = lines.slice(1).join("\n").trim().split("\n");
-			var parsedBody: any = parseNodeBody(body);
+			var parsedBody: DCaseParsedNodeBody = parseNodeBody(body);
 
 			var node: DCaseNodeModel = new DCaseNodeModel(
 				parseInt(heads[2]),
@@ -268,7 +268,7 @@ function DNodeView_InplaceEdit(self): void {
 			$edit = $("<textarea></textarea>")
 				.addClass("node-inplace")
 				.autosize()
-				.css("top", self.$divText.offset().y)
+				.css("top", self.$divText.offset().top)
 				.attr("value", generateMarkdownText(self.node))
 				.appendTo(self.$div)
 				.focus()
@@ -287,24 +287,24 @@ function DNodeView_InplaceEdit(self): void {
 		}
 	}
 
-	function updateNode(node: any, nodejson: any): any {
+	function updateNode(node: DCaseNodeModel, nodejson: DCaseNodeModel): DCaseNodeModel {
 		var newDesc: string = nodejson.desc;
 		var newType: string = nodejson.type;
 		var newName: string = nodejson.name || newType[0] + "_" + node.id;
-		var newMetadata: any = nodejson.metadata;
-		var DCase = self.viewer.getDCase();
+		var newMetadata: DCaseMetaContent[] = nodejson.metadata;
+		var DCase: DCaseModel = self.viewer.getDCase();
 		DCase.setParam(node, newType, newName, newDesc, newMetadata);
 		return node;
 	}
 
 	function closingInplace(): void {
 		var markdown: string = $edit.attr("value").trim();
-		var nodes: any[] = parseMarkdownText(markdown);
-		var node: any = self.node;
-		var viewer = self.viewer;
-		var DCase = viewer.getDCase();
-		var parent = node.parent;
-
+		var nodes: DCaseNodeModel[] = parseMarkdownText(markdown);
+		var node: DCaseNodeModel = self.node;
+		var viewer: DCaseViewer = self.viewer;
+		var DCase: DCaseModel = viewer.getDCase();
+		var parent: DCaseNodeModel = node.parent;
+		
 		viewer.canMoveByKeyboard = true;
 
 		if(nodes.length === 0){
@@ -331,9 +331,9 @@ function DNodeView_InplaceEdit(self): void {
 				nodes[0].type = "Goal";
 			}
 			updateNode(node, nodes[0]);
-
-			var idNodeTable: any = {};
-			var idIndexTable: any = {};
+			
+			var idNodeTable: DCaseNodeModel[] = [];
+			var idIndexTable: number[] = [];
 
 			var ch: number = 0, co: number = 0;
 			node.eachSubNode((i: number, n: DCaseNodeModel) => {
@@ -345,31 +345,31 @@ function DNodeView_InplaceEdit(self): void {
 				}
 			});
 
-			var newChildren: any[] = [];
-			var newContexts: string[] = [];
+			var newChildren: DCaseNodeModel[] = [];
+			var newContexts: DCaseNodeModel[] = [];
 
 			var treeChanged: bool = false;
 			for(var i: number = 1; i < nodes.length; ++i){
-				var nd: any = nodes[i];
-				var id: string = nd.id;
+				var nd: DCaseNodeModel = nodes[i];
+				var id: number = nd.id;
 				if(idNodeTable[id]){
 					if(!node.isTypeApendable(nd.type)){
 						nd.type = idNodeTable[id].type;
 					}
-					var newNode: any = updateNode(idNodeTable[id], nd);
+					var newNode: DCaseNodeModel = updateNode(idNodeTable[id], nd);
 					// check subnode swapping
 					treeChanged = idIndexTable[id] !== (newNode.isContext ? newContexts : newChildren).length;
 					delete idNodeTable[id];
 					(newNode.isContext ? newContexts : newChildren).push(newNode);
 				}else if(node.isTypeApendable(nd.type)){
 					// create new node
-					var newNode: any = DCase.insertNode(node, nd.type, nd.desc, nd.metadata);
+					var newNode: DCaseNodeModel = DCase.insertNode(node, nd.type, nd.desc, nd.metadata);
 					treeChanged = true;
 					(newNode.isContext ? newContexts : newChildren).push(newNode);
 				}
 			}
 			// if a node is left in Table, it means that the node is removed from markdown text.
-			jQuery.each(idNodeTable, (i, v) => {
+			jQuery.each(idNodeTable, (i: number, v: DCaseNodeModel) => {
 				DCase.removeNode(v);
 				treeChanged = true;
 			});
@@ -415,14 +415,14 @@ function DNodeView_InplaceEdit(self): void {
 
 //-----------------------------------------------------------------------------
 
-function DNodeView_ToolBox(self): void {
+function DNodeView_ToolBox(self: DNodeView): void {
 	var edit_lock: bool = false;
 	var edit_hover: bool = false;
 	var edit_active: bool = false;
 	var $edit: JQuery = null;
 	var timeout = null;
 
-	function showNewNode(visible): void {
+	function showNewNode(visible: bool): void {
 		var type_selected = null;
 		function edit_close(): void {
 			$edit.remove();
@@ -438,9 +438,9 @@ function DNodeView_ToolBox(self): void {
 				$edit.css("opacity", 0.95);
 				self.viewer.$root.css("-moz-user-select", "text");
 				self.viewer.$root.one("click", () => {
-					var text = $edit.find("textarea").attr("value");
+					var text: string = $edit.find("textarea").attr("value");
 					if(text != "") {
-						var parsedBody: any = parseNodeBody(text.trim().split("\n"));
+						var parsedBody: DCaseParsedNodeBody = parseNodeBody(text.trim().split("\n"));
 						self.viewer.getDCase().insertNode(self.node, type_selected, parsedBody.description, parsedBody.metadata);
 					}
 					edit_close();
@@ -454,7 +454,7 @@ function DNodeView_ToolBox(self): void {
 			}
 		}
 		if(visible) {
-			var types = self.node.appendableTypes();
+			var types: string[] = self.node.appendableTypes();
 			if(self.node.contexts.length > 0) {
 				types = types.slice(0);//clone
 				for(var i: number = 0; i < self.node.contexts.length; i++) {
@@ -481,7 +481,7 @@ function DNodeView_ToolBox(self): void {
 				.appendTo(self.$div);
 
 				var $ul: JQuery = $edit.find("ul");
-				$.each(types, (i, type) => {
+				$.each(types, (i: number, type: string) => {
 					var $li = $("<li></li>")
 						.html("<a href=\"#\">" + type + "</a>")
 						.click(() => {
@@ -523,9 +523,9 @@ function DNodeView_ToolBox(self): void {
 		}
 	};
 
-	var $toolbox = null;
+	var $toolbox: JQuery = null;
 	
-	function showToolbox(visible): void {
+	function showToolbox(visible: bool): void {
 		if(visible) {
 			if($toolbox != null) return;
 			$toolbox = $("<div></div>")
@@ -560,7 +560,7 @@ function DNodeView_ToolBox(self): void {
 
 			$menu.find("#ml-paste").click((e: JQueryEventObject) => {
 				e.preventDefault();
-				var node: any = self.viewer.clipboard;
+				var node: DCaseNodeModel = self.viewer.clipboard;
 				if(node != null) {
 					if(self.node.isTypeApendable(node.type)) {
 						self.viewer.getDCase().pasteNode(self.node, node);
@@ -621,10 +621,10 @@ function DNodeView_ToolBox(self): void {
 	});
 };
 
-function DNodeView_ToolBox_uneditable(self): void {
+function DNodeView_ToolBox_uneditable(self: DNodeView): void {
 	var $toolbox: JQuery = null;
 	
-	function showToolbox(visible): void {
+	function showToolbox(visible: bool): void {
 		if(visible) {
 			if($toolbox != null) return;
 			$toolbox = $("<div></div>")

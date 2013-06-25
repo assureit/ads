@@ -192,8 +192,8 @@ function parseNodeBody(body) {
         description = body.join("\n").trim();
     }
     return {
-        "description": description,
-        "metadata": [
+        description: description,
+        metadata: [
             metadata
         ]
     };
@@ -234,7 +234,7 @@ function DNodeView_InplaceEdit(self) {
             self.$divText.css("display", "none");
             self.viewer.$root.css("-moz-user-select", "text");
             self.viewer.canMoveByKeyboard = false;
-            $edit = $("<textarea></textarea>").addClass("node-inplace").autosize().css("top", self.$divText.offset().y).attr("value", generateMarkdownText(self.node)).appendTo(self.$div).focus().mousedown(function (e) {
+            $edit = $("<textarea></textarea>").addClass("node-inplace").autosize().css("top", self.$divText.offset().top).attr("value", generateMarkdownText(self.node)).appendTo(self.$div).focus().mousedown(function (e) {
                 e.stopPropagation();
             }).mousewheel(function (e) {
                 e.stopPropagation();
@@ -292,10 +292,8 @@ function DNodeView_InplaceEdit(self) {
                 nodes[0].type = "Goal";
             }
             updateNode(node, nodes[0]);
-            var idNodeTable = {
-            };
-            var idIndexTable = {
-            };
+            var idNodeTable = [];
+            var idIndexTable = [];
             var ch = 0, co = 0;
             node.eachSubNode(function (i, n) {
                 idNodeTable[n.id] = n;

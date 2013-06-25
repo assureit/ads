@@ -1,13 +1,3 @@
-var DCaseMetaContent = (function () {
-    function DCaseMetaContent(type, text) {
-        this.type = type;
-        this.text = text;
-    }
-    DCaseMetaContent.prototype.clone = function () {
-        return new DCaseMetaContent(this.type, this.text);
-    };
-    return DCaseMetaContent;
-})();
 var DCaseNodeModel = (function () {
     function DCaseNodeModel(id, name, type, desc, metadata) {
         this.isContext = false;
