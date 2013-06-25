@@ -531,6 +531,12 @@ var DNodeView = (function () {
         this.$div.mouseup(function (e) {
             return _this.viewer.dragEnd(_this);
         });
+        this.$div[0].ondragenter = function (e) {
+            _this.viewer.setSelectedNode(_this);
+        };
+        this.$div[0].ondragleave = function (e) {
+            _this.viewer.setSelectedNode(null);
+        };
         this.$div.hover(function () {
             _this.hovered = true;
             _this.updateColor();
