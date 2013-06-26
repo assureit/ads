@@ -5,9 +5,23 @@ var __extends = this.__extends || function (d, b) {
 };
 var http = require('http')
 var error = require('../api/error')
+var url = require('url')
 var CONFIG = require('config');
 var Redmine = (function () {
     function Redmine() { }
+    Redmine.prototype._resolvePath = function (path) {
+        if(CONFIG.redmine.basePath) {
+            if(!CONFIG.redmine.basePath.match(/\/$/)) {
+                CONFIG.redmine.basePath = CONFIG.redmine.basePath + '/';
+            }
+            while(path.match(/^\//)) {
+                path = path.substr(1);
+            }
+            path = url.resolve(CONFIG.redmine.basePath, path);
+            console.log(CONFIG.redmine.basePath);
+        }
+        return path;
+    };
     Redmine.prototype.post = function (path, params, callback) {
         if(!CONFIG.redmine.host || !CONFIG.redmine.apiKey) {
             callback(new error.InternalError('Redmine host or api key configuration is not found', null), null);
@@ -15,7 +29,8 @@ var Redmine = (function () {
         var jsonParams = JSON.stringify(params);
         var options = {
             host: CONFIG.redmine.host,
-            path: path,
+            path: this._resolvePath(path),
+            port: CONFIG.redmine.port,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -52,7 +67,7 @@ var Issue = (function (_super) {
 
     }
     Issue.prototype.createSimple = function (title, body, callback) {
-        _super.prototype.post.call(this, '/issues.json', {
+        _super.prototype.post.call(this, 'issues.json', {
             issue: {
                 project_id: CONFIG.redmine.projectId,
                 subject: title,
