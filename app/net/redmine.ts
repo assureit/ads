@@ -48,7 +48,7 @@ export class Redmine {
 					callback(err, null);
 					return;
 				}
-				callback(null, JSON.parse(result));
+				callback(null, result);
 			});
 		} catch (e) {
 			callback(e, null);
@@ -91,5 +91,13 @@ export class Issue extends Redmine {
 				}
 			},
 			callback);
+	}
+
+	addComment(itsId: string, comment:string, callback:Callback) {
+		super.put('issues/' + itsId + '.json', {
+				issue: {
+					notes: comment
+				}
+			}, callback);
 	}
 }

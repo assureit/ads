@@ -40,7 +40,6 @@ var Request = (function () {
             return;
         }
         this.options.path = path;
-        console.log(this.options);
         var req = http.request(this.options, function (res) {
             if(res.statusCode != 200 && res.statusCode != 201) {
                 callback(new error.InternalError('Failed to access: ' + res.statusCode, res), null);
@@ -52,7 +51,6 @@ var Request = (function () {
                 body += chunk;
             });
             res.on('end', function (event) {
-                console.log(body);
                 callback(null, body);
             });
         });

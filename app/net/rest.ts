@@ -61,8 +61,6 @@ export class Request {
 		// this.setHeader('Content-Length', _getByteLength(data));
 		this.options.path = path;
 
-		console.log(this.options);
-
 		var req = http.request(this.options, (res:any) => {
 			if (res.statusCode != 200 && res.statusCode != 201) {
 				callback(new error.InternalError('Failed to access: ' + res.statusCode, res), null);
@@ -77,7 +75,6 @@ export class Request {
 			});
 
 			res.on('end', (event:any) => {
-				console.log(body);
 				callback(null, body);
 			});
 		});

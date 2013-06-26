@@ -38,24 +38,19 @@ var Redmine = (function () {
         }
     };
     Redmine.prototype.put = function (path, params, callback) {
-        if(!CONFIG.redmine.host || !CONFIG.redmine.apiKey) {
-            callback(new error.InternalError('Redmine host or api key configuration is not found', null), null);
-        }
         var jsonParams = JSON.stringify(params);
-        var options = {
-            host: CONFIG.redmine.host,
-            port: CONFIG.redmine.port
-        };
-        var req = new rest.Request(options);
-        req.setContentType('application/json');
-        req.setHeader('X-Redmine-API-Key', CONFIG.redmine.apiKey);
-        req.post(this._resolvePath(path), jsonParams, function (err, result) {
-            if(err) {
-                callback(err, null);
-                return;
-            }
-            callback(null, JSON.parse(result));
-        });
+        try  {
+            var req = this._buildRequest();
+            req.put(this._resolvePath(path), jsonParams, function (err, result) {
+                if(err) {
+                    callback(err, null);
+                    return;
+                }
+                callback(null, result);
+            });
+        } catch (e) {
+            callback(e, null);
+        }
     };
     Redmine.prototype._buildRequest = function () {
         if(!CONFIG.redmine.host || !CONFIG.redmine.apiKey) {
@@ -85,6 +80,13 @@ var Issue = (function (_super) {
                 project_id: CONFIG.redmine.projectId,
                 subject: title,
                 description: body
+            }
+        }, callback);
+    };
+    Issue.prototype.addComment = function (itsId, comment, callback) {
+        _super.prototype.put.call(this, 'issues/' + itsId + '.json', {
+            issue: {
+                notes: comment
             }
         }, callback);
     };

@@ -32,5 +32,14 @@ describe('net', () => {
 				});
 			});
 		});
+		describe('addComment', () => {
+			it('should create new comment to issue', function(done) {
+				issue.addComment("103", 'コメントを追加', (err:any, result:any) => {
+					expect(err).to.be(null);
+					expect(result).to.equal('');
+					done();
+				});
+			});
+		});
 	});
 })
