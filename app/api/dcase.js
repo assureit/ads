@@ -168,47 +168,54 @@ function commit(params, callback) {
     var userId = constant.SYSTEM_USER_ID;
     var con = new db.Database();
     con.begin(function (err, result) {
-        var commitDAO = new model_commit.CommitDAO(con);
-        commitDAO.get(params.commitId, function (err, com) {
-            if(err) {
-                callback.onFailure(err);
-                return;
-            }
-            commitDAO.insert({
-                data: JSON.stringify(params.contents),
-                prevId: params.commitId,
-                dcaseId: com.dcaseId,
-                userId: userId,
-                message: params.commitMessage
-            }, function (err, commitId) {
+        _commit(con, params.commitId, params.commitMessage, params.contents, function (err, result) {
+            con.commit(function (err, result) {
                 if(err) {
                     callback.onFailure(err);
                     return;
                 }
-                var nodeDAO = new model_node.NodeDAO(con);
-                nodeDAO.insertList(com.dcaseId, commitId, params.contents.NodeList, function (err) {
-                    if(err) {
-                        callback.onFailure(err);
-                        return;
-                    }
-                    commitDAO.update(commitId, JSON.stringify(params.contents), function (err) {
-                        con.commit(function (err, result) {
-                            if(err) {
-                                callback.onFailure(err);
-                                return;
-                            }
-                            var issueDAO = new model_issue.IssueDAO(con);
-                            issueDAO.publish(com.dcaseId, function (err) {
-                                con.commit(function (err, result) {
-                                    if(err) {
-                                        return;
-                                    }
-                                    callback.onSuccess({
-                                        commitId: commitId
-                                    });
-                                    con.close();
-                                });
-                            });
+                callback.onSuccess(result);
+                con.close();
+            });
+        });
+    });
+}
+exports.commit = commit;
+;
+function _commit(con, previousCommitId, message, contents, callback) {
+    var userId = constant.SYSTEM_USER_ID;
+    var commitDAO = new model_commit.CommitDAO(con);
+    commitDAO.get(previousCommitId, function (err, com) {
+        if(err) {
+            callback(err, null);
+            return;
+        }
+        commitDAO.insert({
+            data: JSON.stringify(contents),
+            prevId: previousCommitId,
+            dcaseId: com.dcaseId,
+            userId: userId,
+            message: message
+        }, function (err, commitId) {
+            if(err) {
+                callback(err, null);
+                return;
+            }
+            var nodeDAO = new model_node.NodeDAO(con);
+            nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, function (err) {
+                if(err) {
+                    callback(err, null);
+                    return;
+                }
+                commitDAO.update(commitId, JSON.stringify(contents), function (err) {
+                    var issueDAO = new model_issue.IssueDAO(con);
+                    issueDAO.publish(com.dcaseId, function (err) {
+                        if(err) {
+                            callback(err, null);
+                            return;
+                        }
+                        callback(null, {
+                            commitId: commitId
                         });
                     });
                 });
@@ -216,8 +223,7 @@ function commit(params, callback) {
         });
     });
 }
-exports.commit = commit;
-;
+exports._commit = _commit;
 function deleteDCase(params, callback) {
     var userId = constant.SYSTEM_USER_ID;
     var con = new db.Database();

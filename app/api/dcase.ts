@@ -155,51 +155,95 @@ export function commit(params: any, callback: type.Callback) {
 
 	var con = new db.Database();
 	con.begin((err, result) => {
-		var commitDAO = new model_commit.CommitDAO(con);
-		commitDAO.get(params.commitId, (err:any, com: model_commit.Commit) => {
-			if (err) {
-				callback.onFailure(err);
-				return;
-			}
-			commitDAO.insert({data: JSON.stringify(params.contents), prevId: params.commitId, dcaseId: com.dcaseId, userId: userId, message: params.commitMessage}, (err:any, commitId) => {
+		_commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
+			con.commit((err, result) =>{
 				if (err) {
 					callback.onFailure(err);
 					return;
 				}
-				var nodeDAO = new model_node.NodeDAO(con);
-				nodeDAO.insertList(com.dcaseId, commitId, params.contents.NodeList, (err:any) => {
-					if (err) {
-						callback.onFailure(err);
-						return;
-					}
-					commitDAO.update(commitId, JSON.stringify(params.contents), (err:any) => {
-						con.commit((err, result) =>{
-							if (err) {
-								callback.onFailure(err);
-								return;
-							}
-							// callback.onSuccess({commitId: commitId});
+				callback.onSuccess(result);
+				con.close();
+			});
+		});
+		// var commitDAO = new model_commit.CommitDAO(con);
+		// commitDAO.get(params.commitId, (err:any, com: model_commit.Commit) => {
+		// 	if (err) {
+		// 		callback.onFailure(err);
+		// 		return;
+		// 	}
+		// 	commitDAO.insert({data: JSON.stringify(params.contents), prevId: params.commitId, dcaseId: com.dcaseId, userId: userId, message: params.commitMessage}, (err:any, commitId) => {
+		// 		if (err) {
+		// 			callback.onFailure(err);
+		// 			return;
+		// 		}
+		// 		var nodeDAO = new model_node.NodeDAO(con);
+		// 		nodeDAO.insertList(com.dcaseId, commitId, params.contents.NodeList, (err:any) => {
+		// 			if (err) {
+		// 				callback.onFailure(err);
+		// 				return;
+		// 			}
+		// 			commitDAO.update(commitId, JSON.stringify(params.contents), (err:any) => {
+		// 				con.commit((err, result) =>{
+		// 					if (err) {
+		// 						callback.onFailure(err);
+		// 						return;
+		// 					}
+		// 					// callback.onSuccess({commitId: commitId});
 
-							var issueDAO = new model_issue.IssueDAO(con);
-							issueDAO.publish(com.dcaseId, (err:any) => {
-								// TODO: 管理者にエラー通知などのエラー処理
-								con.commit((err, result) =>{
-									if (err) {
-										// TODO: 管理者にエラー通知などのエラー処理
-										return;
-									}
-							callback.onSuccess({commitId: commitId});
-									con.close();
-								});
-							});
-						});
+		// 					var issueDAO = new model_issue.IssueDAO(con);
+		// 					issueDAO.publish(com.dcaseId, (err:any) => {
+		// 						// TODO: 管理者にエラー通知などのエラー処理
+		// 						con.commit((err, result) =>{
+		// 							if (err) {
+		// 								// TODO: 管理者にエラー通知などのエラー処理
+		// 								return;
+		// 							}
+		// 					callback.onSuccess({commitId: commitId});
+		// 							con.close();
+		// 						});
+		// 					});
+		// 				});
+		// 			});
+		// 		});
+		// 	});
+		// });
+
+	});
+};
+
+export function _commit(con: db.Database, previousCommitId:number, message: string, contents:any, callback: (err:any, result:any)=>void) {
+	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
+	var commitDAO = new model_commit.CommitDAO(con);
+	commitDAO.get(previousCommitId, (err:any, com: model_commit.Commit) => {
+		if (err) {
+			callback(err, null);
+			return;
+		}
+		commitDAO.insert({data: JSON.stringify(contents), prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message}, (err:any, commitId) => {
+			if (err) {
+				callback(err, null);
+				return;
+			}
+			var nodeDAO = new model_node.NodeDAO(con);
+			nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, (err:any) => {
+				if (err) {
+					callback(err, null);
+					return;
+				}
+				commitDAO.update(commitId, JSON.stringify(contents), (err:any) => {
+					var issueDAO = new model_issue.IssueDAO(con);
+					issueDAO.publish(com.dcaseId, (err:any) => {
+						if (err) {
+							callback(err, null);
+							return;
+						}
+						callback(null, {commitId: commitId});
 					});
 				});
 			});
 		});
-
 	});
-};
+}
 
 export function deleteDCase(params:any, callback: type.Callback) {
 	// TODO: 認証チェック

@@ -1,9 +1,6 @@
 var http = require('http')
 var error = require('../api/error')
-var querystring = require('querystring')
-function _getByteLength(str) {
-    return querystring.unescape(encodeURIComponent(str)).length;
-}
+
 var Request = (function () {
     function Request(options) {
         this.options = options;
