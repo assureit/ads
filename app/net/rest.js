@@ -39,6 +39,7 @@ var Request = (function () {
             callback(new error.InternalError('host configuration is not found', null), null);
             return;
         }
+        this.setHeader('Content-Length', Buffer.byteLength(data, 'utf8'));
         this.options.path = path;
         var req = http.request(this.options, function (res) {
             if(res.statusCode != 200 && res.statusCode != 201) {

@@ -15,9 +15,6 @@ export interface Option {
 	path?: string;
 }
 
-function _getByteLength(str: string):number {
-	return querystring.unescape(encodeURIComponent(str)).length;
-}
 export class Request {
 	constructor(public options?: Option) {
 		this._initOptions();		
@@ -58,7 +55,7 @@ export class Request {
 			callback(new error.InternalError('host configuration is not found', null), null);
 			return;
 		}
-		// this.setHeader('Content-Length', _getByteLength(data));
+		this.setHeader('Content-Length', Buffer.byteLength(data, 'utf8'));
 		this.options.path = path;
 
 		var req = http.request(this.options, (res:any) => {
