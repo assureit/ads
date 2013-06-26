@@ -304,9 +304,9 @@ function DNodeView_InplaceEdit(self): void {
 		var viewer = self.viewer;
 		var DCase = viewer.getDCase();
 		var parent = node.parent;
-		
+
 		viewer.canMoveByKeyboard = true;
-				
+
 		if(nodes.length === 0){
 			// plain-text is given.
 			if(markdown.length === 0){
@@ -331,7 +331,7 @@ function DNodeView_InplaceEdit(self): void {
 				nodes[0].type = "Goal";
 			}
 			updateNode(node, nodes[0]);
-			
+
 			var idNodeTable: any = {};
 			var idIndexTable: any = {};
 
