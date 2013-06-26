@@ -8,7 +8,7 @@ export interface MetaData {
 	Subject?: string;
 	Description?: string;
 	Visible?:string;
-	IssueId?: number;
+	_IssueId?: number;
 }
 export interface NodeData {
 	ThisNodeId: number;
@@ -57,10 +57,10 @@ export class NodeDAO extends model.DAO {
 		});
 	}
 	processMetaData(dcaseId:number, commitId:number, meta:MetaData, callback: (err:any)=>void): void {
-		if (meta.Type == 'Issue' && !meta.IssueId) {
+		if (meta.Type == 'Issue' && !meta._IssueId) {
 			var issueDAO = new model_issue.IssueDAO(this.con);
 			issueDAO.insert(new model_issue.Issue(0, dcaseId, null, meta.Subject, meta.Description), (err:any, result:model_issue.Issue) => {
-				meta.IssueId = result.id;
+				meta._IssueId = result.id;
 				callback(null);
 			});
 		} else {
