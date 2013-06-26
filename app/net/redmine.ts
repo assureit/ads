@@ -3,6 +3,7 @@
 import http = module('http')
 import error = module('../api/error')
 import url = module('url')
+import rest = module('./rest')
 var CONFIG = require('config');
 
 interface Callback {
@@ -41,30 +42,15 @@ export class Redmine {
 				'X-Redmine-API-Key': CONFIG.redmine.apiKey
 			}
 		};
-		var req = http.request(options, (res) => {
-			if (res.statusCode != 200 && res.statusCode != 201) {
-				callback(new error.InternalError('Failed to access redmine: ' + res.statusCode, res), null);
-				return ;
+
+		var client = new rest.Request(options);
+		client.post(this._resolvePath(path), jsonParams, (err:any, result:string) => {
+			if (err) {
+				callback(err, null);
+				return;
 			}
-
-			res.setEncoding('utf8');
-
-			var body = "";
-			res.on('data', (chunk: string) => {
-				body += chunk;
-			});
-
-			res.on('end', (event:any) => {
-				callback(null, JSON.parse(body));
-			});
+			callback(null, JSON.parse(result));
 		});
-
-		req.on('error', (err:any) => {
-			callback(err, null);
-		});
-
-		req.write(jsonParams);
-		req.end();
 	}
 }
 

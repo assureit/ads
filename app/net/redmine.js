@@ -3,9 +3,10 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var http = require('http')
+
 var error = require('../api/error')
 var url = require('url')
+var rest = require('./rest')
 var CONFIG = require('config');
 var Redmine = (function () {
     function Redmine() { }
@@ -36,25 +37,15 @@ var Redmine = (function () {
                 'X-Redmine-API-Key': CONFIG.redmine.apiKey
             }
         };
-        var req = http.request(options, function (res) {
-            if(res.statusCode != 200 && res.statusCode != 201) {
-                callback(new error.InternalError('Failed to access redmine: ' + res.statusCode, res), null);
+        var client = new rest.Request(options);
+        client.post(this._resolvePath(path), jsonParams, function (err, result) {
+            if(err) {
+                console.log(err);
+                callback(err, null);
                 return;
             }
-            res.setEncoding('utf8');
-            var body = "";
-            res.on('data', function (chunk) {
-                body += chunk;
-            });
-            res.on('end', function (event) {
-                callback(null, JSON.parse(body));
-            });
+            callback(null, JSON.parse(result));
         });
-        req.on('error', function (err) {
-            callback(err, null);
-        });
-        req.write(jsonParams);
-        req.end();
     };
     return Redmine;
 })();
