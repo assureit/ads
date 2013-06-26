@@ -24,33 +24,50 @@ export class Redmine {
 	}
 
 	post(path:string, params:any, callback:Callback) {
-		if (!CONFIG.redmine.host || !CONFIG.redmine.apiKey) {
-			callback(new error.InternalError('Redmine host or api key configuration is not found', null), null);
-		}
-
 		var jsonParams = JSON.stringify(params);
+		try {
+			var req = this._buildRequest();
+			req.post(this._resolvePath(path), jsonParams, (err:any, result:string) => {
+				if (err) {
+					callback(err, null);
+					return;
+				}
+				callback(null, JSON.parse(result));
+			});
+		} catch (e) {
+			callback(e, null);
+		}
+	}
 
+	put(path:string, params:any, callback:Callback) {
+		var jsonParams = JSON.stringify(params);
+		try {
+			var req = this._buildRequest();
+			req.put(this._resolvePath(path), jsonParams, (err:any, result:string) => {
+				if (err) {
+					callback(err, null);
+					return;
+				}
+				callback(null, JSON.parse(result));
+			});
+		} catch (e) {
+			callback(e, null);
+		}
+	}
+
+	_buildRequest(): rest.Request {
+		if (!CONFIG.redmine.host || !CONFIG.redmine.apiKey) {
+			throw new error.InternalError('Redmine host or api key configuration is not found', null);
+		}
 		var options = {
 			host: CONFIG.redmine.host,
-			path: this._resolvePath(path),
 			port: CONFIG.redmine.port,
-
-			// method: 'POST',
-			headers: {
-				// 'Content-Length': jsonParams.length,
-				'Content-Type': 'application/json',
-				'X-Redmine-API-Key': CONFIG.redmine.apiKey
-			}
 		};
 
-		var client = new rest.Request(options);
-		client.post(this._resolvePath(path), jsonParams, (err:any, result:string) => {
-			if (err) {
-				callback(err, null);
-				return;
-			}
-			callback(null, JSON.parse(result));
-		});
+		var req = new rest.Request(options);
+		req.setContentType('application/json');
+		req.setHeader('X-Redmine-API-Key', CONFIG.redmine.apiKey)
+		return req;
 	}
 }
 

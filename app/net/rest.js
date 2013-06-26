@@ -30,6 +30,10 @@ var Request = (function () {
         this.setMethod('POST');
         this._send(path, data, callback);
     };
+    Request.prototype.put = function (path, data, callback) {
+        this.setMethod('PUT');
+        this._send(path, data, callback);
+    };
     Request.prototype._send = function (path, data, callback) {
         if(!this.options.host) {
             callback(new error.InternalError('host configuration is not found', null), null);

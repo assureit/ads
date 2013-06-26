@@ -23,27 +23,52 @@ var Redmine = (function () {
         return path;
     };
     Redmine.prototype.post = function (path, params, callback) {
+        var jsonParams = JSON.stringify(params);
+        try  {
+            var req = this._buildRequest();
+            req.post(this._resolvePath(path), jsonParams, function (err, result) {
+                if(err) {
+                    callback(err, null);
+                    return;
+                }
+                callback(null, JSON.parse(result));
+            });
+        } catch (e) {
+            callback(e, null);
+        }
+    };
+    Redmine.prototype.put = function (path, params, callback) {
         if(!CONFIG.redmine.host || !CONFIG.redmine.apiKey) {
             callback(new error.InternalError('Redmine host or api key configuration is not found', null), null);
         }
         var jsonParams = JSON.stringify(params);
         var options = {
             host: CONFIG.redmine.host,
-            path: this._resolvePath(path),
-            port: CONFIG.redmine.port,
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Redmine-API-Key': CONFIG.redmine.apiKey
-            }
+            port: CONFIG.redmine.port
         };
-        var client = new rest.Request(options);
-        client.post(this._resolvePath(path), jsonParams, function (err, result) {
+        var req = new rest.Request(options);
+        req.setContentType('application/json');
+        req.setHeader('X-Redmine-API-Key', CONFIG.redmine.apiKey);
+        req.post(this._resolvePath(path), jsonParams, function (err, result) {
             if(err) {
                 callback(err, null);
                 return;
             }
             callback(null, JSON.parse(result));
         });
+    };
+    Redmine.prototype._buildRequest = function () {
+        if(!CONFIG.redmine.host || !CONFIG.redmine.apiKey) {
+            throw new error.InternalError('Redmine host or api key configuration is not found', null);
+        }
+        var options = {
+            host: CONFIG.redmine.host,
+            port: CONFIG.redmine.port
+        };
+        var req = new rest.Request(options);
+        req.setContentType('application/json');
+        req.setHeader('X-Redmine-API-Key', CONFIG.redmine.apiKey);
+        return req;
     };
     return Redmine;
 })();
