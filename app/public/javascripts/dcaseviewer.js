@@ -264,6 +264,13 @@ var DCaseViewer = (function () {
             _this.location_updated = true;
             _this.repaintAll();
         });
+        var importFile = new ImportFile(".node-container");
+        importFile.upload(function (data, target) {
+            var selected = _this.getSelectedNode();
+            selected.node.desc += "\n" + data;
+            _this.setDCase(_this.dcase);
+            _this.location_updated = true;
+        });
     };
     DCaseViewer.prototype.setLocation = function (x, y, scale, ms) {
         if (typeof ms === "undefined") { ms = 0; }
@@ -524,6 +531,12 @@ var DNodeView = (function () {
         this.$div.mouseup(function (e) {
             return _this.viewer.dragEnd(_this);
         });
+        this.$div[0].ondragenter = function (e) {
+            _this.viewer.setSelectedNode(_this);
+        };
+        this.$div[0].ondragleave = function (e) {
+            _this.viewer.setSelectedNode(null);
+        };
         this.$div.hover(function () {
             _this.hovered = true;
             _this.updateColor();

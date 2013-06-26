@@ -85,7 +85,7 @@ class ADS {
 			this.initDefaultScreen(this.getLoginUserorNull(), pageIndex, this.selectDCaseView);
 			$("#newDCase").hide();
 			$("#selectDCase").show();
-			var importFile = new ImportFile();
+			var importFile = new ImportFile("#ase");
 			importFile.read((file: DCaseFile) => {
 				var tree = JSON.parse(file.result); //TODO convert to Markdown
 				if("contents" in tree) {
