@@ -3,6 +3,7 @@
 import http = module('http')
 import error = module('../api/error')
 import url = module('url')
+import rest = module('./rest')
 var CONFIG = require('config');
 
 interface Callback {
@@ -23,48 +24,50 @@ export class Redmine {
 	}
 
 	post(path:string, params:any, callback:Callback) {
-		if (!CONFIG.redmine.host || !CONFIG.redmine.apiKey) {
-			callback(new error.InternalError('Redmine host or api key configuration is not found', null), null);
-		}
-
 		var jsonParams = JSON.stringify(params);
+		try {
+			var req = this._buildRequest();
+			req.post(this._resolvePath(path), jsonParams, (err:any, result:string) => {
+				if (err) {
+					callback(err, null);
+					return;
+				}
+				callback(null, JSON.parse(result));
+			});
+		} catch (e) {
+			callback(e, null);
+		}
+	}
 
+	put(path:string, params:any, callback:Callback) {
+		var jsonParams = JSON.stringify(params);
+		try {
+			var req = this._buildRequest();
+			req.put(this._resolvePath(path), jsonParams, (err:any, result:string) => {
+				if (err) {
+					callback(err, null);
+					return;
+				}
+				callback(null, result);
+			});
+		} catch (e) {
+			callback(e, null);
+		}
+	}
+
+	_buildRequest(): rest.Request {
+		if (!CONFIG.redmine.host || !CONFIG.redmine.apiKey) {
+			throw new error.InternalError('Redmine host or api key configuration is not found', null);
+		}
 		var options = {
 			host: CONFIG.redmine.host,
-			path: this._resolvePath(path),
 			port: CONFIG.redmine.port,
-
-			method: 'POST',
-			headers: {
-				// 'Content-Length': jsonParams.length,
-				'Content-Type': 'application/json',
-				'X-Redmine-API-Key': CONFIG.redmine.apiKey
-			}
 		};
-		var req = http.request(options, (res) => {
-			if (res.statusCode != 200 && res.statusCode != 201) {
-				callback(new error.InternalError('Failed to access redmine: ' + res.statusCode, res), null);
-				return ;
-			}
 
-			res.setEncoding('utf8');
-
-			var body = "";
-			res.on('data', (chunk: string) => {
-				body += chunk;
-			});
-
-			res.on('end', (event:any) => {
-				callback(null, JSON.parse(body));
-			});
-		});
-
-		req.on('error', (err:any) => {
-			callback(err, null);
-		});
-
-		req.write(jsonParams);
-		req.end();
+		var req = new rest.Request(options);
+		req.setContentType('application/json');
+		req.setHeader('X-Redmine-API-Key', CONFIG.redmine.apiKey)
+		return req;
 	}
 }
 
@@ -88,5 +91,13 @@ export class Issue extends Redmine {
 				}
 			},
 			callback);
+	}
+
+	addComment(itsId: string, comment:string, callback:Callback) {
+		super.put('issues/' + itsId + '.json', {
+				issue: {
+					notes: comment
+				}
+			}, callback);
 	}
 }
