@@ -459,7 +459,7 @@ class DCaseViewer {
 		}, 1000/60);
 	}
 	
-	expandBranch(view: DNodeView, b: bool, isAll: bool) {
+	expandBranch(view: DNodeView, b?: bool, isAll?: bool) {
 		if(b == null) b = !view.childVisible;
 	
 		var b0 = view.getLocation();
