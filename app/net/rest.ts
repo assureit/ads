@@ -48,7 +48,7 @@ export class Request {
 			callback(new error.InternalError('host configuration is not found', null), null);
 			return;
 		}
-		this.setHeader('Content-Length', _getByteLength(data));
+		// this.setHeader('Content-Length', _getByteLength(data));
 		this.setMethod('POST');
 		this.options.path = path;
 
@@ -68,7 +68,6 @@ export class Request {
 			});
 
 			res.on('end', (event:any) => {
-				console.log('hoge');
 				console.log(body);
 				callback(null, body);
 			});
@@ -79,6 +78,7 @@ export class Request {
 		});
 
 		req.write(data);
+		// req.write(data, 'utf8');
 		req.end();
 	}
 

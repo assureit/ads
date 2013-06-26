@@ -7,6 +7,7 @@
 
 import assert = module('assert')
 import redmine = module('../../net/redmine')
+var expect = require('expect.js');	// TODO: import module化
 
 describe('net', () => {
 	describe('redmine', () => {
@@ -14,18 +15,22 @@ describe('net', () => {
 		describe('createSimple', () => {
 			it('should create new issue', function(done) {
 				issue.createSimple('test', 'contents', (err:any, result:any) => {
-					// console.log(err);
-					// console.log(result);
+					expect(err).to.be(null);
+					expect(result).not.to.be(null);
+					expect(result.issue).not.to.be(null);
+					expect(result.issue.id).not.to.be(null);
 					done();
 				});
 			});
-			// it('should create new Japanese issue', function(done) {
-			// 	issue.createSimple('タイトル', 'これが内容', (err:any, result:any) => {
-			// 		console.log(err);
-			// 		console.log(result);
-			// 		done();
-			// 	});
-			// });
+			it('should create new Japanese issue', function(done) {
+				issue.createSimple('タイトル', 'これが内容', (err:any, result:any) => {
+					expect(err).to.be(null);
+					expect(result).not.to.be(null);
+					expect(result.issue).not.to.be(null);
+					expect(result.issue.id).not.to.be(null);
+					done();
+				});
+			});
 		});
 	});
 })

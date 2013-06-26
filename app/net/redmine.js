@@ -31,7 +31,6 @@ var Redmine = (function () {
             host: CONFIG.redmine.host,
             path: this._resolvePath(path),
             port: CONFIG.redmine.port,
-            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Redmine-API-Key': CONFIG.redmine.apiKey
@@ -40,7 +39,6 @@ var Redmine = (function () {
         var client = new rest.Request(options);
         client.post(this._resolvePath(path), jsonParams, function (err, result) {
             if(err) {
-                console.log(err);
                 callback(err, null);
                 return;
             }

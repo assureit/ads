@@ -35,7 +35,7 @@ export class Redmine {
 			path: this._resolvePath(path),
 			port: CONFIG.redmine.port,
 
-			method: 'POST',
+			// method: 'POST',
 			headers: {
 				// 'Content-Length': jsonParams.length,
 				'Content-Type': 'application/json',
