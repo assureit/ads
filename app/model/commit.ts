@@ -30,6 +30,12 @@ export class CommitDAO extends model.DAO {
 		});
 	}
 
+	update(id:number, data: string, callback: (err:any) => void): void {
+		this.con.query('UPDATE commit SET data=? WHERE id=?', [data, id], (err, result) => {
+			callback(err);
+		});
+	}
+
 	_clearLastUpdateFlag(dcaseId: number, latestCommitId: number, callback: (err:any)=>void): void {
 		this.con.query('UPDATE commit SET latest_flag = FALSE WHERE dcase_id = ? AND id <> ? AND latest_flag = TRUE', [dcaseId, latestCommitId], (err, result) => {
 			if (err) {

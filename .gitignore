@@ -3,3 +3,11 @@ app/node_modules
 db/ER.mwb.bak
 app/npm-debug.log
 upload
+
+app/config/development.yaml
+
+app/config/local.yaml
+
+app/config/runtime.json
+
+npm-debug.log

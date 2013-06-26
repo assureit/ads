@@ -5,6 +5,7 @@ var model_dcase = require('../model/dcase')
 var model_commit = require('../model/commit')
 var model_node = require('../model/node')
 
+var model_issue = require('../model/issue')
 
 function searchDCase(params, callback) {
     var con = new db.Database();
@@ -145,7 +146,7 @@ function createDCase(params, callback) {
                     return;
                 }
                 var nodeDAO = new model_node.NodeDAO(con);
-                nodeDAO.insertList(commitId, params.contents.NodeList, function (err) {
+                nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, function (err) {
                     if(err) {
                         callback.onFailure(err);
                         return;
@@ -185,20 +186,30 @@ function commit(params, callback) {
                     return;
                 }
                 var nodeDAO = new model_node.NodeDAO(con);
-                nodeDAO.insertList(commitId, params.contents.NodeList, function (err) {
+                nodeDAO.insertList(com.dcaseId, commitId, params.contents.NodeList, function (err) {
                     if(err) {
                         callback.onFailure(err);
                         return;
                     }
-                    con.commit(function (err, result) {
-                        if(err) {
-                            callback.onFailure(err);
-                            return;
-                        }
-                        callback.onSuccess({
-                            commitId: commitId
+                    commitDAO.update(commitId, JSON.stringify(params.contents), function (err) {
+                        con.commit(function (err, result) {
+                            if(err) {
+                                callback.onFailure(err);
+                                return;
+                            }
+                            var issueDAO = new model_issue.IssueDAO(con);
+                            issueDAO.publish(com.dcaseId, function (err) {
+                                con.commit(function (err, result) {
+                                    if(err) {
+                                        return;
+                                    }
+                                    callback.onSuccess({
+                                        commitId: commitId
+                                    });
+                                    con.close();
+                                });
+                            });
                         });
-                        con.close();
                     });
                 });
             });
