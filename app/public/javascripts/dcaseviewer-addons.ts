@@ -331,9 +331,9 @@ function DNodeView_InplaceEdit(self: DNodeView): void {
 				nodes[0].type = "Goal";
 			}
 			updateNode(node, nodes[0]);
-			
-			var idNodeTable: DCaseNodeModel[] = [];
-			var idIndexTable: number[] = [];
+
+			var idNodeTable: any = {};
+			var idIndexTable: any = {};
 
 			var ch: number = 0, co: number = 0;
 			node.eachSubNode((i: number, n: DCaseNodeModel) => {
