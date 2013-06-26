@@ -56,7 +56,7 @@ describe('model', function() {
 				};
 				nodeDAO.processMetaDataList(100, 107, node.MetaData, (err: any) => {
 					expect(err).to.be(null);
-					expect(node.MetaData[0].IssueId).not.to.be(undefined);
+					expect(node.MetaData[0]._IssueId).not.to.be(undefined);
 					done();
 				});
 			});
