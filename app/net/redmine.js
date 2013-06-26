@@ -18,7 +18,6 @@ var Redmine = (function () {
                 path = path.substr(1);
             }
             path = url.resolve(CONFIG.redmine.basePath, path);
-            console.log(CONFIG.redmine.basePath);
         }
         return path;
     };

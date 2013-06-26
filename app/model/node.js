@@ -53,10 +53,10 @@ var NodeDAO = (function (_super) {
         });
     };
     NodeDAO.prototype.processMetaData = function (dcaseId, commitId, meta, callback) {
-        if(meta.Type == 'Issue' && !meta.IssueId) {
+        if(meta.Type == 'Issue' && !meta._IssueId) {
             var issueDAO = new model_issue.IssueDAO(this.con);
             issueDAO.insert(new model_issue.Issue(0, dcaseId, null, meta.Subject, meta.Description), function (err, result) {
-                meta.IssueId = result.id;
+                meta._IssueId = result.id;
                 callback(null);
             });
         } else {
