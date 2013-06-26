@@ -5,6 +5,7 @@ import model_dcase = module('../model/dcase')
 import model_commit = module('../model/commit')
 import model_node = module('../model/node')
 import model_pager = module('../model/pager')
+import model_issue = module('../model/issue')
 import error = module('./error')
 
 export function searchDCase(params:any, callback: type.Callback) {
@@ -133,7 +134,7 @@ export function createDCase(params:any, callback: type.Callback) {
 					return;
 				}
 				var nodeDAO = new model_node.NodeDAO(con);
-				nodeDAO.insertList(commitId, params.contents.NodeList, (err:any) => {
+				nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, (err:any) => {
 					if (err) {
 						callback.onFailure(err);
 						return;
@@ -166,18 +167,32 @@ export function commit(params: any, callback: type.Callback) {
 					return;
 				}
 				var nodeDAO = new model_node.NodeDAO(con);
-				nodeDAO.insertList(commitId, params.contents.NodeList, (err:any) => {
+				nodeDAO.insertList(com.dcaseId, commitId, params.contents.NodeList, (err:any) => {
 					if (err) {
 						callback.onFailure(err);
 						return;
 					}
-					con.commit((err, result) =>{
-						if (err) {
-							callback.onFailure(err);
-							return;
-						}
-						callback.onSuccess({commitId: commitId});
-						con.close();
+					commitDAO.update(commitId, JSON.stringify(params.contents), (err:any) => {
+						con.commit((err, result) =>{
+							if (err) {
+								callback.onFailure(err);
+								return;
+							}
+							// callback.onSuccess({commitId: commitId});
+
+							var issueDAO = new model_issue.IssueDAO(con);
+							issueDAO.publish(com.dcaseId, (err:any) => {
+								// TODO: 管理者にエラー通知などのエラー処理
+								con.commit((err, result) =>{
+									if (err) {
+										// TODO: 管理者にエラー通知などのエラー処理
+										return;
+									}
+							callback.onSuccess({commitId: commitId});
+									con.close();
+								});
+							});
+						});
 					});
 				});
 			});

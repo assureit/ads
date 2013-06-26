@@ -2,7 +2,7 @@
 ///<reference path='../../DefinitelyTyped/node/node.d.ts'/>
 
 import assert = module('assert')
-import db = module('../../db/db');
+import db = module('../../db/db')
 
 describe('db', function() {
 	describe('query', function() {

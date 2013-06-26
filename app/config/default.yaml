@@ -1,0 +1,6 @@
+redmine:
+  host: "localhost"
+  port: 80
+  basePath: "/"
+  apiKey: "GET API KEY FROM REDMINE"
+  projectId: 1

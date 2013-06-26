@@ -357,6 +357,7 @@ describe('api', function() {
 		///////////////////////////////////////////////
 		describe('commit', function() {
 			it('should return result', function(done) {
+				this.timeout(15000);
 				dcase.commit(
 					{
 						commitId: 12,
@@ -369,7 +370,20 @@ describe('api', function() {
 									ThisNodeId:1,
 									Description:"dcase1",
 									Children:[2],
-									NodeType:"Goal"
+									NodeType:"Goal",
+									MetaData: [
+										{   
+											Type: "Issue",
+											Subject: "このゴールを満たす必要がある",
+											Description: "詳細な情報をここに記述する",
+											Visible: "true",
+										},
+										{
+											Type: "LastUpdated",
+											User: "Shida",
+											Visible: "false",
+										},
+									]
 								},
 								{
 									ThisNodeId:2,
