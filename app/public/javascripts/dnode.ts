@@ -5,9 +5,24 @@
 interface DCaseMetaContent {
 }
 
-interface DCaseParsedNodeBody {
+interface DCaseNodeBody {
+	id?: number;
+	name?: string;
+	type?: string;
 	description: string;
 	metadata: DCaseMetaContent[];
+	children?: DCaseNodeBody[];
+}
+
+interface DCaseNodeTypes { //type?
+	Goal?: any;
+	Context?: any;
+	Subject?: any;
+	Strategy?: any;
+	Evidence?: any;
+	Solution?: any;
+	Rebuttal?: any;
+	Monitor?: any;
 }
 
 interface DCaseNodeRawData {
@@ -16,7 +31,7 @@ interface DCaseNodeRawData {
 	NodeType: string;
 	Description: string;
 	Children: number[];
-	Metadata: any[];
+	Metadata: any;
 }
 class DCaseNodeModel {
 	id: number;
@@ -33,7 +48,7 @@ class DCaseNodeModel {
 	isUndeveloped: bool = false;
 	isDScript: bool = false;
 
-	static TYPES = [
+	static TYPES: string[] = [
 		"Goal",
 		"Context",
 		"Subject",
@@ -44,7 +59,7 @@ class DCaseNodeModel {
 		"Monitor"
 	];
 
-	static SELECTABLE_TYPES = {
+	static SELECTABLE_TYPES: DCaseNodeTypes = {
 		"Goal": [
 				"Goal",
 				"Context",
@@ -53,28 +68,28 @@ class DCaseNodeModel {
 				"Evidence",
 				"Solution",
 				"Monitor"
+				],
+		"Context": [],
+		"Subject": [],
+		"Strategy": [
+				"Goal", 
+				"Context"
 			],
-			"Context": [],
-			"Subject": [],
-			"Strategy": [
-			"Goal", 
-			"Context"
+		"Evidence": [
+				"Rebuttal"
 			],
-			"Evidence": [
-			"Rebuttal"
+		"Solution": [
+				"Context", 
+				"Rebuttal"
 			],
-			"Solution": [
-			"Context", 
-			"Rebuttal"
-			],
-			"Rebuttal": [],
-			"Monitor": [
-			"Context", 
-			"Rebuttal"
+		"Rebuttal": [],
+		"Monitor": [
+				"Context", 
+				"Rebuttal"
 			]
 	};
 
-	static NAME_PREFIX = {
+	static NAME_PREFIX: DCaseNodeTypes = {
 		"Goal": "G_",
 		"Context": "C_",
 		"Subject": "Sub_",
@@ -107,19 +122,19 @@ class DCaseNodeModel {
 	}
 
 	eachChildren(f: (i: number, v: DCaseNodeModel) => void): void { //FIXME
-		for(var i = 0; i < this.children.length; ++i){
+		for(var i: number = 0; i < this.children.length; ++i){
 			f(i, this.children[i]);
 		}
 	}
 
 	eachContexts(f: (i: number, v: DCaseNodeModel) => void): void {
-		for(var i = 0; i < this.contexts.length; ++i){
+		for(var i: number = 0; i < this.contexts.length; ++i){
 			f(i, this.contexts[i]);
 		}
 	}
 
 	eachContents(f: (i: number, v: DCaseMetaContent) => void): void {
-		for(var i = 0; i < this.metadata.length; ++i){
+		for(var i: number = 0; i < this.metadata.length; ++i){
 			f(i, this.metadata[i]);
 		}
 	}
@@ -130,8 +145,8 @@ class DCaseNodeModel {
 	}
 
 	traverse(f: (i: number, v: DCaseNodeModel) => void): void {
-		var traverse_ = (n: DCaseNodeModel, f: (i: number, v: DCaseNodeModel) => void)=>{
-			n.eachSubNode((i, v)=>{
+		function traverse_(n: DCaseNodeModel, f: (i: number, v: DCaseNodeModel) => void): void {
+			n.eachSubNode((i: number, v: DCaseNodeModel) => {
 				f(i, v);
 				traverse_(v, f)
 			});
@@ -142,13 +157,13 @@ class DCaseNodeModel {
 
 	deepCopy(): DCaseNodeModel { //FIXME
 		var node: DCaseNodeModel = new DCaseNodeModel(this.id, this.name, this.type, this.desc, this.metadata);
-		this.eachSubNode((i, v) => {
+		this.eachSubNode((i: number, v: DCaseNodeModel) => {
 			node.insertChild(v.deepCopy(), i);
 		});
 		return node;
 	}
 
-	insertChild(node: DCaseNodeModel, index: number): void {
+	insertChild(node: DCaseNodeModel, index?: number): void {
 		var a: DCaseNodeModel[] = node.isContext ? this.contexts : this.children;
 			if(index == null) {
 				index = a.length;
@@ -181,8 +196,8 @@ class DCaseNodeModel {
 		}
 	}
 
-	getHtmlMetadata(): any { 
-		var innerText: any = generateMetadata(this).join("\n");    //FIXME
+	getHtmlMetadata(): JQuery { 
+		var innerText: string = generateMetadata(this).join("\n");
 		var divText: string = "<div></div>";
 		if(innerText != "") {
 			divText = "<div>Metadata</div>";
@@ -198,9 +213,9 @@ class DCaseNodeModel {
 		return (DCaseNodeModel.SELECTABLE_TYPES[this.type].indexOf(type) != -1);
 	}
 
-	toJson(): any {   //FIXME
-		var children = [];
-		this.eachSubNode((i, node) => { 
+	toJson(): DCaseNodeBody {   //FIXME?
+		var children: DCaseNodeBody[] = [];
+		this.eachSubNode((i: number, node: DCaseNodeModel) => { 
 			children.push(node.toJson());
 		})
 		return {
@@ -221,27 +236,34 @@ interface DCaseTreeRawData {
 }
 
 class DCaseTree {   //FIXME
-	NodeList: DCaseNodeModel[];
+	NodeList: any[]; //FIXME ver0.9.x (DCaseNodeModel and DCaseNodeRawData)
 	TopGoalId: number;
 	NodeCount: number;
 	DCaseName: string;
 
-	constructor(tl: DCaseNodeModel[], id: number, nodeCount: number) {
+	constructor(tl: DCaseNodeModel[], id: number, nodeCount: number);
+	constructor(tl: DCaseNodeRawData[], id: number, nodeCount: number);
+	constructor(tl: any[], id: number, nodeCount: number) {
 		this.NodeList = tl;
 		this.TopGoalId = id;
 		this.NodeCount = nodeCount;
 	}
 }
 
+interface DCaseOperation {
+	undo: () => void;
+	redo: () => void;
+}
+
 class DCaseModel {
 	node: DCaseNodeModel;
 	commitId: number;
 	argId: number;
-	opQueue: any;   //FIXME
+	opQueue: DCaseOperation[];   //FIXME?
 	undoCount: number;
 	nodeCount: number;
-	typeCount: any;
-	view: any;  //FIXME
+	typeCount: DCaseNodeTypes;
+	views: DCaseViewer[];  //FIXME?
 
 	constructor(tree: DCaseTreeRawData, argId: number, commitId: number) { 
 		this.node = null;
@@ -251,10 +273,10 @@ class DCaseModel {
 		this.undoCount = 0;
 		this.nodeCount = 0;
 		this.typeCount = {};
-		this.view = [];
+		this.views = [];
 
-		var types: any = DCaseNodeModel.TYPES; 
-		for(var i = 0; i < types.length; i++) {
+		var types: string[] = DCaseNodeModel.TYPES;
+		for(var i: number = 0; i < types.length; i++) {
 			this.typeCount[types[i]] = 1;
 		}
 		this.decode(tree);
@@ -272,12 +294,12 @@ class DCaseModel {
 
 		var self: DCaseModel = this;
 		var nodes: DCaseNodeRawData[] = [];
-		for(var i = 0; i < tree.NodeList.length; i++) {
+		for(var i: number = 0; i < tree.NodeList.length; i++) {
 			var c: DCaseNodeRawData = tree.NodeList[i];
-			nodes[c.ThisNodeId] = c;  
+			nodes[c.ThisNodeId] = c; 
 		}
 
-		var create = (id: any) => { //FIXME
+		function create(id: number): DCaseNodeModel { //FIXME?
 			var data: DCaseNodeRawData = nodes[id];
 			var type: string = data.NodeType;
 			var desc: string = data.Description;
@@ -292,7 +314,7 @@ class DCaseModel {
 				metadata = [];
 			}
 			var node: DCaseNodeModel = self.createNode(id, type, desc, metadata);
-			for(var i = 0; i < data.Children.length; i++) {
+			for(var i: number = 0; i < data.Children.length; i++) {
 				node.insertChild(create(data.Children[i]), i);
 			}
 			return node;
@@ -304,11 +326,11 @@ class DCaseModel {
 	}
 
 	encode(): DCaseTree {
-		var tl: any = [];  //FIXME
+		var tl: DCaseNodeRawData[] = [];  //FIXME?
 		var node: DCaseNodeModel = this.node;
-		node.traverse((i, v) => {
-			var c: any = [];
-			v.eachSubNode((i, v) => {
+		node.traverse((i: number, v: DCaseNodeModel) => {
+			var c: number[] = [];
+			v.eachSubNode((i: number, v: DCaseNodeModel) => {
 				console.log(v.id);
 				c.push(v.id);
 			});
@@ -316,8 +338,8 @@ class DCaseModel {
 				ThisNodeId: v.id,
 				NodeType: v.type,
 				Description: v.desc,
-				Metadata: v.metadata,
-				Children: c
+				Children: c,
+				Metadata: v.metadata
 			});
 		});
 		return new DCaseTree(tl, node.id, this.nodeCount);
@@ -347,7 +369,7 @@ class DCaseModel {
 	copyNode(node: DCaseNodeModel): DCaseNodeModel {
 		var self: DCaseModel = this;
 		var newNode: DCaseNodeModel = self.createNode(++this.nodeCount, node.type, node.desc, node.metadata);
-		node.eachSubNode((i, v) => {
+		node.eachSubNode((i: number, v: DCaseNodeModel) => {
 			newNode.insertChild(self.copyNode(v), i);
 		});
 		return newNode;
@@ -471,7 +493,7 @@ class DCaseModel {
 		var n: number = this.opQueue.length;
 		if(n > this.undoCount) {
 			this.undoCount++;
-			var op: any = this.opQueue[n - this.undoCount]; //FIXME
+			var op: DCaseOperation = this.opQueue[n - this.undoCount]; //FIXME?
 			op.undo();
 			return true;
 		} else {
@@ -481,7 +503,7 @@ class DCaseModel {
 
 	redo(): bool {
 		if(this.undoCount > 0) {
-			var op: any = this.opQueue[this.opQueue.length - this.undoCount];   //FIXME
+			var op: DCaseOperation = this.opQueue[this.opQueue.length - this.undoCount];   //FIXME?
 			this.undoCount--;
 			op.redo();
 			return true;
@@ -490,14 +512,14 @@ class DCaseModel {
 		}
 	}
 
-	applyOperation(op: any): void { //FIXME
+	applyOperation(op: DCaseOperation): void { //FIXME?
 		this.opQueue.splice(this.opQueue.length - this.undoCount, this.undoCount, op);
 		this.undoCount = 0;
 		op.redo();
 	}
 
-	commit(msg: any): bool {  //FIXME
-		var tree: any = this.encode();
+	commit(msg: string): bool {  //FIXME?
+		var tree: DCaseTree = this.encode();
 		var r: number = DCaseAPI.commit(tree, msg, this.commitId);
 		this.commitId = r;
 		this.undoCount = 0;
@@ -505,34 +527,34 @@ class DCaseModel {
 		return true;
 	}
 
-	addListener(view: any): void {  //FIXME
-		this.view.push(view);
+	addListener(view: DCaseViewer): void {  //FIXME?
+		this.views.push(view);
 	}
 
-	removeListener(view: any): void {
-		this.view.splice(this.view.indexOf(view), 1);
+	removeListener(view: DCaseViewer): void {
+		this.views.splice(this.views.indexOf(view), 1);
 	}
 
 	structureUpdated(): void {  //FIXME
-		$.each(this.view, (i, view) => {
+		$.each(this.views, (i: number, view: DCaseViewer) => {
 			view.structureUpdated();
 		});
 	}
 
 	nodeInserted(parent: DCaseNodeModel, node: DCaseNodeModel, index: number): void {   //FIXME
-		$.each(this.view, (i, view) => {
+		$.each(this.views, (i: number, view: DCaseViewer) => {
 			view.nodeInserted(parent, node, index);
 		});
 	}
 
 	nodeRemoved(parent: DCaseNodeModel, node: DCaseNodeModel, index: number): void {    //FIXME
-		$.each(this.view, (i, view) => {
+		$.each(this.views, (i: number, view: DCaseViewer) => {
 			view.nodeRemoved(parent, node, index);
 		});
 	}
 
 	nodeChanged(node: DCaseNodeModel): void {   //FIXME
-		$.each(this.view, (i, view) => {
+		$.each(this.views, (i: number, view: DCaseViewer) => {
 			view.nodeChanged(node);
 		});
 	}

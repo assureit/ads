@@ -91,12 +91,12 @@ var DCaseNodeModel = (function () {
         this.eachChildren(f);
     };
     DCaseNodeModel.prototype.traverse = function (f) {
-        var traverse_ = function (n, f) {
+        function traverse_(n, f) {
             n.eachSubNode(function (i, v) {
                 f(i, v);
                 traverse_(v, f);
             });
-        };
+        }
         f(-1, this);
         traverse_(this, f);
     };
@@ -184,7 +184,7 @@ var DCaseModel = (function () {
         this.nodeCount = 0;
         this.typeCount = {
         };
-        this.view = [];
+        this.views = [];
         var types = DCaseNodeModel.TYPES;
         for(var i = 0; i < types.length; i++) {
             this.typeCount[types[i]] = 1;
@@ -198,7 +198,7 @@ var DCaseModel = (function () {
             var c = tree.NodeList[i];
             nodes[c.ThisNodeId] = c;
         }
-        var create = function (id) {
+        function create(id) {
             var data = nodes[id];
             var type = data.NodeType;
             var desc = data.Description;
@@ -218,7 +218,7 @@ var DCaseModel = (function () {
                 node.insertChild(create(data.Children[i]), i);
             }
             return node;
-        };
+        }
         var topId = tree.TopGoalId;
         this.node = create(topId);
         this.nodeCount = tree.NodeCount;
@@ -236,8 +236,8 @@ var DCaseModel = (function () {
                 ThisNodeId: v.id,
                 NodeType: v.type,
                 Description: v.desc,
-                Metadata: v.metadata,
-                Children: c
+                Children: c,
+                Metadata: v.metadata
             });
         });
         return new DCaseTree(tl, node.id, this.nodeCount);
@@ -414,28 +414,28 @@ var DCaseModel = (function () {
         return true;
     };
     DCaseModel.prototype.addListener = function (view) {
-        this.view.push(view);
+        this.views.push(view);
     };
     DCaseModel.prototype.removeListener = function (view) {
-        this.view.splice(this.view.indexOf(view), 1);
+        this.views.splice(this.views.indexOf(view), 1);
     };
     DCaseModel.prototype.structureUpdated = function () {
-        $.each(this.view, function (i, view) {
+        $.each(this.views, function (i, view) {
             view.structureUpdated();
         });
     };
     DCaseModel.prototype.nodeInserted = function (parent, node, index) {
-        $.each(this.view, function (i, view) {
+        $.each(this.views, function (i, view) {
             view.nodeInserted(parent, node, index);
         });
     };
     DCaseModel.prototype.nodeRemoved = function (parent, node, index) {
-        $.each(this.view, function (i, view) {
+        $.each(this.views, function (i, view) {
             view.nodeRemoved(parent, node, index);
         });
     };
     DCaseModel.prototype.nodeChanged = function (node) {
-        $.each(this.view, function (i, view) {
+        $.each(this.views, function (i, view) {
             view.nodeChanged(node);
         });
     };
