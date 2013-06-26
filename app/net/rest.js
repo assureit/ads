@@ -27,11 +27,14 @@ var Request = (function () {
         this.setHeader('Content-Type', contentType);
     };
     Request.prototype.post = function (path, data, callback) {
+        this.setMethod('POST');
+        this._send(path, data, callback);
+    };
+    Request.prototype._send = function (path, data, callback) {
         if(!this.options.host) {
             callback(new error.InternalError('host configuration is not found', null), null);
             return;
         }
-        this.setMethod('POST');
         this.options.path = path;
         console.log(this.options);
         var req = http.request(this.options, function (res) {
@@ -54,8 +57,6 @@ var Request = (function () {
         });
         req.write(data);
         req.end();
-    };
-    Request.prototype.end = function (err, result) {
     };
     return Request;
 })();

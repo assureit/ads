@@ -44,12 +44,21 @@ export class Request {
 	}
 
 	post(path: string, data:string, callback:Callback): void {
+		this.setMethod('POST');
+		this._send(path, data, callback);
+	}
+
+	put(path: string, data:string, callback:Callback): void {
+		this.setMethod('PUT');
+		this._send(path, data, callback);
+	}
+
+	_send(path: string, data:string, callback:Callback): void {
 		if (!this.options.host) {
 			callback(new error.InternalError('host configuration is not found', null), null);
 			return;
 		}
 		// this.setHeader('Content-Length', _getByteLength(data));
-		this.setMethod('POST');
 		this.options.path = path;
 
 		console.log(this.options);
@@ -80,9 +89,5 @@ export class Request {
 		req.write(data);
 		// req.write(data, 'utf8');
 		req.end();
-	}
-
-	end(err:any, result:string) {
-
 	}
 }
