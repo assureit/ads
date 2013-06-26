@@ -1,2 +1,4 @@
-dummy:
-  default: "true"
+redmine:
+  host: "localhost"
+  apiKey: "GET API KEY FROM REDMINE"
+  projectId: 1
