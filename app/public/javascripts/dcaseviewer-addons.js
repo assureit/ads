@@ -292,8 +292,10 @@ function DNodeView_InplaceEdit(self) {
                 nodes[0].type = "Goal";
             }
             updateNode(node, nodes[0]);
-            var idNodeTable = [];
-            var idIndexTable = [];
+            var idNodeTable = {
+            };
+            var idIndexTable = {
+            };
             var ch = 0, co = 0;
             node.eachSubNode(function (i, n) {
                 idNodeTable[n.id] = n;
