@@ -6,13 +6,13 @@ import model_commit = module('../model/commit')
 import model_node = module('../model/node')
 import model_issue = module('../model/issue')
 import model_monitor = module('../model/monitor')
-import error = module('./error');
+import redmine = module('../net/redmine')
+import error = module('./error')
 
 export function modifyMonitorStatus(params:any, callback: type.Callback) {
 
 	function addRebuttalNode(nodeList: any, params: any, thisNodeId: number) : number {
 		var maxThisNodeId = 0;
-		
 
 		nodeList.forEach((node) => {
 			if (maxThisNodeId < node.ThisNodeId) maxThisNodeId = node.ThisNodeId;
@@ -83,13 +83,11 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 					callback.onFailure(err);
 					return;
 				}
-console.log('dcaseId:' + dcaseId);
-console.log('thisNodeId:' + thisNodeId);
-console.log('rebuttalThisNodeId:' + rebuttalThisNodeId);
 
 				var data = JSON.parse(latestCommit.data);
 				var nodeList = data.NodeList;
-				var rebuttalId : number;
+				var rebuttalId : number = null;
+				var issueId : number = null;
 
 				if (rebuttalThisNodeId) {
 					if (params.status == 'OK') {
@@ -118,15 +116,35 @@ console.log('rebuttalThisNodeId:' + rebuttalThisNodeId);
 						callback.onFailure(err);
 						return;
 					}
-					con.commit((err, result) =>{
-						callback.onSuccess(null);
-						con.close();
-					});				
+					console.log(issueId);
+					if (issueId) {
+						monitorDAO.getItsId(issueId, (err: any, itsId: string) => {
+							if (err) {
+								callback.onFailure(err);
+								return;
+							}
+							var redmineIssue = new redmine.Issue();
+							redmineIssue.addComment(itsId, params.comment, (err:any, result:any)  => {
+								if (err) {
+									callback.onFailure(err);
+									return;
+								}
+								con.commit((err, result) =>{
+									callback.onSuccess(null);
+									con.close();
+								});				
+							});
+						});		
+					} else {
+						con.commit((err, result) =>{
+							callback.onSuccess(null);
+							con.close();
+						});
+					}				
 				});
 			});
 		});
 	});
-
 }
 
 

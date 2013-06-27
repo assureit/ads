@@ -69,4 +69,18 @@ export class monitorDAO extends model.DAO {
 		});
 	}
 
+	getItsId(issueId: number, callback: (err: any, itsId: string) => void) {
+		this.con.query('SELECT its_id FROM issue WHERE id = ?', [issueId], (err, result) => {
+			if (err) {
+				callback(err, null);
+				return;
+			}
+			if (result.length == 0) {
+				callback(new error.NotFoundError('ITSID was not found.'), null);
+				return;
+			}
+			callback(err, result[0].its_id);	
+
+		});
+	}
 }

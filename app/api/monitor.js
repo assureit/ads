@@ -6,6 +6,7 @@ var model_commit = require('../model/commit')
 
 
 var model_monitor = require('../model/monitor')
+var redmine = require('../net/redmine')
 var error = require('./error')
 function modifyMonitorStatus(params, callback) {
     function addRebuttalNode(nodeList, params, thisNodeId) {
@@ -39,17 +40,30 @@ function modifyMonitorStatus(params, callback) {
         return maxThisNodeId;
     }
     function removeRebuttalNode(nodeList, thisNodeId, rebuttalThisNodeId) {
-        var rebuttalNodePos;
-        var cnt = 0;
-        nodeList.forEach(function (node) {
+        var rebuttalNodePos = -1;
+        var rebuttalChildrenPos = -1;
+        var issueId = -1;
+        for(var i = 0; i < nodeList.length; i++) {
+            var node = nodeList[i];
             if(thisNodeId == node.thisNodeId) {
+                for(var j = 0; j < node.Children.length; j++) {
+                    if(node.Children[j] == rebuttalThisNodeId) {
+                        rebuttalChildrenPos = j;
+                    }
+                }
+                if(rebuttalChildrenPos > -1) {
+                    node.Children.splice(rebuttalChildrenPos, 1);
+                }
             }
             if(rebuttalThisNodeId == node.thisNodeId) {
-                rebuttalNodePos = cnt;
+                rebuttalNodePos = i;
+                issueId = node.MetaData._IssueId;
             }
-            cnt++;
-        });
-        nodeList.splice(rebuttalNodePos, 1);
+        }
+        if(rebuttalNodePos > -1) {
+            nodeList.splice(rebuttalNodePos, 1);
+        }
+        return issueId;
     }
     var con = new db.Database();
     con.begin(function (err, result) {
@@ -65,14 +79,13 @@ function modifyMonitorStatus(params, callback) {
                     callback.onFailure(err);
                     return;
                 }
-                console.log('dcaseId:' + dcaseId);
-                console.log('thisNodeId:' + thisNodeId);
-                console.log('rebuttalThisNodeId:' + rebuttalThisNodeId);
                 var data = JSON.parse(latestCommit.data);
                 var nodeList = data.NodeList;
-                var rebuttalId;
+                var rebuttalId = null;
+                var issueId = null;
                 if(rebuttalThisNodeId) {
                     if(params.status == 'OK') {
+                        issueId = removeRebuttalNode(nodeList, thisNodeId, rebuttalThisNodeId);
                     } else {
                         callback.onFailure(new error.InternalError('Rebuttal already exists. ', null));
                         return;
@@ -95,10 +108,31 @@ function modifyMonitorStatus(params, callback) {
                         callback.onFailure(err);
                         return;
                     }
-                    con.commit(function (err, result) {
-                        callback.onSuccess(null);
-                        con.close();
-                    });
+                    console.log(issueId);
+                    if(issueId) {
+                        monitorDAO.getItsId(issueId, function (err, itsId) {
+                            if(err) {
+                                callback.onFailure(err);
+                                return;
+                            }
+                            var redmineIssue = new redmine.Issue();
+                            redmineIssue.addComment(itsId, params.comment, function (err, result) {
+                                if(err) {
+                                    callback.onFailure(err);
+                                    return;
+                                }
+                                con.commit(function (err, result) {
+                                    callback.onSuccess(null);
+                                    con.close();
+                                });
+                            });
+                        });
+                    } else {
+                        con.commit(function (err, result) {
+                            callback.onSuccess(null);
+                            con.close();
+                        });
+                    }
                 });
             });
         });

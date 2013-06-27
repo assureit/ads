@@ -69,6 +69,21 @@ var monitorDAO = (function (_super) {
             callback(err, new model_commit.Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
         });
     };
+    monitorDAO.prototype.getItsId = function (issueId, callback) {
+        this.con.query('SELECT its_id FROM issue WHERE id = ?', [
+            issueId
+        ], function (err, result) {
+            if(err) {
+                callback(err, null);
+                return;
+            }
+            if(result.length == 0) {
+                callback(new error.NotFoundError('ITSID was not found.'), null);
+                return;
+            }
+            callback(err, result[0].its_id);
+        });
+    };
     return monitorDAO;
 })(model.DAO);
 exports.monitorDAO = monitorDAO;
