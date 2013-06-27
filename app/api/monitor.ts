@@ -69,7 +69,7 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 	var con = new db.Database();
 	
 	con.begin((err, result) => {
-		var monitorDAO = new model_monitor.monitorDAO(con);
+		var monitorDAO = new model_monitor.MonitorDAO(con);
 		monitorDAO.select(params.systemNodeId, (err:any, dcaseId: number, thisNodeId: number, rebuttalThisNodeId: number) => {
 			if (err) {
 				callback.onFailure(err);
