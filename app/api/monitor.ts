@@ -7,6 +7,7 @@ import redmine = module('../net/redmine')
 import error = module('./error')
 
 export function modifyMonitorStatus(params:any, callback: type.Callback) {
+	var commitMessage = 'monitor status exchange';
 
 	function addRebuttalNode(nodeList: any, params: any, thisNodeId: number) : number {
 		var maxThisNodeId = 0;
@@ -30,7 +31,7 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 					Description: params.comment,
 					Children: [],
 					NodeType: 'Rebuttal',
-					MetaData: metaData}; 
+					MetaData: [metaData]}; 
 
 		nodeList.push(node);
 
@@ -44,7 +45,7 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 
 		for (var i = 0; i < nodeList.length; i++) {
 			var node = nodeList[i];
-			if (thisNodeId == node.thisNodeId) {
+			if (thisNodeId == node.ThisNodeId) {
 				for (var j = 0; j < node.Children.length; j++) {
 					if (node.Children[j] == rebuttalThisNodeId) {
 						rebuttalChildrenPos = j;
@@ -53,7 +54,7 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 				if (rebuttalChildrenPos > -1) node.Children.splice(rebuttalChildrenPos, 1);
 			}
 
-			if (rebuttalThisNodeId == node.thisNodeId) {
+			if (rebuttalThisNodeId == node.ThisNodeId) {
 				rebuttalNodePos = i;
 				issueId = node.MetaData._IssueId;
 			}
@@ -87,7 +88,8 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 
 				if (rebuttalThisNodeId) {
 					if (params.status == 'OK') {
-						issueId = removeRebuttalNode(nodeList, thisNodeId, rebuttalThisNodeId);	
+						issueId = removeRebuttalNode(nodeList, thisNodeId, rebuttalThisNodeId);
+						data.NodeCount--;
 					} else {
 						callback.onFailure(new error.InternalError('Rebuttal already exists. ', null));
 						return;
@@ -95,47 +97,50 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 				} else {
 					if (params.status == 'NG') {
 						rebuttalId = addRebuttalNode(nodeList, params, thisNodeId);
+						data.NodeCount++;
 					} else {
 						callback.onFailure(new error.InternalError('Rebuttal does not exist. ', null));
 						return;
 					}
 				}
-
-				var commit_params: any = { contents: nodeList,
-							   commitId: latestCommit.id,
-							   commitMessage: ''};
-			
-				//commit処理
-				
-				monitorDAO.update(params.systemNodeId, rebuttalId, (err: any) => {
+	
+				var commitDAO = new model_commit.CommitDAO(con);
+				commitDAO.commit(constant.SYSTEM_USER_ID, latestCommit.id, commitMessage, data, (err, result) => {
 					if (err) {
 						callback.onFailure(err);
-						return;
 					}
-					if (issueId) {
-						monitorDAO.getItsId(issueId, (err: any, itsId: string) => {
-							if (err) {
-								callback.onFailure(err);
-								return;
-							}
-							var redmineIssue = new redmine.Issue();
-							redmineIssue.addComment(itsId, params.comment, (err:any, result:any)  => {
+	
+					monitorDAO.update(params.systemNodeId, rebuttalId, (err: any) => {
+						if (err) {
+							callback.onFailure(err);
+							return;
+						}
+						if (issueId) {
+console.log(issueId);
+							monitorDAO.getItsId(issueId, (err: any, itsId: string) => {
 								if (err) {
 									callback.onFailure(err);
 									return;
 								}
-								con.commit((err, result) =>{
-									callback.onSuccess(null);
-									con.close();
-								});				
+								var redmineIssue = new redmine.Issue();
+								redmineIssue.addComment(itsId, params.comment, (err:any, result:any)  => {
+									if (err) {
+										callback.onFailure(err);
+										return;
+									}
+									con.commit((err, result) =>{
+										callback.onSuccess(null);
+										con.close();
+									});				
+								});
+							});		
+						} else {
+							con.commit((err, result) =>{
+								callback.onSuccess(null);
+								con.close();
 							});
-						});		
-					} else {
-						con.commit((err, result) =>{
-							callback.onSuccess(null);
-							con.close();
-						});
-					}
+						}
+					});
 				});
 			});
 		});

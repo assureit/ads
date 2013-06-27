@@ -6,7 +6,6 @@ var expect = require('expect.js');
 describe('api', function () {
     describe('monitor', function () {
         describe('modifyMonitorStatus', function () {
-            var con = new db.Database();
             it('system node ID not existing is specified ', function (done) {
                 monitor.modifyMonitorStatus({
                     evidenceId: 1,
@@ -16,6 +15,7 @@ describe('api', function () {
                     status: 'NG'
                 }, {
                     onSuccess: function (result) {
+                        console.log('bbb');
                         done();
                     },
                     onFailure: function (err) {
@@ -34,6 +34,7 @@ describe('api', function () {
                     status: 'NG'
                 }, {
                     onSuccess: function (result) {
+                        console.log('aaa');
                         done();
                     },
                     onFailure: function (err) {
@@ -52,14 +53,19 @@ describe('api', function () {
                     status: 'NG'
                 }, {
                     onSuccess: function (result) {
-                        con.query('select m.dcase_id, c.id, n.this_node_id, n.node_type from monitor_node m, commit c, node n where m.id = 3 and  m.dcase_id = c.dcase_id and c.latest_flag = TRUE AND c.id = n.commit_id and node_type = "Rebuttal";', function (err, expectedResult) {
+                        var con = new db.Database();
+                        con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = 3 AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', function (err, expectedResult) {
+                            console.log(expectedResult);
+                            console.log('------------------------');
                             expect(err).to.be(null);
                             expect(1).to.be(expectedResult.length);
+                            con.close();
                             done();
                         });
                     },
                     onFailure: function (err) {
                         console.log(err);
+                        expect(err).not.to.be(null);
                         done();
                     }
                 });
@@ -73,19 +79,22 @@ describe('api', function () {
                     status: 'OK'
                 }, {
                     onSuccess: function (result) {
-                        con.query('select m.dcase_id, c.id, n.this_node_id, n.node_type from monitor_node m, commit c, node n where m.id = 3 and  m.dcase_id = c.dcase_id and c.latest_flag = TRUE AND c.id = n.commit_id and node_type = "Rebuttal";', function (err, expectedResult) {
+                        var con = new db.Database();
+                        con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = 3 AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', function (err, expectedResult) {
+                            console.log(expectedResult);
                             expect(err).to.be(null);
                             expect(0).to.be(expectedResult.length);
+                            con.close();
                             done();
                         });
                     },
                     onFailure: function (err) {
                         console.log(err);
+                        expect(err).not.to.be(null);
                         done();
                     }
                 });
             });
-            con.close();
         });
     });
 });

@@ -12,8 +12,6 @@ var expect = require('expect.js');	// TODO: import module化
 describe('api', function() {
 	describe('monitor', function() {
 		describe('modifyMonitorStatus', function() {
-			var con = new db.Database();
-
 			it('system node ID not existing is specified ', function(done) {
 				monitor.modifyMonitorStatus({evidenceId: 1,
 							     systemNodeId: 99999,
@@ -21,6 +19,7 @@ describe('api', function() {
 							     comment:'Unit Test run',
 							     status:'NG'}, {
 					onSuccess: (result: any) => {
+						console.log('bbb');
 						done();
 					}, 
 					onFailure: (err: any) => {
@@ -37,6 +36,7 @@ describe('api', function() {
 							     comment:'Unit Test run',
 							     status:'NG'}, {
 					onSuccess: (result: any) => {
+						console.log('aaa');
 						done();
 					}, 
 					onFailure: (err: any) => {
@@ -53,15 +53,17 @@ describe('api', function() {
 							     comment:'Unit Test run',
 							     status:'NG'}, {
 					onSuccess: (result: any) => {
+						var con = new db.Database();
 						con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = 3 AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', (err, expectedResult) => {
 							expect(err).to.be(null);
 							expect(1).to.be(expectedResult.length);
-
+							con.close();
 							done();
 						});
 					}, 
 					onFailure: (err: any) => {
 						console.log(err);
+						expect(err).not.to.be(null);
 						done();
 					},
 				});
@@ -73,21 +75,21 @@ describe('api', function() {
 							     comment:'Unit Test run',
 							     status:'OK'}, {
 					onSuccess: (result: any) => {
+						var con = new db.Database();
 						con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = 3 AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', (err, expectedResult) => {
-
 							expect(err).to.be(null);
 							expect(0).to.be(expectedResult.length);
-
+							con.close();
 							done();
 						});
 					}, 
 					onFailure: (err: any) => {
 						console.log(err);
+						expect(err).not.to.be(null);
 						done();
 					},
 				});
 			});
-			con.close();
 		});
 	});
 });
