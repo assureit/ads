@@ -171,7 +171,7 @@ function commit(params, callback) {
     var commitDAO = new model_commit.CommitDAO(con);
     con.begin(function (err, result) {
         commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
-            con.commit(function (err, result) {
+            con.commit(function (err, _result) {
                 if(err) {
                     callback.onFailure(err);
                     return;
