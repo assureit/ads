@@ -157,8 +157,10 @@ export function commit(params: any, callback: type.Callback) {
 	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
 
 	var con = new db.Database();
+	var commitDAO = new model_commit.CommitDAO(con);
 	con.begin((err, result) => {
-		_commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
+		// _commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
+		commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err, result) => {
 			con.commit((err, result) =>{
 				if (err) {
 					callback.onFailure(err);
@@ -170,34 +172,6 @@ export function commit(params: any, callback: type.Callback) {
 		});
 	});
 };
-
-export function _commit(con: db.Database, previousCommitId:number, message: string, contents:any, callbackOrg: (err:any, result:any)=>void) {
-	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
-	var commitDAO = new model_commit.CommitDAO(con);
-	async.waterfall([
-		(callback) => {
-			commitDAO.get(previousCommitId, (err:any, com: model_commit.Commit) => {callback(err, com);});
-		}
-		, (com: model_commit.Commit, callback) => {
-			commitDAO.insert({data: JSON.stringify(contents), prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message}, (err:any, commitId:number) => {callback(err, com, commitId);});
-		}
-		, (com: model_commit.Commit, commitId: number, callback) => {
-			var nodeDAO = new model_node.NodeDAO(con);
-			nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, (err:any) => {callback(err, com, commitId);});
-		}
-		, (com: model_commit.Commit, commitId: number, callback) => {
-			commitDAO.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
-		} 
-		, (com: model_commit.Commit, commitId: number, callback) => {
-			var issueDAO = new model_issue.IssueDAO(con);
-			issueDAO.publish(com.dcaseId, (err:any) => {
-				callback(err, {commitId: commitId});
-			});
-		} 
-	], (err:any, result:any) => {
-		callbackOrg(err, result);
-	});
-}
 
 export function deleteDCase(params:any, callback: type.Callback) {
 	// TODO: 認証チェック

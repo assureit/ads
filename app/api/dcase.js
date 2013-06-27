@@ -5,7 +5,7 @@ var model_dcase = require('../model/dcase')
 var model_commit = require('../model/commit')
 var model_node = require('../model/node')
 
-var model_issue = require('../model/issue')
+
 
 var async = require('async');
 function searchDCase(params, callback) {
@@ -168,8 +168,9 @@ exports.createDCase = createDCase;
 function commit(params, callback) {
     var userId = constant.SYSTEM_USER_ID;
     var con = new db.Database();
+    var commitDAO = new model_commit.CommitDAO(con);
     con.begin(function (err, result) {
-        _commit(con, params.commitId, params.commitMessage, params.contents, function (err, result) {
+        commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
             con.commit(function (err, result) {
                 if(err) {
                     callback.onFailure(err);
@@ -183,49 +184,6 @@ function commit(params, callback) {
 }
 exports.commit = commit;
 ;
-function _commit(con, previousCommitId, message, contents, callbackOrg) {
-    var userId = constant.SYSTEM_USER_ID;
-    var commitDAO = new model_commit.CommitDAO(con);
-    async.waterfall([
-        function (callback) {
-            commitDAO.get(previousCommitId, function (err, com) {
-                callback(err, com);
-            });
-        }, 
-        function (com, callback) {
-            commitDAO.insert({
-                data: JSON.stringify(contents),
-                prevId: previousCommitId,
-                dcaseId: com.dcaseId,
-                userId: userId,
-                message: message
-            }, function (err, commitId) {
-                callback(err, com, commitId);
-            });
-        }, 
-        function (com, commitId, callback) {
-            var nodeDAO = new model_node.NodeDAO(con);
-            nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, function (err) {
-                callback(err, com, commitId);
-            });
-        }, 
-        function (com, commitId, callback) {
-            commitDAO.update(commitId, JSON.stringify(contents), function (err) {
-                callback(err, com, commitId);
-            });
-        }, 
-        function (com, commitId, callback) {
-            var issueDAO = new model_issue.IssueDAO(con);
-            issueDAO.publish(com.dcaseId, function (err) {
-                callback(err, {
-                    commitId: commitId
-                });
-            });
-        }    ], function (err, result) {
-        callbackOrg(err, result);
-    });
-}
-exports._commit = _commit;
 function deleteDCase(params, callback) {
     var userId = constant.SYSTEM_USER_ID;
     var con = new db.Database();
