@@ -10,7 +10,7 @@ export interface InsertMonitor {
 }
 
 
-export class monitorDAO extends model.DAO {
+export class MonitorDAO extends model.DAO {
 
 	insert(param: InsertMonitor, callback: (err: any, id: number) => void) {
 		this.con.query('INSERT INTO monitor_node(dcase_id, this_node_id, preset_id, params) VALUES(?,?,?,?) ', 
