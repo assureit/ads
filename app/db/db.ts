@@ -2,16 +2,17 @@
 
 import mysql = module('mysql')
 import events = module('events')
+var CONFIG = require('config');
 
 export class Database extends events.EventEmitter {
 	public con: mysql.Connection;
 
 	static getConnection() {
 		return mysql.createConnection({
-				host: 'localhost',
-				user: 'ads_test',
-				password: 'ads_test',
-				database: 'ads'
+				host: CONFIG.mysql.host,
+				user: CONFIG.mysql.user,
+				password: CONFIG.mysql.password,
+				database: CONFIG.mysql.database
 			});
 	}
 
