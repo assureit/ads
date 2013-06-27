@@ -2,9 +2,6 @@ var db = require('../db/db')
 
 var constant = require('../constant')
 
-var model_commit = require('../model/commit')
-
-
 var model_monitor = require('../model/monitor')
 var redmine = require('../net/redmine')
 var error = require('./error')
@@ -33,7 +30,7 @@ function modifyMonitorStatus(params, callback) {
             ThisNodeId: maxThisNodeId,
             Description: params.comment,
             Children: [],
-            NodeType: "Rebuttal",
+            NodeType: 'Rebuttal',
             MetaData: metaData
         };
         nodeList.push(node);
@@ -73,7 +70,6 @@ function modifyMonitorStatus(params, callback) {
                 callback.onFailure(err);
                 return;
             }
-            var commitDAO = new model_commit.CommitDAO(con);
             monitorDAO.getLatestCommit(dcaseId, function (err, latestCommit) {
                 if(err) {
                     callback.onFailure(err);

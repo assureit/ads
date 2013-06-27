@@ -1,10 +1,7 @@
 import db = module('../db/db')
 import type = module('./type')
 import constant = module('../constant')
-import model_dcase = module('../model/dcase')
 import model_commit = module('../model/commit')
-import model_node = module('../model/node')
-import model_issue = module('../model/issue')
 import model_monitor = module('../model/monitor')
 import redmine = module('../net/redmine')
 import error = module('./error')
@@ -32,7 +29,7 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 		var node: any = {	ThisNodeId: maxThisNodeId,
 					Description: params.comment,
 					Children: [],
-					NodeType: "Rebuttal",
+					NodeType: 'Rebuttal',
 					MetaData: metaData}; 
 
 		nodeList.push(node);
@@ -77,7 +74,6 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 				callback.onFailure(err);
 				return;
 			}
-			var commitDAO = new model_commit.CommitDAO(con);
 			monitorDAO.getLatestCommit(dcaseId, (err:any, latestCommit: model_commit.Commit) => {
 				if (err) {
 					callback.onFailure(err);

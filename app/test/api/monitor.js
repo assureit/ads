@@ -1,11 +1,12 @@
 
-
+var db = require('../../db/db')
 var monitor = require('../../api/monitor')
 var error = require('../../api/error')
 var expect = require('expect.js');
 describe('api', function () {
     describe('monitor', function () {
         describe('modifyMonitorStatus', function () {
+            var con = new db.Database();
             it('system node ID not existing is specified ', function (done) {
                 monitor.modifyMonitorStatus({
                     evidenceId: 1,
@@ -42,7 +43,7 @@ describe('api', function () {
                     }
                 });
             });
-            it('', function (done) {
+            it('status change OK->NG', function (done) {
                 monitor.modifyMonitorStatus({
                     evidenceId: 1,
                     systemNodeId: 3,
@@ -51,7 +52,11 @@ describe('api', function () {
                     status: 'NG'
                 }, {
                     onSuccess: function (result) {
-                        done();
+                        con.query('select m.dcase_id, c.id, n.this_node_id, n.node_type from monitor_node m, commit c, node n where m.id = 3 and  m.dcase_id = c.dcase_id and c.latest_flag = TRUE AND c.id = n.commit_id and node_type = "Rebuttal";', function (err, expectedResult) {
+                            expect(err).to.be(null);
+                            expect(1).to.be(expectedResult.length);
+                            done();
+                        });
                     },
                     onFailure: function (err) {
                         console.log(err);
@@ -59,7 +64,7 @@ describe('api', function () {
                     }
                 });
             });
-            it('', function (done) {
+            it('status change NG->OK', function (done) {
                 monitor.modifyMonitorStatus({
                     evidenceId: 1,
                     systemNodeId: 3,
@@ -68,7 +73,11 @@ describe('api', function () {
                     status: 'OK'
                 }, {
                     onSuccess: function (result) {
-                        done();
+                        con.query('select m.dcase_id, c.id, n.this_node_id, n.node_type from monitor_node m, commit c, node n where m.id = 3 and  m.dcase_id = c.dcase_id and c.latest_flag = TRUE AND c.id = n.commit_id and node_type = "Rebuttal";', function (err, expectedResult) {
+                            expect(err).to.be(null);
+                            expect(0).to.be(expectedResult.length);
+                            done();
+                        });
                     },
                     onFailure: function (err) {
                         console.log(err);
@@ -76,6 +85,7 @@ describe('api', function () {
                     }
                 });
             });
+            con.close();
         });
     });
 });

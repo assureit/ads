@@ -12,6 +12,8 @@ var expect = require('expect.js');	// TODO: import module化
 describe('api', function() {
 	describe('monitor', function() {
 		describe('modifyMonitorStatus', function() {
+			var con = new db.Database();
+
 			it('system node ID not existing is specified ', function(done) {
 				monitor.modifyMonitorStatus({evidenceId: 1,
 							     systemNodeId: 99999,
@@ -44,14 +46,19 @@ describe('api', function() {
 					},
 				});
 			});
-			it('', function(done) {
+			it('status change OK->NG', function(done) {
 				monitor.modifyMonitorStatus({evidenceId: 1,
 							     systemNodeId: 3,
 							     timestamp:'2013-06-26T12:30:30.999Z',
 							     comment:'Unit Test run',
 							     status:'NG'}, {
 					onSuccess: (result: any) => {
-						done();
+						con.query('select m.dcase_id, c.id, n.this_node_id, n.node_type from monitor_node m, commit c, node n where m.id = 3 and  m.dcase_id = c.dcase_id and c.latest_flag = TRUE AND c.id = n.commit_id and node_type = "Rebuttal";', (err, expectedResult) => {
+							expect(err).to.be(null);
+							expect(1).to.be(expectedResult.length);
+
+							done();
+						});
 					}, 
 					onFailure: (err: any) => {
 						console.log(err);
@@ -59,14 +66,20 @@ describe('api', function() {
 					},
 				});
 			});
-			it('', function(done) {
+			it('status change NG->OK', function(done) {
 				monitor.modifyMonitorStatus({evidenceId: 1,
 							     systemNodeId: 3,
 							     timestamp:'2013-06-26T12:30:30.999Z',
 							     comment:'Unit Test run',
 							     status:'OK'}, {
 					onSuccess: (result: any) => {
-						done();
+						con.query('select m.dcase_id, c.id, n.this_node_id, n.node_type from monitor_node m, commit c, node n where m.id = 3 and  m.dcase_id = c.dcase_id and c.latest_flag = TRUE AND c.id = n.commit_id and node_type = "Rebuttal";', (err, expectedResult) => {
+
+							expect(err).to.be(null);
+							expect(0).to.be(expectedResult.length);
+
+							done();
+						});
 					}, 
 					onFailure: (err: any) => {
 						console.log(err);
@@ -74,6 +87,7 @@ describe('api', function() {
 					},
 				});
 			});
+			con.close();
 		});
 	});
 });
