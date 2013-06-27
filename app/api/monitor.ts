@@ -116,7 +116,6 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 							return;
 						}
 						if (issueId) {
-console.log(issueId);
 							monitorDAO.getItsId(issueId, (err: any, itsId: string) => {
 								if (err) {
 									callback.onFailure(err);

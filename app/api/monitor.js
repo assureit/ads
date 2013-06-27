@@ -110,7 +110,6 @@ function modifyMonitorStatus(params, callback) {
                             return;
                         }
                         if(issueId) {
-                            console.log(issueId);
                             monitorDAO.getItsId(issueId, function (err, itsId) {
                                 if(err) {
                                     callback.onFailure(err);
