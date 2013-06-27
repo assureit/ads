@@ -161,7 +161,7 @@ export function commit(params: any, callback: type.Callback) {
 	con.begin((err, result) => {
 		// _commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
 		commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err, result) => {
-			con.commit((err, result) =>{
+			con.commit((err, _result) =>{
 				if (err) {
 					callback.onFailure(err);
 					return;
