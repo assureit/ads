@@ -154,7 +154,7 @@ ENGINE = InnoDB;
 -- Table `monitor_node`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `monitor_node` (
-  `id` INT NOT NULL ,
+  `id` INT NOT NULL AUTO_INCREMENT ,
   `dcase_id` INT NOT NULL ,
   `this_node_id` INT NOT NULL ,
   `preset_id` VARCHAR(45) NULL ,
