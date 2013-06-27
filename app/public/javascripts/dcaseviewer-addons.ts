@@ -177,6 +177,12 @@ function parseMetaData(data: string[]): DCaseMetaContent {
 	} else {
 		metadata["Description"] = "";
 	}
+	//TODO Change the flag depending on a type of metadata.
+	//     Currently, "Visible" is set to true automatically right here and cannot modify.
+	//     In addition, "Visible" itself and a metadata whose field "Visible" is set to false 
+	//     expect not to visible but now it is.
+	metadata["Visible"] = true;
+
 	return metadata;
 }
 
@@ -331,9 +337,9 @@ function DNodeView_InplaceEdit(self: DNodeView): void {
 				nodes[0].type = "Goal";
 			}
 			updateNode(node, nodes[0]);
-			
-			var idNodeTable: DCaseNodeModel[] = [];
-			var idIndexTable: number[] = [];
+
+			var idNodeTable: any = {};
+			var idIndexTable: any = {};
 
 			var ch: number = 0, co: number = 0;
 			node.eachSubNode((i: number, n: DCaseNodeModel) => {

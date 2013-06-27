@@ -1,5 +1,10 @@
+///<reference path='../DefinitelyTyped/async/async.d.ts'/>
+
 import model = module('./model')
 import model_user = module('./user')
+import model_node = module('../model/node')
+import model_issue = module('../model/issue')
+var async = require('async')
 
 export interface InsertArg {
 	data: string;
@@ -71,6 +76,33 @@ export class CommitDAO extends model.DAO {
 				list.push(c);
 			});
 			callback(err, list);
+		});
+	}
+
+
+	commit(userId:number, previousCommitId:number, message: string, contents:any, commitCallback: (err:any, result:any)=>void) {
+		async.waterfall([
+			(callback) => {
+				this.get(previousCommitId, (err:any, com: Commit) => {callback(err, com);});
+			}
+			, (com: Commit, callback) => {
+				this.insert({data: JSON.stringify(contents), prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message}, (err:any, commitId:number) => {callback(err, com, commitId);});
+			}
+			, (com: Commit, commitId: number, callback) => {
+				var nodeDAO = new model_node.NodeDAO(this.con);
+				nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, (err:any) => {callback(err, com, commitId);});
+			}
+			, (com: Commit, commitId: number, callback) => {
+				this.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
+			} 
+			, (com: Commit, commitId: number, callback) => {
+				var issueDAO = new model_issue.IssueDAO(this.con);
+				issueDAO.publish(com.dcaseId, (err:any) => {
+					callback(err, {commitId: commitId});
+				});
+			} 
+		], (err:any, result:any) => {
+			commitCallback(err, result);
 		});
 	}
 }

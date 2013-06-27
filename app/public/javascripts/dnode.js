@@ -203,7 +203,7 @@ var DCaseModel = (function () {
             var type = data.NodeType;
             var desc = data.Description;
             var metadata = null;
-            var metadata_raw = data.Metadata;
+            var metadata_raw = data.MetaData;
             if(metadata_raw instanceof Array) {
                 metadata = metadata_raw;
             } else if(metadata_raw != null) {
@@ -237,7 +237,8 @@ var DCaseModel = (function () {
                 NodeType: v.type,
                 Description: v.desc,
                 Children: c,
-                Metadata: v.metadata
+                Contexts: [],
+                MetaData: v.metadata
             });
         });
         return new DCaseTree(tl, node.id, this.nodeCount);

@@ -5,6 +5,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var mysql = require('mysql')
 var events = require('events')
+var CONFIG = require('config');
 var Database = (function (_super) {
     __extends(Database, _super);
     function Database() {
@@ -13,10 +14,10 @@ var Database = (function (_super) {
     }
     Database.getConnection = function getConnection() {
         return mysql.createConnection({
-            host: 'localhost',
-            user: 'ads_test',
-            password: 'ads_test',
-            database: 'ads'
+            host: CONFIG.mysql.host,
+            user: CONFIG.mysql.user,
+            password: CONFIG.mysql.password,
+            database: CONFIG.mysql.database
         });
     };
     Database.prototype.query = function (sql, values, callback) {

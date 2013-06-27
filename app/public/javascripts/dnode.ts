@@ -31,7 +31,8 @@ interface DCaseNodeRawData {
 	NodeType: string;
 	Description: string;
 	Children: number[];
-	Metadata: any;
+	Contexts: number[]; // TODO USE IT
+	MetaData: any;
 }
 class DCaseNodeModel {
 	id: number;
@@ -305,7 +306,7 @@ class DCaseModel {
 			var desc: string = data.Description;
 			//var metadata: DCaseMetaContent[] = data.metadata ? data.metadata : null;
 			var metadata: DCaseMetaContent[] = null; /* TODO Handle metadata */
-			var metadata_raw: any = data.Metadata;
+			var metadata_raw: any = data.MetaData;
 			if (metadata_raw instanceof Array) {
 				metadata = metadata_raw;
 			} else if (metadata_raw != null) {
@@ -339,7 +340,8 @@ class DCaseModel {
 				NodeType: v.type,
 				Description: v.desc,
 				Children: c,
-				Metadata: v.metadata
+				Contexts: [],
+				MetaData: v.metadata
 			});
 		});
 		return new DCaseTree(tl, node.id, this.nodeCount);

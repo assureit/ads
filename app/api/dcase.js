@@ -5,8 +5,9 @@ var model_dcase = require('../model/dcase')
 var model_commit = require('../model/commit')
 var model_node = require('../model/node')
 
-var model_issue = require('../model/issue')
 
+
+var async = require('async');
 function searchDCase(params, callback) {
     var con = new db.Database();
     var dcaseDAO = new model_dcase.DCaseDAO(con);
@@ -167,51 +168,16 @@ exports.createDCase = createDCase;
 function commit(params, callback) {
     var userId = constant.SYSTEM_USER_ID;
     var con = new db.Database();
+    var commitDAO = new model_commit.CommitDAO(con);
     con.begin(function (err, result) {
-        var commitDAO = new model_commit.CommitDAO(con);
-        commitDAO.get(params.commitId, function (err, com) {
-            if(err) {
-                callback.onFailure(err);
-                return;
-            }
-            commitDAO.insert({
-                data: JSON.stringify(params.contents),
-                prevId: params.commitId,
-                dcaseId: com.dcaseId,
-                userId: userId,
-                message: params.commitMessage
-            }, function (err, commitId) {
+        commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
+            con.commit(function (err, _result) {
                 if(err) {
                     callback.onFailure(err);
                     return;
                 }
-                var nodeDAO = new model_node.NodeDAO(con);
-                nodeDAO.insertList(com.dcaseId, commitId, params.contents.NodeList, function (err) {
-                    if(err) {
-                        callback.onFailure(err);
-                        return;
-                    }
-                    commitDAO.update(commitId, JSON.stringify(params.contents), function (err) {
-                        con.commit(function (err, result) {
-                            if(err) {
-                                callback.onFailure(err);
-                                return;
-                            }
-                            var issueDAO = new model_issue.IssueDAO(con);
-                            issueDAO.publish(com.dcaseId, function (err) {
-                                con.commit(function (err, result) {
-                                    if(err) {
-                                        return;
-                                    }
-                                    callback.onSuccess({
-                                        commitId: commitId
-                                    });
-                                    con.close();
-                                });
-                            });
-                        });
-                    });
-                });
+                callback.onSuccess(result);
+                con.close();
             });
         });
     });
