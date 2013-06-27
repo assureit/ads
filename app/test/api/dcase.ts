@@ -389,13 +389,27 @@ describe('api', function() {
 									ThisNodeId:2,
 									Description:"s1",
 									Children:[3],
-									NodeType:"Strategy"
+									NodeType:"Strategy",
+									MetaData:[]
 								},
 								{
 									ThisNodeId:3,
 									Description:"g1",
 									Children:[],
-									NodeType:"Goal"
+									NodeType:"Goal",
+									MetaData: [
+										{   
+											Type: "Issue",
+											Subject: "2つ目のイシュー",
+											Description: "あああ詳細な情報をここに記述する",
+											Visible: "true"
+										},
+										{
+											Type: "LastUpdated",
+											User: "Shida",
+											Visible: "false",
+										},
+									]
 								}
 							]
 						}
