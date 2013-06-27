@@ -53,7 +53,7 @@ describe('api', function() {
 							     comment:'Unit Test run',
 							     status:'NG'}, {
 					onSuccess: (result: any) => {
-						con.query('select m.dcase_id, c.id, n.this_node_id, n.node_type from monitor_node m, commit c, node n where m.id = 3 and  m.dcase_id = c.dcase_id and c.latest_flag = TRUE AND c.id = n.commit_id and node_type = "Rebuttal";', (err, expectedResult) => {
+						con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = 3 AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', (err, expectedResult) => {
 							expect(err).to.be(null);
 							expect(1).to.be(expectedResult.length);
 
@@ -73,7 +73,7 @@ describe('api', function() {
 							     comment:'Unit Test run',
 							     status:'OK'}, {
 					onSuccess: (result: any) => {
-						con.query('select m.dcase_id, c.id, n.this_node_id, n.node_type from monitor_node m, commit c, node n where m.id = 3 and  m.dcase_id = c.dcase_id and c.latest_flag = TRUE AND c.id = n.commit_id and node_type = "Rebuttal";', (err, expectedResult) => {
+						con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = 3 AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', (err, expectedResult) => {
 
 							expect(err).to.be(null);
 							expect(0).to.be(expectedResult.length);

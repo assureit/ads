@@ -112,7 +112,6 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 						callback.onFailure(err);
 						return;
 					}
-					console.log(issueId);
 					if (issueId) {
 						monitorDAO.getItsId(issueId, (err: any, itsId: string) => {
 							if (err) {
@@ -136,7 +135,7 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 							callback.onSuccess(null);
 							con.close();
 						});
-					}				
+					}
 				});
 			});
 		});
