@@ -157,6 +157,7 @@ function parseMetaData(data) {
     } else {
         metadata["Description"] = "";
     }
+    metadata["Visible"] = true;
     return metadata;
 }
 function generateMetadata(n) {
