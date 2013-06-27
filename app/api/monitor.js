@@ -67,7 +67,7 @@ function modifyMonitorStatus(params, callback) {
     }
     var con = new db.Database();
     con.begin(function (err, result) {
-        var monitorDAO = new model_monitor.monitorDAO(con);
+        var monitorDAO = new model_monitor.MonitorDAO(con);
         monitorDAO.select(params.systemNodeId, function (err, dcaseId, thisNodeId, rebuttalThisNodeId) {
             if(err) {
                 callback.onFailure(err);

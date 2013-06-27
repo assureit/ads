@@ -6,13 +6,13 @@ var __extends = this.__extends || function (d, b) {
 var model = require('./model')
 var model_commit = require('./commit')
 var error = require('../api/error')
-var monitorDAO = (function (_super) {
-    __extends(monitorDAO, _super);
-    function monitorDAO() {
+var MonitorDAO = (function (_super) {
+    __extends(MonitorDAO, _super);
+    function MonitorDAO() {
         _super.apply(this, arguments);
 
     }
-    monitorDAO.prototype.insert = function (param, callback) {
+    MonitorDAO.prototype.insert = function (param, callback) {
         this.con.query('INSERT INTO monitor_node(dcase_id, this_node_id, preset_id, params) VALUES(?,?,?,?) ', [
             param.dcaseId, 
             param.thisNodeId, 
@@ -26,7 +26,7 @@ var monitorDAO = (function (_super) {
             callback(err, result.insertId);
         });
     };
-    monitorDAO.prototype.update = function (id, rebuttal_id, callback) {
+    MonitorDAO.prototype.update = function (id, rebuttal_id, callback) {
         this.con.query('UPDATE monitor_node  SET rebuttal_this_node_id = ? where id = ?', [
             rebuttal_id, 
             id
@@ -38,7 +38,7 @@ var monitorDAO = (function (_super) {
             callback(err);
         });
     };
-    monitorDAO.prototype.select = function (id, callback) {
+    MonitorDAO.prototype.select = function (id, callback) {
         this.con.query('SELECT dcase_id, this_node_id, rebuttal_this_node_id  from monitor_node where id = ?', [
             id
         ], function (err, result) {
@@ -53,7 +53,7 @@ var monitorDAO = (function (_super) {
             callback(err, result[0].dcase_id, result[0].this_node_id, result[0].rebuttal_this_node_id);
         });
     };
-    monitorDAO.prototype.getLatestCommit = function (dcaseId, callback) {
+    MonitorDAO.prototype.getLatestCommit = function (dcaseId, callback) {
         this.con.query('SELECT * FROM commit WHERE dcase_id = ? AND latest_flag = TRUE', [
             dcaseId
         ], function (err, result) {
@@ -69,7 +69,7 @@ var monitorDAO = (function (_super) {
             callback(err, new model_commit.Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
         });
     };
-    monitorDAO.prototype.getItsId = function (issueId, callback) {
+    MonitorDAO.prototype.getItsId = function (issueId, callback) {
         this.con.query('SELECT its_id FROM issue WHERE id = ?', [
             issueId
         ], function (err, result) {
@@ -84,6 +84,6 @@ var monitorDAO = (function (_super) {
             callback(err, result[0].its_id);
         });
     };
-    return monitorDAO;
+    return MonitorDAO;
 })(model.DAO);
-exports.monitorDAO = monitorDAO;
+exports.MonitorDAO = MonitorDAO;
