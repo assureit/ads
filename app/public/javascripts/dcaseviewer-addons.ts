@@ -208,7 +208,7 @@ function generateMetadata(n: DCaseNodeModel): string[] {
 	return list;
 }
 
-function parseNodeBody(body: string[]): DCaseParsedNodeBody {
+function parseNodeBody(body: string[]): DCaseNodeBody {
 	var metadata: DCaseMetaContent = {};
 	var description: string;
 	var metadataIndex: number = findVaridMetaData(body);
@@ -250,7 +250,7 @@ function DNodeView_InplaceEdit(self: DNodeView): void {
 
 			/* handle metadata */
 			var body: string[] = lines.slice(1).join("\n").trim().split("\n");
-			var parsedBody: DCaseParsedNodeBody = parseNodeBody(body);
+			var parsedBody: DCaseNodeBody = parseNodeBody(body);
 
 			var node: DCaseNodeModel = new DCaseNodeModel(
 				parseInt(heads[2]),
@@ -446,7 +446,7 @@ function DNodeView_ToolBox(self: DNodeView): void {
 				self.viewer.$root.one("click", () => {
 					var text: string = $edit.find("textarea").attr("value");
 					if(text != "") {
-						var parsedBody: DCaseParsedNodeBody = parseNodeBody(text.trim().split("\n"));
+						var parsedBody: DCaseNodeBody = parseNodeBody(text.trim().split("\n"));
 						self.viewer.getDCase().insertNode(self.node, type_selected, parsedBody.description, parsedBody.metadata);
 					}
 					edit_close();
