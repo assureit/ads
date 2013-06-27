@@ -1,3 +1,5 @@
+///<reference path='../DefinitelyTyped/async/async.d.ts'/>
+
 import db = module('../db/db')
 import type = module('./type')
 import constant = module('../constant')
@@ -7,6 +9,7 @@ import model_node = module('../model/node')
 import model_pager = module('../model/pager')
 import model_issue = module('../model/issue')
 import error = module('./error')
+var async = require('async')
 
 export function searchDCase(params:any, callback: type.Callback) {
 	var con = new db.Database();
@@ -154,50 +157,19 @@ export function commit(params: any, callback: type.Callback) {
 	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
 
 	var con = new db.Database();
+	var commitDAO = new model_commit.CommitDAO(con);
 	con.begin((err, result) => {
-		var commitDAO = new model_commit.CommitDAO(con);
-		commitDAO.get(params.commitId, (err:any, com: model_commit.Commit) => {
-			if (err) {
-				callback.onFailure(err);
-				return;
-			}
-			commitDAO.insert({data: JSON.stringify(params.contents), prevId: params.commitId, dcaseId: com.dcaseId, userId: userId, message: params.commitMessage}, (err:any, commitId) => {
+		// _commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
+		commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err, result) => {
+			con.commit((err, result) =>{
 				if (err) {
 					callback.onFailure(err);
 					return;
 				}
-				var nodeDAO = new model_node.NodeDAO(con);
-				nodeDAO.insertList(com.dcaseId, commitId, params.contents.NodeList, (err:any) => {
-					if (err) {
-						callback.onFailure(err);
-						return;
-					}
-					commitDAO.update(commitId, JSON.stringify(params.contents), (err:any) => {
-						con.commit((err, result) =>{
-							if (err) {
-								callback.onFailure(err);
-								return;
-							}
-							// callback.onSuccess({commitId: commitId});
-
-							var issueDAO = new model_issue.IssueDAO(con);
-							issueDAO.publish(com.dcaseId, (err:any) => {
-								// TODO: 管理者にエラー通知などのエラー処理
-								con.commit((err, result) =>{
-									if (err) {
-										// TODO: 管理者にエラー通知などのエラー処理
-										return;
-									}
-							callback.onSuccess({commitId: commitId});
-									con.close();
-								});
-							});
-						});
-					});
-				});
+				callback.onSuccess(result);
+				con.close();
 			});
 		});
-
 	});
 };
 
