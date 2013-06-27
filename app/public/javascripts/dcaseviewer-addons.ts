@@ -177,6 +177,12 @@ function parseMetaData(data: string[]): DCaseMetaContent {
 	} else {
 		metadata["Description"] = "";
 	}
+	//TODO Change the flag depending on a type of metadata.
+	//     Currently, "Visible" is set to true automatically right here and cannot modify.
+	//     In addition, "Visible" itself and a metadata whose field "Visible" is set to false 
+	//     expect not to visible but now it is.
+	metadata["Visible"] = true;
+
 	return metadata;
 }
 

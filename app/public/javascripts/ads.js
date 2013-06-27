@@ -118,8 +118,12 @@ var ADS = (function () {
             } else {
                 var msg = prompt("コミットメッセージを入力して下さい");
                 if(msg != null) {
-                    if(this.viewer.getDCase().commit(msg)) {
+                    var DCaseToBeCommit = this.viewer.getDCase();
+                    if(DCaseToBeCommit.commit(msg)) {
                         alert("コミットしました");
+                        var newCommitId = DCaseToBeCommit.commitId;
+                        var tree = DCaseAPI.getNodeTree(newCommitId);
+                        this.viewer.setDCase(new DCaseModel(tree, tree.dcaseId, newCommitId));
                         this.timelineView.repaint(this.viewer.getDCase());
                     }
                 }
