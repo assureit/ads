@@ -38,22 +38,6 @@ export class RecInterface {
 		}
 	}
 
-	put(path:string, params:any, callback:Callback) {
-		var jsonParams = JSON.stringify(params);
-		try {
-			var req = this._buildRequest();
-			req.put(this._resolvePath(path), jsonParams, (err:any, result:string) => {
-				if (err) {
-					callback(err, null);
-					return;
-				}
-				callback(null, result);
-			});
-		} catch (e) {
-			callback(e, null);
-		}
-	}
-
 	_buildRequest(): rest.Request {
 		if (!CONFIG.rec.host ) {
 			throw new error.InternalError('REC host is not found', null);
@@ -72,11 +56,11 @@ export class RecInterface {
 export class Rec extends RecInterface {
 	// constructor(host:string, apiKey:string) {super(host, apiKey);}
 
-	request(method: string, params: any , id: number,  callback:Callback) {
+	request(method: string, params: any, callback:Callback) {
 		super.post('/rec/api/1.0',{	"jsonrpc": "2.0",
 						"method": method,
 						"params": JSON.stringify(params),
-						"id": id
+						"id": 1
 					},
 			callback);
 	}

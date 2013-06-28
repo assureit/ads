@@ -26,7 +26,7 @@ describe('api', function() {
 	describe('rec', function() {
 
 		before((done) => {
-			app.listen(3001).on('listening', done);
+			app.listen(3030).on('listening', done);
 		});
 
 		describe('getRawItemList', function() {

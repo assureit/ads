@@ -7,10 +7,9 @@ import error = module('./error')
 
 export function getRawItemList(params:any, callback: type.Callback) {
 	var method = "getRawItemList";
-	var id = 1;
 
 	var rc = new rec.Rec();
-	rc.request(method, params, id, (err:any, result:any) => {
+	rc.request(method, params, (err:any, result:any) => {
 		if (err) {
 			callback.onFailure(err);
 			return;
@@ -21,10 +20,9 @@ export function getRawItemList(params:any, callback: type.Callback) {
 
 export function getPresetList(params:any, callback: type.Callback) {
 	var method = "getPresetList";
-	var id = 1;
 
 	var rc = new rec.Rec();
-	rc.request(method, params, id, (err:any, result:any) => {
+	rc.request(method, params, (err:any, result:any) => {
 		if (err) {
 			callback.onFailure(err);
 			return;

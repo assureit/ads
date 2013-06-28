@@ -37,21 +37,6 @@ var RecInterface = (function () {
             callback(e, null);
         }
     };
-    RecInterface.prototype.put = function (path, params, callback) {
-        var jsonParams = JSON.stringify(params);
-        try  {
-            var req = this._buildRequest();
-            req.put(this._resolvePath(path), jsonParams, function (err, result) {
-                if(err) {
-                    callback(err, null);
-                    return;
-                }
-                callback(null, result);
-            });
-        } catch (e) {
-            callback(e, null);
-        }
-    };
     RecInterface.prototype._buildRequest = function () {
         if(!CONFIG.rec.host) {
             throw new error.InternalError('REC host is not found', null);
@@ -73,12 +58,12 @@ var Rec = (function (_super) {
         _super.apply(this, arguments);
 
     }
-    Rec.prototype.request = function (method, params, id, callback) {
+    Rec.prototype.request = function (method, params, callback) {
         _super.prototype.post.call(this, '/rec/api/1.0', {
             "jsonrpc": "2.0",
             "method": method,
             "params": JSON.stringify(params),
-            "id": id
+            "id": 1
         }, callback);
     };
     return Rec;
