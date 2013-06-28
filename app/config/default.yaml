@@ -1,3 +1,5 @@
+ads:
+  basePath: ""
 redmine:
   host: "localhost"
   port: 80
