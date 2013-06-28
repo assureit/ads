@@ -26,6 +26,19 @@ app.configure(function() {
 	// app.use(express.bodyParser({uploadDir:'./upload'}));
 	app.use(express.cookieParser());
 	app.use(express.methodOverride());
+	// app.use(function(req, res, next) {
+	//     console.log([
+	//       req.headers['x-forwarded-for'] || req.client.remoteAddress,
+	//       new Date().toLocaleString(),
+	//       req.method,
+	//       req.url,
+	//       res.statusCode,
+	//       req.headers.referer || '-',
+	//       // req.headers['user-agent'] || '-'
+	//       ].join('\t')
+	//     );
+	//     next();
+	// });
 	app.use(app.router);
 	app.use(express.static(path.join(__dirname, 'public')));
 
@@ -48,7 +61,7 @@ app.get('/page/:id', client.index);
 app.get('/new', client.index);
 app.get('/dcase/:id', client.index);
 app.post('/export.*', client.exporter);
-app.get('/javascript/config.js', js.config);
+app.get('/javascripts/config.js', js.config);
 
 app.post('/file', file.upload);
 app.get('/file/:id', file.download);

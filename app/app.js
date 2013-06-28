@@ -40,7 +40,7 @@ app.get('/page/:id', client.index);
 app.get('/new', client.index);
 app.get('/dcase/:id', client.index);
 app.post('/export.*', client.exporter);
-app.get('/javascript/config.js', js.config);
+app.get('/javascripts/config.js', js.config);
 app.post('/file', file.upload);
 app.get('/file/:id', file.download);
 if(!module.parent) {
