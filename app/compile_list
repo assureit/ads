@@ -8,12 +8,14 @@ api/error.ts
 api/jsonrpc.ts
 api/dcase.ts
 api/monitor.ts
+api/rec.ts
 db/db.ts
 test/db/db.ts
 test/routes/api.ts
 test/routes/file.ts
 test/api/dcase.ts
 test/api/monitor.ts
+test/api/rec.ts
 test/model/user.ts
 test/model/node.ts
 test/net/redmine.ts
