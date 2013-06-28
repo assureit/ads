@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# chkconfig: 35 99 99
+# chkconfig: 345 99 99
 # description: ADS
 #
 
