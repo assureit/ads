@@ -3,7 +3,6 @@ var fs = require('fs')
 var lang = require('./lang')
 var CONFIG = require('config');
 exports.index = function (req, res) {
-    console.log(CONFIG);
     res.cookie('userId', '1');
     res.cookie('userName', 'System');
     var params = {

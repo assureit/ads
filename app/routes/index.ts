@@ -9,7 +9,6 @@ export var index = function(req: any, res: any) {
 	//if(req.cookies.userId !== null) {
 	//	res.render('signin', {title: 'Assurance DS', lang: lang.lang.ja });
 	//}else {
-	console.log(CONFIG);
 	res.cookie('userId','1');
 	res.cookie('userName','System');
 	var params = {basepath: CONFIG.ads.basePath, title: 'Assurance DS', lang: lang.lang.ja, userName: 'System' };
