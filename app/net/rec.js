@@ -75,7 +75,7 @@ var Rec = (function (_super) {
     }
     Rec.prototype.request = function (method, params, id, callback) {
         _super.prototype.post.call(this, '/rec/api/1.0', {
-            "jsonrpc": "1.0",
+            "jsonrpc": "2.0",
             "method": method,
             "params": JSON.stringify(params),
             "id": id

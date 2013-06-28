@@ -12,11 +12,12 @@ import http = module('http')
 var expect = require('expect.js');	// TODO: import module化
 var express = require('express');
 
-var server = express();
+var app = express();
+app.use(express.bodyParser());
 
-server.post('/rec/api/1.0', function (req, res) {
+app.post('/rec/api/1.0', function (req: any, res: any) {
         res.header('Content-Type', 'application/json');
-        res.send({result:'OK'});
+        res.send(req.body);
 });
 
 
@@ -25,15 +26,14 @@ describe('api', function() {
 	describe('rec', function() {
 
 		before((done) => {
-			server.listen(3001).on('listening', done);
+			app.listen(3001).on('listening', done);
 		});
 
 		describe('getRawItemList', function() {
 			it('call method', function(done) {
 				rec.getRawItemList(null, {
 					onSuccess: (result: any) => {
-console.log(result);
-console.log('------------');
+						expect(result.method).to.eql('getRawItemList');
 						done();
 					},
 					onFailure: (err: any) => {
@@ -47,8 +47,7 @@ console.log('------------');
 			it('call method', function(done) {
 				rec.getPresetList(null, {
 					onSuccess: (result: any) => {
-console.log(result);
-console.log('------------');
+						expect(result.method).to.eql('getPresetList');
 						done();
 					},
 					onFailure: (err: any) => {
