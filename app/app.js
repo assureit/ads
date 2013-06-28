@@ -2,6 +2,7 @@ var http = require('http')
 var express = require('express')
 var api = require('./routes/api')
 var client = require('./routes/index')
+var js = require('./routes/javascript')
 var path = require('path')
 var file = require('./routes/file')
 var constant = require('./constant')
@@ -39,6 +40,7 @@ app.get('/page/:id', client.index);
 app.get('/new', client.index);
 app.get('/dcase/:id', client.index);
 app.post('/export.*', client.exporter);
+app.get('/javascript/config.js', js.config);
 app.post('/file', file.upload);
 app.get('/file/:id', file.download);
 if(!module.parent) {

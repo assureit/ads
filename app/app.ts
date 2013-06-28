@@ -5,6 +5,7 @@ import http = module('http')
 import express = module('express')
 import api = module('./routes/api')
 import client = module('./routes/index')
+import js = module('./routes/javascript')
 import path = module('path')
 import file = module('./routes/file')
 import constant = module('./constant')
@@ -47,6 +48,7 @@ app.get('/page/:id', client.index);
 app.get('/new', client.index);
 app.get('/dcase/:id', client.index);
 app.post('/export.*', client.exporter);
+app.get('/javascript/config.js', js.config);
 
 app.post('/file', file.upload);
 app.get('/file/:id', file.download);
