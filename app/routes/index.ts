@@ -2,16 +2,17 @@
 import childProcess = module('child_process')
 import fs           = module('fs')
 import lang = module('./lang')
-import cons = module('../constant')
+var CONFIG = require('config')
 //import ex = module('./exporter')
 
 export var index = function(req: any, res: any) {
 	//if(req.cookies.userId !== null) {
 	//	res.render('signin', {title: 'Assurance DS', lang: lang.lang.ja });
 	//}else {
+	console.log(CONFIG);
 	res.cookie('userId','1');
 	res.cookie('userName','System');
-	var params = {basepath: cons.basepath, title: 'Assurance DS', lang: lang.lang.ja, userName: 'System' };
+	var params = {basepath: CONFIG.ads.basePath, title: 'Assurance DS', lang: lang.lang.ja, userName: 'System' };
 	if( req.cookies.lang == 'en') {
 		params.lang = lang.lang.en;
 	}
