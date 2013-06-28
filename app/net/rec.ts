@@ -73,10 +73,11 @@ export class Rec extends RecInterface {
 	// constructor(host:string, apiKey:string) {super(host, apiKey);}
 
 	request(method: string, params: any , id: number,  callback:Callback) {
-		super.post('/api/1.0',{	"jsonrpc": "1.0",
-					"method": method,
-					"params": JSON.stringify(params),
-					"id": id},
+		super.post('/rec/api/1.0',{	"jsonrpc": "1.0",
+						"method": method,
+						"params": JSON.stringify(params),
+						"id": id
+					},
 			callback);
 	}
 
