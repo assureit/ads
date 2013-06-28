@@ -9,3 +9,8 @@ mysql:
   user: 'ads_test'
   password: 'ads_test'
   database: 'ads'
+rec:
+  host: "localhost"
+  port: 3030
+  basePath: "/"
+
