@@ -25,6 +25,7 @@ app.configure(function() {
 	app.use(express.bodyParser({uploadDir: uploadDir}));
 	// app.use(express.bodyParser({uploadDir:'./upload'}));
 	app.use(express.cookieParser());
+//	app.use(express.cookieSession());
 	app.use(express.methodOverride());
 	// app.use(function(req, res, next) {
 	//     console.log([
@@ -62,6 +63,10 @@ app.get('/new', client.index);
 app.get('/dcase/:id', client.index);
 app.post('/export.*', client.exporter);
 app.get('/javascripts/config.js', js.config);
+
+app.post('/login', client.login);
+app.post('/logout', client.logout);
+app.post('/register', client.register);
 
 app.post('/file', file.upload);
 app.get('/file/:id', file.download);

@@ -3,18 +3,25 @@ var fs = require('fs')
 var lang = require('./lang')
 var CONFIG = require('config');
 exports.index = function (req, res) {
-    res.cookie('userId', '1');
-    res.cookie('userName', 'System');
+    var page = 'signin';
     var params = {
         basepath: CONFIG.ads.basePath,
-        title: 'Assurance DS',
-        lang: lang.lang.ja,
-        userName: 'System'
+        title: 'Assure-It',
+        lang: lang.lang.ja
     };
+    if(req.cookies.userId != null) {
+        page = 'signout';
+        params = {
+            basepath: CONFIG.ads.basePath,
+            title: 'Assure-It',
+            lang: lang.lang.ja,
+            userName: req.cookies.userName
+        };
+    }
     if(req.cookies.lang == 'en') {
         params.lang = lang.lang.en;
     }
-    res.render('signout', params);
+    res.render(page, params);
 };
 exports.exporter = function (req, res) {
     var exec = childProcess.exec;
@@ -59,4 +66,17 @@ exports.exporter = function (req, res) {
             });
         });
     });
+};
+exports.login = function (req, res) {
+    res.cookie('userId', '1');
+    res.cookie('userName', 'System');
+    res.redirect('/');
+};
+exports.logout = function (req, res) {
+    res.clearCookie('userId');
+    res.clearCookie('userName');
+    res.redirect('/');
+};
+exports.register = function (req, res) {
+    res.redirect('/');
 };

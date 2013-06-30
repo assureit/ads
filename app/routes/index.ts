@@ -6,17 +6,18 @@ var CONFIG = require('config')
 //import ex = module('./exporter')
 
 export var index = function(req: any, res: any) {
-	//if(req.cookies.userId !== null) {
-	//	res.render('signin', {title: 'Assurance DS', lang: lang.lang.ja });
-	//}else {
-	res.cookie('userId','1');
-	res.cookie('userName','System');
-	var params = {basepath: CONFIG.ads.basePath, title: 'Assurance DS', lang: lang.lang.ja, userName: 'System' };
+	var page = 'signin';
+	var params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja };
+	if(req.cookies.userId != null) {
+		page = 'signout';
+		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: req.cookies.userName };
+	}
+
 	if( req.cookies.lang == 'en') {
 		params.lang = lang.lang.en;
 	}
-	res.render('signout', params);
-	//}
+
+	res.render(page, params);
 };
 
 
@@ -65,4 +66,20 @@ export var exporter = function(req: any, res: any) {
 		});
 	});
 
+};
+
+export var login = function(req: any, res: any) {
+	res.cookie('userId','1');
+	res.cookie('userName','System');
+	res.redirect('/');
+};
+
+export var logout = function(req: any, res: any) {
+	res.clearCookie('userId');
+	res.clearCookie('userName');
+	res.redirect('/');
+};
+
+export var register = function(req: any, res: any) {
+	res.redirect('/');
 };

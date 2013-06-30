@@ -7,5 +7,5 @@ block sign
                 a.dropdown-toggle(href="#", data-toggle="dropdown")= userName
                     strong.caret
                 .dropdown-menu(style="padding: 15px; padding-bottom: 0px;")
-                    form#sign-in-form.navbar-form.pull-right(method="post", action="action/logout.php")
+                    form#sign-in-form.navbar-form.pull-right(method="post", action="#{basepath}/logout")
                         input.btn.btn-danger(type="submit", style="margin-bottom: 15px; width: 100%; height: 32px; font-size: 13px;", value="Sign out")
