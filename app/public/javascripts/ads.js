@@ -269,9 +269,13 @@ var ADS = (function () {
             e.preventDefault();
         });
         $("#ads-logo").click(function (e) {
-            $(".navbar").removeClass('navbar-hide');
-            $("#viewer").removeClass('navbar-hide');
-            $("#ads-logo").removeClass('navbar-hide');
+            if($("#ads-logo").hasClass('navbar-hide')) {
+                $(".navbar").removeClass('navbar-hide');
+                $("#ads-logo").removeClass('navbar-hide');
+            } else {
+                $(".navbar").addClass('navbar-hide');
+                $("#ads-logo").addClass('navbar-hide');
+            }
             e.preventDefault();
         });
         $("#menu-commit").click(function (e) {
