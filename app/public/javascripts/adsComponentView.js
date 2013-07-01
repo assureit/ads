@@ -60,8 +60,8 @@ var SelectDCaseContent = (function () {
         this.lastUser = lastUser;
         this.isLogin = isLogin;
     }
-    SelectDCaseContent.prototype.toHtml = function () {
-        return $('');
+    SelectDCaseContent.prototype.toHtml = function (callback) {
+        return callback(this.id, this.name, this.user, this.lastDate, this.lastUser, this.isLogin);
     };
     SelectDCaseContent.prototype.setEvent = function () {
         var _this = this;
@@ -87,26 +87,6 @@ var SelectDCaseContent = (function () {
     };
     return SelectDCaseContent;
 })();
-var TableElement = (function (_super) {
-    __extends(TableElement, _super);
-    function TableElement(id, name, user, lastDate, lastUser, isLogin) {
-        _super.call(this, id, name, user, lastDate, lastUser, isLogin);
-        this.id = id;
-        this.name = name;
-        this.user = user;
-        this.lastDate = lastDate;
-        this.lastUser = lastUser;
-        this.isLogin = isLogin;
-    }
-    TableElement.prototype.toHtml = function () {
-        var html = '<td><a href="' + Config.BASEPATH + '/dcase/' + this.id + '">' + this.name + "</a></td><td>" + this.user + "</td><td>" + this.lastDate + "</td><td>" + this.lastUser + "</td>";
-        if(this.isLogin) {
-            html += "<td><a id=\"e" + this.id + "\" href=\"#\">Edit</a></td>" + "<td><a id=\"d" + this.id + "\" href=\"#\">Delete</a></td>";
-        }
-        return $("<tr></tr>").html(html);
-    };
-    return TableElement;
-})(SelectDCaseContent);
 var SelectDCaseManager = (function () {
     function SelectDCaseManager() {
         this.contents = [];
@@ -118,16 +98,47 @@ var SelectDCaseManager = (function () {
     SelectDCaseManager.prototype.add = function (s) {
         this.contents.push(s);
     };
-    SelectDCaseManager.prototype._updateContentsOrZeroView = function ($tbody, zeroStr) {
+    SelectDCaseManager.prototype._updateContentsOrZeroView = function ($tbody, zeroStr, callback) {
         if(this.contents.length == 0) {
             $(zeroStr).appendTo($tbody);
         }
         $.each(this.contents, function (i, s) {
-            s.toHtml().appendTo($tbody);
+            s.toHtml(callback).appendTo($tbody);
             s.setEvent();
         });
     };
     return SelectDCaseManager;
+})();
+var ThumnailView = (function () {
+    function ThumnailView() { }
+    ThumnailView.toThumnail = function toThumnail(id, name, user, lastDate, lastUser, isLogin) {
+        return $('<div></div>').text(name);
+    };
+    return ThumnailView;
+})();
+var SelectDCaseThumbnailManager = (function (_super) {
+    __extends(SelectDCaseThumbnailManager, _super);
+    function SelectDCaseThumbnailManager() {
+        _super.call(this);
+    }
+    SelectDCaseThumbnailManager.prototype.clear = function () {
+        $("#selectDCase *").remove();
+    };
+    SelectDCaseThumbnailManager.prototype.updateContentsOrZeroView = function () {
+        _super.prototype._updateContentsOrZeroView.call(this, $('#selectDCase'), "<font color=gray>DCaseがありません</font>", ThumnailView.toThumnail);
+    };
+    return SelectDCaseThumbnailManager;
+})(SelectDCaseManager);
+var TableView = (function () {
+    function TableView() { }
+    TableView.toTable = function toTable(id, name, user, lastDate, lastUser, isLogin) {
+        var html = '<td><a href="' + Config.BASEPATH + '/dcase/' + id + '">' + name + "</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" + lastUser + "</td>";
+        if(isLogin) {
+            html += "<td><a id=\"e" + id + "\" href=\"#\">Edit</a></td>" + "<td><a id=\"d" + id + "\" href=\"#\">Delete</a></td>";
+        }
+        return $("<tr></tr>").html(html);
+    };
+    return TableView;
 })();
 var SelectDCaseTableManager = (function (_super) {
     __extends(SelectDCaseTableManager, _super);
@@ -138,7 +149,7 @@ var SelectDCaseTableManager = (function (_super) {
         $("tbody#dcase-select-table *").remove();
     };
     SelectDCaseTableManager.prototype.updateContentsOrZeroView = function () {
-        _super.prototype._updateContentsOrZeroView.call(this, $('#dcase-select-table'), "<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>");
+        _super.prototype._updateContentsOrZeroView.call(this, $('#dcase-select-table'), "<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>", TableView.toTable);
     };
     return SelectDCaseTableManager;
 })(SelectDCaseManager);
@@ -146,7 +157,7 @@ var SelectDCaseView = (function () {
     function SelectDCaseView() {
         this.pageIndex = 1;
         this.maxPageSize = 2;
-        this.manager = new SelectDCaseTableManager();
+        this.manager = new SelectDCaseThumbnailManager();
     }
     SelectDCaseView.prototype.clear = function () {
         this.manager.clear();
@@ -162,7 +173,7 @@ var SelectDCaseView = (function () {
         this.maxPageSize = searchResults.summary.maxPage;
         var isLogin = userId != null;
         $.each(dcaseList, function (i, dcase) {
-            var s = new TableElement(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
+            var s = new SelectDCaseContent(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
             _this.manager.add(s);
         });
         this.manager.updateContentsOrZeroView();

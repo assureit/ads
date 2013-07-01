@@ -53,8 +53,8 @@ class SelectDCaseContent {
 	constructor(public id: number, public name: string, public user: string, public lastDate: any, public lastUser: any, public isLogin: bool) {
 	}
 
-	toHtml() : JQuery {
-		return $('');
+	toHtml(callback: (id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool) => JQuery) : JQuery {
+		return callback(this.id, this.name, this.user, this.lastDate, this.lastUser, this.isLogin);
 	}
 
 	setEvent() : void {
@@ -80,25 +80,6 @@ class SelectDCaseContent {
 	}
 }
 
-class TableElement extends SelectDCaseContent {
-	constructor(public id: number, public name: string, public user: string, public lastDate: any, public lastUser: any, public isLogin: bool) {
-		super(id, name, user, lastDate, lastUser, isLogin);
-	}
-
-	toHtml() : JQuery {
-		var html = '<td><a href="' + Config.BASEPATH + '/dcase/' + this.id + '">' + this.name +
-				"</a></td><td>" + this.user + "</td><td>" + this.lastDate + "</td><td>" +
-				this.lastUser + "</td>";
-		if(this.isLogin) {
-			html += "<td><a id=\"e"+ this.id +"\" href=\"#\">Edit</a></td>"
-				+ "<td><a id=\"d"+ this.id +"\" href=\"#\">Delete</a></td>";
-		}
-
-		return $("<tr></tr>").html(html);
-	}
-
-}
-
 class SelectDCaseManager {
 	contents: SelectDCaseContent[] = [];
 	
@@ -110,14 +91,47 @@ class SelectDCaseManager {
 		this.contents.push(s);
 	}
 
-	_updateContentsOrZeroView($tbody: JQuery, zeroStr: string):void {
+	_updateContentsOrZeroView($tbody: JQuery, zeroStr: string, callback: (id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool) => JQuery):void {
 		if(this.contents.length == 0) {
 			$(zeroStr).appendTo($tbody);
 		}
 		$.each(this.contents, (i, s) => {
-			s.toHtml().appendTo($tbody);
+			s.toHtml(callback).appendTo($tbody);
 			s.setEvent();
 		});
+	}
+}
+
+class ThumnailView {
+	static toThumnail(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
+		return $('<div></div>').text(name);
+	}
+}
+
+class SelectDCaseThumbnailManager extends SelectDCaseManager{
+	constructor() {
+		super();
+	}
+
+	clear() : void {
+		$("#selectDCase *").remove();
+	}
+
+	updateContentsOrZeroView():void {
+		super._updateContentsOrZeroView($('#selectDCase'), "<font color=gray>DCaseがありません</font>", ThumnailView.toThumnail);
+	}
+}
+
+class TableView {
+	static toTable(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
+		var html = '<td><a href="' + Config.BASEPATH + '/dcase/' + id + '">' + name +
+				"</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" +
+				lastUser + "</td>";
+		if(isLogin) {
+			html += "<td><a id=\"e"+ id +"\" href=\"#\">Edit</a></td>"
+				+ "<td><a id=\"d"+ id +"\" href=\"#\">Delete</a></td>";
+		}
+		return $("<tr></tr>").html(html);
 	}
 }
 
@@ -131,9 +145,8 @@ class SelectDCaseTableManager extends SelectDCaseManager{
 	}
 
 	updateContentsOrZeroView():void {
-		super._updateContentsOrZeroView($('#dcase-select-table'), "<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>");
+		super._updateContentsOrZeroView($('#dcase-select-table'), "<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>", TableView.toTable);
 	}
-
 }
 
 class SelectDCaseView {
@@ -144,14 +157,14 @@ class SelectDCaseView {
 	constructor() {
 		this.pageIndex = 1;
 		this.maxPageSize = 2;
-		this.manager = new SelectDCaseTableManager();
+		this.manager = new SelectDCaseThumbnailManager();
 	}
 
 	clear(): void {
 		this.manager.clear();
 	}
 
-	addElements(userId, pageIndex): void{
+	addElements(userId, pageIndex): void {
 		if(pageIndex == null || pageIndex < 1) pageIndex = 1;
 		this.pageIndex = pageIndex - 0;
 		var searchResults: any = DCaseAPI.searchDCase(this.pageIndex);
@@ -160,7 +173,7 @@ class SelectDCaseView {
 
 		var isLogin = userId != null;
 		$.each(dcaseList, (i, dcase)=>{
-			var s:SelectDCaseContent = new TableElement(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
+			var s:SelectDCaseContent = new SelectDCaseContent(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
 			this.manager.add(s);
 		});
 		this.manager.updateContentsOrZeroView();
