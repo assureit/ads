@@ -262,12 +262,6 @@ var ADS = (function () {
     };
     ADS.prototype.initDefaultEventListeners = function () {
         var _this = this;
-        $("#navbar-hide").click(function (e) {
-            $(".navbar").addClass('navbar-hide');
-            $("#viewer").addClass('navbar-hide');
-            $("#ads-logo").addClass('navbar-hide');
-            e.preventDefault();
-        });
         $("#ads-logo").click(function (e) {
             if($("#ads-logo").hasClass('navbar-hide')) {
                 $(".navbar").removeClass('navbar-hide');
