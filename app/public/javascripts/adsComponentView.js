@@ -112,7 +112,8 @@ var SelectDCaseManager = (function () {
 var ThumnailView = (function () {
     function ThumnailView() { }
     ThumnailView.toThumnail = function toThumnail(id, name, user, lastDate, lastUser, isLogin) {
-        return $('<div></div>').text(name);
+        var html = '<ul class="thumbnails"><li class="span4"><a href="#" class="thumbnail">' + name + '</a></li></ul>';
+        return $('<div></div>').html(html);
     };
     return ThumnailView;
 })();
@@ -123,9 +124,10 @@ var SelectDCaseThumbnailManager = (function (_super) {
     }
     SelectDCaseThumbnailManager.prototype.clear = function () {
         $("#selectDCase *").remove();
+        $("#selectDCase").append('<div class="row-fluid"></div>');
     };
     SelectDCaseThumbnailManager.prototype.updateContentsOrZeroView = function () {
-        _super.prototype._updateContentsOrZeroView.call(this, $('#selectDCase'), "<font color=gray>DCaseがありません</font>", ThumnailView.toThumnail);
+        _super.prototype._updateContentsOrZeroView.call(this, $('#selectDCase .row-fluid'), "<font color=gray>DCaseがありません</font>", ThumnailView.toThumnail);
     };
     return SelectDCaseThumbnailManager;
 })(SelectDCaseManager);
@@ -157,7 +159,7 @@ var SelectDCaseView = (function () {
     function SelectDCaseView() {
         this.pageIndex = 1;
         this.maxPageSize = 2;
-        this.manager = new SelectDCaseThumbnailManager();
+        this.manager = new SelectDCaseTableManager();
     }
     SelectDCaseView.prototype.clear = function () {
         this.manager.clear();

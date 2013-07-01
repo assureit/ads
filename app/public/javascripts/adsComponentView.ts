@@ -104,7 +104,8 @@ class SelectDCaseManager {
 
 class ThumnailView {
 	static toThumnail(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
-		return $('<div></div>').text(name);
+		var html = '<ul class="thumbnails"><li class="span4"><a href="#" class="thumbnail">'+name+'</a></li></ul>';
+		return $('<div></div>').html(html);
 	}
 }
 
@@ -115,10 +116,11 @@ class SelectDCaseThumbnailManager extends SelectDCaseManager{
 
 	clear() : void {
 		$("#selectDCase *").remove();
+		$("#selectDCase").append('<div class="row-fluid"></div>');
 	}
 
 	updateContentsOrZeroView():void {
-		super._updateContentsOrZeroView($('#selectDCase'), "<font color=gray>DCaseがありません</font>", ThumnailView.toThumnail);
+		super._updateContentsOrZeroView($('#selectDCase .row-fluid'), "<font color=gray>DCaseがありません</font>", ThumnailView.toThumnail);
 	}
 }
 
@@ -157,7 +159,7 @@ class SelectDCaseView {
 	constructor() {
 		this.pageIndex = 1;
 		this.maxPageSize = 2;
-		this.manager = new SelectDCaseThumbnailManager();
+		this.manager = new SelectDCaseTableManager();
 	}
 
 	clear(): void {
