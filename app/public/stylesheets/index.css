@@ -11,8 +11,23 @@ body {
 	left: 0px;
 	top : 40px;
 	width : 100%;
+	min-height: 100%;
 	bottom: 0px;
+	-webkit-transition: all 1s ease-in-out;
 }
+
+.navbar {
+	-webkit-transition: all 1s ease-in-out;
+}
+
+.navbar-hide {
+	-webkit-transform: translate(0,-40px);
+}
+
+#viewer.navbar-hide {
+	hight:100%;
+}
+
 #dcase-manager {
 	margin-top: 60px;
 }
@@ -21,4 +36,6 @@ body {
 	right: 0px;
 	top: 45px;
 	width: 233px;
+	z-index: 255;
+	-webkit-transition: all 1s ease-in-out;
 }

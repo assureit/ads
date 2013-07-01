@@ -262,6 +262,18 @@ var ADS = (function () {
     };
     ADS.prototype.initDefaultEventListeners = function () {
         var _this = this;
+        $("#navbar-hide").click(function (e) {
+            $(".navbar").addClass('navbar-hide');
+            $("#viewer").addClass('navbar-hide');
+            $("#ads-logo").addClass('navbar-hide');
+            e.preventDefault();
+        });
+        $("#ads-logo").click(function (e) {
+            $(".navbar").removeClass('navbar-hide');
+            $("#viewer").removeClass('navbar-hide');
+            $("#ads-logo").removeClass('navbar-hide');
+            e.preventDefault();
+        });
         $("#menu-commit").click(function (e) {
             _this.commit();
             e.preventDefault();
