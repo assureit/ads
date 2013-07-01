@@ -338,8 +338,8 @@ function DNodeView_InplaceEdit(self: DNodeView): void {
 			}
 			updateNode(node, nodes[0]);
 
-			var idNodeTable: any = {};
-			var idIndexTable: any = {};
+			var idNodeTable: DCaseNodeModel[] = [];
+			var idIndexTable: number[] = [];
 
 			var ch: number = 0, co: number = 0;
 			node.eachSubNode((i: number, n: DCaseNodeModel) => {
@@ -375,10 +375,10 @@ function DNodeView_InplaceEdit(self: DNodeView): void {
 				}
 			}
 			// if a node is left in Table, it means that the node is removed from markdown text.
-			jQuery.each(idNodeTable, (i: number, v: DCaseNodeModel) => {
+			jQuery.each(idNodeTable, (i: number, v: DCaseNodeModel) => { if(v){
 				DCase.removeNode(v);
 				treeChanged = true;
-			});
+			} });
 			node.children = newChildren;
 			node.contexts = newContexts;
 			if(DCase.getTopGoal() === node){

@@ -3,28 +3,37 @@
 ///<reference path='./api.ts'/>
 ///<reference path='./ads.ts'/>
 
+interface CommitInformation {
+	commitId: number;
+	dateTime: string;
+	commitMessage?: string;
+	userId: number;
+	userName?: string; //FIXME not Exist in DCaseAPI.getCommitList(...)
+	latest?: bool;
+}
+
 class TimeLine {
-	$timeline: any;  //FIXME
-	$canvas: any;    //FIXME
-	$container: any; //FIXME
+	$timeline: JQuery;
+	$canvas: JQuery;
+	$container: JQuery;
 	titleString : string = "";//FIXME
 
 	visibleFlag: bool = false;
 	scrollX: number = 0;
-	mouseX: any = null;
+	mouseX: number = null;
 	dragX: number = 0;
 
-	selected = null;
+	selected: JQuery = null;
 	MX: number = 24;
 	MY: number = 24;
 	NX: number = 50;
 	NY: number = 30;
 
-	argument: any = null;   //FIXME
-	onDCaseSelected: (dcaseId: any, commitId: any, isLatest: any) => bool;
+	argument: DCaseModel = null;
+	onDCaseSelected: (dcaseId: number, commitId: number, isLatest: bool) => bool;
 
 
-	constructor($root: string) {
+	constructor($root: JQuery) {
 		this.titleString = "<div></div>";
 		this.$timeline = $(this.titleString)    //FIXME
 			.addClass("timeline")
@@ -45,18 +54,18 @@ class TimeLine {
 
 	//--------------------------------------------------------
  
-		this.$timeline.mousedown((e) => {
+		this.$timeline.mousedown((e: JQueryMouseEventObject) => {
 			this.mouseX = e.pageX;
 		});
 
-		this.$timeline.mousemove((e) => {
+		this.$timeline.mousemove((e: JQueryMouseEventObject) => {
 			if(this.mouseX != null) {
 				this.dragX = e.pageX - this.mouseX;
 				this.drag();
 			}
 		});
 
-		this.$timeline.mouseup((e) => {
+		this.$timeline.mouseup((e: JQueryMouseEventObject) => {
 			this.scrollX += this.dragX;
 			this.dragX = 0;
 			this.mouseX = null;
@@ -66,7 +75,7 @@ class TimeLine {
 
 	//-------------------------------------------------------
 
-	repaint(arg) {
+	repaint(arg: DCaseModel): void {
 		this.argument = arg;
 		this.$container.empty();
 
@@ -74,19 +83,19 @@ class TimeLine {
 			return;
 		}
 
-		var mm = {};
-		var l = (<any>DCaseAPI).getCommitList(arg.getArgumentId());//FIXME
-		for(var i=0; i<l.length-1; i++) {
-			var x = mm[l[i].commitId];
-			if(x == null) x = [];
+		var mm: number[][] = [];
+		var l: CommitInformation[] = DCaseAPI.getCommitList(arg.getArgumentId());
+		for(var i: number = 0; i < l.length - 1; i++) {
+			var x: number[] = [];
+			if(mm[l[i].commitId]) x = mm[l[i].commitId];
 			if(x.indexOf(l[i+1].commitId) == -1) x.push(l[i + 1].commitId);
 			mm[l[i].commitId] = x;
 			l[i].latest = false;
 		}
 		l[l.length-1].latest = true;
 
-		var ci = {};
-		for(var i=0; i<l.length; i++) {
+		var ci: CommitInformation[] = [];
+		for(var i: number = 0; i < l.length; i++) {
 			ci[l[i].commitId] = l[i];
 		}
 		//$.each(DCaseAPI.getBranchList(arg.argId), function(i, br) {
@@ -102,7 +111,7 @@ class TimeLine {
 		//});
 		this.selected = null;
 
-		var b = this.calcSize(mm, 0, 0, l[0].commitId);
+		var b: { w: number; h: number; } = this.calcSize(mm, 0, 0, l[0].commitId);
 		b.w += this.MX * 2;
 		b.h += this.MY * 2;
 		this.$timeline.height(b.h);
@@ -116,10 +125,10 @@ class TimeLine {
 		this.$canvas.attr("top", this.MX/2);
 		this.$canvas.css("top", this.MX/2);
 
-		var ctx = (<any>this.$canvas[0]).getContext("2d");
+		var ctx: CanvasRenderingContext2D = (<HTMLCanvasElement>this.$canvas[0]).getContext("2d"); //FIXME
 		ctx.clearRect(0, 0, this.$canvas.width(), this.$canvas.height());
 		ctx.beginPath();
-		var y = this.put(ctx, mm, ci, 0, 0, l[0].commitId);
+		var y: number = this.put(ctx, mm, ci, 0, 0, l[0].commitId);
 		ctx.stroke();
 
 		this.scrollX = (this.$timeline.width() - b.w) / 2;
@@ -128,7 +137,7 @@ class TimeLine {
 
 	visible(b?: bool): void {
 		if(b == null) {
-		this.visibleFlag = !this.visibleFlag;
+			this.visibleFlag = !this.visibleFlag;
 		} else {
 			this.visibleFlag = b;
 		}
@@ -141,15 +150,15 @@ class TimeLine {
 		this.$canvas.css("left", this.scrollX + this.dragX);
 	}
 
-	calcSize(mm: any, x: number, y: number, id: number): any {  //FIXME
-		var b: any = { w: x, h: y };
-		var c: any = mm[id];
+	calcSize(mm: number[][], x: number, y: number, id: number): { w: number; h: number; } {
+		var b: { w: number; h: number; } = { w: x, h: y };
+		var c: number[] = mm[id];
 		if(c != null) {
-			var b1: any = this.calcSize(mm, x+this.NX, y, c[0]);
+			var b1: { w: number; h: number; } = this.calcSize(mm, x+this.NX, y, c[0]);
 			b.w = Math.max(b.w, b1.w);
 			y = b.h = Math.max(b.h, b1.h);
-			for(var i=1; i<c.length; i++) {
-				var b2 = this.calcSize(mm, x+this.NX, y+this.NY, c[i]);
+			for(var i: number = 1; i < c.length; i++) {
+				var b2: { w: number; h: number; } = this.calcSize(mm, x+this.NX, y+this.NY, c[i]);
 				b.w = Math.max(b.w, b2.w);
 				y = b.h = Math.max(b.h, b2.h);
 			}
@@ -157,16 +166,16 @@ class TimeLine {
 		return b;
 	}
 
-	put(ctx: any, mm: any, l: any, x: number, y: number, id: number): number {
+	put(ctx: CanvasRenderingContext2D, mm: number[][], l: CommitInformation[], x: number, y: number, id: number): number {
 		this.addCommitMark(x, y, l, id);
-		var c: any = mm[id];
+		var c: number[] = mm[id];
 		if(c != null) {
 			var y0: number = y;
 			y = this.put(ctx, mm, l, x+this.NX, y, c[0]);
 			ctx.moveTo(x+this.MX/2   , y0+this.MY/2);
 			ctx.lineTo(x+this.MX/2+this.NX, y0+this.MY/2);
-			for(var i=1; i<c.length; i++) {
-				var y1 = y;
+			for(var i: number = 1; i < c.length; i++) {
+				var y1: number = y;
 				y = this.put(ctx, mm, l, x+this.NX, y+this.NY, c[i]);
 				ctx.moveTo(x+this.MX/2   , y0+this.MY/2);
 				ctx.lineTo(x+this.MX/2   , y1+this.NY+this.MY/2);
@@ -176,12 +185,12 @@ class TimeLine {
 		return y;
 	}
 
-	addCommitMark(x: number, y: number, list: any, commitId: number): void {    //FIXME
-		var $d: any = $(this.titleString).css({
+	addCommitMark(x: number, y: number, list: CommitInformation[], commitId: number): void {
+		var $d: JQuery = $(this.titleString).css({
 			left: x, top: y, width: this.MX, height: this.MY,
 		}).addClass("timeline-commit").appendTo(this.$container);
 
-		var info: any = list[commitId]; //FIXME
+		var info: CommitInformation = list[commitId];
 		//var timefmt = DateFormatter(info.time).format();
 
 		$d.popover({
@@ -216,25 +225,25 @@ class TimeLine {
 class TimeLineView {
 	timeline: TimeLine;
 
-	constructor($body, viewer, isLogin) {
+	constructor($body: JQuery, viewer: DCaseViewer, isLogin: bool) {
 		this.timeline = new TimeLine($body);
 
-		$("#menu-history-toggle").click((e) => {
+		$("#menu-history-toggle").click((e: JQueryEventObject) => {
 			this.timeline.visible();
 			e.preventDefault();
 		});
 
-		this.timeline.onDCaseSelected = (dcaseId, commitId, isLatest) => {
-			var dcase = viewer.getDCase();
+		this.timeline.onDCaseSelected = (dcaseId: number, commitId: number, isLatest: bool) => {
+			var dcase: DCaseModel = viewer.getDCase();
 			//var dcase_latest = dcase;
 			if(dcase != null && dcase.isChanged()) {
 				viewer.dcase_latest = dcase;
 			}
-			viewer.editable = isLatest && isLogin;//FIXME
+			viewer.editable = isLatest && isLogin; //FIXME
 			if(isLatest && viewer.dcase_latest != null) {
 				viewer.setDCase(viewer.dcase_latest);
 			} else {
-				var tree = (<any>DCaseAPI).getNodeTree(commitId);
+				var tree: DCaseTreeRawData = DCaseAPI.getNodeTree(commitId);
 				viewer.setDCase(new DCaseModel(tree, dcaseId, commitId));
 			}
 			return true;
@@ -242,7 +251,7 @@ class TimeLineView {
 
 	}
 
-	repaint(dcase) : void {
+	repaint(dcase: DCaseModel) : void {
 		this.timeline.repaint(dcase);
 	}
 }
