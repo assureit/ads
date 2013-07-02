@@ -198,11 +198,11 @@ class DCaseNodeModel {
 	}
 
 	getHtmlMetadata(): JQuery { 
-		var innerText: string = generateMetadata(this).join("\n");
+		var innerText: string = generateMetadata(this);
 		var divText: string = "<div></div>";
-		if(innerText != "") {
-			divText = "<div>Metadata</div>";
-		}
+		//if(innerText != "") {
+		//	divText = "<div>Metadata</div>";
+		//}
 		return $(divText).append($("<font color=\"black\">" + innerText.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") + "</font>")).addClass("node-text-metadata").css("background-color", "gray").css("opacity", "0.5");
 	}
 

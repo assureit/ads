@@ -137,28 +137,30 @@ function checkKeyValue(str: string): bool {
 	return str.indexOf(":") != -1;
 }
 
-function findVaridMetaData(body: string[]): number {
-	body = body.join("\n").trim().split("\n");
+function findVaridMetaData(body: string): string[] {
+	var bodies: string[] = body.trim().split("---");
 
-	if (checkKeyValue(body[0])) {
-		return 0;
+	if (checkKeyValue(body.split("\n")[0])) {
+		return bodies;
 	}
 
-	var emptyLineIndex: number;
-	for (emptyLineIndex = 0; emptyLineIndex < body.length; emptyLineIndex++) {
-		if (body[emptyLineIndex] == "") {
-			while (emptyLineIndex+1 < body.length && body[emptyLineIndex+1] == "") {
+	/* Check if the first element of markdown is key-value */
+	var firstbody: string[] = bodies[0].split("\n");
+	var emptyLineIndex: number = 0;
+	//for (emptyLineIndex = 0; emptyLineIndex < firstbody.length; emptyLineIndex++) {
+	//	if (firstbody[emptyLineIndex] == "") {
+			while (emptyLineIndex+1 < firstbody.length && firstbody[emptyLineIndex] == "") {
 				emptyLineIndex++;
 			}
-			break;
-		}
+	//		break;
+	//	}
+	//}
+	if (emptyLineIndex < firstbody.length-1 && checkKeyValue(firstbody[emptyLineIndex+1])) {
+		return bodies;
+		//return emptyLineIndex+1;
 	}
 
-	if (emptyLineIndex < body.length-1 && checkKeyValue(body[emptyLineIndex+1])) {
-		return emptyLineIndex+1;
-	}
-
-	return -1;
+	return bodies.slice(1);
 }
 
 
@@ -186,12 +188,13 @@ function parseMetaData(data: string[]): DCaseMetaContent {
 	return metadata;
 }
 
-function generateMetadata(n: DCaseNodeModel): string[] {
+function generateMetadata(n: DCaseNodeModel): string {
 	var metadata: DCaseMetaContent[] = n.metadata;
 	var list: string[] = [];
 	for (var i = 0; i < metadata.length; i++) {
 		var keys: string[] = Object.keys(metadata[i]);
-		var data: string = (keys.length > 0) ? "\n" : "";
+		//var data: string = (keys.length > 0) ? "\n" : "";
+		var data: string = "---\n";
 		for (var j: number = 0; j < keys.length; j++) {
 			var key: string = keys[j];
 			if (key != "Description") {
@@ -205,21 +208,31 @@ function generateMetadata(n: DCaseNodeModel): string[] {
 		}
 		list.push(data);
 	}
-	return list;
+	return list.join("\n");
 }
 
-function parseNodeBody(body: string[]): DCaseNodeBody {
-	var metadata: DCaseMetaContent = {};
+function parseNodeBody(body: string): DCaseNodeBody {
+	var metadata: DCaseMetaContent[] = [];
 	var description: string;
-	var metadataIndex: number = findVaridMetaData(body);
-	if (metadataIndex != -1) {
-		description = body.slice(0, metadataIndex).join("\n");
-		metadata = parseMetaData(body.slice(metadataIndex));
+	var metadataTexts: string[] = findVaridMetaData(body);
+	if (metadataTexts[0] != "" && body.indexOf(metadataTexts[0]) != 0) {
+		description = body.split("---")[0].trim();
 	} else {
-		description = body.join("\n").trim();
+		description = "";
+	}
+	//return null;
+	for (var i = 0; i < metadataTexts.length; i++) {
+		metadata.push(parseMetaData(metadataTexts[i].trim().split("\n")));
 	}
 
-	return {description: description, metadata: [metadata]};
+	//if (metadataIndex != -1) {
+	//	description = body.slice(0, metadataIndex).join("\n");
+	//	metadata = parseMetaData(body.slice(metadataIndex));
+	//} else {
+	//	description = body.join("\n").trim();
+	//}
+
+	return {description: description, metadata: metadata};
 }
 
 function DNodeView_InplaceEdit(self: DNodeView): void {
@@ -249,7 +262,7 @@ function DNodeView_InplaceEdit(self: DNodeView): void {
 			var heads: string[] = lines[0].trim().split(/\s+/);
 
 			/* handle metadata */
-			var body: string[] = lines.slice(1).join("\n").trim().split("\n");
+			var body: string = lines.slice(1).join("\n").trim();
 			var parsedBody: DCaseNodeBody = parseNodeBody(body);
 
 			var node: DCaseNodeModel = new DCaseNodeModel(
@@ -446,7 +459,7 @@ function DNodeView_ToolBox(self: DNodeView): void {
 				self.viewer.$root.one("click", () => {
 					var text: string = $edit.find("textarea").attr("value");
 					if(text != "") {
-						var parsedBody: DCaseNodeBody = parseNodeBody(text.trim().split("\n"));
+						var parsedBody: DCaseNodeBody = parseNodeBody(text.trim());
 						self.viewer.getDCase().insertNode(self.node, type_selected, parsedBody.description, parsedBody.metadata);
 					}
 					edit_close();

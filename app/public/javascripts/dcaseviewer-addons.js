@@ -121,23 +121,19 @@ function checkKeyValue(str) {
     return str.indexOf(":") != -1;
 }
 function findVaridMetaData(body) {
-    body = body.join("\n").trim().split("\n");
-    if(checkKeyValue(body[0])) {
-        return 0;
+    var bodies = body.trim().split("---");
+    if(checkKeyValue(body.split("\n")[0])) {
+        return bodies;
     }
-    var emptyLineIndex;
-    for(emptyLineIndex = 0; emptyLineIndex < body.length; emptyLineIndex++) {
-        if(body[emptyLineIndex] == "") {
-            while(emptyLineIndex + 1 < body.length && body[emptyLineIndex + 1] == "") {
-                emptyLineIndex++;
-            }
-            break;
-        }
+    var firstbody = bodies[0].split("\n");
+    var emptyLineIndex = 0;
+    while(emptyLineIndex + 1 < firstbody.length && firstbody[emptyLineIndex] == "") {
+        emptyLineIndex++;
     }
-    if(emptyLineIndex < body.length - 1 && checkKeyValue(body[emptyLineIndex + 1])) {
-        return emptyLineIndex + 1;
+    if(emptyLineIndex < firstbody.length - 1 && checkKeyValue(firstbody[emptyLineIndex + 1])) {
+        return bodies;
     }
-    return -1;
+    return bodies.slice(1);
 }
 function parseMetaData(data) {
     var metadata = {
@@ -165,7 +161,7 @@ function generateMetadata(n) {
     var list = [];
     for(var i = 0; i < metadata.length; i++) {
         var keys = Object.keys(metadata[i]);
-        var data = (keys.length > 0) ? "\n" : "";
+        var data = "---\n";
         for(var j = 0; j < keys.length; j++) {
             var key = keys[j];
             if(key != "Description") {
@@ -179,24 +175,23 @@ function generateMetadata(n) {
         }
         list.push(data);
     }
-    return list;
+    return list.join("\n");
 }
 function parseNodeBody(body) {
-    var metadata = {
-    };
+    var metadata = [];
     var description;
-    var metadataIndex = findVaridMetaData(body);
-    if(metadataIndex != -1) {
-        description = body.slice(0, metadataIndex).join("\n");
-        metadata = parseMetaData(body.slice(metadataIndex));
+    var metadataTexts = findVaridMetaData(body);
+    if(metadataTexts[0] != "" && body.indexOf(metadataTexts[0]) != 0) {
+        description = body.split("---")[0].trim();
     } else {
-        description = body.join("\n").trim();
+        description = "";
+    }
+    for(var i = 0; i < metadataTexts.length; i++) {
+        metadata.push(parseMetaData(metadataTexts[i].trim().split("\n")));
     }
     return {
         description: description,
-        metadata: [
-            metadata
-        ]
+        metadata: metadata
     };
 }
 function DNodeView_InplaceEdit(self) {
@@ -220,7 +215,7 @@ function DNodeView_InplaceEdit(self) {
         for(var i = 0; i < nodesrc.length; ++i) {
             var lines = nodesrc[i].split(/\r\n|\r|\n/);
             var heads = lines[0].trim().split(/\s+/);
-            var body = lines.slice(1).join("\n").trim().split("\n");
+            var body = lines.slice(1).join("\n").trim();
             var parsedBody = parseNodeBody(body);
             var node = new DCaseNodeModel(parseInt(heads[2]), heads[1], findMostSimilarNodeType(heads[0]), parsedBody.description, parsedBody.metadata);
             nodes.push(node);
@@ -390,7 +385,7 @@ function DNodeView_ToolBox(self) {
                 self.viewer.$root.one("click", function () {
                     var text = $edit.find("textarea").attr("value");
                     if(text != "") {
-                        var parsedBody = parseNodeBody(text.trim().split("\n"));
+                        var parsedBody = parseNodeBody(text.trim());
                         self.viewer.getDCase().insertNode(self.node, type_selected, parsedBody.description, parsedBody.metadata);
                     }
                     edit_close();
