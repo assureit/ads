@@ -130,8 +130,6 @@ function findVaridMetaData(body) {
     while(emptyLineIndex + 1 < firstbody.length && firstbody[emptyLineIndex] == "") {
         emptyLineIndex++;
     }
-    console.log("emptyLineIndex");
-    console.log(emptyLineIndex);
     if(emptyLineIndex < firstbody.length - 1 && checkKeyValue(firstbody[emptyLineIndex + 1])) {
         return bodies;
     }
@@ -180,8 +178,6 @@ function generateMetadata(n) {
     return list.join("\n");
 }
 function parseNodeBody(body) {
-    console.log("body");
-    console.log(body);
     var metadata = [];
     var description;
     var metadataTexts = findVaridMetaData(body);
@@ -190,15 +186,9 @@ function parseNodeBody(body) {
     } else {
         description = "";
     }
-    console.log("metadataTexts");
-    console.log(metadataTexts);
     for(var i = 0; i < metadataTexts.length; i++) {
         metadata.push(parseMetaData(metadataTexts[i].trim().split("\n")));
     }
-    console.log("description");
-    console.log(description);
-    console.log("metadata");
-    console.log(metadata);
     return {
         description: description,
         metadata: metadata

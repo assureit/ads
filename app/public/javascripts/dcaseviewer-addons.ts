@@ -155,8 +155,6 @@ function findVaridMetaData(body: string): string[] {
 	//		break;
 	//	}
 	//}
-	console.log("emptyLineIndex");
-	console.log(emptyLineIndex);
 	if (emptyLineIndex < firstbody.length-1 && checkKeyValue(firstbody[emptyLineIndex+1])) {
 		return bodies;
 		//return emptyLineIndex+1;
@@ -214,8 +212,6 @@ function generateMetadata(n: DCaseNodeModel): string {
 }
 
 function parseNodeBody(body: string): DCaseNodeBody {
-	console.log("body");
-	console.log(body);
 	var metadata: DCaseMetaContent[] = [];
 	var description: string;
 	var metadataTexts: string[] = findVaridMetaData(body);
@@ -224,8 +220,6 @@ function parseNodeBody(body: string): DCaseNodeBody {
 	} else {
 		description = "";
 	}
-	console.log("metadataTexts");
-	console.log(metadataTexts);
 	//return null;
 	for (var i = 0; i < metadataTexts.length; i++) {
 		metadata.push(parseMetaData(metadataTexts[i].trim().split("\n")));
@@ -238,10 +232,6 @@ function parseNodeBody(body: string): DCaseNodeBody {
 	//	description = body.join("\n").trim();
 	//}
 
-	console.log("description");
-	console.log(description);
-	console.log("metadata");
-	console.log(metadata);
 	return {description: description, metadata: metadata};
 }
 
