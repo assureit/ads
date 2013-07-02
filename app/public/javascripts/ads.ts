@@ -305,6 +305,20 @@ class ADS {
 	};
 
 	initDefaultEventListeners(): void {
+
+		$("#ads-logo").click((e)=> {
+			if($("#ads-logo").hasClass('navbar-hide')) {
+				$(".navbar").removeClass('navbar-hide');
+				//$("#viewer").removeClass('navbar-hide');
+				$("#ads-logo").removeClass('navbar-hide');
+			} else {
+				$(".navbar").addClass('navbar-hide');
+				//$("#viewer").addClass('navbar-hide');
+				$("#ads-logo").addClass('navbar-hide');
+			}
+			e.preventDefault();
+		});
+
 		$("#menu-commit").click((e)=> {
 			this.commit();
 			e.preventDefault();

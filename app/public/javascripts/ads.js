@@ -262,6 +262,16 @@ var ADS = (function () {
     };
     ADS.prototype.initDefaultEventListeners = function () {
         var _this = this;
+        $("#ads-logo").click(function (e) {
+            if($("#ads-logo").hasClass('navbar-hide')) {
+                $(".navbar").removeClass('navbar-hide');
+                $("#ads-logo").removeClass('navbar-hide');
+            } else {
+                $(".navbar").addClass('navbar-hide');
+                $("#ads-logo").addClass('navbar-hide');
+            }
+            e.preventDefault();
+        });
         $("#menu-commit").click(function (e) {
             _this.commit();
             e.preventDefault();
