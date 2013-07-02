@@ -9,10 +9,21 @@ body {
 
 #viewer {
 	left: 0px;
-	top : 40px;
+	top : 0px;
 	width : 100%;
+	min-height: 100%;
 	bottom: 0px;
+	-webkit-transition: all 0.5s ease-in-out;
 }
+
+.navbar {
+	-webkit-transition: all 0.5s ease-in-out;
+}
+
+.navbar-hide {
+	-webkit-transform: translate(0,-40px);
+}
+
 #dcase-manager {
 	margin-top: 60px;
 }
@@ -21,4 +32,6 @@ body {
 	right: 0px;
 	top: 45px;
 	width: 233px;
+	z-index: 255;
+	-webkit-transition: all 0.5s ease-in-out;
 }
