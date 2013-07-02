@@ -49,66 +49,136 @@ class CreateDCaseView {
 	};
 }
 
+class SelectDCaseContent {
+	constructor(public id: number, public name: string, public user: string, public lastDate: any, public lastUser: any, public isLogin: bool) {
+	}
+
+	toHtml(callback: (id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool) => JQuery) : JQuery {
+		return callback(this.id, this.name, this.user, this.lastDate, this.lastUser, this.isLogin);
+	}
+
+	setEvent() : void {
+		if(this.isLogin) {
+			$("a#e"+this.id).click((e)=>{
+				var msg = prompt("dcase名を入力して下さい");
+				if(msg != null) {
+					if(DCaseAPI.editDCase(this.id, msg) != null) {
+						alert("変更しました");
+						location.reload();
+					}
+				}
+			});
+			$("a#d"+this.id).click((e)=>{
+				if(window.confirm('dcaseを削除しますか?')) {
+					if(DCaseAPI.deleteDCase(this.id) != null) {
+						alert("削除しました");
+						location.reload();
+					}
+				}
+			});
+		}
+	}
+}
+
+class SelectDCaseManager {
+	contents: SelectDCaseContent[] = [];
+	
+	constructor() {}
+	clear() : void {}
+	updateContentsOrZeroView():void {}
+
+	add(s: SelectDCaseContent): void {
+		this.contents.push(s);
+	}
+
+	_updateContentsOrZeroView($tbody: JQuery, zeroStr: string, callback: (id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool) => JQuery):void {
+		if(this.contents.length == 0) {
+			$(zeroStr).appendTo($tbody);
+		}
+		$.each(this.contents, (i, s) => {
+			s.toHtml(callback).appendTo($tbody);
+			s.setEvent();
+		});
+	}
+}
+
+class ThumnailView {
+	static toThumnail(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
+		var html = '<ul class="thumbnails"><li class="span4"><a href="#" class="thumbnail">'+name+'</a></li></ul>';
+		return $('<div></div>').html(html);
+	}
+}
+
+class SelectDCaseThumbnailManager extends SelectDCaseManager{
+	constructor() {
+		super();
+	}
+
+	clear() : void {
+		$("#selectDCase *").remove();
+		$("#selectDCase").append('<div class="row-fluid"></div>');
+	}
+
+	updateContentsOrZeroView():void {
+		super._updateContentsOrZeroView($('#selectDCase .row-fluid'), "<font color=gray>DCaseがありません</font>", ThumnailView.toThumnail);
+	}
+}
+
+class TableView {
+	static toTable(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
+		var html = '<td><a href="' + Config.BASEPATH + '/dcase/' + id + '">' + name +
+				"</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" +
+				lastUser + "</td>";
+		if(isLogin) {
+			html += "<td><a id=\"e"+ id +"\" href=\"#\">Edit</a></td>"
+				+ "<td><a id=\"d"+ id +"\" href=\"#\">Delete</a></td>";
+		}
+		return $("<tr></tr>").html(html);
+	}
+}
+
+class SelectDCaseTableManager extends SelectDCaseManager{
+	constructor() {
+		super();
+	}
+
+	clear() : void {
+		$("tbody#dcase-select-table *").remove();
+	}
+
+	updateContentsOrZeroView():void {
+		super._updateContentsOrZeroView($('#dcase-select-table'), "<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>", TableView.toTable);
+	}
+}
+
 class SelectDCaseView {
 	pageIndex: number;
 	maxPageSize: number;
+	manager: SelectDCaseManager;
 
 	constructor() {
 		this.pageIndex = 1;
 		this.maxPageSize = 2;
+		this.manager = new SelectDCaseTableManager();
 	}
 
-	clearTable(): void{
-		$("tbody#dcase-select-table *").remove();
+	clear(): void {
+		this.manager.clear();
 	}
 
-	addTable(userId, pageIndex): void{
+	addElements(userId, pageIndex): void {
 		if(pageIndex == null || pageIndex < 1) pageIndex = 1;
 		this.pageIndex = pageIndex - 0;
-		var $tbody = $("#dcase-select-table");
 		var searchResults: any = DCaseAPI.searchDCase(this.pageIndex);
 		var dcaseList : any = searchResults.dcaseList;
 		this.maxPageSize  = searchResults.summary.maxPage;
-		if(dcaseList.length == 0) {
-			$("<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>")
-			.appendTo($tbody);
-		}
-		$.each(dcaseList, (i, dcase) => {
-			var id = dcase.dcaseId;
-			var name = dcase.dcaseName;
-			var user = dcase.userName;
-			var lastDate: any = dcase.latestCommit.dateTime;//new DateFormatter(dcase.latestCommit.time).format();
-			var lastUser: any = dcase.latestCommit.userName;
-			var html = '<td><a href="' + Config.BASEPATH + '/dcase/' + id + '">' + name +
-					"</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" +
-					lastUser + "</td>";
-			if(userId != null) {
-				html += "<td><a id=\"e"+ id +"\" href=\"#\">Edit</a></td>"
-					+ "<td><a id=\"d"+ id +"\" href=\"#\">Delete</a></td>";
-			}
-			$("<tr></tr>")
-				.html(html)
-				.appendTo($tbody);
-			if(userId != null) {
-				$("a#e"+id).click(function(){
-					var msg = prompt("dcase名を入力して下さい");
-					if(msg != null) {
-						if(DCaseAPI.editDCase(id, msg) != null) {
-							alert("変更しました");
-							location.reload();
-						}
-					}
-				});
-				$("a#d"+id).click(function(){
-					if(window.confirm('dcaseを削除しますか?')) {
-						if(DCaseAPI.deleteDCase(id) != null) {
-							alert("削除しました");
-							location.reload();
-						}
-					}
-				});
-			}
+
+		var isLogin = userId != null;
+		$.each(dcaseList, (i, dcase)=>{
+			var s:SelectDCaseContent = new SelectDCaseContent(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
+			this.manager.add(s);
 		});
+		this.manager.updateContentsOrZeroView();
 	}
 
 	initEvents() {

@@ -57,8 +57,8 @@ class ADS {
 		$("#dcase-manager").css("display", "block");
 
 		if(selectDCaseView != null) {
-			selectDCaseView.clearTable();
-			selectDCaseView.addTable(userId, pageIndex);
+			selectDCaseView.clear();
+			selectDCaseView.addElements(userId, pageIndex);
 		}
 	}
 
