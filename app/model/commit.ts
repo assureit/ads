@@ -4,6 +4,7 @@ import model = module('./model')
 import model_user = module('./user')
 import model_node = module('../model/node')
 import model_issue = module('../model/issue')
+import model_monitor = module('../model/monitor')
 var async = require('async')
 
 export interface InsertArg {
@@ -98,6 +99,12 @@ export class CommitDAO extends model.DAO {
 			, (com: Commit, commitId: number, callback) => {
 				var issueDAO = new model_issue.IssueDAO(this.con);
 				issueDAO.publish(com.dcaseId, (err:any) => {
+					callback(err, com, commitId);
+				});
+			} 
+			, (com: Commit, commitId: number, callback) => {
+				var monitorDAO = new model_monitor.MonitorDAO(this.con);
+				monitorDAO.publish(com.dcaseId, (err:any) => {
 					callback(err, {commitId: commitId});
 				});
 			} 

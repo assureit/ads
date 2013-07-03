@@ -13,8 +13,12 @@ app.post('/rec/api/1.0', function (req, res) {
 });
 describe('api', function () {
     describe('rec', function () {
+        var server = null;
         before(function (done) {
-            app.listen(3030).on('listening', done);
+            server = app.listen(3030).on('listening', done);
+        });
+        after(function () {
+            server.close();
         });
         describe('getRawItemList', function () {
             it('call method', function (done) {

@@ -21,8 +21,13 @@ app.post('/rec/api/1.0', function (req: any, res: any) {
 
 describe('model', function() {
 	describe('monitor', function() {
+		var server = null;
 		before((done) => {
-			app.listen(3030).on('listening', done);
+			server = app.listen(3030).on('listening', done);
+		});
+
+		after(() => {
+			server.close();
 		});
 
 		var con: db.Database
