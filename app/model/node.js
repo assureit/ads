@@ -65,7 +65,7 @@ var NodeDAO = (function (_super) {
                 callback(null);
             });
             return;
-        } else if(meta.Type == 'Monitor') {
+        } else if(meta.Type == 'Monitor' && !meta._MonitorNodeId) {
             var monitorDAO = new model_monitor.MonitorDAO(this.con);
             var params = _.reduce(_.filter(_.flatten(_.map(_.filter(originalList, function (it) {
                 return _.find(node.Children, function (childId) {
