@@ -1,28 +1,76 @@
+///<reference path='../DefinitelyTyped/async/async.d.ts'/>
+
 import model = module('./model')
 import model_commit = module('./commit')
-import error = module('../api/error');
+import error = module('../api/error')
+import net_rec = module('../net/rec')
+var async = require('async')
 
-export interface InsertMonitor {
-        dcaseId: number;
-        thisNodeId: number;
-        preSetId?: number;
-        params?: string;
+// export interface InsertMonitor {
+//         dcaseId: number;
+//         thisNodeId: number;
+//         preSetId?: number;
+//         params?: string;
+// }
+
+export var PUBLISH_STATUS_NONE = 0;
+export var PUBLISH_STATUS_PUBLISHED = 1;
+export var PUBLISH_STATUS_UPDATED = 2;
+
+export class MonitorNode {
+	constructor(public id:number, public dcaseId:number, public thisNodeId:number, public watchId:string, public presetId:string, public params:any, public rebuttalThisNodeId?:number, public publishStatus?:number) {
+		if (!this.publishStatus) this.publishStatus = PUBLISH_STATUS_NONE;
+		if (!this.params) this.params = {};
+	}
+	static tableToObject(table: any) {
+		return new MonitorNode(table.id, table.dcase_id, table.this_node_id, table.watch_id, table.preset_id, table.params ? JSON.parse(table.params) : {}, table.rebuttal_this_node_id, table.publish_status);
+	}
 }
 
-
 export class MonitorDAO extends model.DAO {
-
-	insert(param: InsertMonitor, callback: (err: any, id: number) => void) {
-		this.con.query('INSERT INTO monitor_node(dcase_id, this_node_id, preset_id, params) VALUES(?,?,?,?) ', 
-				[param.dcaseId, param.thisNodeId , param.preSetId, param.params], (err, result) => {
+	get(id:number, callback:(err:any, monitor:MonitorNode)=>void) {
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT * FROM monitor_node WHERE id=?', [id], (err:any, result:any) => {
+					next(err, result);
+				});
+			}
+			, (result:any, next) => {
+				// TODO: NotFoundErrorチェック
+				var monitor = MonitorNode.tableToObject(result[0]);
+				next(null, monitor);
+			}
+		], (err:any, monitor:MonitorNode) => {
+			callback(err, monitor);
+		});
+	}
+	insert(monitor: MonitorNode, callback: (err: any, id: number) => void) {
+		async.waterfall([
+			(next) => {
+				this.con.query('INSERT INTO monitor_node (dcase_id, this_node_id, watch_id, preset_id, params) VALUES(?,?,?,?,?)', 
+						[monitor.dcaseId, monitor.thisNodeId , monitor.watchId, monitor.presetId, JSON.stringify(monitor.params)], (err:any, result:any) => {
+					next(err, result);
+				});
+			}
+		], (err:any, result:any) => {
 			if (err) {
 				callback(err, null);
 				return;
 			}
 			callback(err, result.insertId);
-
 		});
 	}
+	// insert(param: InsertMonitor, callback: (err: any, id: number) => void) {
+	// 	this.con.query('INSERT INTO monitor_node(dcase_id, this_node_id, preset_id, params) VALUES(?,?,?,?) ', 
+	// 			[param.dcaseId, param.thisNodeId , param.preSetId, param.params], (err, result) => {
+	// 		if (err) {
+	// 			callback(err, null);
+	// 			return;
+	// 		}
+	// 		callback(err, result.insertId);
+
+	// 	});
+	// }
 
 	update(id: number, rebuttal_id: number, callback: (err: any) => void) {
 		this.con.query('UPDATE monitor_node  SET rebuttal_this_node_id = ? where id = ?', [rebuttal_id, id], (err, result) => {
@@ -81,6 +129,102 @@ export class MonitorDAO extends model.DAO {
 			}
 			callback(err, result[0].its_id);	
 
+		});
+	}
+
+	updatePublished(monitor:MonitorNode, callback: (err:any, updated: MonitorNode) => void) {
+		async.waterfall([
+			(next) => {
+				this.con.query('UPDATE monitor_node SET publish_status=? WHERE id=?', [PUBLISH_STATUS_PUBLISHED, monitor.id], (err:any, result:any) => {
+					next(err);
+				});
+			}
+		], (err:any) => {
+			callback(err, monitor);
+		});
+	}
+
+	listNotPublished(dcaseId: number, callback: (err:any, result:MonitorNode[]) => void) {
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT * FROM monitor_node WHERE dcase_id=? AND publish_status != ?', [dcaseId, PUBLISH_STATUS_PUBLISHED], (err:any, result:any) => {
+					next(err, result);
+				});
+			}
+			, (result:any, next) => {
+				var list = [];
+				result.forEach((it:any) => {
+					list.push(MonitorNode.tableToObject(it));
+				});
+				next(null, list);
+			}
+		], (err:any, list:MonitorNode[]) => {
+			callback(err, list);
+		});
+	}
+
+	publish(dcaseId: number, callback: (err:any) => void) {
+		// async.waterfall([
+		// 	(next) => {
+		// 		this.get(previousCommitId, (err:any, com: Commit) => {callback(err, com);});
+		// 	}
+		// 	, (com: Commit, callback) => {
+		// 		this.insert({data: JSON.stringify(contents), prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message}, (err:any, commitId:number) => {callback(err, com, commitId);});
+		// 	}
+		// 	, (com: Commit, commitId: number, callback) => {
+		// 		var nodeDAO = new model_node.NodeDAO(this.con);
+		// 		nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, (err:any) => {callback(err, com, commitId);});
+		// 	}
+		// 	, (com: Commit, commitId: number, callback) => {
+		// 		this.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
+		// 	} 
+		// 	, (com: Commit, commitId: number, callback) => {
+		// 		var issueDAO = new model_issue.IssueDAO(this.con);
+		// 		issueDAO.publish(com.dcaseId, (err:any) => {
+		// 			callback(err, {commitId: commitId});
+		// 		});
+		// 	} 
+		// ], (err:any, result:any) => {
+		// 	commitCallback(err, result);
+		// });
+
+		this.listNotPublished(dcaseId, (err:any, list:MonitorNode[]) => {
+			if(err) {
+				callback(err);
+				return;
+			}
+			this._publish(list, callback);
+		});
+	}
+
+	_publish(list:MonitorNode[], callback: (err:any) => void) {
+		if (!list || list.length == 0) {
+			callback(null);
+			return;
+		}
+		var monitor = list[0];
+		var rec = new net_rec.Rec();
+		var method:string = (monitor.publishStatus == PUBLISH_STATUS_NONE) ? 'registMonitor' : 'updateMonitor';
+		rec.request(method, 
+				{
+					nodeID: monitor.id, 
+					name: 'DCase: ' + monitor.dcaseId + ' Node: ' + monitor.thisNodeId, 
+					watchID: monitor.watchId,
+					presetID: monitor.presetId,
+					params: monitor.params
+				}, (err:any, result:any) => {
+			if(err) {
+				callback(err);
+				return;
+			}
+			monitor.publishStatus = 1;
+			this.updatePublished(monitor, (err:any, updated:MonitorNode) => {
+				if(err) {
+					callback(err);
+					return;
+				}
+				this._publish(list.slice(1), callback);
+			});
 		});
 	}
 }
