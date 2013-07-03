@@ -8,6 +8,9 @@ var model_commit = require('./commit')
 var error = require('../api/error')
 var net_rec = require('../net/rec')
 var async = require('async');
+exports.PUBLISH_STATUS_NONE = 0;
+exports.PUBLISH_STATUS_PUBLISHED = 1;
+exports.PUBLISH_STATUS_UPDATED = 2;
 var MonitorNode = (function () {
     function MonitorNode(id, dcaseId, thisNodeId, watchId, presetId, params, rebuttalThisNodeId, publishStatus) {
         this.id = id;
@@ -18,6 +21,13 @@ var MonitorNode = (function () {
         this.params = params;
         this.rebuttalThisNodeId = rebuttalThisNodeId;
         this.publishStatus = publishStatus;
+        if(!this.publishStatus) {
+            this.publishStatus = exports.PUBLISH_STATUS_NONE;
+        }
+        if(!this.params) {
+            this.params = {
+            };
+        }
     }
     MonitorNode.tableToObject = function tableToObject(table) {
         return new MonitorNode(table.id, table.dcase_id, table.this_node_id, table.watch_id, table.preset_id, table.params ? JSON.parse(table.params) : {
@@ -32,13 +42,37 @@ var MonitorDAO = (function (_super) {
         _super.apply(this, arguments);
 
     }
-    MonitorDAO.prototype.insert = function (param, callback) {
-        this.con.query('INSERT INTO monitor_node(dcase_id, this_node_id, preset_id, params) VALUES(?,?,?,?) ', [
-            param.dcaseId, 
-            param.thisNodeId, 
-            param.preSetId, 
-            param.params
-        ], function (err, result) {
+    MonitorDAO.prototype.get = function (id, callback) {
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query('SELECT * FROM monitor_node WHERE id=?', [
+                    id
+                ], function (err, result) {
+                    next(err, result);
+                });
+            }, 
+            function (result, next) {
+                var monitor = MonitorNode.tableToObject(result[0]);
+                next(null, monitor);
+            }        ], function (err, monitor) {
+            callback(err, monitor);
+        });
+    };
+    MonitorDAO.prototype.insert = function (monitor, callback) {
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query('INSERT INTO monitor_node (dcase_id, this_node_id, watch_id, preset_id, params) VALUES(?,?,?,?,?)', [
+                    monitor.dcaseId, 
+                    monitor.thisNodeId, 
+                    monitor.watchId, 
+                    monitor.presetId, 
+                    JSON.stringify(monitor.params)
+                ], function (err, result) {
+                    next(err, result);
+                });
+            }        ], function (err, result) {
             if(err) {
                 callback(err, null);
                 return;
@@ -108,7 +142,8 @@ var MonitorDAO = (function (_super) {
         var _this = this;
         async.waterfall([
             function (next) {
-                _this.con.query('UPDATE monitor_node SET publish_status=1 WHERE id=?', [
+                _this.con.query('UPDATE monitor_node SET publish_status=? WHERE id=?', [
+                    exports.PUBLISH_STATUS_PUBLISHED, 
                     monitor.id
                 ], function (err, result) {
                     next(err);
@@ -121,8 +156,9 @@ var MonitorDAO = (function (_super) {
         var _this = this;
         async.waterfall([
             function (next) {
-                _this.con.query('SELECT * FROM monitor_node WHERE dcase_id=? AND publish_status != 1', [
-                    dcaseId
+                _this.con.query('SELECT * FROM monitor_node WHERE dcase_id=? AND publish_status != ?', [
+                    dcaseId, 
+                    exports.PUBLISH_STATUS_PUBLISHED
                 ], function (err, result) {
                     next(err, result);
                 });
@@ -155,7 +191,7 @@ var MonitorDAO = (function (_super) {
         }
         var monitor = list[0];
         var rec = new net_rec.Rec();
-        var method = (monitor.publishStatus == 0) ? 'registMonitor' : 'updateMonitor';
+        var method = (monitor.publishStatus == exports.PUBLISH_STATUS_NONE) ? 'registMonitor' : 'updateMonitor';
         rec.request(method, {
             nodeID: monitor.id,
             name: 'DCase: ' + monitor.dcaseId + ' Node: ' + monitor.thisNodeId,
