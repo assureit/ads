@@ -55,9 +55,9 @@ var DCaseDAO = (function (_super) {
             var list = new Array();
             result.forEach(function (row) {
                 var d = new DCase(row.d.id, row.d.name, row.d.user_id, row.d.delete_flag);
-                d.user = new model_user.User(row.u.id, row.u.name, row.u.delete_flag, row.u.system_flag);
+                d.user = new model_user.User(row.u.id, row.u.login_name, row.u.delete_flag, row.u.system_flag);
                 d.latestCommit = new model_commit.Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
-                d.latestCommit.user = new model_user.User(row.cu.id, row.cu.name, row.cu.delete_flag, row.cu.system_flag);
+                d.latestCommit.user = new model_user.User(row.cu.id, row.cu.login_name, row.cu.delete_flag, row.cu.system_flag);
                 list.push(d);
             });
             _this.con.query('SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ', function (err, countResult) {
