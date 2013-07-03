@@ -327,6 +327,49 @@ describe('api', function() {
 					}
 				);
 			});
+			it('UserId not found', function(done) {
+				dcase.createDCase(
+					{
+						dcaseName: 'test dcase', 
+						contents: {
+							NodeCount:3,
+							TopGoalId:1,
+							NodeList:[
+								{
+									ThisNodeId:1,
+									Description:"dcase1",
+									Children:[2],
+									NodeType:"Goal"
+								},
+								{
+									ThisNodeId:2,
+									Description:"s1",
+									Children:[3],
+									NodeType:"Strategy"
+								},
+								{
+									ThisNodeId:3,
+									Description:"g1",
+									Children:[],
+									NodeType:"Goal"
+								}
+							]
+						}
+					}, 99999, 
+					{
+						onSuccess: (result: any) => {
+							expect(result).to.be(null);	
+							done();
+						}, 
+						onFailure: (error: error.RPCError) => {
+							expect(error.rpcHttpStatus).to.be(200);
+							expect(error.code).to.be(19999);
+							expect(error.message).to.be('UserId Not Found.');
+							done();
+						},
+					}
+				);
+			});
 		});
 
 		describe('deleteDCase', function() {
@@ -343,6 +386,24 @@ describe('api', function() {
 					}
 				);
 			});
+			it('UserId Not Found', function(done) {
+				dcase.deleteDCase(
+					{dcaseId: 36}, 
+					99999, 
+					{
+						onSuccess: (result: any) => {
+							expect(result).to.be(null);	
+							done();
+						}, 
+						onFailure: (error: error.RPCError) => {
+							expect(error.rpcHttpStatus).to.be(200);
+							expect(error.code).to.be(19999);
+							expect(error.message).to.be('UserId Not Found.');
+							done();
+						},
+					}
+				);
+			});
 		});
 
 		describe('editDCase', function() {
@@ -356,6 +417,24 @@ describe('api', function() {
 							done();
 						}, 
 						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					}
+				);
+			});
+			it('UserId Not Found', function(done) {
+				dcase.editDCase(
+					{dcaseId: 37, dcaseName: 'modified dcase name'}, 
+					99999, 
+					{
+						onSuccess: (result: any) => {
+							expect(result).to.be(null);	
+							done();
+						}, 
+						onFailure: (error: error.RPCError) => {
+							expect(error.rpcHttpStatus).to.be(200);
+							expect(error.code).to.be(19999);
+							expect(error.message).to.be('UserId Not Found.');
+							done();
+						},
 					}
 				);
 			});
@@ -428,6 +507,79 @@ describe('api', function() {
 							done();
 						}, 
 						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					}
+				);
+			});
+			it('should return result', function(done) {
+				this.timeout(15000);
+				dcase.commit(
+					{
+						commitId: 12,
+						commitMessage: 'test',
+						contents: {
+							NodeCount:3,
+							TopGoalId:1,
+							NodeList:[
+								{
+									ThisNodeId:1,
+									Description:"dcase1",
+									Children:[2],
+									NodeType:"Goal",
+									MetaData: [
+										{   
+											Type: "Issue",
+											Subject: "このゴールを満たす必要がある",
+											Description: "詳細な情報をここに記述する",
+											Visible: "true",
+										},
+										{
+											Type: "LastUpdated",
+											User: "Shida",
+											Visible: "false",
+										},
+									]
+								},
+								{
+									ThisNodeId:2,
+									Description:"s1",
+									Children:[3],
+									NodeType:"Strategy",
+									MetaData:[]
+								},
+								{
+									ThisNodeId:3,
+									Description:"g1",
+									Children:[],
+									NodeType:"Goal",
+									MetaData: [
+										{   
+											Type: "Issue",
+											Subject: "2つ目のイシュー",
+											Description: "あああ詳細な情報をここに記述する",
+											Visible: "true"
+										},
+										{
+											Type: "LastUpdated",
+											User: "Shida",
+											Visible: "false",
+										},
+									]
+								}
+							]
+						}
+					}, 
+					99999, 
+					{
+						onSuccess: (result: any) => {
+							expect(result).to.be(null);	
+							done();
+						}, 
+						onFailure: (error: error.RPCError) => {
+							expect(error.rpcHttpStatus).to.be(200);
+							expect(error.code).to.be(19999);
+							expect(error.message).to.be('UserId Not Found.');
+							done();
+						},
 					}
 				);
 			});

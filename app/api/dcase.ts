@@ -8,6 +8,7 @@ import model_commit = module('../model/commit')
 import model_node = module('../model/node')
 import model_pager = module('../model/pager')
 import model_issue = module('../model/issue')
+import model_user = module('../model/user')
 import error = module('./error')
 var async = require('async')
 
@@ -121,27 +122,34 @@ export function searchNode(params:any, userId: number, callback: type.Callback) 
 export function createDCase(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
-		var dcaseDAO = new model_dcase.DCaseDAO(con);
-		dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName}, (err:any, dcaseId:number) => {
+		var userDAO = new model_user.UserDAO(con);
+		userDAO.select(userId, (err:any, user: model_user.User) => {
 			if (err) {
 				callback.onFailure(err);
 				return;
 			}
-			var commitDAO = new model_commit.CommitDAO(con);
-			commitDAO.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (err:any, commitId:number) => {
+			var dcaseDAO = new model_dcase.DCaseDAO(con);
+			dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName}, (err:any, dcaseId:number) => {
 				if (err) {
 					callback.onFailure(err);
 					return;
 				}
-				var nodeDAO = new model_node.NodeDAO(con);
-				nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, (err:any) => {
+				var commitDAO = new model_commit.CommitDAO(con);
+				commitDAO.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (err:any, commitId:number) => {
 					if (err) {
 						callback.onFailure(err);
 						return;
 					}
-					con.commit((err, result) =>{
-						callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
-						con.close();
+					var nodeDAO = new model_node.NodeDAO(con);
+					nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, (err:any) => {
+						if (err) {
+							callback.onFailure(err);
+							return;
+						}
+						con.commit((err, result) =>{
+							callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
+							con.close();
+						});
 					});
 				});
 			});
@@ -153,15 +161,23 @@ export function commit(params: any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	var commitDAO = new model_commit.CommitDAO(con);
 	con.begin((err, result) => {
-		// _commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
-		commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err, result) => {
-			con.commit((err, _result) =>{
-				if (err) {
-					callback.onFailure(err);
-					return;
-				}
-				callback.onSuccess(result);
-				con.close();
+		var userDAO = new model_user.UserDAO(con);
+		userDAO.select(userId, (err:any, user: model_user.User) => {
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
+		
+			// _commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
+			commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err, result) => {
+				con.commit((err, _result) =>{
+					if (err) {
+						callback.onFailure(err);
+						return;
+					}
+					callback.onSuccess(result);
+					con.close();
+				});
 			});
 		});
 	});
@@ -173,15 +189,22 @@ export function deleteDCase(params:any, userId: number, callback: type.Callback)
 
 	var con = new db.Database();
 	con.begin((err, result) => {
-		var dcaseDAO = new model_dcase.DCaseDAO(con);
-		dcaseDAO.remove(params.dcaseId, (err:any) => {
+		var userDAO = new model_user.UserDAO(con);
+		userDAO.select(userId, (err:any, user: model_user.User) => {
 			if (err) {
 				callback.onFailure(err);
 				return;
 			}
-			con.commit((err, result) =>{
-				callback.onSuccess({dcaseId: params.dcaseId});
-				con.close();
+			var dcaseDAO = new model_dcase.DCaseDAO(con);
+			dcaseDAO.remove(params.dcaseId, (err:any) => {
+				if (err) {
+					callback.onFailure(err);
+					return;
+				}
+				con.commit((err, result) =>{
+					callback.onSuccess({dcaseId: params.dcaseId});
+					con.close();
+				});
 			});
 		});
 	});
@@ -193,19 +216,26 @@ export function editDCase(params:any, userId: number, callback: type.Callback) {
 
 	var con = new db.Database();
 	con.begin((err, result) => {
-		var dcaseDAO = new model_dcase.DCaseDAO(con);
-		dcaseDAO.update(params.dcaseId, params.dcaseName, (err:any) => {
+		var userDAO = new model_user.UserDAO(con);
+		userDAO.select(userId, (err:any, user: model_user.User) => {
 			if (err) {
 				callback.onFailure(err);
 				return;
 			}
-			con.commit((err, result) =>{
+			var dcaseDAO = new model_dcase.DCaseDAO(con);
+			dcaseDAO.update(params.dcaseId, params.dcaseName, (err:any) => {
 				if (err) {
 					callback.onFailure(err);
 					return;
 				}
-				callback.onSuccess({dcaseId: params.dcaseId});
-				con.close();
+				con.commit((err, result) =>{
+					if (err) {
+						callback.onFailure(err);
+						return;
+					}
+					callback.onSuccess({dcaseId: params.dcaseId});
+					con.close();
+				});
 			});
 		});
 	});
