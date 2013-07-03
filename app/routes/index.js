@@ -1,6 +1,8 @@
 var childProcess = require('child_process')
 var fs = require('fs')
 var lang = require('./lang')
+var model_user = require('../model/user')
+var db = require('../db/db')
 var CONFIG = require('config');
 exports.index = function (req, res) {
     var page = 'signin';
@@ -68,9 +70,17 @@ exports.exporter = function (req, res) {
     });
 };
 exports.login = function (req, res) {
-    res.cookie('userId', '1');
-    res.cookie('userName', 'System');
-    res.redirect('/');
+    var con = new db.Database();
+    var userDAO = new model_user.UserDAO(con);
+    userDAO.login(req.body.username, req.body.password, function (err, result) {
+        if(err) {
+            res.redirect('/');
+            return;
+        }
+        res.cookie('userId', result.id);
+        res.cookie('userName', result.loginName);
+        res.redirect('/');
+    });
 };
 exports.logout = function (req, res) {
     res.clearCookie('userId');
@@ -78,5 +88,15 @@ exports.logout = function (req, res) {
     res.redirect('/');
 };
 exports.register = function (req, res) {
-    res.redirect('/');
+    var con = new db.Database();
+    var userDAO = new model_user.UserDAO(con);
+    userDAO.register(req.body.username, req.body.password, function (err, result) {
+        if(err) {
+            res.redirect('/');
+            return;
+        }
+        res.cookie('userId', result.id);
+        res.cookie('userName', result.loginName);
+        res.redirect('/');
+    });
 };
