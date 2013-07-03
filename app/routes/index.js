@@ -90,17 +90,13 @@ exports.logout = function (req, res) {
 exports.register = function (req, res) {
     var con = new db.Database();
     var userDAO = new model_user.UserDAO(con);
-    if(req.body.password == req.body.password2) {
-        userDAO.register(req.body.username, req.body.password, function (err, result) {
-            if(err) {
-                res.redirect('/');
-                return;
-            }
-            res.cookie('userId', result.id);
-            res.cookie('userName', result.loginName);
+    userDAO.register(req.body.username, req.body.password, function (err, result) {
+        if(err) {
             res.redirect('/');
-        });
-    } else {
+            return;
+        }
+        res.cookie('userId', result.id);
+        res.cookie('userName', result.loginName);
         res.redirect('/');
-    }
+    });
 };

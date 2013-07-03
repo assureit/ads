@@ -97,22 +97,15 @@ export var register = function(req: any, res: any) {
 	var con = new db.Database();
 	var userDAO = new model_user.UserDAO(con);
 
-	if (req.body.password == req.body.password2) {
-		userDAO.register(req.body.username, req.body.password, (err:any, result: model_user.User) => {
-			if (err) {
-				// TODO:エラー表示
-				res.redirect('/');
-				return;
-			}
-			res.cookie('userId', result.id);
-			res.cookie('userName', result.loginName);
+	userDAO.register(req.body.username, req.body.password, (err:any, result: model_user.User) => {
+		if (err) {
+			// TODO:エラー表示
 			res.redirect('/');
-		});
-	}
-	else
-	{
-		//TODO: passwordとpassword2が異なる場合のエラー表示
+			return;
+		}
+		res.cookie('userId', result.id);
+		res.cookie('userName', result.loginName);
 		res.redirect('/');
-	}
+	});
 
 };
