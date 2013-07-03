@@ -64,12 +64,9 @@ describe('model', function() {
 							});
 					}
 					, (next) => {
-						console.log('3');
 						monitorDAO.listNotPublished(40, (err:any, list:model_monitor.MonitorNode[]) => {
 							expect(list).not.to.be(null);
 							expect(list.length > 0).to.equal(true);
-							console.log(list);
-							var tested = 0;
 							list.forEach((it) => {
 								expect(it.id).not.to.equal(published);
 							});
@@ -82,5 +79,46 @@ describe('model', function() {
 				});
 			});
 		});
+
+		// describe('publish', function() {
+		// 	it('should update publish_status to 1', function(done) {
+		// 		var notPublishedList = [];
+		// 		var published = 0;
+		// 		async.waterfall([
+		// 			(next) => {
+		// 				con.query('INSERT INTO monitor_node(dcase_id, this_node_id, watch_id, preset_id, params) VALUES (?, ?, ?, ?, ?)', 
+		// 					[40, 1, 10, 100, JSON.stringify({a: 'val_a', b: 2})], 
+		// 					(err:any, result:any) => {
+		// 						if (!err) notPublishedList.push(result.insertId);
+		// 						next(err);
+		// 					});
+		// 			}
+		// 			, (next) => {
+		// 				con.query('INSERT INTO monitor_node(dcase_id, this_node_id, watch_id, preset_id, params, publish_status) VALUES (?, ?, ?, ?, ?, ?)', 
+		// 					[40, 2, 20, 200, null, 2], 
+		// 					(err:any, result:any) => {
+		// 						if (!err) notPublishedList.push(result.insertId);
+		// 						next(err);
+		// 					});
+		// 			}
+		// 			, (next) => {
+		// 				console.log('3');
+		// 				monitorDAO.listNotPublished(40, (err:any, list:model_monitor.MonitorNode[]) => {
+		// 					expect(list).not.to.be(null);
+		// 					expect(list.length > 0).to.equal(true);
+		// 					console.log(list);
+		// 					var tested = 0;
+		// 					list.forEach((it) => {
+		// 						expect(it.id).not.to.equal(published);
+		// 					});
+		// 					next(err);
+		// 				});
+		// 			}
+		// 		], (err:any, result:any) => {
+		// 			expect(err).to.be(null);
+		// 			done();
+		// 		});
+		// 	});
+		// });
 	});
 });

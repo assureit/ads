@@ -26,7 +26,7 @@ describe('model', function () {
             }
         });
         describe('listNotPublish', function () {
-            it('should create issue if metadata exists', function (done) {
+            it('should not select publish_status 1', function (done) {
                 var notPublishedList = [];
                 var published = 0;
                 async.waterfall([
@@ -78,12 +78,9 @@ describe('model', function () {
                         });
                     }, 
                     function (next) {
-                        console.log('3');
                         monitorDAO.listNotPublished(40, function (err, list) {
                             expect(list).not.to.be(null);
                             expect(list.length > 0).to.equal(true);
-                            console.log(list);
-                            var tested = 0;
                             list.forEach(function (it) {
                                 expect(it.id).not.to.equal(published);
                             });

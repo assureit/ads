@@ -105,29 +105,36 @@ var MonitorDAO = (function (_super) {
         });
     };
     MonitorDAO.prototype.updatePublished = function (monitor, callback) {
-        this.con.query('UPDATE monitor_node SET publish_status=1 WHERE id=?', [
-            monitor.id
-        ], function (err, result) {
-            if(err) {
-                callback(err, null);
-                return;
-            }
-            callback(null, monitor);
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query('UPDATE monitor_node SET publish_status=1 WHERE id=?', [
+                    monitor.id
+                ], function (err, result) {
+                    next(err);
+                });
+            }        ], function (err) {
+            callback(err, monitor);
         });
     };
     MonitorDAO.prototype.listNotPublished = function (dcaseId, callback) {
-        this.con.query('SELECT * FROM monitor_node WHERE dcase_id=? AND publish_status != 1', [
-            dcaseId
-        ], function (err, result) {
-            if(err) {
-                callback(err, null);
-                return;
-            }
-            var list = [];
-            result.forEach(function (it) {
-                list.push(MonitorNode.tableToObject(it));
-            });
-            callback(null, list);
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query('SELECT * FROM monitor_node WHERE dcase_id=? AND publish_status != 1', [
+                    dcaseId
+                ], function (err, result) {
+                    next(err, result);
+                });
+            }, 
+            function (result, next) {
+                var list = [];
+                result.forEach(function (it) {
+                    list.push(MonitorNode.tableToObject(it));
+                });
+                next(null, list);
+            }        ], function (err, list) {
+            callback(err, list);
         });
     };
     MonitorDAO.prototype.publish = function (dcaseId, callback) {

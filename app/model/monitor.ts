@@ -95,26 +95,33 @@ export class MonitorDAO extends model.DAO {
 	}
 
 	updatePublished(monitor:MonitorNode, callback: (err:any, updated: MonitorNode) => void) {
-		this.con.query('UPDATE monitor_node SET publish_status=1 WHERE id=?', [monitor.id], (err, result) => {
-			if (err) {
-				callback(err, null);
-				return;
+		async.waterfall([
+			(next) => {
+				this.con.query('UPDATE monitor_node SET publish_status=1 WHERE id=?', [monitor.id], (err:any, result:any) => {
+					next(err);
+				});
 			}
-			callback(null, monitor);
+		], (err:any) => {
+			callback(err, monitor);
 		});
 	}
 
 	listNotPublished(dcaseId: number, callback: (err:any, result:MonitorNode[]) => void) {
-		this.con.query('SELECT * FROM monitor_node WHERE dcase_id=? AND publish_status != 1', [dcaseId], (err, result) => {
-			if (err) {
-				callback(err, null);
-				return;
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT * FROM monitor_node WHERE dcase_id=? AND publish_status != 1', [dcaseId], (err:any, result:any) => {
+					next(err, result);
+				});
 			}
-			var list = [];
-			result.forEach((it:any) => {
-				list.push(MonitorNode.tableToObject(it));
-			});
-			callback(null, list);
+			, (result:any, next) => {
+				var list = [];
+				result.forEach((it:any) => {
+					list.push(MonitorNode.tableToObject(it));
+				});
+				next(null, list);
+			}
+		], (err:any, list:MonitorNode[]) => {
+			callback(err, list);
 		});
 	}
 
