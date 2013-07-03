@@ -2,6 +2,9 @@
 import childProcess = module('child_process')
 import fs           = module('fs')
 import lang = module('./lang')
+import model_user = module('../model/user')
+import db = module('../db/db')
+
 var CONFIG = require('config')
 //import ex = module('./exporter')
 
@@ -69,9 +72,19 @@ export var exporter = function(req: any, res: any) {
 };
 
 export var login = function(req: any, res: any) {
-	res.cookie('userId','1');
-	res.cookie('userName','System');
-	res.redirect('/');
+	var con = new db.Database();
+	var userDAO = new model_user.UserDAO(con);
+	
+	userDAO.login(req.body.username, req.body.password, (err:any, result: model_user.User) => {
+		if (err) {
+			//TODO:エラー表示
+			res.redirect('/');
+			return;
+		}
+		res.cookie('userId',result.id);
+		res.cookie('userName',result.loginName);
+		res.redirect('/');
+	});
 };
 
 export var logout = function(req: any, res: any) {
@@ -81,5 +94,25 @@ export var logout = function(req: any, res: any) {
 };
 
 export var register = function(req: any, res: any) {
-	res.redirect('/');
+	var con = new db.Database();
+	var userDAO = new model_user.UserDAO(con);
+
+	if (req.body.password == req.body.password2) {
+		userDAO.register(req.body.username, req.body.password, (err:any, result: model_user.User) => {
+			if (err) {
+				// TODO:エラー表示
+				res.redirect('/');
+				return;
+			}
+			res.cookie('userId', result.id);
+			res.cookie('userName', result.loginName);
+			res.redirect('/');
+		});
+	}
+	else
+	{
+		//TODO: passwordとpassword2が異なる場合のエラー表示
+		res.redirect('/');
+	}
+
 };
