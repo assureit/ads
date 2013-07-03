@@ -19,6 +19,7 @@ test/api/monitor.ts
 test/api/rec.ts
 test/model/user.ts
 test/model/node.ts
+test/model/monitor.ts
 test/net/redmine.ts
 public/javascripts/ads.ts
 public/javascripts/adsComponentView.ts

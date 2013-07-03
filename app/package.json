@@ -15,6 +15,7 @@
     "config": "0.4.27",
     "js-yaml": "0.3.x",
     "async": "0.2.9",
+    "underscore": "1.4.4",
     "jade": "*"
   },
   "devDependencies": {
