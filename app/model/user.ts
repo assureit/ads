@@ -48,4 +48,22 @@ export class UserDAO extends model.DAO {
 			});
 		});
 	}
+
+	select(id: number, callback: (err:any, user: User) => void) {
+		this.con.query('SELECT * FROM user WHERE id = ? ', [id], (err, result) => {
+			if (err) {
+				callback(err, null);
+				return;
+			}
+			var resultUser : User = null;
+			if (result.length == 0) {
+				err = new error.NotFoundError('UserId Not Found.');
+			} else {
+				resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
+			}	
+			callback(err, resultUser);
+		});
+
+	}
+
 }

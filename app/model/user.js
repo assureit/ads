@@ -62,6 +62,23 @@ var UserDAO = (function (_super) {
             });
         });
     };
+    UserDAO.prototype.select = function (id, callback) {
+        this.con.query('SELECT * FROM user WHERE id = ? ', [
+            id
+        ], function (err, result) {
+            if(err) {
+                callback(err, null);
+                return;
+            }
+            var resultUser = null;
+            if(result.length == 0) {
+                err = new error.NotFoundError('UserId Not Found.');
+            } else {
+                resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
+            }
+            callback(err, resultUser);
+        });
+    };
     return UserDAO;
 })(model.DAO);
 exports.UserDAO = UserDAO;
