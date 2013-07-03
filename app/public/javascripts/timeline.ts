@@ -83,7 +83,7 @@ class TimeLine {
 			return;
 		}
 
-		var mm: number[][] = [];
+		var mm: any = {};
 		var l: CommitInformation[] = DCaseAPI.getCommitList(arg.getArgumentId());
 		for(var i: number = 0; i < l.length - 1; i++) {
 			var x: number[] = [];
@@ -94,7 +94,7 @@ class TimeLine {
 		}
 		l[l.length-1].latest = true;
 
-		var ci: CommitInformation[] = [];
+		var ci: any = {};
 		for(var i: number = 0; i < l.length; i++) {
 			ci[l[i].commitId] = l[i];
 		}
@@ -150,7 +150,7 @@ class TimeLine {
 		this.$canvas.css("left", this.scrollX + this.dragX);
 	}
 
-	calcSize(mm: number[][], x: number, y: number, id: number): { w: number; h: number; } {
+	calcSize(mm: any, x: number, y: number, id: number): { w: number; h: number; } {
 		var b: { w: number; h: number; } = { w: x, h: y };
 		var c: number[] = mm[id];
 		if(c != null) {
@@ -166,7 +166,7 @@ class TimeLine {
 		return b;
 	}
 
-	put(ctx: CanvasRenderingContext2D, mm: number[][], l: CommitInformation[], x: number, y: number, id: number): number {
+	put(ctx: CanvasRenderingContext2D, mm: any, l: any, x: number, y: number, id: number): number {
 		this.addCommitMark(x, y, l, id);
 		var c: number[] = mm[id];
 		if(c != null) {
@@ -185,7 +185,7 @@ class TimeLine {
 		return y;
 	}
 
-	addCommitMark(x: number, y: number, list: CommitInformation[], commitId: number): void {
+	addCommitMark(x: number, y: number, list: any, commitId: number): void {
 		var $d: JQuery = $(this.titleString).css({
 			left: x, top: y, width: this.MX, height: this.MY,
 		}).addClass("timeline-commit").appendTo(this.$container);

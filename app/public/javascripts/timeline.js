@@ -43,7 +43,8 @@ var TimeLine = (function () {
         if(arg == null) {
             return;
         }
-        var mm = [];
+        var mm = {
+        };
         var l = DCaseAPI.getCommitList(arg.getArgumentId());
         for(var i = 0; i < l.length - 1; i++) {
             var x = [];
@@ -57,7 +58,8 @@ var TimeLine = (function () {
             l[i].latest = false;
         }
         l[l.length - 1].latest = true;
-        var ci = [];
+        var ci = {
+        };
         for(var i = 0; i < l.length; i++) {
             ci[l[i].commitId] = l[i];
         }

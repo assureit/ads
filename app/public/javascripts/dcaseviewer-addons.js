@@ -288,8 +288,10 @@ function DNodeView_InplaceEdit(self) {
                 nodes[0].type = "Goal";
             }
             updateNode(node, nodes[0]);
-            var idNodeTable = [];
-            var idIndexTable = [];
+            var idNodeTable = {
+            };
+            var idIndexTable = {
+            };
             var ch = 0, co = 0;
             node.eachSubNode(function (i, n) {
                 idNodeTable[n.id] = n;
@@ -320,10 +322,8 @@ function DNodeView_InplaceEdit(self) {
                 }
             }
             jQuery.each(idNodeTable, function (i, v) {
-                if(v) {
-                    DCase.removeNode(v);
-                    treeChanged = true;
-                }
+                DCase.removeNode(v);
+                treeChanged = true;
             });
             node.children = newChildren;
             node.contexts = newContexts;
