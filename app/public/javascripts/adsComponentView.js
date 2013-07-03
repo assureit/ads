@@ -1,3 +1,8 @@
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var CreateDCaseView = (function () {
     function CreateDCaseView() {
         $("#dcase-create").click(function () {
@@ -46,57 +51,134 @@ var CreateDCaseView = (function () {
     };
     return CreateDCaseView;
 })();
+var SelectDCaseContent = (function () {
+    function SelectDCaseContent(id, name, user, lastDate, lastUser, isLogin) {
+        this.id = id;
+        this.name = name;
+        this.user = user;
+        this.lastDate = lastDate;
+        this.lastUser = lastUser;
+        this.isLogin = isLogin;
+    }
+    SelectDCaseContent.prototype.toHtml = function (callback) {
+        return callback(this.id, this.name, this.user, this.lastDate, this.lastUser, this.isLogin);
+    };
+    SelectDCaseContent.prototype.setEvent = function () {
+        var _this = this;
+        if(this.isLogin) {
+            $("a#e" + this.id).click(function (e) {
+                var msg = prompt("dcase名を入力して下さい");
+                if(msg != null) {
+                    if(DCaseAPI.editDCase(_this.id, msg) != null) {
+                        alert("変更しました");
+                        location.reload();
+                    }
+                }
+            });
+            $("a#d" + this.id).click(function (e) {
+                if(window.confirm('dcaseを削除しますか?')) {
+                    if(DCaseAPI.deleteDCase(_this.id) != null) {
+                        alert("削除しました");
+                        location.reload();
+                    }
+                }
+            });
+        }
+    };
+    return SelectDCaseContent;
+})();
+var SelectDCaseManager = (function () {
+    function SelectDCaseManager() {
+        this.contents = [];
+    }
+    SelectDCaseManager.prototype.clear = function () {
+    };
+    SelectDCaseManager.prototype.updateContentsOrZeroView = function () {
+    };
+    SelectDCaseManager.prototype.add = function (s) {
+        this.contents.push(s);
+    };
+    SelectDCaseManager.prototype._updateContentsOrZeroView = function ($tbody, zeroStr, callback) {
+        if(this.contents.length == 0) {
+            $(zeroStr).appendTo($tbody);
+        }
+        $.each(this.contents, function (i, s) {
+            s.toHtml(callback).appendTo($tbody);
+            s.setEvent();
+        });
+    };
+    return SelectDCaseManager;
+})();
+var ThumnailView = (function () {
+    function ThumnailView() { }
+    ThumnailView.toThumnail = function toThumnail(id, name, user, lastDate, lastUser, isLogin) {
+        var html = '<ul class="thumbnails"><li class="span4"><a href="#" class="thumbnail">' + name + '</a></li></ul>';
+        return $('<div></div>').html(html);
+    };
+    return ThumnailView;
+})();
+var SelectDCaseThumbnailManager = (function (_super) {
+    __extends(SelectDCaseThumbnailManager, _super);
+    function SelectDCaseThumbnailManager() {
+        _super.call(this);
+    }
+    SelectDCaseThumbnailManager.prototype.clear = function () {
+        $("#selectDCase *").remove();
+        $("#selectDCase").append('<div class="row-fluid"></div>');
+    };
+    SelectDCaseThumbnailManager.prototype.updateContentsOrZeroView = function () {
+        _super.prototype._updateContentsOrZeroView.call(this, $('#selectDCase .row-fluid'), "<font color=gray>DCaseがありません</font>", ThumnailView.toThumnail);
+    };
+    return SelectDCaseThumbnailManager;
+})(SelectDCaseManager);
+var TableView = (function () {
+    function TableView() { }
+    TableView.toTable = function toTable(id, name, user, lastDate, lastUser, isLogin) {
+        var html = '<td><a href="' + Config.BASEPATH + '/dcase/' + id + '">' + name + "</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" + lastUser + "</td>";
+        if(isLogin) {
+            html += "<td><a id=\"e" + id + "\" href=\"#\">Edit</a></td>" + "<td><a id=\"d" + id + "\" href=\"#\">Delete</a></td>";
+        }
+        return $("<tr></tr>").html(html);
+    };
+    return TableView;
+})();
+var SelectDCaseTableManager = (function (_super) {
+    __extends(SelectDCaseTableManager, _super);
+    function SelectDCaseTableManager() {
+        _super.call(this);
+    }
+    SelectDCaseTableManager.prototype.clear = function () {
+        $("tbody#dcase-select-table *").remove();
+    };
+    SelectDCaseTableManager.prototype.updateContentsOrZeroView = function () {
+        _super.prototype._updateContentsOrZeroView.call(this, $('#dcase-select-table'), "<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>", TableView.toTable);
+    };
+    return SelectDCaseTableManager;
+})(SelectDCaseManager);
 var SelectDCaseView = (function () {
     function SelectDCaseView() {
         this.pageIndex = 1;
         this.maxPageSize = 2;
+        this.manager = new SelectDCaseTableManager();
     }
-    SelectDCaseView.prototype.clearTable = function () {
-        $("tbody#dcase-select-table *").remove();
+    SelectDCaseView.prototype.clear = function () {
+        this.manager.clear();
     };
-    SelectDCaseView.prototype.addTable = function (userId, pageIndex) {
+    SelectDCaseView.prototype.addElements = function (userId, pageIndex) {
+        var _this = this;
         if(pageIndex == null || pageIndex < 1) {
             pageIndex = 1;
         }
         this.pageIndex = pageIndex - 0;
-        var $tbody = $("#dcase-select-table");
         var searchResults = DCaseAPI.searchDCase(this.pageIndex);
         var dcaseList = searchResults.dcaseList;
         this.maxPageSize = searchResults.summary.maxPage;
-        if(dcaseList.length == 0) {
-            $("<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>").appendTo($tbody);
-        }
+        var isLogin = userId != null;
         $.each(dcaseList, function (i, dcase) {
-            var id = dcase.dcaseId;
-            var name = dcase.dcaseName;
-            var user = dcase.userName;
-            var lastDate = dcase.latestCommit.dateTime;
-            var lastUser = dcase.latestCommit.userName;
-            var html = "<td><a href=\"dcase/" + id + "\">" + name + "</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" + lastUser + "</td>";
-            if(userId != null) {
-                html += "<td><a id=\"e" + id + "\" href=\"#\">Edit</a></td>" + "<td><a id=\"d" + id + "\" href=\"#\">Delete</a></td>";
-            }
-            $("<tr></tr>").html(html).appendTo($tbody);
-            if(userId != null) {
-                $("a#e" + id).click(function () {
-                    var msg = prompt("dcase名を入力して下さい");
-                    if(msg != null) {
-                        if(DCaseAPI.editDCase(id, msg) != null) {
-                            alert("変更しました");
-                            location.reload();
-                        }
-                    }
-                });
-                $("a#d" + id).click(function () {
-                    if(window.confirm('dcaseを削除しますか?')) {
-                        if(DCaseAPI.deleteDCase(id) != null) {
-                            alert("削除しました");
-                            location.reload();
-                        }
-                    }
-                });
-            }
+            var s = new SelectDCaseContent(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
+            _this.manager.add(s);
         });
+        this.manager.updateContentsOrZeroView();
     };
     SelectDCaseView.prototype.initEvents = function () {
         var _this = this;

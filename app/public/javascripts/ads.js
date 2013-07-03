@@ -107,8 +107,8 @@ var ADS = (function () {
         this.hideViewMenu();
         $("#dcase-manager").css("display", "block");
         if(selectDCaseView != null) {
-            selectDCaseView.clearTable();
-            selectDCaseView.addTable(userId, pageIndex);
+            selectDCaseView.clear();
+            selectDCaseView.addElements(userId, pageIndex);
         }
     };
     ADS.prototype.commit = function () {
@@ -172,22 +172,20 @@ var ADS = (function () {
             return;
         }
         var rootview = nodeViewMap[root.id];
-        var shiftX = -rootview.bounds.x - rootview.subtreeBounds.x;
-        var shiftY = -rootview.bounds.y - rootview.subtreeBounds.y + rootview.nodeOffset;
         var $svg = $('<svg width="100%" height="100%" version="1.1" xmlns="' + SVG_NS + '">');
         $svg.append($("svg defs").clone(false));
-        var $target = $(document.createElementNS(SVG_NS, "g")).attr("transform", "translate(" + shiftX + ", " + shiftY + ")").appendTo($svg);
+        var $target = $(document.createElementNS(SVG_NS, "g")).appendTo($svg);
         var foreachLine = this.foreachLine;
         root.traverse(function (i, node) {
             var nodeView = nodeViewMap[node.id];
             if(nodeView.visible == false) {
                 return;
             }
-            var svg = nodeView.svg[0];
+            var svg = nodeView.svgShape.$g;
             var div = nodeView.$div[0];
-            var arg = nodeView.argumentBorder;
-            var undev = nodeView.svgUndevel;
-            var connector = node != root ? nodeView.line : null;
+            var arg = nodeView.$argBorder;
+            var undev = nodeView.$undevel;
+            var connector = node != root ? nodeView.$line : null;
             jQuery.each([
                 arg, 
                 connector, 
@@ -264,6 +262,16 @@ var ADS = (function () {
     };
     ADS.prototype.initDefaultEventListeners = function () {
         var _this = this;
+        $("#ads-logo").click(function (e) {
+            if($("#ads-logo").hasClass('navbar-hide')) {
+                $(".navbar").removeClass('navbar-hide');
+                $("#ads-logo").removeClass('navbar-hide');
+            } else {
+                $(".navbar").addClass('navbar-hide');
+                $("#ads-logo").addClass('navbar-hide');
+            }
+            e.preventDefault();
+        });
         $("#menu-commit").click(function (e) {
             _this.commit();
             e.preventDefault();
