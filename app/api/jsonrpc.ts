@@ -34,7 +34,7 @@ export function httpHandler(req: any, res: any) {
 	}
 
         function getUserId() : number {
-                var userId: number = constant.SYSTEM_USER_ID;
+		var userId: number = constant.SYSTEM_USER_ID;
 
 		var cookies = {};
 		req.headers.cookie && req.headers.cookie.split(';').forEach(function( cookie ) {
@@ -42,9 +42,9 @@ export function httpHandler(req: any, res: any) {
 			cookies[ parts[ 0 ].trim() ] = ( parts[ 1 ] || '' ).trim();
 		});
 
-                if (cookies['userId']) {
-                        userId = Number(cookies['userId']);
-                }
+		if (cookies['userId']) {
+			userId = Number(cookies['userId']);
+		}
 		return userId;
         }
 
