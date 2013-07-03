@@ -6,8 +6,11 @@ import assert = module('assert')
 import db = module('../../db/db');
 import monitor = module('../../api/monitor')
 import error = module('../../api/error')
+import constant = module('../../constant')
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
+
+var userId = constant.SYSTEM_USER_ID;
 
 describe('api', function() {
 	describe('monitor', function() {
@@ -23,7 +26,7 @@ describe('api', function() {
 							     systemNodeId: 99999,
 							     timestamp:'2013-06-26T12:30:30.999Z',
 							     comment:'Unit Test run',
-							     status:'NG'}, {
+							     status:'NG'}, userId, {
 					onSuccess: (result: any) => {
 						expect(result).to.be(null);
 						done();
@@ -40,7 +43,7 @@ describe('api', function() {
 							     systemNodeId: 1,
 							     timestamp:'2013-06-26T12:30:30.999Z',
 							     comment:'Unit Test run',
-							     status:'NG'}, {
+							     status:'NG'}, userId, {
 					onSuccess: (result: any) => {
 						var con = new db.Database();
 						con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = 1 AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', (err, expectedResult) => {
@@ -61,7 +64,7 @@ describe('api', function() {
 							     systemNodeId: 1,
 							     timestamp:'2013-06-26T12:30:30.999Z',
 							     comment:'Unit Test run',
-							     status:'OK'}, {
+							     status:'OK'}, userId, {
 					onSuccess: (result: any) => {
 						var con = new db.Database();
 						con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = 1 AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', (err, expectedResult) => {

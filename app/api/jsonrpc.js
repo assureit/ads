@@ -2,6 +2,7 @@
 var error = require("./error")
 
 var domain = require('domain')
+var constant = require('../constant')
 exports.methods = {
 };
 function add(key, method) {
@@ -24,6 +25,19 @@ function httpHandler(req, res) {
             id: id
         }), error.rpcHttpStatus);
     }
+    function getUserId() {
+        var userId = constant.SYSTEM_USER_ID;
+        var cookies = {
+        };
+        req.headers.cookie && req.headers.cookie.split(';').forEach(function (cookie) {
+            var parts = cookie.split('=');
+            cookies[parts[0].trim()] = (parts[1] || '').trim();
+        });
+        if(cookies['userId']) {
+            userId = Number(cookies['userId']);
+        }
+        return userId;
+    }
     res.header('Content-Type', 'application/json');
     if(req.body.jsonrpc !== '2.0') {
         onError(req.body.id, 400, new error.InvalidRequestError('JSON RPC version is invalid or missiong', null));
@@ -39,7 +53,7 @@ function httpHandler(req, res) {
         onError(req.body.id, 500, new error.InternalError('Execution error is occured', JSON.stringify(err)));
     });
     d.run(function () {
-        method(req.body.params, {
+        method(req.body.params, getUserId(), {
             onSuccess: function (result) {
                 res.send(JSON.stringify({
                     jsonrpc: '2.0',
@@ -63,6 +77,9 @@ function httpHandler(req, res) {
     return;
 }
 exports.httpHandler = httpHandler;
-add('ping', function (params, callback) {
+add('ping', function (params, userId, callback) {
     callback.onSuccess('ok');
+});
+add('ping2', function (params, userId, callback) {
+    callback.onSuccess(userId);
 });

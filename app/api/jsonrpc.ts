@@ -9,6 +9,7 @@ import express = module("express")
 import error = module("./error")
 import type = module('./type')
 import domain = module('domain')
+import constant = module('../constant')
 
 export var methods: {[key: string]: type.Method;} = {};
 export function add(key:string, method: type.Method) {
@@ -32,6 +33,21 @@ export function httpHandler(req: any, res: any) {
 			}), error.rpcHttpStatus);
 	}
 
+        function getUserId() : number {
+                var userId: number = constant.SYSTEM_USER_ID;
+
+		var cookies = {};
+		req.headers.cookie && req.headers.cookie.split(';').forEach(function( cookie ) {
+			var parts = cookie.split('=');
+			cookies[ parts[ 0 ].trim() ] = ( parts[ 1 ] || '' ).trim();
+		});
+
+                if (cookies['userId']) {
+                        userId = Number(cookies['userId']);
+                }
+		return userId;
+        }
+
 
 	res.header('Content-Type', 'application/json');
 
@@ -51,7 +67,7 @@ export function httpHandler(req: any, res: any) {
 	});
 
 	d.run(function() {
-		method(req.body.params, {
+		method(req.body.params, getUserId(), {
 			onSuccess: function(result: any) {
 				res.send(JSON.stringify({
 					jsonrpc: '2.0',
@@ -76,6 +92,10 @@ export function httpHandler(req: any, res: any) {
 }
 
 // default api
-add('ping', function(params: any, callback: type.Callback) {
+add('ping', function(params: any, userId: number, callback: type.Callback) {
 	callback.onSuccess('ok');
 });
+add('ping2', function(params: any, userId: number, callback: type.Callback) {
+	callback.onSuccess(userId);
+});
+

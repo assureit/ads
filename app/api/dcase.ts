@@ -11,7 +11,7 @@ import model_issue = module('../model/issue')
 import error = module('./error')
 var async = require('async')
 
-export function searchDCase(params:any, callback: type.Callback) {
+export function searchDCase(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	var dcaseDAO = new model_dcase.DCaseDAO(con);
 	params = params || {};
@@ -48,7 +48,7 @@ export function searchDCase(params:any, callback: type.Callback) {
 	});
 }
 
-export function getDCase(params:any, callback: type.Callback) {
+export function getDCase(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	con.query({sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?', nestTables: true}, [params.dcaseId], (err, result) => {
 		if (err) {
@@ -68,7 +68,7 @@ export function getDCase(params:any, callback: type.Callback) {
 	});
 }
 
-export function getNodeTree(params:any, callback: type.Callback) {
+export function getNodeTree(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	con.query({sql: 'SELECT * FROM commit WHERE id = ?', nestTables: true}, [params.commitId], (err, result) => {
 		if (err) {
@@ -85,7 +85,7 @@ export function getNodeTree(params:any, callback: type.Callback) {
 	});
 }
 
-export function searchNode(params:any, callback: type.Callback) {
+export function searchNode(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var nodeDAO = new model_node.NodeDAO(con);
@@ -118,10 +118,7 @@ export function searchNode(params:any, callback: type.Callback) {
 	});
 }
 
-export function createDCase(params:any, callback: type.Callback) {
-	// TODO: 認証チェック
-	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
-
+export function createDCase(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var dcaseDAO = new model_dcase.DCaseDAO(con);
@@ -152,10 +149,7 @@ export function createDCase(params:any, callback: type.Callback) {
 	});
 }
 
-export function commit(params: any, callback: type.Callback) {
-	// TODO: 認証チェック
-	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
-
+export function commit(params: any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	var commitDAO = new model_commit.CommitDAO(con);
 	con.begin((err, result) => {
@@ -173,9 +167,9 @@ export function commit(params: any, callback: type.Callback) {
 	});
 };
 
-export function deleteDCase(params:any, callback: type.Callback) {
+export function deleteDCase(params:any, userId: number, callback: type.Callback) {
 	// TODO: 認証チェック
-	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
+	//var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
 
 	var con = new db.Database();
 	con.begin((err, result) => {
@@ -193,9 +187,9 @@ export function deleteDCase(params:any, callback: type.Callback) {
 	});
 }
 
-export function editDCase(params:any, callback: type.Callback) {
+export function editDCase(params:any, userId: number, callback: type.Callback) {
 	// TODO: 認証チェック
-	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
+	//var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
 
 	var con = new db.Database();
 	con.begin((err, result) => {
@@ -217,7 +211,7 @@ export function editDCase(params:any, callback: type.Callback) {
 	});
 }
 
-export function getCommitList(params:any, callback: type.Callback) {
+export function getCommitList(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	var commitDAO = new model_commit.CommitDAO(con);
 	commitDAO.list(params.dcaseId, (err:any, list: model_commit.Commit[]) => {
