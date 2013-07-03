@@ -6,7 +6,7 @@ var __extends = this.__extends || function (d, b) {
 var model = require('./model')
 var model_commit = require('./commit')
 var error = require('../api/error')
-
+var net_rec = require('../net/rec')
 var async = require('async');
 var MonitorNode = (function () {
     function MonitorNode(id, dcaseId, thisNodeId, watchId, presetId, params, rebuttalThisNodeId, publishStatus) {
@@ -154,7 +154,7 @@ var MonitorDAO = (function (_super) {
             return;
         }
         var monitor = list[0];
-        var rec = new rec.Rec();
+        var rec = new net_rec.Rec();
         var method = (monitor.publishStatus == 0) ? 'registMonitor' : 'updateMonitor';
         rec.request(method, {
             nodeID: monitor.id,

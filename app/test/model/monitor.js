@@ -3,8 +3,18 @@ var model_monitor = require('../../model/monitor')
 
 var expect = require('expect.js');
 var async = require('async');
+var express = require('express');
+var app = express();
+app.use(express.bodyParser());
+app.post('/rec/api/1.0', function (req, res) {
+    res.header('Content-Type', 'application/json');
+    res.send(req.body);
+});
 describe('model', function () {
     describe('monitor', function () {
+        before(function (done) {
+            app.listen(3030).on('listening', done);
+        });
         var con;
         var monitorDAO;
         beforeEach(function (done) {
@@ -84,6 +94,52 @@ describe('model', function () {
                             list.forEach(function (it) {
                                 expect(it.id).not.to.equal(published);
                             });
+                            next(err);
+                        });
+                    }                ], function (err, result) {
+                    expect(err).to.be(null);
+                    done();
+                });
+            });
+        });
+        describe('publish', function () {
+            it('should update publish_status to 1', function (done) {
+                async.waterfall([
+                    function (next) {
+                        con.query('INSERT INTO monitor_node(dcase_id, this_node_id, watch_id, preset_id, params) VALUES (?, ?, ?, ?, ?)', [
+                            40, 
+                            1, 
+                            10, 
+                            100, 
+                            JSON.stringify({
+                                a: 'val_a',
+                                b: 2
+                            })
+                        ], function (err, result) {
+                            return next(err);
+                        });
+                    }, 
+                    function (next) {
+                        con.query('INSERT INTO monitor_node(dcase_id, this_node_id, watch_id, preset_id, params, publish_status) VALUES (?, ?, ?, ?, ?, ?)', [
+                            40, 
+                            2, 
+                            20, 
+                            200, 
+                            null, 
+                            2
+                        ], function (err, result) {
+                            return next(err);
+                        });
+                    }, 
+                    function (next) {
+                        monitorDAO.publish(40, function (err) {
+                            next(err);
+                        });
+                    }, 
+                    function (next) {
+                        monitorDAO.listNotPublished(40, function (err, list) {
+                            expect(list).not.to.be(null);
+                            expect(list.length).to.equal(0);
                             next(err);
                         });
                     }                ], function (err, result) {

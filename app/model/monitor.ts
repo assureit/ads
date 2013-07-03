@@ -3,7 +3,7 @@
 import model = module('./model')
 import model_commit = module('./commit')
 import error = module('../api/error')
-import rec = module('../net/rec')
+import net_rec = module('../net/rec')
 var async = require('async')
 
 export interface InsertMonitor {
@@ -165,7 +165,7 @@ export class MonitorDAO extends model.DAO {
 			return;
 		}
 		var monitor = list[0];
-		var rec = new rec.Rec();
+		var rec = new net_rec.Rec();
 		var method:string = (monitor.publishStatus == 0) ? 'registMonitor' : 'updateMonitor';
 		rec.request(method, 
 				{
