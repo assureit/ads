@@ -3,6 +3,7 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 ALTER TABLE `ads`.`monitor_node` ADD COLUMN `publish_status` INT(11) NOT NULL DEFAULT 0 COMMENT 'REC登録状態\n0: 未\n1: 済\n2: 要更新'  AFTER `rebuttal_this_node_id` , CHANGE COLUMN `params` `params` TEXT NULL DEFAULT NULL  ;
+ALTER TABLE `ads`.`monitor_node` ADD COLUMN `watch_id` VARCHAR(45) NOT NULL  AFTER `this_node_id` ;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

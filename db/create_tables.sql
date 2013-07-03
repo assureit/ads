@@ -157,6 +157,7 @@ CREATE  TABLE IF NOT EXISTS `monitor_node` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `dcase_id` INT NOT NULL ,
   `this_node_id` INT NOT NULL ,
+  `watch_id` VARCHAR(45) NOT NULL ,
   `preset_id` VARCHAR(45) NULL ,
   `params` TEXT NULL ,
   `rebuttal_this_node_id` INT NULL ,

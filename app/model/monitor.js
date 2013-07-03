@@ -6,6 +6,26 @@ var __extends = this.__extends || function (d, b) {
 var model = require('./model')
 var model_commit = require('./commit')
 var error = require('../api/error')
+
+var async = require('async');
+var MonitorNode = (function () {
+    function MonitorNode(id, dcaseId, thisNodeId, watchId, presetId, params, rebuttalThisNodeId, publishStatus) {
+        this.id = id;
+        this.dcaseId = dcaseId;
+        this.thisNodeId = thisNodeId;
+        this.watchId = watchId;
+        this.presetId = presetId;
+        this.params = params;
+        this.rebuttalThisNodeId = rebuttalThisNodeId;
+        this.publishStatus = publishStatus;
+    }
+    MonitorNode.tableToObject = function tableToObject(table) {
+        return new MonitorNode(table.id, table.dcase_id, table.this_node_id, table.watch_id, table.preset_id, table.params ? JSON.parse(table.params) : {
+        }, table.rebuttal_this_node_id, table.publish_status);
+    };
+    return MonitorNode;
+})();
+exports.MonitorNode = MonitorNode;
 var MonitorDAO = (function (_super) {
     __extends(MonitorDAO, _super);
     function MonitorDAO() {
@@ -82,6 +102,72 @@ var MonitorDAO = (function (_super) {
                 return;
             }
             callback(err, result[0].its_id);
+        });
+    };
+    MonitorDAO.prototype.updatePublished = function (monitor, callback) {
+        this.con.query('UPDATE monitor_node SET publish_status=1 WHERE id=?', [
+            monitor.id
+        ], function (err, result) {
+            if(err) {
+                callback(err, null);
+                return;
+            }
+            callback(null, monitor);
+        });
+    };
+    MonitorDAO.prototype.listNotPublished = function (dcaseId, callback) {
+        this.con.query('SELECT * FROM monitor_node WHERE dcase_id=? AND publish_status != 1', [
+            dcaseId
+        ], function (err, result) {
+            if(err) {
+                callback(err, null);
+                return;
+            }
+            var list = [];
+            result.forEach(function (it) {
+                list.push(MonitorNode.tableToObject(it));
+            });
+            callback(null, list);
+        });
+    };
+    MonitorDAO.prototype.publish = function (dcaseId, callback) {
+        var _this = this;
+        this.listNotPublished(dcaseId, function (err, list) {
+            if(err) {
+                callback(err);
+                return;
+            }
+            _this._publish(list, callback);
+        });
+    };
+    MonitorDAO.prototype._publish = function (list, callback) {
+        var _this = this;
+        if(!list || list.length == 0) {
+            callback(null);
+            return;
+        }
+        var monitor = list[0];
+        var rec = new rec.Rec();
+        var method = (monitor.publishStatus == 0) ? 'registMonitor' : 'updateMonitor';
+        rec.request(method, {
+            nodeID: monitor.id,
+            name: 'DCase: ' + monitor.dcaseId + ' Node: ' + monitor.thisNodeId,
+            watchID: monitor.watchId,
+            presetID: monitor.presetId,
+            params: monitor.params
+        }, function (err, result) {
+            if(err) {
+                callback(err);
+                return;
+            }
+            monitor.publishStatus = 1;
+            _this.updatePublished(monitor, function (err, updated) {
+                if(err) {
+                    callback(err);
+                    return;
+                }
+                _this._publish(list.slice(1), callback);
+            });
         });
     };
     return MonitorDAO;
