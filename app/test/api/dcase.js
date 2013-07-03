@@ -2,12 +2,14 @@ var assert = require('assert')
 var db = require('../../db/db')
 var dcase = require('../../api/dcase')
 
+var constant = require('../../constant')
 var expect = require('expect.js');
+var userId = constant.SYSTEM_USER_ID;
 describe('api', function () {
     describe('dcase', function () {
         describe('searchDCase', function () {
             it('should return result', function (done) {
-                dcase.searchDCase(null, {
+                dcase.searchDCase(null, userId, {
                     onSuccess: function (result) {
                         done();
                     },
@@ -19,7 +21,7 @@ describe('api', function () {
             it('dcaseList should be limited length', function (done) {
                 dcase.searchDCase({
                     page: 1
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                         assert.equal(20, result.dcaseList.length);
                         done();
@@ -32,7 +34,7 @@ describe('api', function () {
             it('provides paging feature', function (done) {
                 dcase.searchDCase({
                     page: 1
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                         expect(result.summary).not.to.be(undefined);
                         expect(result.summary.currentPage).not.to.be(undefined);
@@ -57,11 +59,11 @@ describe('api', function () {
             it('can return next page result', function (done) {
                 dcase.searchDCase({
                     page: 1
-                }, {
+                }, userId, {
                     onSuccess: function (result1st) {
                         dcase.searchDCase({
                             page: 2
-                        }, {
+                        }, userId, {
                             onSuccess: function (result) {
                                 assert.notEqual(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
                                 done();
@@ -79,11 +81,11 @@ describe('api', function () {
             it('allow page 0 as 1', function (done) {
                 dcase.searchDCase({
                     page: 1
-                }, {
+                }, userId, {
                     onSuccess: function (result1st) {
                         dcase.searchDCase({
                             page: 0
-                        }, {
+                        }, userId, {
                             onSuccess: function (result) {
                                 assert.equal(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
                                 done();
@@ -101,11 +103,11 @@ describe('api', function () {
             it('allow minus page as 1', function (done) {
                 dcase.searchDCase({
                     page: 1
-                }, {
+                }, userId, {
                     onSuccess: function (result1st) {
                         dcase.searchDCase({
                             page: -1
-                        }, {
+                        }, userId, {
                             onSuccess: function (result) {
                                 assert.equal(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
                                 done();
@@ -129,7 +131,7 @@ describe('api', function () {
                     }
                     dcase.searchDCase({
                         page: 1
-                    }, {
+                    }, userId, {
                         onSuccess: function (result) {
                             assert.equal(result.dcaseList[0].dcaseId, expectedResult[0].id);
                             done();
@@ -145,7 +147,7 @@ describe('api', function () {
             it('should return result', function (done) {
                 dcase.getDCase({
                     dcaseId: 50
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                     },
                     onFailure: function (error) {
@@ -159,7 +161,7 @@ describe('api', function () {
             it('should return result', function (done) {
                 dcase.getNodeTree({
                     commitId: 42
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                     },
                     onFailure: function (error) {
@@ -173,7 +175,7 @@ describe('api', function () {
             it('should return result', function (done) {
                 dcase.getCommitList({
                     dcaseId: 50
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                     },
                     onFailure: function (error) {
@@ -187,7 +189,7 @@ describe('api', function () {
             it('should return result', function (done) {
                 dcase.searchNode({
                     text: 'dcase1'
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                         expect(result.searchResultList).to.be.an('array');
                         expect(result.searchResultList[0].dcaseId).not.to.be(undefined);
@@ -206,7 +208,7 @@ describe('api', function () {
                 dcase.searchNode({
                     text: 'dcase1',
                     page: 1
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                         assert.equal(20, result.searchResultList.length);
                         done();
@@ -221,7 +223,7 @@ describe('api', function () {
                 dcase.searchNode({
                     text: query,
                     page: 1
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                         expect(result.summary).not.to.be(undefined);
                         expect(result.summary.currentPage).not.to.be(undefined);
@@ -250,12 +252,12 @@ describe('api', function () {
                 dcase.searchNode({
                     text: query,
                     page: 1
-                }, {
+                }, userId, {
                     onSuccess: function (result1st) {
                         dcase.searchNode({
                             text: query,
                             page: 2
-                        }, {
+                        }, userId, {
                             onSuccess: function (result) {
                                 expect(result.searchResultList[0]).not.to.eql(result1st.searchResultList[0]);
                                 done();
@@ -275,12 +277,12 @@ describe('api', function () {
                 dcase.searchNode({
                     text: query,
                     page: 1
-                }, {
+                }, userId, {
                     onSuccess: function (result1st) {
                         dcase.searchNode({
                             text: query,
                             page: 0
-                        }, {
+                        }, userId, {
                             onSuccess: function (result) {
                                 expect(result.searchResultList[0]).to.eql(result1st.searchResultList[0]);
                                 done();
@@ -300,12 +302,12 @@ describe('api', function () {
                 dcase.searchNode({
                     text: query,
                     page: 1
-                }, {
+                }, userId, {
                     onSuccess: function (result1st) {
                         dcase.searchNode({
                             text: query,
                             page: -1
-                        }, {
+                        }, userId, {
                             onSuccess: function (result) {
                                 expect(result.searchResultList[0]).to.eql(result1st.searchResultList[0]);
                                 done();
@@ -336,7 +338,7 @@ describe('api', function () {
                     dcase.searchNode({
                         text: query,
                         page: 1
-                    }, {
+                    }, userId, {
                         onSuccess: function (result) {
                             expect({
                                 dcaseId: result.searchResultList[0].dcaseId,
@@ -386,7 +388,7 @@ describe('api', function () {
                             }
                         ]
                     }
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                         done();
                     },
@@ -400,7 +402,7 @@ describe('api', function () {
             it('should return result', function (done) {
                 dcase.deleteDCase({
                     dcaseId: 36
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                         done();
                     },
@@ -415,7 +417,7 @@ describe('api', function () {
                 dcase.editDCase({
                     dcaseId: 37,
                     dcaseName: 'modified dcase name'
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                         done();
                     },
@@ -488,7 +490,7 @@ describe('api', function () {
                             }
                         ]
                     }
-                }, {
+                }, userId, {
                     onSuccess: function (result) {
                         done();
                     },

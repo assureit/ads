@@ -5,7 +5,7 @@ var model_commit = require('../model/commit')
 var model_monitor = require('../model/monitor')
 var redmine = require('../net/redmine')
 var error = require('./error')
-function modifyMonitorStatus(params, callback) {
+function modifyMonitorStatus(params, userId, callback) {
     var commitMessage = 'monitor status exchange';
     function addRebuttalNode(nodeList, params, thisNodeId) {
         var maxThisNodeId = 0;
@@ -100,7 +100,7 @@ function modifyMonitorStatus(params, callback) {
                     }
                 }
                 var commitDAO = new model_commit.CommitDAO(con);
-                commitDAO.commit(constant.SYSTEM_USER_ID, latestCommit.id, commitMessage, data, function (err, result) {
+                commitDAO.commit(userId, latestCommit.id, commitMessage, data, function (err, result) {
                     if(err) {
                         callback.onFailure(err);
                     }

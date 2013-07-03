@@ -5,7 +5,7 @@ import constant = module('../constant')
 import rec = module('../net/rec')
 import error = module('./error')
 
-export function getRawItemList(params:any, callback: type.Callback) {
+export function getRawItemList(params:any, userId:number, callback: type.Callback) {
 	var method = "getRawItemList";
 
 	var rc = new rec.Rec();
@@ -18,7 +18,7 @@ export function getRawItemList(params:any, callback: type.Callback) {
 	});
 }
 
-export function getPresetList(params:any, callback: type.Callback) {
+export function getPresetList(params:any, userId:number, callback: type.Callback) {
 	var method = "getPresetList";
 
 	var rc = new rec.Rec();
