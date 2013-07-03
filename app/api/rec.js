@@ -3,7 +3,7 @@
 
 var rec = require('../net/rec')
 
-function getRawItemList(params, callback) {
+function getRawItemList(params, userId, callback) {
     var method = "getRawItemList";
     var rc = new rec.Rec();
     rc.request(method, params, function (err, result) {
@@ -15,7 +15,7 @@ function getRawItemList(params, callback) {
     });
 }
 exports.getRawItemList = getRawItemList;
-function getPresetList(params, callback) {
+function getPresetList(params, userId, callback) {
     var method = "getPresetList";
     var rc = new rec.Rec();
     rc.request(method, params, function (err, result) {
