@@ -1,6 +1,6 @@
 var db = require('../db/db')
 
-var constant = require('../constant')
+
 var model_dcase = require('../model/dcase')
 var model_commit = require('../model/commit')
 var model_node = require('../model/node')
@@ -8,7 +8,7 @@ var model_node = require('../model/node')
 
 
 var async = require('async');
-function searchDCase(params, callback) {
+function searchDCase(params, userId, callback) {
     var con = new db.Database();
     var dcaseDAO = new model_dcase.DCaseDAO(con);
     params = params || {
@@ -46,7 +46,7 @@ function searchDCase(params, callback) {
     });
 }
 exports.searchDCase = searchDCase;
-function getDCase(params, callback) {
+function getDCase(params, userId, callback) {
     var con = new db.Database();
     con.query({
         sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?',
@@ -69,7 +69,7 @@ function getDCase(params, callback) {
     });
 }
 exports.getDCase = getDCase;
-function getNodeTree(params, callback) {
+function getNodeTree(params, userId, callback) {
     var con = new db.Database();
     con.query({
         sql: 'SELECT * FROM commit WHERE id = ?',
@@ -89,7 +89,7 @@ function getNodeTree(params, callback) {
     });
 }
 exports.getNodeTree = getNodeTree;
-function searchNode(params, callback) {
+function searchNode(params, userId, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
         var nodeDAO = new model_node.NodeDAO(con);
@@ -122,8 +122,7 @@ function searchNode(params, callback) {
     });
 }
 exports.searchNode = searchNode;
-function createDCase(params, callback) {
-    var userId = constant.SYSTEM_USER_ID;
+function createDCase(params, userId, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
         var dcaseDAO = new model_dcase.DCaseDAO(con);
@@ -165,8 +164,7 @@ function createDCase(params, callback) {
     });
 }
 exports.createDCase = createDCase;
-function commit(params, callback) {
-    var userId = constant.SYSTEM_USER_ID;
+function commit(params, userId, callback) {
     var con = new db.Database();
     var commitDAO = new model_commit.CommitDAO(con);
     con.begin(function (err, result) {
@@ -184,8 +182,7 @@ function commit(params, callback) {
 }
 exports.commit = commit;
 ;
-function deleteDCase(params, callback) {
-    var userId = constant.SYSTEM_USER_ID;
+function deleteDCase(params, userId, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
         var dcaseDAO = new model_dcase.DCaseDAO(con);
@@ -204,8 +201,7 @@ function deleteDCase(params, callback) {
     });
 }
 exports.deleteDCase = deleteDCase;
-function editDCase(params, callback) {
-    var userId = constant.SYSTEM_USER_ID;
+function editDCase(params, userId, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
         var dcaseDAO = new model_dcase.DCaseDAO(con);
@@ -228,7 +224,7 @@ function editDCase(params, callback) {
     });
 }
 exports.editDCase = editDCase;
-function getCommitList(params, callback) {
+function getCommitList(params, userId, callback) {
     var con = new db.Database();
     var commitDAO = new model_commit.CommitDAO(con);
     commitDAO.list(params.dcaseId, function (err, list) {

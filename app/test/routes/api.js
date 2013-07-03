@@ -107,5 +107,21 @@ describe('api', function () {
                 done();
             });
         });
+        it('UserId Check', function (done) {
+            request(app['app']).post('/api/1.0/').set('cookie', 'userId=1318;').send({
+                jsonrpc: "2.0",
+                method: "ping2",
+                id: 100
+            }).expect(200).end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
+                assert.equal(100, res.body.id);
+                assert.strictEqual(null, res.body.error);
+                assert.notStrictEqual(undefined, res.body.result);
+                assert.equal(1318, res.body.result);
+                done();
+            });
+        });
     });
 });

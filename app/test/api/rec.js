@@ -3,6 +3,8 @@
 var rec = require('../../api/rec')
 
 
+var constant = require('../../constant')
+var userId = constant.SYSTEM_USER_ID;
 var expect = require('expect.js');
 var express = require('express');
 var app = express();
@@ -18,7 +20,7 @@ describe('api', function () {
         });
         describe('getRawItemList', function () {
             it('call method', function (done) {
-                rec.getRawItemList(null, {
+                rec.getRawItemList(null, userId, {
                     onSuccess: function (result) {
                         expect(result.method).to.eql('getRawItemList');
                         done();
@@ -32,7 +34,7 @@ describe('api', function () {
         });
         describe('getPresetList', function () {
             it('call method', function (done) {
-                rec.getPresetList(null, {
+                rec.getPresetList(null, userId, {
                     onSuccess: function (result) {
                         expect(result.method).to.eql('getPresetList');
                         done();

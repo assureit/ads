@@ -20,5 +20,5 @@ export interface Callback {
  * JSON-RPC method's interface
  */
 export interface Method {
-	(params:any, callback:Callback): void;	
+	(params:any, userId:number, callback:Callback): void;	
 }
