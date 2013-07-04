@@ -1,50 +1,101 @@
-.menu-i {
+#menu-button {
+	margin: 0 auto;
+	width:  200px;
+	height: 48px;
+	display: inline-block;
 	position: absolute;
-	left: 24px;
-	top : 0px;
-	width : 40px;
-	height: 40px;
-	background: #CCC;
-	opacity: 0.8;
-	border-radius: 4px;
-	text-align: center;
-}
-
-#menu-search input {
-	width: 90%;
-}
-
-.menu-i:hover {
-	background: #EEE;
-}
-
-.menu-box {
-	position: absolute;
-	display: none;
+	top: 0px;
 	left: 0px;
-	top: 40px;
-	width: 192px;
-	bottom: 0px;
-	background: #EEE;
-	padding: 4px;
-	overflow: auto;
+	z-index: 99999;
 }
 
-.sidemenu-search-result {
-	overflow: scroll;
+#menu-button:hover {
+	background: #2C3E50
 }
 
-.sidemenu-result {
-	list-style-type: none;
-	height: 0.8cm;
+.menu {
 	position: relative;
+	top: 48px;
+	z-index: 99998;
+	height: 100%;
+	-webkit-transition: all ease-in-out;
+	-webkit-transition-delay: 0.5s;
+	-moz-transition: all ease-in-out 0.5s;
+	-o-transition: all ease-in-out 0.5s;
+	transition: all ease-in-out 0.5s;
 }
 
-.sidemenu-result:hover {
-	color: #FFA0A0;
+#drop-menu {
+	float: left;
+	width: 200px;
+	height: 100%;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
 }
 
-ul.sidemenu-result li ul {
-	margin: 0 0 0 0.3em;
-	padding 0;
+#drop-menu.clicked {
+	height: 0;
+}
+
+
+#drop-menu li {
+	display: block;
+	width: 200px;
+	height: 34px;
+	text-align: center;
+	background: #2C3E50
+}
+
+#drop-menu li.line {
+	border-top: 1px solid #e5e5e5;
+}
+
+#drop-menu li a {
+	display: block;
+	width: 200px;
+	height: 34px;
+	padding: 0;
+	color: #f0f0f0;
+	line-height: 2.1;
+	font-family: sans-serif;
+	text-decoration: none;
+	background: #2C3E50
+}
+
+#drop-menu li a:hover {
+	display: block;
+	width: 200px;
+	color: #777777;
+	text-decoration: none;
+	/*background: none;*/
+	background: #3D4F61
+}
+
+#drop-menu ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+#drop-menu li ul {
+	display: none;
+}
+
+#drop-menu li:hover ul {
+	display: block;
+	position: relative;
+
+	top: -34px;
+	left: 200px;
+	width: 200px;
+	height: 34px;
+}
+
+#drop-menu li:hover ul li ul {
+	display: none;
+}
+
+#drop-menu li ul li:hover ul {
+	display: block;
 }
