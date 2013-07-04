@@ -5,6 +5,7 @@ import assert = module('assert')
 import db = module('../../db/db')
 import testdb = module('../../db/test-db')
 var expect = require('expect.js');	// TODO: import module化
+var async = require('async')
 
 describe('test-db', () => {
     var con;
@@ -29,13 +30,49 @@ describe('test-db', () => {
     });
 	describe('load', () => {
 		it('should load yaml data to database tables', (done) => {
-			testDB.load('test/default-data.yaml', (err:any) => {
-				con.query('SELECT count(*) as cnt FROM USER WHERE id=101', (err:any, result:any) => {
-					expect(result.length).to.equal(1);
-					expect(result[0].cnt).to.equal(1);
+			async.waterfall([
+				(next:Function) => {
+					testDB.load('test/default-data.yaml', (err:any) => {next(err);});
+				}, 
+				(next:Function) => {
+					con.query('SELECT count(*) as cnt FROM USER WHERE id=101', (err:any, result:any) => {
+						expect(result.length).to.equal(1);
+						expect(result[0].cnt).to.equal(1);
+						next(err);
+					});
+				}, 
+				], (err:any) => {
+					expect(err).to.be(null);
 					done();
-				});
-			});
+				}
+			);
+		});
+	});
+
+	describe('clearAll', () => {
+		it('should clear all database tables', (done) => {
+			async.waterfall([
+				(next:Function) => {
+					testDB.load('test/default-data.yaml', (err:any) => {next(err);});
+				}, 
+				(next:Function) => {
+					testDB.clearAll((err:any) => {
+						expect(err).to.be(null);
+						next(err);
+					});
+				}, 
+				(next:Function) => {
+					con.query('SELECT count(*) as cnt FROM USER WHERE id=101', (err:any, result:any) => {
+						expect(result.length).to.equal(1);
+						expect(result[0].cnt).to.equal(0);
+						next(err);
+					});
+				}, 
+				], (err:any) => {
+					expect(err).to.be(null);
+					done();
+				}
+			);
 		});
 	});
 });

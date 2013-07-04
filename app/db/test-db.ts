@@ -4,6 +4,7 @@ import yaml = module('js-yaml')
 import fs = module('fs')
 var _ = require('underscore');
 var async = require('async')
+var CONFIG = require('config');
 
 export class TestDB {
 	constructor(public con:db.Database) {
@@ -57,8 +58,33 @@ export class TestDB {
 			+ ')';
 		var params = _.map(columns, (c:string) => {return raw[c];});
 		return (next:Function) => {
-			console.log('LOADING: ' + table + ' ' + JSON.stringify(raw));
+			// console.log('LOADING: ' + table + ' ' + JSON.stringify(raw));
 			this.con.query(sql, params, (err:any, result:any) => {next(err);});
 		};
+	}
+
+	clearAll(callback: (err:any)=>void): void {
+		this._clearAll(_.map(CONFIG.test.database.tables, (table)=> {return table;}), callback);
+	}
+
+	_clearAll(tables:string[], callback: (err:any)=>void) {
+		if (tables.length == 0) {
+			callback(null);
+			return;
+		}
+		this.clearTable(tables[0], (err:any) => {
+			if (err) {
+				callback(err);
+				return;
+			}
+			this._clearAll(tables.slice(1), callback);
+		});
+	}
+
+	clearTable(table:string, callback: (err:any)=>void) {
+		// console.log('DELETING: ' + table);
+		this.con.query('DELETE FROM ' + table, (err:any, result:any) => {
+			callback(err)
+		});
 	}
 }

@@ -3,6 +3,7 @@ var yaml = require('js-yaml')
 var fs = require('fs')
 var _ = require('underscore');
 var async = require('async');
+var CONFIG = require('config');
 var TestDB = (function () {
     function TestDB(con) {
         this.con = con;
@@ -61,11 +62,34 @@ var TestDB = (function () {
             return raw[c];
         });
         return function (next) {
-            console.log('INSERTING: ' + table + ' ' + JSON.stringify(raw));
             _this.con.query(sql, params, function (err, result) {
                 next(err);
             });
         };
+    };
+    TestDB.prototype.clearAll = function (callback) {
+        this._clearAll(_.map(CONFIG.test.database.tables, function (table) {
+            return table;
+        }), callback);
+    };
+    TestDB.prototype._clearAll = function (tables, callback) {
+        var _this = this;
+        if(tables.length == 0) {
+            callback(null);
+            return;
+        }
+        this.clearTable(tables[0], function (err) {
+            if(err) {
+                callback(err);
+                return;
+            }
+            _this._clearAll(tables.slice(1), callback);
+        });
+    };
+    TestDB.prototype.clearTable = function (table, callback) {
+        this.con.query('DELETE FROM ' + table, function (err, result) {
+            callback(err);
+        });
     };
     return TestDB;
 })();
