@@ -1,7 +1,7 @@
 .timeline {
 	position: absolute;
 	left: 0px;
-	top : 40px;
+	top : 0px;
 	width: 100%;
 	height: 0px;
 	margin: 0px;
@@ -13,7 +13,7 @@
 
 .timeline-title {
 	position: absolute;
-	left: 0px;
+	right: 0px;
 	top: 0px;
 	background: gray;
 	color: white;
