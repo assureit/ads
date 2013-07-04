@@ -19,12 +19,14 @@ test/api/monitor.ts
 test/api/rec.ts
 test/model/user.ts
 test/model/node.ts
+test/model/monitor.ts
 test/net/redmine.ts
 public/javascripts/ads.ts
 public/javascripts/adsComponentView.ts
 public/javascripts/animation.ts
 public/javascripts/api.ts
 public/javascripts/color.ts
+public/javascripts/config.ts
 public/javascripts/dcaseviewer-addons.ts
 public/javascripts/dcaseviewer.ts
 public/javascripts/dnode.ts
@@ -33,5 +35,5 @@ public/javascripts/handler.ts
 public/javascripts/importfile.ts
 public/javascripts/index.ts
 public/javascripts/router.ts
+public/javascripts/sidemenu.ts
 public/javascripts/timeline.ts
-public/javascripts/config.ts

@@ -7,6 +7,7 @@ var model = require('./model')
 var model_user = require('./user')
 var model_node = require('../model/node')
 var model_issue = require('../model/issue')
+var model_monitor = require('../model/monitor')
 var async = require('async');
 var Commit = (function () {
     function Commit(id, prevCommitId, dcaseId, userId, message, data, dateTime, latestFlag) {
@@ -96,7 +97,7 @@ var CommitDAO = (function (_super) {
             var list = new Array();
             result.forEach(function (row) {
                 var c = new Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
-                c.user = new model_user.User(row.u.id, row.u.name, row.u.delete_flag, row.u.system_flag);
+                c.user = new model_user.User(row.u.id, row.u.login_name, row.u.delete_flag, row.u.system_flag);
                 list.push(c);
             });
             callback(err, list);
@@ -135,6 +136,12 @@ var CommitDAO = (function (_super) {
             function (com, commitId, callback) {
                 var issueDAO = new model_issue.IssueDAO(_this.con);
                 issueDAO.publish(com.dcaseId, function (err) {
+                    callback(err, com, commitId);
+                });
+            }, 
+            function (com, commitId, callback) {
+                var monitorDAO = new model_monitor.MonitorDAO(_this.con);
+                monitorDAO.publish(com.dcaseId, function (err) {
                     callback(err, {
                         commitId: commitId
                     });

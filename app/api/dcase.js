@@ -1,14 +1,15 @@
 var db = require('../db/db')
 
-var constant = require('../constant')
+
 var model_dcase = require('../model/dcase')
 var model_commit = require('../model/commit')
 var model_node = require('../model/node')
 
 
+var model_user = require('../model/user')
 
 var async = require('async');
-function searchDCase(params, callback) {
+function searchDCase(params, userId, callback) {
     var con = new db.Database();
     var dcaseDAO = new model_dcase.DCaseDAO(con);
     params = params || {
@@ -46,7 +47,7 @@ function searchDCase(params, callback) {
     });
 }
 exports.searchDCase = searchDCase;
-function getDCase(params, callback) {
+function getDCase(params, userId, callback) {
     var con = new db.Database();
     con.query({
         sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?',
@@ -69,7 +70,7 @@ function getDCase(params, callback) {
     });
 }
 exports.getDCase = getDCase;
-function getNodeTree(params, callback) {
+function getNodeTree(params, userId, callback) {
     var con = new db.Database();
     con.query({
         sql: 'SELECT * FROM commit WHERE id = ?',
@@ -89,7 +90,7 @@ function getNodeTree(params, callback) {
     });
 }
 exports.getNodeTree = getNodeTree;
-function searchNode(params, callback) {
+function searchNode(params, userId, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
         var nodeDAO = new model_node.NodeDAO(con);
@@ -122,42 +123,48 @@ function searchNode(params, callback) {
     });
 }
 exports.searchNode = searchNode;
-function createDCase(params, callback) {
-    var userId = constant.SYSTEM_USER_ID;
+function createDCase(params, userId, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
-        var dcaseDAO = new model_dcase.DCaseDAO(con);
-        dcaseDAO.insert({
-            userId: userId,
-            dcaseName: params.dcaseName
-        }, function (err, dcaseId) {
+        var userDAO = new model_user.UserDAO(con);
+        userDAO.select(userId, function (err, user) {
             if(err) {
                 callback.onFailure(err);
                 return;
             }
-            var commitDAO = new model_commit.CommitDAO(con);
-            commitDAO.insert({
-                data: JSON.stringify(params.contents),
-                dcaseId: dcaseId,
+            var dcaseDAO = new model_dcase.DCaseDAO(con);
+            dcaseDAO.insert({
                 userId: userId,
-                message: 'Initial Commit'
-            }, function (err, commitId) {
+                dcaseName: params.dcaseName
+            }, function (err, dcaseId) {
                 if(err) {
                     callback.onFailure(err);
                     return;
                 }
-                var nodeDAO = new model_node.NodeDAO(con);
-                nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, function (err) {
+                var commitDAO = new model_commit.CommitDAO(con);
+                commitDAO.insert({
+                    data: JSON.stringify(params.contents),
+                    dcaseId: dcaseId,
+                    userId: userId,
+                    message: 'Initial Commit'
+                }, function (err, commitId) {
                     if(err) {
                         callback.onFailure(err);
                         return;
                     }
-                    con.commit(function (err, result) {
-                        callback.onSuccess({
-                            dcaseId: dcaseId,
-                            commitId: commitId
+                    var nodeDAO = new model_node.NodeDAO(con);
+                    nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, function (err) {
+                        if(err) {
+                            callback.onFailure(err);
+                            return;
+                        }
+                        con.commit(function (err, result) {
+                            callback.onSuccess({
+                                dcaseId: dcaseId,
+                                commitId: commitId
+                            });
+                            con.close();
                         });
-                        con.close();
                     });
                 });
             });
@@ -165,70 +172,88 @@ function createDCase(params, callback) {
     });
 }
 exports.createDCase = createDCase;
-function commit(params, callback) {
-    var userId = constant.SYSTEM_USER_ID;
+function commit(params, userId, callback) {
     var con = new db.Database();
     var commitDAO = new model_commit.CommitDAO(con);
     con.begin(function (err, result) {
-        commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
-            con.commit(function (err, _result) {
-                if(err) {
-                    callback.onFailure(err);
-                    return;
-                }
-                callback.onSuccess(result);
-                con.close();
+        var userDAO = new model_user.UserDAO(con);
+        userDAO.select(userId, function (err, user) {
+            if(err) {
+                callback.onFailure(err);
+                return;
+            }
+            commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
+                con.commit(function (err, _result) {
+                    if(err) {
+                        callback.onFailure(err);
+                        return;
+                    }
+                    callback.onSuccess(result);
+                    con.close();
+                });
             });
         });
     });
 }
 exports.commit = commit;
 ;
-function deleteDCase(params, callback) {
-    var userId = constant.SYSTEM_USER_ID;
+function deleteDCase(params, userId, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
-        var dcaseDAO = new model_dcase.DCaseDAO(con);
-        dcaseDAO.remove(params.dcaseId, function (err) {
+        var userDAO = new model_user.UserDAO(con);
+        userDAO.select(userId, function (err, user) {
             if(err) {
                 callback.onFailure(err);
                 return;
             }
-            con.commit(function (err, result) {
-                callback.onSuccess({
-                    dcaseId: params.dcaseId
+            var dcaseDAO = new model_dcase.DCaseDAO(con);
+            dcaseDAO.remove(params.dcaseId, function (err) {
+                if(err) {
+                    callback.onFailure(err);
+                    return;
+                }
+                con.commit(function (err, result) {
+                    callback.onSuccess({
+                        dcaseId: params.dcaseId
+                    });
+                    con.close();
                 });
-                con.close();
             });
         });
     });
 }
 exports.deleteDCase = deleteDCase;
-function editDCase(params, callback) {
-    var userId = constant.SYSTEM_USER_ID;
+function editDCase(params, userId, callback) {
     var con = new db.Database();
     con.begin(function (err, result) {
-        var dcaseDAO = new model_dcase.DCaseDAO(con);
-        dcaseDAO.update(params.dcaseId, params.dcaseName, function (err) {
+        var userDAO = new model_user.UserDAO(con);
+        userDAO.select(userId, function (err, user) {
             if(err) {
                 callback.onFailure(err);
                 return;
             }
-            con.commit(function (err, result) {
+            var dcaseDAO = new model_dcase.DCaseDAO(con);
+            dcaseDAO.update(params.dcaseId, params.dcaseName, function (err) {
                 if(err) {
                     callback.onFailure(err);
                     return;
                 }
-                callback.onSuccess({
-                    dcaseId: params.dcaseId
+                con.commit(function (err, result) {
+                    if(err) {
+                        callback.onFailure(err);
+                        return;
+                    }
+                    callback.onSuccess({
+                        dcaseId: params.dcaseId
+                    });
+                    con.close();
                 });
-                con.close();
             });
         });
     });
 }
 exports.editDCase = editDCase;
-function getCommitList(params, callback) {
+function getCommitList(params, userId, callback) {
     var con = new db.Database();
     var commitDAO = new model_commit.CommitDAO(con);
     commitDAO.list(params.dcaseId, function (err, list) {

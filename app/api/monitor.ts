@@ -6,7 +6,7 @@ import model_monitor = module('../model/monitor')
 import redmine = module('../net/redmine')
 import error = module('./error')
 
-export function modifyMonitorStatus(params:any, callback: type.Callback) {
+export function modifyMonitorStatus(params:any, userId:number, callback: type.Callback) {
 	var commitMessage = 'monitor status exchange';
 
 	function addRebuttalNode(nodeList: any, params: any, thisNodeId: number) : number {
@@ -105,9 +105,10 @@ export function modifyMonitorStatus(params:any, callback: type.Callback) {
 				}
 	
 				var commitDAO = new model_commit.CommitDAO(con);
-				commitDAO.commit(constant.SYSTEM_USER_ID, latestCommit.id, commitMessage, data, (err, result) => {
+				commitDAO.commit(userId, latestCommit.id, commitMessage, data, (err, result) => {
 					if (err) {
 						callback.onFailure(err);
+						return;
 					}
 	
 					monitorDAO.update(params.systemNodeId, rebuttalId, (err: any) => {

@@ -150,6 +150,29 @@ CREATE  TABLE IF NOT EXISTS `issue` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `monitor_node`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `monitor_node` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `dcase_id` INT NOT NULL ,
+  `this_node_id` INT NOT NULL ,
+  `watch_id` VARCHAR(45) NOT NULL ,
+  `preset_id` VARCHAR(45) NULL ,
+  `params` TEXT NULL ,
+  `rebuttal_this_node_id` INT NULL ,
+  `publish_status` INT NOT NULL DEFAULT 0 COMMENT 'REC登録状態\n0: 未\n1: 済\n2: 要更新' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_monitor_node_dcase1` (`dcase_id` ASC) ,
+  UNIQUE INDEX `unq_monitor_node1` (`dcase_id` ASC, `this_node_id` ASC) ,
+  CONSTRAINT `fk_monitor_node_dcase1`
+    FOREIGN KEY (`dcase_id` )
+    REFERENCES `dcase` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

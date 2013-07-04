@@ -8,10 +8,11 @@ import model_commit = module('../model/commit')
 import model_node = module('../model/node')
 import model_pager = module('../model/pager')
 import model_issue = module('../model/issue')
+import model_user = module('../model/user')
 import error = module('./error')
 var async = require('async')
 
-export function searchDCase(params:any, callback: type.Callback) {
+export function searchDCase(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	var dcaseDAO = new model_dcase.DCaseDAO(con);
 	params = params || {};
@@ -48,7 +49,7 @@ export function searchDCase(params:any, callback: type.Callback) {
 	});
 }
 
-export function getDCase(params:any, callback: type.Callback) {
+export function getDCase(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	con.query({sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?', nestTables: true}, [params.dcaseId], (err, result) => {
 		if (err) {
@@ -68,7 +69,7 @@ export function getDCase(params:any, callback: type.Callback) {
 	});
 }
 
-export function getNodeTree(params:any, callback: type.Callback) {
+export function getNodeTree(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	con.query({sql: 'SELECT * FROM commit WHERE id = ?', nestTables: true}, [params.commitId], (err, result) => {
 		if (err) {
@@ -85,7 +86,7 @@ export function getNodeTree(params:any, callback: type.Callback) {
 	});
 }
 
-export function searchNode(params:any, callback: type.Callback) {
+export function searchNode(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var nodeDAO = new model_node.NodeDAO(con);
@@ -118,33 +119,37 @@ export function searchNode(params:any, callback: type.Callback) {
 	});
 }
 
-export function createDCase(params:any, callback: type.Callback) {
-	// TODO: 認証チェック
-	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
-
+export function createDCase(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	con.begin((err, result) => {
-		var dcaseDAO = new model_dcase.DCaseDAO(con);
-		dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName}, (err:any, dcaseId:number) => {
+		var userDAO = new model_user.UserDAO(con);
+		userDAO.select(userId, (err:any, user: model_user.User) => {
 			if (err) {
 				callback.onFailure(err);
 				return;
 			}
-			var commitDAO = new model_commit.CommitDAO(con);
-			commitDAO.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (err:any, commitId:number) => {
+			var dcaseDAO = new model_dcase.DCaseDAO(con);
+			dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName}, (err:any, dcaseId:number) => {
 				if (err) {
 					callback.onFailure(err);
 					return;
 				}
-				var nodeDAO = new model_node.NodeDAO(con);
-				nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, (err:any) => {
+				var commitDAO = new model_commit.CommitDAO(con);
+				commitDAO.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (err:any, commitId:number) => {
 					if (err) {
 						callback.onFailure(err);
 						return;
 					}
-					con.commit((err, result) =>{
-						callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
-						con.close();
+					var nodeDAO = new model_node.NodeDAO(con);
+					nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, (err:any) => {
+						if (err) {
+							callback.onFailure(err);
+							return;
+						}
+						con.commit((err, result) =>{
+							callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
+							con.close();
+						});
 					});
 				});
 			});
@@ -152,72 +157,91 @@ export function createDCase(params:any, callback: type.Callback) {
 	});
 }
 
-export function commit(params: any, callback: type.Callback) {
-	// TODO: 認証チェック
-	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
-
+export function commit(params: any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	var commitDAO = new model_commit.CommitDAO(con);
 	con.begin((err, result) => {
-		// _commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
-		commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err, result) => {
-			con.commit((err, _result) =>{
-				if (err) {
-					callback.onFailure(err);
-					return;
-				}
-				callback.onSuccess(result);
-				con.close();
+		var userDAO = new model_user.UserDAO(con);
+		userDAO.select(userId, (err:any, user: model_user.User) => {
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
+		
+			// _commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
+			commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err, result) => {
+				con.commit((err, _result) =>{
+					if (err) {
+						callback.onFailure(err);
+						return;
+					}
+					callback.onSuccess(result);
+					con.close();
+				});
 			});
 		});
 	});
 };
 
-export function deleteDCase(params:any, callback: type.Callback) {
+export function deleteDCase(params:any, userId: number, callback: type.Callback) {
 	// TODO: 認証チェック
-	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
+	//var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
 
 	var con = new db.Database();
 	con.begin((err, result) => {
-		var dcaseDAO = new model_dcase.DCaseDAO(con);
-		dcaseDAO.remove(params.dcaseId, (err:any) => {
+		var userDAO = new model_user.UserDAO(con);
+		userDAO.select(userId, (err:any, user: model_user.User) => {
 			if (err) {
 				callback.onFailure(err);
 				return;
 			}
-			con.commit((err, result) =>{
-				callback.onSuccess({dcaseId: params.dcaseId});
-				con.close();
-			});
-		});
-	});
-}
-
-export function editDCase(params:any, callback: type.Callback) {
-	// TODO: 認証チェック
-	var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
-
-	var con = new db.Database();
-	con.begin((err, result) => {
-		var dcaseDAO = new model_dcase.DCaseDAO(con);
-		dcaseDAO.update(params.dcaseId, params.dcaseName, (err:any) => {
-			if (err) {
-				callback.onFailure(err);
-				return;
-			}
-			con.commit((err, result) =>{
+			var dcaseDAO = new model_dcase.DCaseDAO(con);
+			dcaseDAO.remove(params.dcaseId, (err:any) => {
 				if (err) {
 					callback.onFailure(err);
 					return;
 				}
-				callback.onSuccess({dcaseId: params.dcaseId});
-				con.close();
+				con.commit((err, result) =>{
+					callback.onSuccess({dcaseId: params.dcaseId});
+					con.close();
+				});
 			});
 		});
 	});
 }
 
-export function getCommitList(params:any, callback: type.Callback) {
+export function editDCase(params:any, userId: number, callback: type.Callback) {
+	// TODO: 認証チェック
+	//var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
+
+	var con = new db.Database();
+	con.begin((err, result) => {
+		var userDAO = new model_user.UserDAO(con);
+		userDAO.select(userId, (err:any, user: model_user.User) => {
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
+			var dcaseDAO = new model_dcase.DCaseDAO(con);
+			dcaseDAO.update(params.dcaseId, params.dcaseName, (err:any) => {
+				if (err) {
+					callback.onFailure(err);
+					return;
+				}
+				con.commit((err, result) =>{
+					if (err) {
+						callback.onFailure(err);
+						return;
+					}
+					callback.onSuccess({dcaseId: params.dcaseId});
+					con.close();
+				});
+			});
+		});
+	});
+}
+
+export function getCommitList(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	var commitDAO = new model_commit.CommitDAO(con);
 	commitDAO.list(params.dcaseId, (err:any, list: model_commit.Commit[]) => {

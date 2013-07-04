@@ -7,7 +7,9 @@ import db = module('../../db/db')
 import rec = module('../../api/rec')
 import error = module('../../api/error')
 import http = module('http')
+import constant = module('../../constant')
 
+var userId = constant.SYSTEM_USER_ID;
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
 var express = require('express');
@@ -24,14 +26,19 @@ app.post('/rec/api/1.0', function (req: any, res: any) {
 
 describe('api', function() {
 	describe('rec', function() {
+		var server = null;
 
 		before((done) => {
-			app.listen(3030).on('listening', done);
+			server = app.listen(3030).on('listening', done);
+		});
+
+		after(() => {
+			server.close();
 		});
 
 		describe('getRawItemList', function() {
 			it('call method', function(done) {
-				rec.getRawItemList(null, {
+				rec.getRawItemList(null, userId, {
 					onSuccess: (result: any) => {
 						expect(result.method).to.eql('getRawItemList');
 						done();
@@ -45,7 +52,7 @@ describe('api', function() {
 		});
 		describe('getPresetList', function() {
 			it('call method', function(done) {
-				rec.getPresetList(null, {
+				rec.getPresetList(null, userId, {
 					onSuccess: (result: any) => {
 						expect(result.method).to.eql('getPresetList');
 						done();

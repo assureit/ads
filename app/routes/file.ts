@@ -29,7 +29,22 @@ export var upload = function(req: any, res: any){
 		return 'upload/' + yy + '/' + mm + '/' + dd;	// TODO: 'upload'をconstantへ入れるか？
 	}
 
-	var userId = constant.SYSTEM_USER_ID;	// TODO:ログインユーザーIDに変更
+	function getUserId() : number {
+		var userId: number = constant.SYSTEM_USER_ID;
+
+		var cookies = {};
+		req.headers.cookie && req.headers.cookie.split(';').forEach(function( cookie ) {
+		var parts = cookie.split('=');
+			cookies[ parts[ 0 ].trim() ] = ( parts[ 1 ] || '' ).trim();
+		});
+
+		if (cookies['userId']) {
+			userId = Number(cookies['userId']);
+		}
+		return userId;
+	}
+
+	var userId = getUserId();
 
 	var upfile = req.files.upfile
 	if (upfile) {

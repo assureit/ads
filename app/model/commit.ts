@@ -4,6 +4,7 @@ import model = module('./model')
 import model_user = module('./user')
 import model_node = module('../model/node')
 import model_issue = module('../model/issue')
+import model_monitor = module('../model/monitor')
 var async = require('async')
 
 export interface InsertArg {
@@ -72,7 +73,7 @@ export class CommitDAO extends model.DAO {
 			var list = new Commit[];
 			result.forEach((row) => {
 				var c = new Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
-				c.user = new model_user.User(row.u.id, row.u.name, row.u.delete_flag, row.u.system_flag)
+				c.user = new model_user.User(row.u.id, row.u.login_name, row.u.delete_flag, row.u.system_flag)
 				list.push(c);
 			});
 			callback(err, list);
@@ -98,6 +99,12 @@ export class CommitDAO extends model.DAO {
 			, (com: Commit, commitId: number, callback) => {
 				var issueDAO = new model_issue.IssueDAO(this.con);
 				issueDAO.publish(com.dcaseId, (err:any) => {
+					callback(err, com, commitId);
+				});
+			} 
+			, (com: Commit, commitId: number, callback) => {
+				var monitorDAO = new model_monitor.MonitorDAO(this.con);
+				monitorDAO.publish(com.dcaseId, (err:any) => {
 					callback(err, {commitId: commitId});
 				});
 			} 

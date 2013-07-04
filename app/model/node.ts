@@ -1,14 +1,24 @@
+// <reference path="../DefinitelyTyped/underscore/underscore.d.ts" />
+
 import model = module('./model')
 import model_dcase = module('./dcase')
 import model_pager = module('./pager')
 import model_issue = module('./issue')
+import model_monitor = module('./monitor')
+// import _ = module('underscore')
+var _ = require('underscore');
 
 export interface MetaData {
 	Type: string;
 	Subject?: string;
 	Description?: string;
 	Visible?:string;
+	// for Issue
 	_IssueId?: number;
+	// for monitor
+	_MonitorNodeId?: number;
+	WatchId?: string;
+	PresetId?: string;
 }
 export interface NodeData {
 	ThisNodeId: number;
@@ -30,41 +40,74 @@ export class NodeDAO extends model.DAO {
 	 *   モニタ作成
 	 */
 	processNodeList(dcaseId:number, commitId:number, list: NodeData[], callback: (err:any)=>void): void {
+		this._processNodeList(dcaseId, commitId, list, list, callback);
+	}
+
+	_processNodeList(dcaseId:number, commitId:number, list: NodeData[], originalList:NodeData[], callback: (err:any)=>void): void {
 		if (list.length == 0) {
 			callback(null);
 			return;
 		}
-		this.processMetaDataList(dcaseId, commitId, list[0].MetaData, (err:any) => {
+		this.processMetaDataList(dcaseId, commitId, list[0], list[0].MetaData, originalList, (err:any) => {
 			if (err) {
 				callback(err);
 				return;
 			}
-			this.processNodeList(dcaseId, commitId, list.slice(1), callback);
+			this._processNodeList(dcaseId, commitId, list.slice(1), originalList, callback);
 		});
 	}
 
-	processMetaDataList(dcaseId:number, commitId:number, list:MetaData[], callback: (err:any)=>void): void {
+	processMetaDataList(dcaseId:number, commitId:number, node:NodeData, list:MetaData[], originalList:NodeData[], callback: (err:any)=>void): void {
 		if (!list || list.length == 0) {
 			callback(null);
 			return;
 		}
-		this.processMetaData(dcaseId, commitId, list[0], (err:any) => {
+		this.processMetaData(dcaseId, commitId, node, list[0], originalList, (err:any) => {
 			if (err) {
 				callback(err);
 				return;
 			}
-			this.processMetaDataList(dcaseId, commitId, list.slice(1), callback);
+			this.processMetaDataList(dcaseId, commitId, node, list.slice(1), originalList, callback);
 		});
 	}
-	processMetaData(dcaseId:number, commitId:number, meta:MetaData, callback: (err:any)=>void): void {
+	processMetaData(dcaseId:number, commitId:number, node:NodeData, meta:MetaData, originalList:NodeData[], callback: (err:any)=>void): void {
 		if (meta.Type == 'Issue' && !meta._IssueId) {
 			var issueDAO = new model_issue.IssueDAO(this.con);
+			// TODO: 必要項目チェック
 			issueDAO.insert(new model_issue.Issue(0, dcaseId, null, meta.Subject, meta.Description), (err:any, result:model_issue.Issue) => {
 				meta._IssueId = result.id;
 				callback(null);
 			});
+			return;
+		} else if (meta.Type == 'Monitor' && !meta._MonitorNodeId) {
+			// TODO: 必要項目チェック
+			var monitorDAO = new model_monitor.MonitorDAO(this.con);
+			var params = 
+				_.reduce(
+					_.filter(
+						_.flatten(
+							_.map(
+								_.filter(originalList, (it:NodeData) => {
+									return _.find(node.Children, (childId:number) => {return it.ThisNodeId == childId;});
+								})
+								, (it:NodeData) => {return it.MetaData;}))
+						, (it: MetaData) => {return it.Type == 'Parameter';})
+					, (param, it:MetaData) => {return _.extend(param, it);}, {});
+			params = _.omit(params, ['Type', 'Visible']);
+
+			monitorDAO.insert(new model_monitor.MonitorNode(0, dcaseId, node.ThisNodeId, meta.WatchId, meta.PresetId, params), 
+					(err:any, monitorId:number) => {
+						if (err) {
+							callback(err);
+							return;
+						}
+						meta._MonitorNodeId = monitorId;
+						callback(null);
+					});
+			return;
 		} else {
 			callback(null);
+			return;
 		}
 	}
 	insert(commitId: number, data: NodeData, callback: (err:any, nodeId: number)=>void): void {

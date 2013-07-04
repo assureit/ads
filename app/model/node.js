@@ -7,6 +7,8 @@ var model = require('./model')
 var model_dcase = require('./dcase')
 var model_pager = require('./pager')
 var model_issue = require('./issue')
+var model_monitor = require('./monitor')
+var _ = require('underscore');
 var Node = (function () {
     function Node(id, commitId, thisNodeId, nodeType, description) {
         this.id = id;
@@ -25,42 +27,74 @@ var NodeDAO = (function (_super) {
 
     }
     NodeDAO.prototype.processNodeList = function (dcaseId, commitId, list, callback) {
+        this._processNodeList(dcaseId, commitId, list, list, callback);
+    };
+    NodeDAO.prototype._processNodeList = function (dcaseId, commitId, list, originalList, callback) {
         var _this = this;
         if(list.length == 0) {
             callback(null);
             return;
         }
-        this.processMetaDataList(dcaseId, commitId, list[0].MetaData, function (err) {
+        this.processMetaDataList(dcaseId, commitId, list[0], list[0].MetaData, originalList, function (err) {
             if(err) {
                 callback(err);
                 return;
             }
-            _this.processNodeList(dcaseId, commitId, list.slice(1), callback);
+            _this._processNodeList(dcaseId, commitId, list.slice(1), originalList, callback);
         });
     };
-    NodeDAO.prototype.processMetaDataList = function (dcaseId, commitId, list, callback) {
+    NodeDAO.prototype.processMetaDataList = function (dcaseId, commitId, node, list, originalList, callback) {
         var _this = this;
         if(!list || list.length == 0) {
             callback(null);
             return;
         }
-        this.processMetaData(dcaseId, commitId, list[0], function (err) {
+        this.processMetaData(dcaseId, commitId, node, list[0], originalList, function (err) {
             if(err) {
                 callback(err);
                 return;
             }
-            _this.processMetaDataList(dcaseId, commitId, list.slice(1), callback);
+            _this.processMetaDataList(dcaseId, commitId, node, list.slice(1), originalList, callback);
         });
     };
-    NodeDAO.prototype.processMetaData = function (dcaseId, commitId, meta, callback) {
+    NodeDAO.prototype.processMetaData = function (dcaseId, commitId, node, meta, originalList, callback) {
         if(meta.Type == 'Issue' && !meta._IssueId) {
             var issueDAO = new model_issue.IssueDAO(this.con);
             issueDAO.insert(new model_issue.Issue(0, dcaseId, null, meta.Subject, meta.Description), function (err, result) {
                 meta._IssueId = result.id;
                 callback(null);
             });
+            return;
+        } else if(meta.Type == 'Monitor' && !meta._MonitorNodeId) {
+            var monitorDAO = new model_monitor.MonitorDAO(this.con);
+            var params = _.reduce(_.filter(_.flatten(_.map(_.filter(originalList, function (it) {
+                return _.find(node.Children, function (childId) {
+                    return it.ThisNodeId == childId;
+                });
+            }), function (it) {
+                return it.MetaData;
+            })), function (it) {
+                return it.Type == 'Parameter';
+            }), function (param, it) {
+                return _.extend(param, it);
+            }, {
+            });
+            params = _.omit(params, [
+                'Type', 
+                'Visible'
+            ]);
+            monitorDAO.insert(new model_monitor.MonitorNode(0, dcaseId, node.ThisNodeId, meta.WatchId, meta.PresetId, params), function (err, monitorId) {
+                if(err) {
+                    callback(err);
+                    return;
+                }
+                meta._MonitorNodeId = monitorId;
+                callback(null);
+            });
+            return;
         } else {
             callback(null);
+            return;
         }
     };
     NodeDAO.prototype.insert = function (commitId, data, callback) {

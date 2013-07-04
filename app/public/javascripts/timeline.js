@@ -45,11 +45,11 @@ var TimeLine = (function () {
         }
         var mm = {
         };
-        var l = (DCaseAPI).getCommitList(arg.getArgumentId());
+        var l = DCaseAPI.getCommitList(arg.getArgumentId());
         for(var i = 0; i < l.length - 1; i++) {
-            var x = mm[l[i].commitId];
-            if(x == null) {
-                x = [];
+            var x = [];
+            if(mm[l[i].commitId]) {
+                x = mm[l[i].commitId];
             }
             if(x.indexOf(l[i + 1].commitId) == -1) {
                 x.push(l[i + 1].commitId);
@@ -185,7 +185,7 @@ var TimeLineView = (function () {
             if(isLatest && viewer.dcase_latest != null) {
                 viewer.setDCase(viewer.dcase_latest);
             } else {
-                var tree = (DCaseAPI).getNodeTree(commitId);
+                var tree = DCaseAPI.getNodeTree(commitId);
                 viewer.setDCase(new DCaseModel(tree, dcaseId, commitId));
             }
             return true;
