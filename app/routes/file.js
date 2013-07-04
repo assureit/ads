@@ -29,7 +29,20 @@ exports.upload = function (req, res) {
         }
         return 'upload/' + yy + '/' + mm + '/' + dd;
     }
-    var userId = constant.SYSTEM_USER_ID;
+    function getUserId() {
+        var userId = constant.SYSTEM_USER_ID;
+        var cookies = {
+        };
+        req.headers.cookie && req.headers.cookie.split(';').forEach(function (cookie) {
+            var parts = cookie.split('=');
+            cookies[parts[0].trim()] = (parts[1] || '').trim();
+        });
+        if(cookies['userId']) {
+            userId = Number(cookies['userId']);
+        }
+        return userId;
+    }
+    var userId = getUserId();
     var upfile = req.files.upfile;
     if(upfile) {
         var con = new db.Database();

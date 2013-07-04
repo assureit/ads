@@ -108,6 +108,7 @@ export function modifyMonitorStatus(params:any, userId:number, callback: type.Ca
 				commitDAO.commit(userId, latestCommit.id, commitMessage, data, (err, result) => {
 					if (err) {
 						callback.onFailure(err);
+						return;
 					}
 	
 					monitorDAO.update(params.systemNodeId, rebuttalId, (err: any) => {
