@@ -10,10 +10,26 @@ import constant = module('../../constant')
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
 
+var express = require('express');
+var app = express();
+app.use(express.bodyParser());
+app.post('/rec/api/1.0', function (req: any, res: any) {
+	res.header('Content-Type', 'application/json');
+	res.send(req.body);
+});
+
 var userId = constant.SYSTEM_USER_ID;
 
 describe('api', function() {
 	describe('monitor', function() {
+		var server = null;
+		before((done) => {
+			server = app.listen(3030).on('listening', done);
+		});
+
+		after(() => {
+			server.close();
+		});
 
 		var con = new db.Database();
 		con.query('INSERT INTO monitor_node(dcase_id, this_node_id) VALUE (12, 2)', (err, expectedResult) => {
@@ -54,7 +70,7 @@ describe('api', function() {
 						});
 					}, 
 					onFailure: (err: any) => {
-						expect(err).not.to.be(null);
+						expect(err).to.be(null);
 						done();
 					},
 				});
@@ -75,7 +91,7 @@ describe('api', function() {
 						});
 					}, 
 					onFailure: (err: any) => {
-						expect(err).not.to.be(null);
+						expect(err).to.be(null);
 						done();
 					},
 				});

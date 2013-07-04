@@ -103,6 +103,7 @@ function modifyMonitorStatus(params, userId, callback) {
                 commitDAO.commit(userId, latestCommit.id, commitMessage, data, function (err, result) {
                     if(err) {
                         callback.onFailure(err);
+                        return;
                     }
                     monitorDAO.update(params.systemNodeId, rebuttalId, function (err) {
                         if(err) {
