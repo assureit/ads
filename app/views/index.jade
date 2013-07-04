@@ -1,63 +1,63 @@
 extends layout
 block bar
-    .navbar.navbar-inverse.navbar-fixed-top
-        .navbar-inner
-            .container
-                button.btn.btn-navbar(type="button", data-toggle="collapse", data-target=".nav-collapse")
-                    span.icon-bar
-                    span.icon-bar
-                    span.icon-bar
-                form#search-form.navbar-search.pull-left
-                    input#search-query.search-query(type="text", placeholder="Search")
-                .nav-collapse.collapse
-                    ul.nav
-                        li
-                            a( href="#{basepath}/")= lang.home
-                        li
-                            a( href="#{basepath}/new") New
-                        li.dropdown.ads-edit-menu
-                            a.dropdown-toggle(data-toggle="dropdown", href="#")= lang.edit
-                                b.caret
-                            ul.dropdown-menu
-                                li
-                                    a#menu-undo(href="#")= lang.undo
-                                li
-                                    a#menu-redo(href="#")= lang.redo
-                           li.dropdown.ads-edit-menu.ads-view-menu
-                               a.dropdown-toggle(data-toggle="dropdown", href="#")= lang.export
-                                   b.caret
-                               ul.dropdown-menu
-                                   li
-                                       a#menu-export-json(href="#")= lang.JSON
-                                   li
-                                       a#menu-export-png(href="#")= lang.PNG
-                                   li
-                                       a#menu-export-pdf(href="#")= lang.PDF
-                                   li
-                                       a#menu-export-dscript(href="#") D-Script
-                            li.ads-edit-menu
-                                a#menu-commit(href="#")= lang.commit
-                            li.dropdown.ads-edit-menu.ads-view-menu
-                                a.dropdown-toggle#menu-history-toggle(href="#")= lang.commitlog
-                                    b.caret
-                            li.dropdown.ads-edit-menu.ads-view-menu
-                                a.dropdown-toggle(data-toggle="dropdown", href="#")= lang.config
-                                    b.caret
-                                ul.dropdown-menu
-                                    li.dropdown-submenu
-                                        a(href="#")= lang.color_theme
-                                        ul#menu-change-theme.dropdown-menu
-                                    li.dropdown-submenu
-                                        a(href="#")= lang.locale
-                                        ul#lang-theme.dropdown-menu
-                                            li
-                                                a#lang-select-english(href="#") English
-                                            li
-                                                a#lang-select-japanese(href="#") 日本語
-                block sign
+    img#menu-button(src="#{basepath}/images/ait.png") Menu
+    .menu
+        ul#drop-menu
+            li
+                a(href='#{basepath}/')= lang.home
+            li.line.ads-edit-menu
+                a(href='#') edit
+                ul
+                    li
+                        a(href='#{basepath}/new') New
+                    li
+                        a(href='#{basepath}/clone') Clone
+                    li
+                        a#menu-undo(href='#')= lang.undo
+                    li
+                        a#menu-redo(href='#')= lang.redo
+                    li
+                        a#menu-commit(href='#')= lang.commit
+            li.ads-edit-menu.ads-view-menu
+                a(href='#') Checker
+                ul
+                    li
+                        a(href='#') simple verifier
+                    li
+                        a(href='#') Agda
+            li.ads-edit-menu.ads-view-menu
+                a(href='#') export
+                ul
+                    li
+                        a#menu-export-json(href="#") JSON
+                    li
+                        a#menu-export-png(href="#") PNG
+                    li
+                        a#menu-export-pef(href="#") PDF
+                    li
+                        a#menu-export-dscript(href="#") D-Script
+                    li
+                        a#menu-export-xml(href="#") XML
+            li.ads-edit-menu.ads-view-menu
+                a#menu-history-toggle(href="#")= lang.commitlog
+            li.ads-edit-menu.ads-view-menu
+                a(href="#")= lang.config
+                ul
+                    li
+                        a Gesture
+                    li
+                        a(href="#")= lang.color_theme
+                        ul#menu-change-theme.dropdown-menu
+                    li
+                        a(href="#")= lang.locale
+                        ul#lang-theme
+                            li
+                                a#lang-select-english(href="#") English
+                            li
+                                a#lang-select-japanese(href="#") Japanese
+            block sign
 block content
     #ase.container
-        img#ads-logo(src="#{basepath}/images/ait.png")
         #viewer(style="display: none;")
         #dcase-manager.container-fluid(style="display: none;")
             .row
