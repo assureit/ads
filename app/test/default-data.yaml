@@ -1,0 +1,10 @@
+# don't forget ' ' after ':'
+user:
+  - {id: 1, login_name: 'system', system_flag: 1}
+  - {id: 101, login_name: 'user1', system_flag: 0}
+  - {id: 102, login_name: 'user2', system_flag: 0}
+  - {id: 103, login_name: 'user3', system_flag: 0}
+dcase:
+  - {id: 201, name: 'dcase1', user_id: 101}
+  - {id: 202, name: 'dcase2', user_id: 102}
+  - {id: 203, name: 'dcase3', user_id: 103}
