@@ -35,6 +35,9 @@ var DCaseViewer = (function () {
             "-ms-touch-action": "none"
         });
         this.canMoveByKeyboard = true;
+        this.exportSubtree = function (view, type) {
+            alert("");
+        };
         this.$root = $(root);
         root.className = "viewer-root";
         var $svgroot = $(document.createElementNS(SVG_NS, "svg")).attr({
@@ -203,9 +206,6 @@ var DCaseViewer = (function () {
                 }
             }
         });
-    };
-    DCaseViewer.prototype.exportSubtree = function (view, type) {
-        alert("");
     };
     DCaseViewer.prototype.getDCase = function () {
         return this.dcase;
@@ -776,8 +776,8 @@ var DNodeView = (function () {
         if(this.$line != null) {
             var l = this.$line[0];
             if(!this.node.isContext) {
-                var start = l.pathSegList.getItem(0);
-                var curve = l.pathSegList.getItem(1);
+                var start = (l).pathSegList.getItem(0);
+                var curve = (l).pathSegList.getItem(1);
                 var x1 = pb.x + pb.w / 2;
                 var y1 = pb.y + pb.h;
                 var x2 = b.x + b.w / 2;
