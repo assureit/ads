@@ -111,7 +111,7 @@ export function modifyMonitorStatus(params:any, userId:number, callback: type.Ca
 						return;
 					}
 	
-					monitorDAO.update(params.systemNodeId, rebuttalId, (err: any) => {
+					monitorDAO.setRebuttalThisNodeId(params.systemNodeId, rebuttalId, (err: any) => {
 						if (err) {
 							callback.onFailure(err);
 							return;

@@ -12,6 +12,7 @@ api/monitor.ts
 api/rec.ts
 db/db.ts
 test/db/db.ts
+test/db/test-db.ts
 test/routes/api.ts
 test/routes/file.ts
 test/api/dcase.ts

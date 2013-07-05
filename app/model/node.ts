@@ -5,8 +5,10 @@ import model_dcase = module('./dcase')
 import model_pager = module('./pager')
 import model_issue = module('./issue')
 import model_monitor = module('./monitor')
+import error = module('../api/error')
 // import _ = module('underscore')
 var _ = require('underscore');
+var async = require('async');
 
 export interface MetaData {
 	Type: string;
@@ -75,6 +77,10 @@ export class NodeDAO extends model.DAO {
 			var issueDAO = new model_issue.IssueDAO(this.con);
 			// TODO: 必要項目チェック
 			issueDAO.insert(new model_issue.Issue(0, dcaseId, null, meta.Subject, meta.Description), (err:any, result:model_issue.Issue) => {
+				if(err) {
+					callback(err);
+					return;					
+				}
 				meta._IssueId = result.id;
 				callback(null);
 			});
@@ -88,22 +94,55 @@ export class NodeDAO extends model.DAO {
 						_.flatten(
 							_.map(
 								_.filter(originalList, (it:NodeData) => {
-									return _.find(node.Children, (childId:number) => {return it.ThisNodeId == childId;});
+									return _.find(node.Children, (childId:number) => {return it.ThisNodeId == childId && it.NodeType == 'Context';});
 								})
 								, (it:NodeData) => {return it.MetaData;}))
 						, (it: MetaData) => {return it.Type == 'Parameter';})
 					, (param, it:MetaData) => {return _.extend(param, it);}, {});
 			params = _.omit(params, ['Type', 'Visible']);
 
-			monitorDAO.insert(new model_monitor.MonitorNode(0, dcaseId, node.ThisNodeId, meta.WatchId, meta.PresetId, params), 
-					(err:any, monitorId:number) => {
-						if (err) {
-							callback(err);
-							return;
+			async.waterfall([
+				(next) => {
+					monitorDAO.findByThisNodeId(dcaseId, node.ThisNodeId, (err:any, monitor:model_monitor.MonitorNode) => {
+						if (err instanceof error.NotFoundError) {
+							next(null, null);
+						} else {
+							next(err, monitor);
 						}
-						meta._MonitorNodeId = monitorId;
-						callback(null);
 					});
+				},
+				(monitor:model_monitor.MonitorNode, next: Function) => {
+					if (monitor) {
+						if (meta.WatchId != monitor.watchId
+							|| meta.PresetId != monitor.watchId
+							|| JSON.stringify(params) != JSON.stringify(monitor.params)) {
+
+							monitor.watchId = meta.WatchId;
+							monitor.presetId = meta.PresetId;
+							monitor.params = params;
+							monitor.publishStatus = model_monitor.PUBLISH_STATUS_UPDATED;
+							monitorDAO.update(monitor, (err:any) => {
+								if (!err) {
+									meta._MonitorNodeId = monitor.id;
+								}
+								next(err);
+							});
+						} else {
+							next(null);
+						}
+					} else {
+						monitorDAO.insert(new model_monitor.MonitorNode(0, dcaseId, node.ThisNodeId, meta.WatchId, meta.PresetId, params), 
+							(err:any, monitorId:number) => {
+								if (!err) {
+									meta._MonitorNodeId = monitorId;
+								}
+								next(err);
+							});
+					}
+				}
+			], (err:any) => {
+				callback(err);
+			});
 			return;
 		} else {
 			callback(null);
@@ -147,7 +186,7 @@ export class NodeDAO extends model.DAO {
 		// TODO: 全文検索エンジン対応
 		var pager = new model_pager.Pager(page);
 		query = '%' + query + '%';
-		this.con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT ? OFFSET ? ', nestTables:true}, 
+		this.con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? ORDER BY c.modified desc, c.id LIMIT ? OFFSET ? ', nestTables:true}, 
 			[query, pager.limit, pager.getOffset()], (err, result) => {
 			if (err) {
 				callback(err, null, null);
