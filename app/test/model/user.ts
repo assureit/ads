@@ -7,7 +7,7 @@ import model_user = module('../../model/user')
 import error = module('../../api/error')
 import domain = module('domain')
 var expect = require('expect.js');	// TODO: import module化
-
+var ldap = require('ldapjs');		// TODO: import module化
 
 describe('model', function() {
 	describe('user', function() {
@@ -17,7 +17,22 @@ describe('model', function() {
 			con = new db.Database();
 			con.begin((err, result) => {
 				userDAO = new model_user.UserDAO(con);
-				done();
+
+				var client = ldap.createClient({url: 'ldap://127.0.0.1/cn=root,dc=assureit,dc=org'});
+				var entry = {
+					cn: 'system',
+					sn: 'system',
+					objectClass: 'inetOrgPerson',
+					userPassword: 'password'
+					};
+
+				client.bind('cn=root,dc=assureit,dc=org', 'vOCDYE66', function(err) {
+					client.add('uid=system,ou=user,dc=assureit,dc=org', entry, function(err) {
+						client.unbind(function(err) {
+							done();
+						});
+					});
+				});
 			});
 		});
 
@@ -28,7 +43,16 @@ describe('model', function() {
 					if (err) {
 						throw err;
 					}
-					done();
+					var client = ldap.createClient({url: 'ldap://127.0.0.1/cn=root,dc=assureit,dc=org'});
+					client.bind('cn=root,dc=assureit,dc=org', 'vOCDYE66', function(err) {
+						client.del('uid=unittest01,ou=user,dc=assureit,dc=org', function(err) {
+							client.del('uid=unittest02,ou=user,dc=assureit,dc=org', function(err) {
+								client.unbind(function(err) {
+									done();
+								});
+							});
+						});
+					});
 				});
 			}
 		});
@@ -65,7 +89,7 @@ describe('model', function() {
 
 
 			});
-			it('can not register if login name is duplicated', function(done) {
+			it('The login name is already registered into LDAP. ', function(done) {
 				var loginName = 'unittest02';
 				var pwd = 'password';
 
@@ -73,8 +97,29 @@ describe('model', function() {
 					expect(err).to.be(null);
 					userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
 						expect(err).not.to.be(null);
-						expect(err instanceof error.DuplicatedError).to.be(true);
+						expect(err instanceof error.InternalError).to.be(true);
+						expect(err.message).to.be('Internal error: OpenLDAP registration failure');
 						done();
+					});
+				});
+			});
+			it('can not register if login name is duplicated', function(done) {
+				var loginName = 'unittest02';
+				var pwd = 'password';
+
+				userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
+					expect(err).to.be(null);
+					var client = ldap.createClient({url: 'ldap://127.0.0.1/cn=root,dc=assureit,dc=org'});
+					client.bind('cn=root,dc=assureit,dc=org', 'vOCDYE66', function(err) {
+						client.del('uid=unittest02,ou=user,dc=assureit,dc=org', function(err) {
+							client.unbind(function(err) {
+								userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
+									expect(err).not.to.be(null);
+									expect(err instanceof error.DuplicatedError).to.be(true);
+									done();
+								});
+							});
+						});
 					});
 				});
 			});

@@ -15,4 +15,8 @@ rec:
   host: "localhost"
   port: 3030
   basePath: "/"
-
+ldap:
+  url: 'ldap://localhost/cn=root,dc=assureit,dc=org'
+  dn: 'uid=$1,ou=user,dc=assureit,dc=org'
+  root: 'cn=root,dc=assureit,dc=org'
+  password: 'ROOTPASSWORD'
