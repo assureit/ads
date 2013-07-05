@@ -297,7 +297,7 @@ var ADS = (function () {
             e.preventDefault();
         });
         $("#menu-export-dscript").click(function (e) {
-            _this.exportTree("dscript", null);
+            _this.exportTree("ds", null);
             e.preventDefault();
         });
         $("#lang-select-english").click(function (e) {

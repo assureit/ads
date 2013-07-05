@@ -6,6 +6,7 @@ routes/api.ts
 routes/index.ts
 routes/javascript.ts
 routes/lang.ts
+routes/dscript.ts
 routes/file.ts
 api/error.ts
 api/jsonrpc.ts
