@@ -1,8 +1,8 @@
-var db = require('../../db/db')
+
 var model_node = require('../../model/node')
 var model_monitor = require('../../model/monitor')
 
-var testdb = require('../../db/test-db')
+
 var testdata = require('../testdata')
 var expect = require('expect.js');
 var async = require('async');
@@ -12,58 +12,18 @@ describe('model', function () {
     var nodeDAO;
     var monitorDAO;
     beforeEach(function (done) {
-        con = new db.Database();
-        testDB = new testdb.TestDB(con);
-        nodeDAO = new model_node.NodeDAO(con);
-        monitorDAO = new model_monitor.MonitorDAO(con);
-        async.waterfall([
-            function (next) {
-                testdata.load([
-                    'test/default-data.yaml'
-                ], function (err) {
-                    return next(err);
-                });
-            }, 
-            function (next) {
-                con.begin(function (err, result) {
-                    return next(err);
-                });
-            }, 
-            
-        ], function (err) {
-            if(err) {
-                throw err;
-            }
+        testdata.begin([
+            'test/default-data.yaml'
+        ], function (err, c) {
+            con = c;
+            nodeDAO = new model_node.NodeDAO(con);
+            monitorDAO = new model_monitor.MonitorDAO(con);
             done();
         });
     });
     afterEach(function (done) {
-        async.waterfall([
-            function (next) {
-                if(con) {
-                    con.rollback(function (err, result) {
-                        return next(err);
-                    });
-                } else {
-                    next();
-                }
-            }, 
-            function (next) {
-                if(con) {
-                    con.close(function (err, result) {
-                        return next(err);
-                    });
-                } else {
-                    next();
-                }
-            }, 
-            function (next) {
-                testdata.clear(function (err) {
-                    return next(err);
-                });
-            }, 
-            
-        ], function (err) {
+        con.rollback(function (err, result) {
+            con.close();
             if(err) {
                 throw err;
             }

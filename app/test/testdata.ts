@@ -13,16 +13,10 @@ export function load(filePathList:string[], callback: (err:any)=>void) {
 	var testDB = new testdb.TestDB(con);
 	async.waterfall([
 		(next:Function) => {
-			con.begin((err:any, result:any) => next(err));
-		},
-		(next:Function) => {
 			testDB.clearAll((err:any) => next(err));
 		}, 
 		(next:Function) => {
 			testDB.load('test/default-data.yaml', (err:any) => next(err));
-		}, 
-		(next:Function) => {
-			con.commit((err:any) => next(err));
 		}, 
 		(next:Function) => {
 			con.close((err:any) => next(err));
@@ -39,13 +33,7 @@ export function clear(callback: (err:any)=>void) {
 	var testDB = new testdb.TestDB(con);
 	async.waterfall([
 		(next:Function) => {
-			con.begin((err:any, result:any) => next(err));
-		},
-		(next:Function) => {
 			testDB.clearAll((err:any) => next(err));
-		}, 
-		(next:Function) => {
-			con.commit((err:any) => next(err));
 		}, 
 		(next:Function) => {
 			con.close((err:any) => next(err));
@@ -53,6 +41,26 @@ export function clear(callback: (err:any)=>void) {
 		], (err:any) => {
 			expect(err).to.be(undefined);
 			callback(err);
+		}
+	);
+}
+
+export function begin(filePathList:string[], callback: (err:any, con:db.Database)=>void) {
+    var con = new db.Database();
+	var testDB = new testdb.TestDB(con);
+	async.waterfall([
+		(next:Function) => {
+			con.begin((err:any, result:any) => next(err));
+		},
+		(next:Function) => {
+			testDB.clearAll((err:any) => next(err));
+		}, 
+		(next:Function) => {
+			testDB.load('test/default-data.yaml', (err:any) => next(err));
+		}, 
+		], (err:any) => {
+			expect(err).to.be(null);
+			callback(err, con);
 		}
 	);
 }

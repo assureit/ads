@@ -17,49 +17,23 @@ describe('model', function() {
 	var con: db.Database
 	var nodeDAO: model_node.NodeDAO;
 	var monitorDAO: model_monitor.MonitorDAO;
-    beforeEach(function (done) {
-        con = new db.Database();
-    	testDB = new testdb.TestDB(con);
-		nodeDAO = new model_node.NodeDAO(con);
-		monitorDAO = new model_monitor.MonitorDAO(con);
-		async.waterfall([
-			(next:Function) => {
-				testdata.load(['test/default-data.yaml'], (err:any) => next(err));
-			},
-			(next:Function) => {
-				con.begin((err:any, result:any) => next(err));
-			},
-			], (err:any) => {
-				if (err) throw err;
-				done();
+	beforeEach(function (done) {
+		testdata.begin(['test/default-data.yaml'], (err:any, c:db.Database) => {
+			con = c;
+			nodeDAO = new model_node.NodeDAO(con);
+			monitorDAO = new model_monitor.MonitorDAO(con);
+			done();
+		});
+	});
+	afterEach(function (done) {
+		con.rollback(function (err, result) {
+			con.close();
+			if(err) {
+				throw err;
 			}
-		);
-    });
-    afterEach(function (done) {
-		async.waterfall([
-			(next:Function) => {
-				if(con) {
-					con.rollback((err, result) => next(err));
-				} else {
-					next();
-				}
-			},
-			(next:Function) => {
-				if(con) {
-					con.close((err, result) => next(err));
-				} else {
-					next();
-				}
-			}, 
-			(next:Function) => {
-				testdata.clear( (err:any) => next(err));
-			}, 
-			], (err:any) => {
-				if (err) throw err;
-				done();
-			}
-		);
-    });
+			done();
+		});
+	});
 	describe('node', function() {
 		describe('process', function() {
 			it('should create issue if metadata exists', function(done) {

@@ -7,22 +7,12 @@ function load(filePathList, callback) {
     var testDB = new testdb.TestDB(con);
     async.waterfall([
         function (next) {
-            con.begin(function (err, result) {
-                return next(err);
-            });
-        }, 
-        function (next) {
             testDB.clearAll(function (err) {
                 return next(err);
             });
         }, 
         function (next) {
             testDB.load('test/default-data.yaml', function (err) {
-                return next(err);
-            });
-        }, 
-        function (next) {
-            con.commit(function (err) {
                 return next(err);
             });
         }, 
@@ -43,17 +33,7 @@ function clear(callback) {
     var testDB = new testdb.TestDB(con);
     async.waterfall([
         function (next) {
-            con.begin(function (err, result) {
-                return next(err);
-            });
-        }, 
-        function (next) {
             testDB.clearAll(function (err) {
-                return next(err);
-            });
-        }, 
-        function (next) {
-            con.commit(function (err) {
                 return next(err);
             });
         }, 
@@ -69,3 +49,29 @@ function clear(callback) {
     });
 }
 exports.clear = clear;
+function begin(filePathList, callback) {
+    var con = new db.Database();
+    var testDB = new testdb.TestDB(con);
+    async.waterfall([
+        function (next) {
+            con.begin(function (err, result) {
+                return next(err);
+            });
+        }, 
+        function (next) {
+            testDB.clearAll(function (err) {
+                return next(err);
+            });
+        }, 
+        function (next) {
+            testDB.load('test/default-data.yaml', function (err) {
+                return next(err);
+            });
+        }, 
+        
+    ], function (err) {
+        expect(err).to.be(null);
+        callback(err, con);
+    });
+}
+exports.begin = begin;
