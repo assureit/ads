@@ -10,11 +10,25 @@ import http = module('http')
 import app = module('../../app')
 import fs = module('fs')
 import db = module('../../db/db')
+// import testdb = module('../../db/test-db')
+import testdata = module('../testdata')
 var request = require('supertest');	// TODO: supertestの宣言ファイル作成
+var async = require('async')
 
 describe('api', function() {
+    var con;
+	beforeEach(function (done) {
+		testdata.load(['test/default-data.yaml'], (err:any) => {
+	        con = new db.Database();
+			done();
+		});
+	});
+	afterEach(function (done) {
+		testdata.clear((err:any) => done());
+	});
 	describe('upload', function() {
 		it('should return HTTP200 return URL ', function(done) {
+			this.timeout(15000);
 			request(app['app'])	// TODO: 型制約を逃げている。要修正。
 				.post('/file')
 				.attach('upfile', 'test/routes/testfiles/uptest.txt')
@@ -83,7 +97,7 @@ describe('api', function() {
 	describe('download', function() {
 		it('not exist file', function(done) {
 			request(app['app'])
-				.get('/file/111')
+				.get('/file/302')
 				.expect(404)
 				.end(function (err, res) {
 					done();
@@ -101,11 +115,11 @@ describe('api', function() {
 		});
 		it('should return name and fileBody', function(done) {
 			request(app['app'])
-				.get('/file/110')
+				.get('/file/301')
 				.expect(200)
 				.end(function (err, res) {
-					assert.equal(res.header['content-type'], 'application/octet-stream');
-					assert.equal(res.header['content-disposition'], 'attachment; filename="uptest.txt"');
+					assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
+					assert.equal(res.header['content-disposition'], 'attachment; filename="file1"');
 					assert.equal(res.text, 'アップロードテスト用のファイルです\n');
 					done();
 				});

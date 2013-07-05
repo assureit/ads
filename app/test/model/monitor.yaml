@@ -1,0 +1,4 @@
+monitor_node:
+  - {id: 1001, dcase_id: 201, this_node_id: 1001, watch_id: 10, preset_id: 100, params: '{"a": "val_a", "b": 2}'}
+  - {id: 1002, dcase_id: 201, this_node_id: 1002, watch_id: 20, preset_id: 200, params: null, publish_status: 2}
+  - {id: 1003, dcase_id: 201, this_node_id: 1003, watch_id: 30, preset_id: 300, params: null, publish_status: 1}

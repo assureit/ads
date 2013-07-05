@@ -6,35 +6,34 @@ import db = module('../../db/db')
 import model_node = module('../../model/node')
 import model_monitor = module('../../model/monitor')
 import error = module('../../api/error')
+import testdata = module('../testdata')
 var expect = require('expect.js');	// TODO: import module化
+var async = require('async')
 
 
 describe('model', function() {
-	describe('node', function() {
-		var con: db.Database
-		var nodeDAO: model_node.NodeDAO;
-		var monitorDAO: model_monitor.MonitorDAO;
-		beforeEach((done) => {
-			con = new db.Database();
-			con.begin((err, result) => {
-				nodeDAO = new model_node.NodeDAO(con);
-				monitorDAO = new model_monitor.MonitorDAO(con);
-				done();
-			});
+    var testDB;
+	var con: db.Database
+	var nodeDAO: model_node.NodeDAO;
+	var monitorDAO: model_monitor.MonitorDAO;
+	beforeEach(function (done) {
+		testdata.begin(['test/default-data.yaml'], (err:any, c:db.Database) => {
+			con = c;
+			nodeDAO = new model_node.NodeDAO(con);
+			monitorDAO = new model_monitor.MonitorDAO(con);
+			done();
 		});
-
-		afterEach((done) => {
-			if (con) {
-				con.rollback((err, result) => {
-					con.close();
-					if (err) {
-						throw err;
-					}
-					done();
-				});
+	});
+	afterEach(function (done) {
+		con.rollback(function (err, result) {
+			con.close();
+			if(err) {
+				throw err;
 			}
+			done();
 		});
-
+	});
+	describe('node', function() {
 		describe('process', function() {
 			it('should create issue if metadata exists', function(done) {
 				var node = {
@@ -57,7 +56,7 @@ describe('model', function() {
 						},
 					]
 				};
-				nodeDAO.processMetaDataList(100, 107, node, node.MetaData, [node], (err: any) => {
+				nodeDAO.processMetaDataList(201, 401, node, node.MetaData, [node], (err: any) => {
 					expect(err).to.be(null);
 					expect(node.MetaData[0]._IssueId).not.to.be(null);
 					expect(node.MetaData[0]._IssueId).not.to.be(undefined);
@@ -124,7 +123,7 @@ describe('model', function() {
 						]
 					}
 				];
-				nodeDAO.processMetaDataList(100, 107, node, node.MetaData, nodeList, (err: any) => {
+				nodeDAO.processMetaDataList(201, 401, node, node.MetaData, nodeList, (err: any) => {
 					expect(err).to.be(null);
 					expect(node.MetaData[0]._MonitorNodeId).not.to.be(null);
 					expect(node.MetaData[0]._MonitorNodeId).not.to.be(undefined);

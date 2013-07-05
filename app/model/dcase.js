@@ -42,7 +42,7 @@ var DCaseDAO = (function (_super) {
         var _this = this;
         var pager = new model_pager.Pager(page);
         this.con.query({
-            sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT ? OFFSET ? ',
+            sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified, c.id desc LIMIT ? OFFSET ? ',
             nestTables: true
         }, [
             pager.limit, 
