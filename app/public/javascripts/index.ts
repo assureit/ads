@@ -5,6 +5,8 @@ $(()=>{
 	var ads: ADS = new ADS(document.getElementById("ase"));
 	ads.initDefaultEventListeners();
 
+	var sidemenu = new SideMenu();
+
 	var $id: JQuery    = $('#signup-userid');
 	var $pass1: JQuery = $('#signup-pass');
 	var $pass2: JQuery = $('#signup-pass2');
