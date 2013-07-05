@@ -350,7 +350,7 @@ class ADS {
 		});
 
 		$("#menu-export-dscript").click((e)=> {
-			this.exportTree("dscript", null);
+			this.exportTree("ds", null);
 			e.preventDefault();
 		});
 
