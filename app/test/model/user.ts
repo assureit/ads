@@ -7,7 +7,8 @@ import model_user = module('../../model/user')
 import error = module('../../api/error')
 import domain = module('domain')
 var expect = require('expect.js');	// TODO: import module化
-
+var ldap = require('ldapjs');		// TODO: import module化
+var CONFIG = require('config');
 
 describe('model', function() {
 	describe('user', function() {
@@ -17,7 +18,23 @@ describe('model', function() {
 			con = new db.Database();
 			con.begin((err, result) => {
 				userDAO = new model_user.UserDAO(con);
-				done();
+
+				var client = ldap.createClient({url: CONFIG.ldap.url});
+				var entry = {
+					cn: 'system',
+					sn: 'system',
+					objectClass: 'inetOrgPerson',
+					userPassword: 'password'
+					};
+
+				client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
+					var dn = CONFIG.ldap.dn.replace('$1', 'system');
+					client.add(dn, entry, function(err) {
+						client.unbind(function(err) {
+							done();
+						});
+					});
+				});
 			});
 		});
 
@@ -28,7 +45,21 @@ describe('model', function() {
 					if (err) {
 						throw err;
 					}
-					done();
+					var client = ldap.createClient({url: CONFIG.ldap.url});
+					client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
+						var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
+						client.del(dn, function(err) {
+							var dn2 = CONFIG.ldap.dn.replace('$1', 'unittest02');
+							client.del(dn2, function(err) {
+								var dn3 = CONFIG.ldap.dn.replace('$1', 'system');
+								client.del(dn3, function(err) {
+									client.unbind(function(err) {
+										done();
+									});
+								});
+							});
+						});
+					});
 				});
 			}
 		});
@@ -65,7 +96,7 @@ describe('model', function() {
 
 
 			});
-			it('can not register if login name is duplicated', function(done) {
+			it('The login name is already registered into LDAP. ', function(done) {
 				var loginName = 'unittest02';
 				var pwd = 'password';
 
@@ -73,8 +104,30 @@ describe('model', function() {
 					expect(err).to.be(null);
 					userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
 						expect(err).not.to.be(null);
-						expect(err instanceof error.DuplicatedError).to.be(true);
+						expect(err instanceof error.InternalError).to.be(true);
+						expect(err.message).to.be('Internal error: OpenLDAP registration failure');
 						done();
+					});
+				});
+			});
+			it('can not register if login name is duplicated', function(done) {
+				var loginName = 'unittest02';
+				var pwd = 'password';
+
+				userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
+					expect(err).to.be(null);
+					var client = ldap.createClient({url: CONFIG.ldap.url});
+					client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
+						var dn = CONFIG.ldap.dn.replace('$1', 'unittest02');
+						client.del(dn, function(err) {
+							client.unbind(function(err) {
+								userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
+									expect(err).not.to.be(null);
+									expect(err instanceof error.DuplicatedError).to.be(true);
+									done();
+								});
+							});
+						});
 					});
 				});
 			});

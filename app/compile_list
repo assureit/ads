@@ -21,6 +21,7 @@ test/model/user.ts
 test/model/node.ts
 test/model/monitor.ts
 test/net/redmine.ts
+test/net/ldap.ts
 public/javascripts/ads.ts
 public/javascripts/adsComponentView.ts
 public/javascripts/animation.ts
