@@ -42,10 +42,10 @@ describe('api', function() {
 			server.close();
 		});
 
-		var con = new db.Database();
-		con.query('INSERT INTO monitor_node(dcase_id, this_node_id) VALUE (12, 2)', (err, expectedResult) => {
-			con.close();
-		});
+		// var con = new db.Database();
+		// con.query('INSERT INTO monitor_node(dcase_id, this_node_id) VALUE (12, 2)', (err, expectedResult) => {
+		// 	con.close();
+		// });
 
 		describe('modifyMonitorStatus', function() {
 			it('system node ID not existing is specified ', function(done) {
