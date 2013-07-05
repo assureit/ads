@@ -3,10 +3,50 @@ var assert = require('assert')
 var app = require('../../app')
 var fs = require('fs')
 var db = require('../../db/db')
+var testdb = require('../../db/test-db')
 var request = require('supertest');
+var async = require('async');
 describe('api', function () {
+    var con;
+    var testDB;
+    beforeEach(function (done) {
+        con = new db.Database();
+        testDB = new testdb.TestDB(con);
+        async.waterfall([
+            function (next) {
+                con.begin(function (err, result) {
+                    return next(err);
+                });
+            }, 
+            function (next) {
+                testDB.load('test/default-data.yaml', function (err) {
+                    next(err);
+                });
+            }, 
+            function (next) {
+                con.commit(function (err, result) {
+                    return next(err);
+                });
+            }, 
+            
+        ], function (err) {
+            done();
+        });
+    });
+    afterEach(function (done) {
+        if(con) {
+            con.rollback(function (err, result) {
+                con.close();
+                if(err) {
+                    throw err;
+                }
+                done();
+            });
+        }
+    });
     describe('upload', function () {
         it('should return HTTP200 return URL ', function (done) {
+            this.timeout(15000);
             request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
                 if(err) {
                     throw err;
@@ -75,7 +115,7 @@ describe('api', function () {
     });
     describe('download', function () {
         it('not exist file', function (done) {
-            request(app['app']).get('/file/111').expect(404).end(function (err, res) {
+            request(app['app']).get('/file/302').expect(404).end(function (err, res) {
                 done();
             });
         });
@@ -87,9 +127,9 @@ describe('api', function () {
             });
         });
         it('should return name and fileBody', function (done) {
-            request(app['app']).get('/file/110').expect(200).end(function (err, res) {
-                assert.equal(res.header['content-type'], 'application/octet-stream');
-                assert.equal(res.header['content-disposition'], 'attachment; filename="uptest.txt"');
+            request(app['app']).get('/file/301').expect(200).end(function (err, res) {
+                assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
+                assert.equal(res.header['content-disposition'], 'attachment; filename="file1"');
                 assert.equal(res.text, 'アップロードテスト用のファイルです\n');
                 done();
             });

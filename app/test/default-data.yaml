@@ -8,3 +8,6 @@ dcase:
   - {id: 201, name: 'dcase1', user_id: 101}
   - {id: 202, name: 'dcase2', user_id: 102}
   - {id: 203, name: 'dcase3', user_id: 103}
+file:
+  - {id: 301, name: 'file1', path: 'test/routes/testfiles/uptest.txt', user_id: 1}
+  - {id: 302, name: 'notfound', path: 'test/routes/testfiles/notfound.', user_id: 1}
