@@ -1,6 +1,5 @@
 app.ts
 constant.ts
-ldapdummy.ts
 routes/api.ts
 routes/index.ts
 routes/javascript.ts

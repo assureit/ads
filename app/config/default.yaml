@@ -22,5 +22,6 @@ ldap:
   dn: 'uid=$1,ou=user,dc=assureit,dc=org'
   root: 'cn=root,dc=assureit,dc=org'
   password: 'ROOTPASSWORD'
-  dummyip: 'localhost'
-  dummyport: 3040
+  dummy:
+    ip: 'localhost'
+    port: 3040

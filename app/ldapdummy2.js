@@ -35,45 +35,17 @@ server.bind(rootSUFFIX, function (req, res, next) {
     return next();
 });
 server.add(SUFFIX, authorize, function (req, res, next) {
-    var dn = req.dn.toString();
-    console.log('---- ADD dn=' + dn);
-    if(db[dn]) {
-        console.log('add error already exists');
-        return next(new ldap.EntryAlreadyExistsError(dn));
-    }
-    db[dn] = req.toObject().attributes;
-    console.log('---- ADD OK ----');
+    console.log('---- CALL ADD ----');
     res.end();
     return next();
 });
 server.bind(SUFFIX, function (req, res, next) {
-    var dn = req.dn.toString();
-    console.log('---- BIND dn=' + dn);
-    if(!db[dn]) {
-        console.log('bind error no such object');
-        return next(new ldap.NoSuchObjectError(dn));
-    }
-    if(!db[dn].userpassword) {
-        console.log('bind error no such attribute userPassword');
-        return next(new ldap.NoSuchAttributeError('userPassword'));
-    }
-    if(db[dn].userpassword[0] !== req.credentials) {
-        console.log('bind error credential error');
-        return next(new ldap.InvalidCredentialsError());
-    }
-    console.log('---- BIND OK ----');
+    console.log('---- CALL BIND ----');
     res.end();
     return next();
 });
 server.del(SUFFIX, authorize, function (req, res, next) {
-    var dn = req.dn.toString();
-    console.log('---- DELETE dn=' + dn);
-    if(!db[dn]) {
-        console.log('delete error no such object');
-        return next(new ldap.NoSuchObjectError(dn));
-    }
-    delete db[dn];
-    console.log('---- DELETE OK ----');
+    console.log('---- CALL DELETE ----');
     res.end();
     return next();
 });

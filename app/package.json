@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node app.js",
     "start_ldap": "node ldapdummy.js",
+    "start_ldap2": "node ldapdummy2.js",
     "test": "sh ../scripts/test.sh",
     "test_debug": "sh ../scripts/test_debug.sh",
     "make": "tsc @compile_list"
