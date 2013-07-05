@@ -1,7 +1,8 @@
 ///<reference path='../DefinitelyTyped/node/node.d.ts'/>
 import childProcess = module('child_process')
 import fs           = module('fs')
-import lang = module('./lang')
+import lang         = module('./lang')
+import dscript      = module('./dscript')
 var CONFIG = require('config')
 //import ex = module('./exporter')
 
@@ -40,6 +41,11 @@ export var exporter = function(req: any, res: any) {
 			return;
 		case "json":
 			res.send(req.body.json);
+			return;
+		case "ds":
+			res.set('Content-type','text/plain; charset=utf-8');
+			var ex = new dscript.DScriptExporter();
+			res.send(ex.export(req.body.json));
 			return;
 		default:
 			res.send(400, "Bad Request");
