@@ -1,11 +1,11 @@
 #menu-button {
 	margin: 0 auto;
-	width:  200px;
-	height: 48px;
+/*	width:  200px;*/
+	height: 54px;
 	display: inline-block;
 	position: absolute;
 	top: 0px;
-	left: 0px;
+	left: 26px;
 	z-index: 99999;
 }
 
