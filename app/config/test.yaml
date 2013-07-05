@@ -1,0 +1,15 @@
+mysql:
+  host: 'localhost'
+  user: 'ads_test'
+  password: 'ads_test'
+  database: 'ads_test'
+test:
+  database:
+    tables:
+      - 'monitor_node'
+      - 'issue'
+      - 'node'
+      - 'commit'
+      - 'dcase'
+      - 'file'
+      - 'user'

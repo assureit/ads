@@ -7,6 +7,7 @@ import db = module('../../db/db');
 import dcase = module('../../api/dcase')
 import error = module('../../api/error')
 import constant = module('../../constant')
+import testdata = module('../testdata')
 
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
@@ -14,13 +15,23 @@ var expect = require('expect.js');	// TODO: import module化
 var userId = constant.SYSTEM_USER_ID;
 
 describe('api', function() {
+    var con;
+	beforeEach(function (done) {
+		testdata.load(['test/default-data.yaml'], (err:any) => {
+	        con = new db.Database();
+			done();
+		});
+	});
+	afterEach(function (done) {
+		testdata.clear((err:any) => done());
+	});
 	describe('dcase', function() {
 		describe('searchDCase', function() {
 
 			it('should return result', function(done) {
 				dcase.searchDCase(null, userId, {
 					onSuccess: (result: any) => {
-						// console.log(result);
+						expect(result).not.to.be(null);
 						done();
 					}, 
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
@@ -46,7 +57,6 @@ describe('api', function() {
 						expect(result.summary.totalItems).not.to.be(undefined);
 						expect(result.summary.itemsPerPage).not.to.be(undefined);
 
-						var con = new db.Database();
 						con.query('SELECT count(d.id) as cnt FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE', (err, expectedResult) => {
 							if (err) {
 								con.close();
@@ -108,7 +118,7 @@ describe('api', function() {
 			it('should start from offset 0', function(done) {
 				// 最初のクエリとsearchDCaseの実行間にcreateDCaseが走ってエラーになったことがあったかもしれない。
 				var con = new db.Database();
-				con.query('SELECT d.* FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT 1', (err, expectedResult) => {
+				con.query('SELECT d.* FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified, c.id desc LIMIT 1', (err, expectedResult) => {
 					if (err) {
 						con.close();
 						throw err;
@@ -128,45 +138,46 @@ describe('api', function() {
 
 		describe('getDCase', function() {
 			it('should return result', function(done) {
-				dcase.getDCase({dcaseId: 50}, userId, {
+				dcase.getDCase({dcaseId: 201}, userId, {
 					onSuccess: (result: any) => {
 						// console.log(result);
+						done();
 					}, 
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
-				done();
 			});
 		});
 
 		describe('getNodeTree', function() {
 			it('should return result', function(done) {
-				dcase.getNodeTree({commitId: 42}, userId, {
+				dcase.getNodeTree({commitId: 401}, userId, {
 					onSuccess: (result: any) => {
 						// console.log(result);
+						done();
 					}, 
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
-				done();
 			});
 		});
 
 		describe('getCommitList', function() {
 			it('should return result', function(done) {
-				dcase.getCommitList({dcaseId: 50}, userId, {
+				dcase.getCommitList({dcaseId: 201}, userId, {
 					onSuccess: (result: any) => {
-						// console.log(result);
+						expect(result.commitList.length > 0).to.be(true);
+						done();
 					}, 
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
-				done();
 			});
 		});
 
 		describe('searchNode', function() {
 			it('should return result', function(done) {
-				dcase.searchNode({text: 'dcase1'}, userId, {
+				dcase.searchNode({text: 'node402'}, userId, {
 					onSuccess: (result: any) => {
 						expect(result.searchResultList).to.be.an('array');
+						expect(result.searchResultList.length > 0).to.be(true);
 						expect(result.searchResultList[0].dcaseId).not.to.be(undefined);
 						expect(result.searchResultList[0].nodeId).not.to.be(undefined);
 						expect(result.searchResultList[0].dcaseName).not.to.be(undefined);
@@ -178,7 +189,7 @@ describe('api', function() {
 				});
 			});
 			it('dcaseList should be limited length', function(done) {
-				dcase.searchNode({text: 'dcase1', page:1}, userId, {
+				dcase.searchNode({text: 'node', page:1}, userId, {
 					onSuccess: (result: any) => {
 						assert.equal(20, result.searchResultList.length);
 						done();
@@ -188,7 +199,7 @@ describe('api', function() {
 			});
 
 			it('provides paging feature', function(done) {
-				var query = 'dcase1';
+				var query = 'node';
 				dcase.searchNode({text: query, page:1}, userId, {
 					onSuccess: (result: any) => {
 						expect(result.summary).not.to.be(undefined);
@@ -213,7 +224,7 @@ describe('api', function() {
 			});
 
 			it('can return next page result', function(done) {
-				var query = 'dcase1';
+				var query = 'node';
 				dcase.searchNode({text: query, page:1}, userId, {
 					onSuccess: (result1st: any) => {
 						dcase.searchNode({text: query, page:2}, userId, {
@@ -229,7 +240,7 @@ describe('api', function() {
 			});
 
 			it('allow page 0 as 1', function(done) {
-				var query = 'dcase1';
+				var query = 'node';
 				dcase.searchNode({text: query, page:1}, userId, {
 					onSuccess: (result1st: any) => {
 						dcase.searchNode({text: query, page:0}, userId, {
@@ -245,7 +256,7 @@ describe('api', function() {
 			});
 
 			it('allow minus page as 1', function(done) {
-				var query = 'dcase1';
+				var query = 'node';
 				dcase.searchNode({text: query, page:1}, userId, {
 					onSuccess: (result1st: any) => {
 						dcase.searchNode({text: query, page:-1}, userId, {
@@ -262,9 +273,9 @@ describe('api', function() {
 
 			it('should start from offset 0', function(done) {
 				// 最初のクエリとsearchDCaseの実行間にcreateDCaseが走ってエラーになったことがあったかもしれない。
-				var query = 'dcase1';
+				var query = 'node';
 				var con = new db.Database();
-				con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT 1', nestTables:true}, 
+				con.query({sql:'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? ORDER BY c.modified desc, c.id LIMIT 1', nestTables:true}, 
 					['%' + query + '%'], (err, expectedResult) => {
 					if (err) {
 						con.close();
@@ -277,7 +288,7 @@ describe('api', function() {
 								nodeId: result.searchResultList[0].nodeId
 							}).to.eql({
 								dcaseId: expectedResult[0].d.id,
-								nodeId: expectedResult[0].n.id
+								nodeId: expectedResult[0].n.this_node_id
 							});
 							done();
 						}, 
@@ -287,7 +298,7 @@ describe('api', function() {
 			});
 		});
 
-		///////////////////////////////////////////////
+		// ///////////////////////////////////////////////
 		describe('createDCase', function() {
 			it('should return result', function(done) {
 				dcase.createDCase(
@@ -375,11 +386,10 @@ describe('api', function() {
 		describe('deleteDCase', function() {
 			it('should return result', function(done) {
 				dcase.deleteDCase(
-					{dcaseId: 36}, 
+					{dcaseId: 201}, 
 					userId, 
 					{
 						onSuccess: (result: any) => {
-							// console.log(result);
 							done();
 						}, 
 						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
@@ -409,7 +419,7 @@ describe('api', function() {
 		describe('editDCase', function() {
 			it('should return result', function(done) {
 				dcase.editDCase(
-					{dcaseId: 37, dcaseName: 'modified dcase name'}, 
+					{dcaseId: 201, dcaseName: 'modified dcase name'}, 
 					userId, 
 					{
 						onSuccess: (result: any) => {
@@ -422,7 +432,7 @@ describe('api', function() {
 			});
 			it('UserId Not Found', function(done) {
 				dcase.editDCase(
-					{dcaseId: 37, dcaseName: 'modified dcase name'}, 
+					{dcaseId: 201, dcaseName: 'modified dcase name'}, 
 					99999, 
 					{
 						onSuccess: (result: any) => {
@@ -446,7 +456,7 @@ describe('api', function() {
 				this.timeout(15000);
 				dcase.commit(
 					{
-						commitId: 12,
+						commitId: 401,
 						commitMessage: 'test',
 						contents: {
 							NodeCount:3,
@@ -514,7 +524,7 @@ describe('api', function() {
 				this.timeout(15000);
 				dcase.commit(
 					{
-						commitId: 12,
+						commitId: 401,
 						commitMessage: 'test',
 						contents: {
 							NodeCount:3,

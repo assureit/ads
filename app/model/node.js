@@ -8,7 +8,9 @@ var model_dcase = require('./dcase')
 var model_pager = require('./pager')
 var model_issue = require('./issue')
 var model_monitor = require('./monitor')
+var error = require('../api/error')
 var _ = require('underscore');
+var async = require('async');
 var Node = (function () {
     function Node(id, commitId, thisNodeId, nodeType, description) {
         this.id = id;
@@ -61,6 +63,10 @@ var NodeDAO = (function (_super) {
         if(meta.Type == 'Issue' && !meta._IssueId) {
             var issueDAO = new model_issue.IssueDAO(this.con);
             issueDAO.insert(new model_issue.Issue(0, dcaseId, null, meta.Subject, meta.Description), function (err, result) {
+                if(err) {
+                    callback(err);
+                    return;
+                }
                 meta._IssueId = result.id;
                 callback(null);
             });
@@ -69,7 +75,7 @@ var NodeDAO = (function (_super) {
             var monitorDAO = new model_monitor.MonitorDAO(this.con);
             var params = _.reduce(_.filter(_.flatten(_.map(_.filter(originalList, function (it) {
                 return _.find(node.Children, function (childId) {
-                    return it.ThisNodeId == childId;
+                    return it.ThisNodeId == childId && it.NodeType == 'Context';
                 });
             }), function (it) {
                 return it.MetaData;
@@ -83,13 +89,42 @@ var NodeDAO = (function (_super) {
                 'Type', 
                 'Visible'
             ]);
-            monitorDAO.insert(new model_monitor.MonitorNode(0, dcaseId, node.ThisNodeId, meta.WatchId, meta.PresetId, params), function (err, monitorId) {
-                if(err) {
-                    callback(err);
-                    return;
-                }
-                meta._MonitorNodeId = monitorId;
-                callback(null);
+            async.waterfall([
+                function (next) {
+                    monitorDAO.findByThisNodeId(dcaseId, node.ThisNodeId, function (err, monitor) {
+                        if(err instanceof error.NotFoundError) {
+                            next(null, null);
+                        } else {
+                            next(err, monitor);
+                        }
+                    });
+                }, 
+                function (monitor, next) {
+                    if(monitor) {
+                        if(meta.WatchId != monitor.watchId || meta.PresetId != monitor.watchId || JSON.stringify(params) != JSON.stringify(monitor.params)) {
+                            monitor.watchId = meta.WatchId;
+                            monitor.presetId = meta.PresetId;
+                            monitor.params = params;
+                            monitor.publishStatus = model_monitor.PUBLISH_STATUS_UPDATED;
+                            monitorDAO.update(monitor, function (err) {
+                                if(!err) {
+                                    meta._MonitorNodeId = monitor.id;
+                                }
+                                next(err);
+                            });
+                        } else {
+                            next(null);
+                        }
+                    } else {
+                        monitorDAO.insert(new model_monitor.MonitorNode(0, dcaseId, node.ThisNodeId, meta.WatchId, meta.PresetId, params), function (err, monitorId) {
+                            if(!err) {
+                                meta._MonitorNodeId = monitorId;
+                            }
+                            next(err);
+                        });
+                    }
+                }            ], function (err) {
+                callback(err);
             });
             return;
         } else {
@@ -136,7 +171,7 @@ var NodeDAO = (function (_super) {
         var pager = new model_pager.Pager(page);
         query = '%' + query + '%';
         this.con.query({
-            sql: 'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? LIMIT ? OFFSET ? ',
+            sql: 'SELECT * FROM node n, commit c, dcase d WHERE n.commit_id=c.id AND c.dcase_id=d.id AND c.latest_flag=TRUE AND n.description LIKE ? ORDER BY c.modified desc, c.id LIMIT ? OFFSET ? ',
             nestTables: true
         }, [
             query, 

@@ -1,6 +1,7 @@
 var childProcess = require('child_process')
 var fs = require('fs')
 var lang = require('./lang')
+var dscript = require('./dscript')
 var model_user = require('../model/user')
 var db = require('../db/db')
 var CONFIG = require('config');
@@ -43,6 +44,11 @@ exports.exporter = function (req, res) {
             return;
         case "json":
             res.send(req.body.json);
+            return;
+        case "ds":
+            res.set('Content-type', 'text/plain; charset=utf-8');
+            var ex = new dscript.DScriptExporter();
+            res.send(ex.export(req.body.json));
             return;
         default:
             res.send(400, "Bad Request");

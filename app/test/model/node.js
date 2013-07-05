@@ -1,32 +1,35 @@
-var db = require('../../db/db')
+
 var model_node = require('../../model/node')
 var model_monitor = require('../../model/monitor')
 
+var testdata = require('../testdata')
 var expect = require('expect.js');
+var async = require('async');
 describe('model', function () {
-    describe('node', function () {
-        var con;
-        var nodeDAO;
-        var monitorDAO;
-        beforeEach(function (done) {
-            con = new db.Database();
-            con.begin(function (err, result) {
-                nodeDAO = new model_node.NodeDAO(con);
-                monitorDAO = new model_monitor.MonitorDAO(con);
-                done();
-            });
+    var testDB;
+    var con;
+    var nodeDAO;
+    var monitorDAO;
+    beforeEach(function (done) {
+        testdata.begin([
+            'test/default-data.yaml'
+        ], function (err, c) {
+            con = c;
+            nodeDAO = new model_node.NodeDAO(con);
+            monitorDAO = new model_monitor.MonitorDAO(con);
+            done();
         });
-        afterEach(function (done) {
-            if(con) {
-                con.rollback(function (err, result) {
-                    con.close();
-                    if(err) {
-                        throw err;
-                    }
-                    done();
-                });
+    });
+    afterEach(function (done) {
+        con.rollback(function (err, result) {
+            con.close();
+            if(err) {
+                throw err;
             }
+            done();
         });
+    });
+    describe('node', function () {
         describe('process', function () {
             it('should create issue if metadata exists', function (done) {
                 var node = {
@@ -50,7 +53,7 @@ describe('model', function () {
                         
                     ]
                 };
-                nodeDAO.processMetaDataList(100, 107, node, node.MetaData, [
+                nodeDAO.processMetaDataList(201, 401, node, node.MetaData, [
                     node
                 ], function (err) {
                     expect(err).to.be(null);
@@ -124,7 +127,7 @@ describe('model', function () {
                         ]
                     }
                 ];
-                nodeDAO.processMetaDataList(100, 107, node, node.MetaData, nodeList, function (err) {
+                nodeDAO.processMetaDataList(201, 401, node, node.MetaData, nodeList, function (err) {
                     expect(err).to.be(null);
                     expect(node.MetaData[0]._MonitorNodeId).not.to.be(null);
                     expect(node.MetaData[0]._MonitorNodeId).not.to.be(undefined);
