@@ -37,6 +37,29 @@ export class MonitorDAO extends model.DAO {
 			}
 			, (result:any, next) => {
 				// TODO: NotFoundErrorチェック
+				if (result.length == 0) {
+					next(new error.NotFoundError('The monitor node was not found. [ID: ' + id + ']')); 
+					return;
+				}
+				var monitor = MonitorNode.tableToObject(result[0]);
+				next(null, monitor);
+			}
+		], (err:any, monitor:MonitorNode) => {
+			callback(err, monitor);
+		});
+	}
+	findByThisNodeId(dcaseId:number, thisNodeId:number, callback:(err:any, monitor:MonitorNode)=>void) {
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT * FROM monitor_node WHERE dcase_id=? AND this_node_id=?', [dcaseId, thisNodeId], (err:any, result:any) => {
+					next(err, result);
+				});
+			}
+			, (result:any, next) => {
+				if (result.length == 0) {
+					next(new error.NotFoundError('The monitor node was not found. [DCase ID: ' + dcaseId + ', This_Node_Id: ' + thisNodeId + ']')); 
+					return;
+				}
 				var monitor = MonitorNode.tableToObject(result[0]);
 				next(null, monitor);
 			}
@@ -60,6 +83,18 @@ export class MonitorDAO extends model.DAO {
 			callback(err, result.insertId);
 		});
 	}
+	update(monitor: MonitorNode, callback: (err: any) => void) {
+		async.waterfall([
+			(next) => {
+				this.con.query('UPDATE monitor_node SET dcase_id=?, this_node_id=?, watch_id=?, preset_id=?, params=?, rebuttal_this_node_id=?, publish_status=? WHERE id=?', 
+						[monitor.dcaseId, monitor.thisNodeId , monitor.watchId, monitor.presetId, JSON.stringify(monitor.params), monitor.rebuttalThisNodeId, monitor.publishStatus, monitor.id], (err:any, result:any) => {
+					next(err);
+				});
+			}
+		], (err:any) => {
+			callback(err);
+		});
+	}
 	// insert(param: InsertMonitor, callback: (err: any, id: number) => void) {
 	// 	this.con.query('INSERT INTO monitor_node(dcase_id, this_node_id, preset_id, params) VALUES(?,?,?,?) ', 
 	// 			[param.dcaseId, param.thisNodeId , param.preSetId, param.params], (err, result) => {
@@ -72,7 +107,7 @@ export class MonitorDAO extends model.DAO {
 	// 	});
 	// }
 
-	update(id: number, rebuttal_id: number, callback: (err: any) => void) {
+	setRebuttalThisNodeId(id: number, rebuttal_id: number, callback: (err: any) => void) {
 		this.con.query('UPDATE monitor_node  SET rebuttal_this_node_id = ? where id = ?', [rebuttal_id, id], (err, result) => {
 			if (err) {
 				callback(err);

@@ -5,8 +5,10 @@ import model_dcase = module('./dcase')
 import model_pager = module('./pager')
 import model_issue = module('./issue')
 import model_monitor = module('./monitor')
+import error = module('../api/error')
 // import _ = module('underscore')
 var _ = require('underscore');
+var async = require('async');
 
 export interface MetaData {
 	Type: string;
@@ -92,22 +94,55 @@ export class NodeDAO extends model.DAO {
 						_.flatten(
 							_.map(
 								_.filter(originalList, (it:NodeData) => {
-									return _.find(node.Children, (childId:number) => {return it.ThisNodeId == childId;});
+									return _.find(node.Children, (childId:number) => {return it.ThisNodeId == childId && it.NodeType == 'Context';});
 								})
 								, (it:NodeData) => {return it.MetaData;}))
 						, (it: MetaData) => {return it.Type == 'Parameter';})
 					, (param, it:MetaData) => {return _.extend(param, it);}, {});
 			params = _.omit(params, ['Type', 'Visible']);
 
-			monitorDAO.insert(new model_monitor.MonitorNode(0, dcaseId, node.ThisNodeId, meta.WatchId, meta.PresetId, params), 
-					(err:any, monitorId:number) => {
-						if (err) {
-							callback(err);
-							return;
+			async.waterfall([
+				(next) => {
+					monitorDAO.findByThisNodeId(dcaseId, node.ThisNodeId, (err:any, monitor:model_monitor.MonitorNode) => {
+						if (err instanceof error.NotFoundError) {
+							next(null, null);
+						} else {
+							next(err, monitor);
 						}
-						meta._MonitorNodeId = monitorId;
-						callback(null);
 					});
+				},
+				(monitor:model_monitor.MonitorNode, next: Function) => {
+					if (monitor) {
+						if (meta.WatchId != monitor.watchId
+							|| meta.PresetId != monitor.watchId
+							|| JSON.stringify(params) != JSON.stringify(monitor.params)) {
+
+							monitor.watchId = meta.WatchId;
+							monitor.presetId = meta.PresetId;
+							monitor.params = params;
+							monitor.publishStatus = model_monitor.PUBLISH_STATUS_UPDATED;
+							monitorDAO.update(monitor, (err:any) => {
+								if (!err) {
+									meta._MonitorNodeId = monitor.id;
+								}
+								next(err);
+							});
+						} else {
+							next(null);
+						}
+					} else {
+						monitorDAO.insert(new model_monitor.MonitorNode(0, dcaseId, node.ThisNodeId, meta.WatchId, meta.PresetId, params), 
+							(err:any, monitorId:number) => {
+								if (!err) {
+									meta._MonitorNodeId = monitorId;
+								}
+								next(err);
+							});
+					}
+				}
+			], (err:any) => {
+				callback(err);
+			});
 			return;
 		} else {
 			callback(null);
