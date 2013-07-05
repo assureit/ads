@@ -6,7 +6,7 @@ import db = module('../db/db')
 import testdb = module('../db/test-db')
 var expect = require('expect.js');	// TODO: import module化
 var async = require('async')
-
+var _ = require('underscore')
 
 export function load(filePathList:string[], callback: (err:any)=>void) {
     var con = new db.Database();
@@ -16,7 +16,7 @@ export function load(filePathList:string[], callback: (err:any)=>void) {
 			testDB.clearAll((err:any) => next(err));
 		}, 
 		(next:Function) => {
-			testDB.load('test/default-data.yaml', (err:any) => next(err));
+			testDB.loadAll(buildFilePathList(filePathList), (err:any) => next(err));
 		}, 
 		(next:Function) => {
 			con.close((err:any) => next(err));
@@ -56,11 +56,15 @@ export function begin(filePathList:string[], callback: (err:any, con:db.Database
 			testDB.clearAll((err:any) => next(err));
 		}, 
 		(next:Function) => {
-			testDB.load('test/default-data.yaml', (err:any) => next(err));
+			testDB.loadAll(buildFilePathList(filePathList), (err:any) => next(err));
 		}, 
 		], (err:any) => {
 			expect(err).to.be(null);
 			callback(err, con);
 		}
 	);
+}
+
+function buildFilePathList(filePathList:string[]): string[] {
+	return _.uniq(_.union(['test/default-data.yaml'], filePathList));
 }

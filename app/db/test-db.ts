@@ -16,6 +16,7 @@ export class TestDB {
 	loadAll(filePathList:string[], callback:(err:any)=>void) {
 		if(filePathList.length == 0) {
 			callback(null);
+			return;
 		}
 		this.load(filePathList[0], (err:any) => {
 			this.loadAll(filePathList.slice(1), callback);

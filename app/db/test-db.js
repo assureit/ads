@@ -15,6 +15,7 @@ var TestDB = (function () {
         var _this = this;
         if(filePathList.length == 0) {
             callback(null);
+            return;
         }
         this.load(filePathList[0], function (err) {
             _this.loadAll(filePathList.slice(1), callback);

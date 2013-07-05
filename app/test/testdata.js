@@ -2,6 +2,7 @@ var db = require('../db/db')
 var testdb = require('../db/test-db')
 var expect = require('expect.js');
 var async = require('async');
+var _ = require('underscore');
 function load(filePathList, callback) {
     var con = new db.Database();
     var testDB = new testdb.TestDB(con);
@@ -12,7 +13,7 @@ function load(filePathList, callback) {
             });
         }, 
         function (next) {
-            testDB.load('test/default-data.yaml', function (err) {
+            testDB.loadAll(buildFilePathList(filePathList), function (err) {
                 return next(err);
             });
         }, 
@@ -64,7 +65,7 @@ function begin(filePathList, callback) {
             });
         }, 
         function (next) {
-            testDB.load('test/default-data.yaml', function (err) {
+            testDB.loadAll(buildFilePathList(filePathList), function (err) {
                 return next(err);
             });
         }, 
@@ -75,3 +76,8 @@ function begin(filePathList, callback) {
     });
 }
 exports.begin = begin;
+function buildFilePathList(filePathList) {
+    return _.uniq(_.union([
+        'test/default-data.yaml'
+    ], filePathList));
+}
