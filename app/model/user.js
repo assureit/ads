@@ -64,10 +64,17 @@ var UserDAO = (function (_super) {
             }
             _this.insert(loginName, function (err, resultInsert) {
                 if(err) {
-                    callback(err, null);
-                    return;
+                    ldap.del(loginName, function (err2) {
+                        if(err2) {
+                            callback(err2, null);
+                            return;
+                        }
+                        callback(err, null);
+                        return;
+                    });
+                } else {
+                    callback(null, resultInsert);
                 }
-                callback(null, resultInsert);
             });
         });
     };

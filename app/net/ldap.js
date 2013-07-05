@@ -45,6 +45,27 @@ var Ldap = (function () {
             });
         });
     };
+    Ldap.prototype.del = function (loginName, callback) {
+        var client = ldap.createClient({
+            url: CONFIG.ldap.url
+        });
+        var dn = CONFIG.ldap.dn.replace('$1', loginName);
+        client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function (err) {
+            if(err) {
+                callback(err);
+                return;
+            }
+            client.del(dn, function (err) {
+                if(err) {
+                    callback(err);
+                    return;
+                }
+                client.unbind(function (err) {
+                    callback(err);
+                });
+            });
+        });
+    };
     return Ldap;
 })();
 exports.Ldap = Ldap;

@@ -52,10 +52,17 @@ export class UserDAO extends model.DAO {
 			}
 			this.insert(loginName, (err, resultInsert) => {
 				if (err) {
-					callback(err, null);
-					return;
+					ldap.del(loginName, (err2: any) => {
+						if (err2) {
+							callback(err2, null);
+							return;
+						}
+						callback(err, null);
+						return;
+					});
+				} else {
+					callback(null, resultInsert);
 				}
-				callback(null, resultInsert);
 			});
 		});
 	}

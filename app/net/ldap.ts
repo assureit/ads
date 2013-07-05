@@ -50,4 +50,24 @@ export class Ldap {
 		});
 	}
 
+	del(loginName: string, callback: (err:any) => void) {
+		var client = ldap.createClient({url: CONFIG.ldap.url});
+		var dn = CONFIG.ldap.dn.replace('$1', loginName);
+
+		client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
+			if (err) {
+				callback(err);
+				return;
+			}
+			client.del(dn, function(err) {
+				if (err) {
+					callback(err);
+					return;
+				}
+				client.unbind(function(err) {
+					callback(err);
+				});
+			});
+		});
+	}
 }
