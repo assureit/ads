@@ -1,5 +1,6 @@
 ///<reference path='DefinitelyTyped/node/node.d.ts'/>
 
+;(() => {
 //OpenLDAP Server DUMMY
 var ldap = require('ldapjs');
 var CONFIG = require('config');
@@ -233,4 +234,4 @@ server.listen(CONFIG.ldap.dummy.port, CONFIG.ldap.dummy.ip, function() {
 //	return next();
 //});
 
-
+})();
