@@ -62,10 +62,7 @@ npm run-script start_ldap
 ブラウザで使用する場合
 ```
 npm run-script start_ldap2
-
 ```
-ダミーサーバーを再コンパイルする場合は直接tscでコンパイルしてください
-
 
 本番環境構築
 ------------
