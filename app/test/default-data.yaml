@@ -11,3 +11,5 @@ dcase:
 file:
   - {id: 301, name: 'file1', path: 'test/routes/testfiles/uptest.txt', user_id: 1}
   - {id: 302, name: 'notfound', path: 'test/routes/testfiles/notfound.', user_id: 1}
+commit:
+  - {id: 401, data: '', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 1', dcase_id: 201, user_id: 101}

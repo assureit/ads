@@ -75,6 +75,10 @@ export class NodeDAO extends model.DAO {
 			var issueDAO = new model_issue.IssueDAO(this.con);
 			// TODO: 必要項目チェック
 			issueDAO.insert(new model_issue.Issue(0, dcaseId, null, meta.Subject, meta.Description), (err:any, result:model_issue.Issue) => {
+				if(err) {
+					callback(err);
+					return;					
+				}
 				meta._IssueId = result.id;
 				callback(null);
 			});

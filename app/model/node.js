@@ -61,6 +61,10 @@ var NodeDAO = (function (_super) {
         if(meta.Type == 'Issue' && !meta._IssueId) {
             var issueDAO = new model_issue.IssueDAO(this.con);
             issueDAO.insert(new model_issue.Issue(0, dcaseId, null, meta.Subject, meta.Description), function (err, result) {
+                if(err) {
+                    callback(err);
+                    return;
+                }
                 meta._IssueId = result.id;
                 callback(null);
             });
