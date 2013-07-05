@@ -60,7 +60,13 @@ export class TestDB {
 		var params = _.map(columns, (c:string) => {return raw[c];});
 		return (next:Function) => {
 			// console.log('LOADING: ' + table + ' ' + JSON.stringify(raw));
-			this.con.query(sql, params, (err:any, result:any) => {next(err);});
+			this.con.query(sql, params, (err:any, result:any) => {
+				if (err) {
+					console.log('LOADING: ' + table + ' ' + JSON.stringify(raw));
+					console.log(err);
+				}
+				next(err);
+			});
 		};
 	}
 

@@ -101,14 +101,14 @@ var MonitorDAO = (function (_super) {
                 return;
             }
             if(result.length == 0) {
-                callback(new error.NotFoundError('Specified id was not found. '), null, null, null);
+                callback(new error.NotFoundError('Specified id was not found. [id: ' + id + ']'), null, null, null);
                 return;
             }
             callback(err, result[0].dcase_id, result[0].this_node_id, result[0].rebuttal_this_node_id);
         });
     };
     MonitorDAO.prototype.getLatestCommit = function (dcaseId, callback) {
-        this.con.query('SELECT * FROM commit WHERE dcase_id = ? AND latest_flag = TRUE', [
+        this.con.query('SELECT * FROM commit WHERE dcase_id = ? AND latest_flag = TRUE ORDER BY id desc', [
             dcaseId
         ], function (err, result) {
             if(err) {

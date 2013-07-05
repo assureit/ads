@@ -120,3 +120,8 @@ node:
   # - {id: 564, this_node_id: 1, description: 'node422_1', node_type: 'Goal', commit_id: 422}
   # - {id: 565, this_node_id: 2, description: 'node422_2', node_type: 'Strategy', commit_id: 422}
   # - {id: 566, this_node_id: 3, description: 'node422_3', node_type: 'Goal', commit_id: 422}
+monitor_node:
+  - {id: 601, dcase_id: 201, this_node_id: 1, watch_id: 10, preset_id: 100, params: '{"a": "val_a", "b": 2}'}
+  - {id: 602, dcase_id: 201, this_node_id: 2, watch_id: 20, preset_id: 200, params: null, publish_status: 2}
+  - {id: 603, dcase_id: 201, this_node_id: 3, watch_id: 30, preset_id: 300, params: null, publish_status: 1}
+

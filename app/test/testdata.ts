@@ -22,6 +22,7 @@ export function load(filePathList:string[], callback: (err:any)=>void) {
 			con.close((err:any) => next(err));
 		}, 
 		], (err:any) => {
+			if (err) console.log(err);
 			expect(err).to.be(undefined);
 			callback(err);
 		}
@@ -39,6 +40,7 @@ export function clear(callback: (err:any)=>void) {
 			con.close((err:any) => next(err));
 		}, 
 		], (err:any) => {
+			if (err) console.log(err);
 			expect(err).to.be(undefined);
 			callback(err);
 		}
@@ -59,6 +61,7 @@ export function begin(filePathList:string[], callback: (err:any, con:db.Database
 			testDB.loadAll(buildFilePathList(filePathList), (err:any) => next(err));
 		}, 
 		], (err:any) => {
+			if (err) console.log(err);
 			expect(err).to.be(null);
 			callback(err, con);
 		}

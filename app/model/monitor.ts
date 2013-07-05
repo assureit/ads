@@ -92,7 +92,7 @@ export class MonitorDAO extends model.DAO {
 				return;
 			}
 			if (result.length == 0) {
-				callback(new error.NotFoundError('Specified id was not found. '), null, null, null); 
+				callback(new error.NotFoundError('Specified id was not found. [id: ' + id + ']'), null, null, null); 
 				return;
 			}
 			callback(err, result[0].dcase_id, result[0].this_node_id, result[0].rebuttal_this_node_id);
@@ -101,7 +101,7 @@ export class MonitorDAO extends model.DAO {
 
 
 	getLatestCommit(dcaseId: number, callback: (err: any, latestCommit: model_commit.Commit) => void) {
-		this.con.query('SELECT * FROM commit WHERE dcase_id = ? AND latest_flag = TRUE', [dcaseId], (err, result) => {
+		this.con.query('SELECT * FROM commit WHERE dcase_id = ? AND latest_flag = TRUE ORDER BY id desc', [dcaseId], (err, result) => {
 			if (err) {
 				callback(err, null);
 				return;

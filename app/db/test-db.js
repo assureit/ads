@@ -64,6 +64,10 @@ var TestDB = (function () {
         });
         return function (next) {
             _this.con.query(sql, params, function (err, result) {
+                if(err) {
+                    console.log('LOADING: ' + table + ' ' + JSON.stringify(raw));
+                    console.log(err);
+                }
                 next(err);
             });
         };

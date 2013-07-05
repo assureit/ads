@@ -24,6 +24,9 @@ function load(filePathList, callback) {
         }, 
         
     ], function (err) {
+        if(err) {
+            console.log(err);
+        }
         expect(err).to.be(undefined);
         callback(err);
     });
@@ -45,6 +48,9 @@ function clear(callback) {
         }, 
         
     ], function (err) {
+        if(err) {
+            console.log(err);
+        }
         expect(err).to.be(undefined);
         callback(err);
     });
@@ -71,6 +77,9 @@ function begin(filePathList, callback) {
         }, 
         
     ], function (err) {
+        if(err) {
+            console.log(err);
+        }
         expect(err).to.be(null);
         callback(err, con);
     });
