@@ -3,6 +3,7 @@ var model_node = require('../../model/node')
 var model_monitor = require('../../model/monitor')
 
 var testdb = require('../../db/test-db')
+var testdata = require('../testdata')
 var expect = require('expect.js');
 var async = require('async');
 describe('model', function () {
@@ -17,18 +18,15 @@ describe('model', function () {
         monitorDAO = new model_monitor.MonitorDAO(con);
         async.waterfall([
             function (next) {
-                con.begin(function (err, result) {
+                testdata.load([
+                    'test/default-data.yaml'
+                ], function (err) {
                     return next(err);
                 });
             }, 
             function (next) {
-                testDB.clearAll(function (err) {
-                    next(err);
-                });
-            }, 
-            function (next) {
-                testDB.load('test/default-data.yaml', function (err) {
-                    next(err);
+                con.begin(function (err, result) {
+                    return next(err);
                 });
             }, 
             
@@ -40,15 +38,37 @@ describe('model', function () {
         });
     });
     afterEach(function (done) {
-        if(con) {
-            con.rollback(function (err, result) {
-                con.close();
-                if(err) {
-                    throw err;
+        async.waterfall([
+            function (next) {
+                if(con) {
+                    con.rollback(function (err, result) {
+                        return next(err);
+                    });
+                } else {
+                    next();
                 }
-                done();
-            });
-        }
+            }, 
+            function (next) {
+                if(con) {
+                    con.close(function (err, result) {
+                        return next(err);
+                    });
+                } else {
+                    next();
+                }
+            }, 
+            function (next) {
+                testdata.clear(function (err) {
+                    return next(err);
+                });
+            }, 
+            
+        ], function (err) {
+            if(err) {
+                throw err;
+            }
+            done();
+        });
     });
     describe('node', function () {
         describe('process', function () {

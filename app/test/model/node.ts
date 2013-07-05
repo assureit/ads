@@ -7,6 +7,7 @@ import model_node = module('../../model/node')
 import model_monitor = module('../../model/monitor')
 import error = module('../../api/error')
 import testdb = module('../../db/test-db')
+import testdata = module('../testdata')
 var expect = require('expect.js');	// TODO: import module化
 var async = require('async')
 
@@ -23,14 +24,11 @@ describe('model', function() {
 		monitorDAO = new model_monitor.MonitorDAO(con);
 		async.waterfall([
 			(next:Function) => {
-				con.begin((err:any, result:any) => next(err));
+				testdata.load(['test/default-data.yaml'], (err:any) => next(err));
 			},
 			(next:Function) => {
-				testDB.clearAll((err:any) => {next(err);});
-			}, 
-			(next:Function) => {
-				testDB.load('test/default-data.yaml', (err:any) => {next(err);});
-			}, 
+				con.begin((err:any, result:any) => next(err));
+			},
 			], (err:any) => {
 				if (err) throw err;
 				done();
@@ -38,15 +36,29 @@ describe('model', function() {
 		);
     });
     afterEach(function (done) {
-        if(con) {
-            con.rollback(function (err, result) {
-                con.close();
-                if(err) {
-                    throw err;
-                }
-                done();
-            });
-        }
+		async.waterfall([
+			(next:Function) => {
+				if(con) {
+					con.rollback((err, result) => next(err));
+				} else {
+					next();
+				}
+			},
+			(next:Function) => {
+				if(con) {
+					con.close((err, result) => next(err));
+				} else {
+					next();
+				}
+			}, 
+			(next:Function) => {
+				testdata.clear( (err:any) => next(err));
+			}, 
+			], (err:any) => {
+				if (err) throw err;
+				done();
+			}
+		);
     });
 	describe('node', function() {
 		describe('process', function() {

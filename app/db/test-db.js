@@ -62,7 +62,6 @@ var TestDB = (function () {
             return raw[c];
         });
         return function (next) {
-            console.log('LOADING: ' + table + ' ' + JSON.stringify(raw));
             _this.con.query(sql, params, function (err, result) {
                 next(err);
             });
