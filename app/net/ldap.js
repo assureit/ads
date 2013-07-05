@@ -32,6 +32,7 @@ var Ldap = (function () {
         client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function (err) {
             if(err) {
                 callback(err);
+                return;
             }
             client.add(dn, entry, function (err) {
                 if(err) {

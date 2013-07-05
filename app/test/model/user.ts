@@ -8,6 +8,7 @@ import error = module('../../api/error')
 import domain = module('domain')
 var expect = require('expect.js');	// TODO: import module化
 var ldap = require('ldapjs');		// TODO: import module化
+var CONFIG = require('config');
 
 describe('model', function() {
 	describe('user', function() {
@@ -18,7 +19,7 @@ describe('model', function() {
 			con.begin((err, result) => {
 				userDAO = new model_user.UserDAO(con);
 
-				var client = ldap.createClient({url: 'ldap://127.0.0.1/cn=root,dc=assureit,dc=org'});
+				var client = ldap.createClient({url: CONFIG.ldap.url});
 				var entry = {
 					cn: 'system',
 					sn: 'system',
@@ -26,8 +27,9 @@ describe('model', function() {
 					userPassword: 'password'
 					};
 
-				client.bind('cn=root,dc=assureit,dc=org', 'vOCDYE66', function(err) {
-					client.add('uid=system,ou=user,dc=assureit,dc=org', entry, function(err) {
+				client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
+					var dn = CONFIG.ldap.dn.replace('$1', 'system');
+					client.add(dn, entry, function(err) {
 						client.unbind(function(err) {
 							done();
 						});
@@ -43,12 +45,17 @@ describe('model', function() {
 					if (err) {
 						throw err;
 					}
-					var client = ldap.createClient({url: 'ldap://127.0.0.1/cn=root,dc=assureit,dc=org'});
-					client.bind('cn=root,dc=assureit,dc=org', 'vOCDYE66', function(err) {
-						client.del('uid=unittest01,ou=user,dc=assureit,dc=org', function(err) {
-							client.del('uid=unittest02,ou=user,dc=assureit,dc=org', function(err) {
-								client.unbind(function(err) {
-									done();
+					var client = ldap.createClient({url: CONFIG.ldap.url});
+					client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
+						var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
+						client.del(dn, function(err) {
+							var dn2 = CONFIG.ldap.dn.replace('$1', 'unittest02');
+							client.del(dn2, function(err) {
+								var dn3 = CONFIG.ldap.dn.replace('$1', 'system');
+								client.del(dn3, function(err) {
+									client.unbind(function(err) {
+										done();
+									});
 								});
 							});
 						});
@@ -109,9 +116,10 @@ describe('model', function() {
 
 				userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
 					expect(err).to.be(null);
-					var client = ldap.createClient({url: 'ldap://127.0.0.1/cn=root,dc=assureit,dc=org'});
-					client.bind('cn=root,dc=assureit,dc=org', 'vOCDYE66', function(err) {
-						client.del('uid=unittest02,ou=user,dc=assureit,dc=org', function(err) {
+					var client = ldap.createClient({url: CONFIG.ldap.url});
+					client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
+						var dn = CONFIG.ldap.dn.replace('$1', 'unittest02');
+						client.del(dn, function(err) {
 							client.unbind(function(err) {
 								userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
 									expect(err).not.to.be(null);

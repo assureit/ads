@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node app.js",
+    "start_ldap": "node ldapdummy.js",
     "test": "sh ../scripts/test.sh",
     "test_debug": "sh ../scripts/test_debug.sh",
     "make": "tsc @compile_list"

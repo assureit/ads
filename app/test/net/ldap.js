@@ -2,11 +2,12 @@ var assert = require('assert')
 var expect = require('expect.js');
 var ldap = require('ldapjs');
 var net_ldap = require('../../net/ldap')
+var CONFIG = require('config');
 describe('net', function () {
     describe('ldap', function () {
         before(function (done) {
             var client = ldap.createClient({
-                url: 'ldap://127.0.0.1/cn=root,dc=assureit,dc=org'
+                url: CONFIG.ldap.url
             });
             var entry = {
                 cn: 'unittest01',
@@ -14,8 +15,9 @@ describe('net', function () {
                 objectClass: 'inetOrgPerson',
                 userPassword: 'unittest01'
             };
-            client.bind('cn=root,dc=assureit,dc=org', 'vOCDYE66', function (err) {
-                client.add('uid=unittest01,ou=user,dc=assureit,dc=org', entry, function (err) {
+            client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function (err) {
+                var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
+                client.add(dn, entry, function (err) {
                     client.unbind(function (err) {
                         done();
                     });
@@ -24,11 +26,13 @@ describe('net', function () {
         });
         after(function (done) {
             var client = ldap.createClient({
-                url: 'ldap://127.0.0.1/cn=root,dc=assureit,dc=org'
+                url: CONFIG.ldap.url
             });
-            client.bind('cn=root,dc=assureit,dc=org', 'vOCDYE66', function (err) {
-                client.del('uid=unittest01,ou=user,dc=assureit,dc=org', function (err) {
-                    client.del('uid=unittest02,ou=user,dc=assureit,dc=org', function (err) {
+            client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function (err) {
+                var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
+                client.del(dn, function (err) {
+                    var dn2 = CONFIG.ldap.dn.replace('$1', 'unittest02');
+                    client.del(dn2, function (err) {
                         client.unbind(function (err) {
                             done();
                         });
@@ -51,9 +55,10 @@ describe('net', function () {
                 ld.add('unittest02', 'unittest02', function (err) {
                     assert.ifError(err);
                     var client = ldap.createClient({
-                        url: 'ldap://127.0.0.1/cn=root,dc=assureit,dc=org'
+                        url: CONFIG.ldap.url
                     });
-                    client.bind('uid=unittest02,ou=user,dc=assureit,dc=org', 'unittest02', function (err) {
+                    var dn = CONFIG.ldap.dn.replace('$1', 'unittest02');
+                    client.bind(dn, 'unittest02', function (err) {
                         assert.ifError(err);
                         client.unbind(function (err) {
                             assert.ifError(err);

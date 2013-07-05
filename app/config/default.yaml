@@ -16,7 +16,11 @@ rec:
   port: 3030
   basePath: "/"
 ldap:
-  url: 'ldap://localhost/cn=root,dc=assureit,dc=org'
+# When you make it operate by dummy OpenLDAP, please generate URL using dummyip and dummyport. 
+#  url: 'ldap://localhost/cn=root,dc=assureit,dc=org'
+  url: 'ldap://localhost:3040/cn=root,dc=assureit,dc=org'
   dn: 'uid=$1,ou=user,dc=assureit,dc=org'
   root: 'cn=root,dc=assureit,dc=org'
   password: 'ROOTPASSWORD'
+  dummyip: 'localhost'
+  dummyport: 3040
