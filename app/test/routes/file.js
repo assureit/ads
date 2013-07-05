@@ -3,46 +3,23 @@ var assert = require('assert')
 var app = require('../../app')
 var fs = require('fs')
 var db = require('../../db/db')
-var testdb = require('../../db/test-db')
+var testdata = require('../testdata')
 var request = require('supertest');
 var async = require('async');
 describe('api', function () {
     var con;
-    var testDB;
     beforeEach(function (done) {
-        con = new db.Database();
-        testDB = new testdb.TestDB(con);
-        async.waterfall([
-            function (next) {
-                con.begin(function (err, result) {
-                    return next(err);
-                });
-            }, 
-            function (next) {
-                testDB.load('test/default-data.yaml', function (err) {
-                    next(err);
-                });
-            }, 
-            function (next) {
-                con.commit(function (err, result) {
-                    return next(err);
-                });
-            }, 
-            
+        testdata.load([
+            'test/default-data.yaml'
         ], function (err) {
+            con = new db.Database();
             done();
         });
     });
     afterEach(function (done) {
-        if(con) {
-            con.rollback(function (err, result) {
-                con.close();
-                if(err) {
-                    throw err;
-                }
-                done();
-            });
-        }
+        testdata.clear(function (err) {
+            return done();
+        });
     });
     describe('upload', function () {
         it('should return HTTP200 return URL ', function (done) {

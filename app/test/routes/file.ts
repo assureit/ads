@@ -10,42 +10,22 @@ import http = module('http')
 import app = module('../../app')
 import fs = module('fs')
 import db = module('../../db/db')
-import testdb = module('../../db/test-db')
+// import testdb = module('../../db/test-db')
+import testdata = module('../testdata')
 var request = require('supertest');	// TODO: supertestの宣言ファイル作成
 var async = require('async')
 
 describe('api', function() {
     var con;
-    var testDB;
-    beforeEach(function (done) {
-        con = new db.Database();
-    	testDB = new testdb.TestDB(con);
-		async.waterfall([
-			(next:Function) => {
-				con.begin((err:any, result:any) => next(err));
-			},
-			(next:Function) => {
-				testDB.load('test/default-data.yaml', (err:any) => {next(err);});
-			}, 
-			(next:Function) => {
-				con.commit((err:any, result:any) => next(err));
-			},
-			], (err:any) => {
-				done();
-			}
-		);
-    });
-    afterEach(function (done) {
-        if(con) {
-            con.rollback(function (err, result) {
-                con.close();
-                if(err) {
-                    throw err;
-                }
-                done();
-            });
-        }
-    });
+	beforeEach(function (done) {
+		testdata.load(['test/default-data.yaml'], (err:any) => {
+	        con = new db.Database();
+			done();
+		});
+	});
+	afterEach(function (done) {
+		testdata.clear((err:any) => done());
+	});
 	describe('upload', function() {
 		it('should return HTTP200 return URL ', function(done) {
 			this.timeout(15000);

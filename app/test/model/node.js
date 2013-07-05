@@ -2,7 +2,6 @@
 var model_node = require('../../model/node')
 var model_monitor = require('../../model/monitor')
 
-
 var testdata = require('../testdata')
 var expect = require('expect.js');
 var async = require('async');

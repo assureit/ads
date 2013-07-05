@@ -6,7 +6,6 @@ import db = module('../../db/db')
 import model_node = module('../../model/node')
 import model_monitor = module('../../model/monitor')
 import error = module('../../api/error')
-import testdb = module('../../db/test-db')
 import testdata = module('../testdata')
 var expect = require('expect.js');	// TODO: import module化
 var async = require('async')
