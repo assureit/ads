@@ -6,7 +6,7 @@ block sign
             a.dropdown-toggle(data-toggle="dropdown", href="#") Sign Up
                 strong.caret
             .dropdown-menu(style="padding: 15px; padding-bottom: 0px;")
-                    form#sign-up-form.navbar-form.pull-right(method="post", action="user/register")
+                form#sign-up-form.navbar-form.pull-right(method="post", action="#{basepath}/register")
                         input#signup-userid.span2(type="text", placeholder="username", name="username", style="margin-bottom: 15px;")
                         input#signup-pass.span2(type="password", placeholder="password", name="password", style="margin-bottom: 15px;")
                         input#signup-pass2.span2(type="password", placeholder="confirm password", name="password2", style="margin-bottom: 15px;")
@@ -15,7 +15,7 @@ block sign
                         a.dropdown-toggle(href="#", data-toggle="dropdown") Sign In
                             strong.caret
                         .dropdown-menu(style="padding: 15px; padding-bottom: 0px;")
-                            form#sign-in-form.navbar-form.pull-right(method="post", action="user/login")
+                            form#sign-in-form.navbar-form.pull-right(method="post", action="#{basepath}/login")
                                 input.span2(type="text", placeholder="username", name="username", style="margin-bottom: 15px;")
                                 input.span2(type="password", placeholder="password", name="password", style="margin-bottom: 15px;")
                                 input(type="hidden" ,name="dcaseId" ,value="{$_GET['dcaseId']}")
