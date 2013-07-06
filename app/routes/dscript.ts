@@ -9,105 +9,156 @@ export class Exporter {
 	}
 }
 
-function FindById(nodeList: any[], id: number):any {
-	for(var i: number = 0; i < nodeList.length; i++) {
-		var node: any = nodeList[i];
-		var thisId = node.ThisNodeId;
-		if(node.ThisNodeId == id) {
-			return node;
-		}
-	}
-	return null;
-}
-
 export class ResponseSource {
+	stack: string[] = [];
 	src: string = "";
+	header: string = "";
 
 	constructor() {
 	}
 
-	print(s: string) : void {
-		this.src += s;
+	printlnHeader(s: string) : void {
+		this.header += s + '\n';
 	}
 
-	println(s: string) : void {
-		this.src += s;
-		this.src += '\n';
+	print(s: string, i?: number) : void {
+		if(i == null) {
+			this.src += s;
+		}else {
+			this.stack[i] += s;
+		}
+	}
+
+	println(s: string, i?: number) : void {
+		if(i == null) {
+			this.src += s + '\n';
+		}else {
+			this.stack[i] += s + '\n';
+		}
+	}
+
+	push(): number {
+		var ret = this.stack.push(this.src);
+		this.src = "";
+		return ret - 1; //Array#push returns length of array
 	}
 
 	emit(): string {
-		return this.src;
+		var ret:string = this.header;
+		ret += this.src;
+		for(var i:number = this.stack.length-1; i >= 0; i--) {
+			ret += this.stack[i];
+		}
+		return ret;
 	}
 }
 
 export class DScriptExporter extends Exporter {
 	res: ResponseSource = new ResponseSource();
-	solutionIndex:number = 0;
-	goalContent:string = "";
+	nodeList: any[];
+	root: any;
+	goalIndex: number = 0;
 
 	constructor() {
 		super();
 	}
 
-	EmitIndent(level:number): string {
-		var ret:string = "";
-		for(var i: number = 0; i < level; i++) {
-			ret += "    ";
+	FindById(id: number):any {
+		for(var i: number = 0; i < this.nodeList.length; i++) {
+			var node: any = this.nodeList[i];
+			var thisId = node.ThisNodeId;
+			if(node.ThisNodeId == id) {
+				return node;
+			}
+		}
+		return null;
+	}
+
+	GetContextData(Children: number[]): any {
+		var ret = {};
+		for(var i: number = 0; i < Children.length; i++) {
+			var node = this.FindById(Children[i]);
+			if(node.NodeType == 'Context') {
+				//TODO
+			}
 		}
 		return ret;
 	}
 
-	GenerateGoalCode(nodeList: any[], nodeId: number, level: number): void {
-		var root:any = FindById(nodeList, nodeId);//any=Node
-		var children:any[] = root.Children;
-		var indent:string = this.EmitIndent(level);
-		if(root.NodeType == "Solution") {
-			this.res.println("boolean Solution_" + this.solutionIndex + "() {"); //FIXME
-			this.res.println("    //" + this.goalContent);
-			this.res.println("    try {");
-			var l = root.Description.split("\n");
-			for(var i:number = 0; i < l.length; i++) {
-				this.res.println("        " + l[i]);
-			}
-			this.res.println("    } catch(Exception e) {");
-			this.res.println("        Syslog.write(e.printStackTrace);");
-			this.res.println("        return false;");
-			this.res.println("    }");
-			this.res.println("    return true;");
-			this.res.println("}\n");
-			this.solutionIndex += 1;
-			this.goalContent = "";
+	GenerateStrategyCode(id: number): number[] {
+		var node = this.FindById(id);
+		if(node == null) {
 			return;
-		} else if(root.NodeType == "Goal") {
-			this.goalContent = root["Description"];
-		} else {
-			this.res.println("//"+ root.NodeType + ":" + root.Description);
 		}
-		for(var i:number = 0; i < children.length; i++) {
-			this.GenerateGoalCode(nodeList, children[i], 0)
+		var ret: number[] = [];
+		var context = this.GetContextData(node.Children);
+		for(var i: number = 0; i < node.Children.length; i++) {
+			var c = this.FindById(node.Children[i]);
+			if(c!=null) {
+				if(c.NodeType == 'Goal') {
+					this.GenerateGoalCode(node.Children[i]);
+					ret.push(node.Children[i]);
+				}
+			}
 		}
+		return ret;
 	}
 
-	export(m: any): string { //FIXME m
-		m = JSON.parse(m);
-		var tree:     any    = m.contents;
-		var rootId:   number = tree.TopGoalId;
-		var nodeList: any[]  = tree.NodeList;
-		var indent:   string = this.EmitIndent(0);
-		var rootNode: any    = FindById(nodeList, rootId);
-		this.res.println("//D-Script Generator v0.1");
-		this.res.println("//"+rootNode.Description.replace("\n", "").replace("\r", ""));
-		this.res.println('');
+	GenerateGoalCode(id: number): void {
+		var node = this.FindById(id);
+		if(node == null) {
+			return;
+		}
+		this.res.print(""); //FIXME
+		var indent = this.res.push();
+		this.res.println("boolean Goal_" + id + "() {",indent); //FIXME
+		for(var i: number = 0; i < node.Children.length; i++) {
+			var c = this.FindById(node.Children[i]);
+			if(c!=null) {
+				if(c.NodeType == 'Strategy') {
+					var subGoalIds:number[] = this.GenerateStrategyCode(node.Children[i]);
+					var run:string = "    return ";
+					for(var i:number = 0; i < subGoalIds.length; i++) { //TODO
+						run += "Goal_" + subGoalIds[i] + "() && ";
+					}
+					run = run.slice(0,-4) + ";"
+					this.res.println(run, indent);
+				}else if(c.NodeType == 'Evidence') {
+					this.res.println('    return true;', indent);
+				}else if(c.NodeType == 'Solution') {
+					this.res.println("    try {",indent);
+					var l = c.Description.split("\n");
+					for(var i:number = 0; i < l.length; i++) {
+						if(l[i].match("    ")) {
+							this.res.println('    '+ l[i], indent);
+						}else {
+							this.res.println('    //' + l[i], indent);
+						}
+					}
+					this.res.println("    } catch(Exception e) {", indent);
+					this.res.println("        Syslog.write(e.printStackTrace);",indent);
+					this.res.println("        return false;",indent);
+					this.res.println("    }",indent);
+					this.res.println("    return true;",indent);
+				}
+			}
+		}
 
-		for(var i: number = 0; i < rootNode.Children.length; i++) {
-			this.GenerateGoalCode(nodeList, rootNode.Children[i], 0);
-		}
-		var run:string = "";
-		for(var i:number = 0; i < this.solutionIndex; i++) {
-			run += "Solution_" + i + "() && ";
-		}
-		run = run.slice(0,-4) + ";" //FIXME
-		this.res.println(run);
+		this.res.println("}", indent);
+		this.res.println('',indent);
+	}
+
+	export(m: any): string {
+		var json = JSON.parse(m).contents;
+		this.nodeList = json.NodeList;
+		this.root = this.FindById(json.TopGoalId);
+
+		this.res.printlnHeader("//D-Script Generator v0.1");
+		this.res.printlnHeader('');
+		this.res.printlnHeader("//"+this.root.Description.replace("\n", "").replace("\r", ""));
+		this.res.printlnHeader('');
+
+		this.GenerateGoalCode(json.TopGoalId);
 
 		return this.res.emit();
 	}
