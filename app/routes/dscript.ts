@@ -1,5 +1,10 @@
 ///<reference path='../DefinitelyTyped/node/node.d.ts'/>
 
+export interface StrategyValue {
+	subGoalIds: number[];
+	or: bool;
+}
+
 export class Exporter {
 	constructor() {
 	}
@@ -13,12 +18,17 @@ export class ResponseSource {
 	stack: string[] = [];
 	src: string = "";
 	header: string = "";
+	footer: string = "";
 
 	constructor() {
 	}
 
 	printlnHeader(s: string) : void {
 		this.header += s + '\n';
+	}
+
+	printlnFooter(s: string) : void {
+		this.footer += s + '\n';
 	}
 
 	print(s: string, i?: number) : void {
@@ -49,6 +59,7 @@ export class ResponseSource {
 		for(var i:number = this.stack.length-1; i >= 0; i--) {
 			ret += this.stack[i];
 		}
+		ret += this.footer;
 		return ret;
 	}
 }
@@ -74,56 +85,74 @@ export class DScriptExporter extends Exporter {
 		return null;
 	}
 
-	GetContextData(Children: number[]): any {
+	GetContextMetaData(Children: number[]): any {
 		var ret = {};
 		for(var i: number = 0; i < Children.length; i++) {
 			var node = this.FindById(Children[i]);
 			if(node.NodeType == 'Context') {
-				//TODO
-			}
-		}
-		return ret;
-	}
-
-	GenerateStrategyCode(id: number): number[] {
-		var node = this.FindById(id);
-		if(node == null) {
-			return;
-		}
-		var ret: number[] = [];
-		var context = this.GetContextData(node.Children);
-		for(var i: number = 0; i < node.Children.length; i++) {
-			var c = this.FindById(node.Children[i]);
-			if(c!=null) {
-				if(c.NodeType == 'Goal') {
-					this.GenerateGoalCode(node.Children[i]);
-					ret.push(node.Children[i]);
+				for(var i:number = 0; i < node.MetaData.length; i++) {
+					if(node.MetaData[i].Type == "Parameter") {
+						delete node.MetaData[i].Type;
+						delete node.MetaData[i].Visible;
+						delete node.MetaData[i].Description;
+						ret = node.MetaData[i];
+					}
 				}
 			}
 		}
 		return ret;
 	}
 
-	GenerateGoalCode(id: number): void {
+	GenerateStrategyCode(id: number): StrategyValue {
 		var node = this.FindById(id);
 		if(node == null) {
 			return;
 		}
-		this.res.print(""); //FIXME
+		var ret = <StrategyValue>{subGoalIds: [], or: false};
+		for(var i: number = 0; i < node.Children.length; i++) {
+			var c = this.FindById(node.Children[i]);
+			if(c!=null) {
+				if(c.NodeType == 'Goal') {
+					this.GenerateGoalCode(node.Children[i]);
+					ret.subGoalIds.push(node.Children[i]);
+				}
+				if(c.NodeType == 'Context') {
+					ret.or = c.Description.match('||')!=null?true:false;
+				}
+			}
+		}
+		return ret;
+	}
+
+	GenerateGoalCode(id: number, b?:bool): void {
+		var node = this.FindById(id);
+		if(node == null) {
+			return;
+		}
 		var indent = this.res.push();
-		this.res.println("boolean Goal_" + id + "() {",indent); //FIXME
+		this.res.println('/*', indent);
+		this.res.println(''+node.Description, indent);
+		this.res.println('*/', indent);
+		this.res.println("boolean Goal_" + id + "(Context parent) {",indent); //FIXME
+		var context = this.GetContextMetaData(node.Children);
+		this.res.println('    Context con = new Context('+JSON.stringify(context)+');',indent);
+		this.res.println('    con.setParent(parent);', indent);
 		for(var i: number = 0; i < node.Children.length; i++) {
 			var c = this.FindById(node.Children[i]);
 			if(c!=null) {
 				if(c.NodeType == 'Strategy') {
-					var subGoalIds:number[] = this.GenerateStrategyCode(node.Children[i]);
+					var strategy: StrategyValue = this.GenerateStrategyCode(node.Children[i]);
 					var run:string = "    return ";
-					for(var i:number = 0; i < subGoalIds.length; i++) { //TODO
-						run += "Goal_" + subGoalIds[i] + "() && ";
+					var op: string = strategy.or? "||" : "&&"
+					for(var i:number = 0; i < strategy.subGoalIds.length; i++) { //TODO
+						run += "Goal_" + strategy.subGoalIds[i] + "(con) "+op+" ";
 					}
 					run = run.slice(0,-4) + ";"
 					this.res.println(run, indent);
 				}else if(c.NodeType == 'Evidence') {
+					this.res.println('    /*', indent);
+					this.res.println('    '+c.Description, indent);
+					this.res.println('    */', indent);
 					this.res.println('    return true;', indent);
 				}else if(c.NodeType == 'Solution') {
 					this.res.println("    try {",indent);
@@ -155,11 +184,15 @@ export class DScriptExporter extends Exporter {
 
 		this.res.printlnHeader("//D-Script Generator v0.1");
 		this.res.printlnHeader('');
-		this.res.printlnHeader("//"+this.root.Description.replace("\n", "").replace("\r", ""));
 		this.res.printlnHeader('');
 
 		this.GenerateGoalCode(json.TopGoalId);
 
+		this.res.printlnFooter("void main() {");
+		this.res.printlnFooter("    Goal_"+json.TopGoalId+"(null);");
+		this.res.printlnFooter("}");
+		this.res.printlnFooter("");
+		this.res.printlnFooter("main();");
 		return this.res.emit();
 	}
 }

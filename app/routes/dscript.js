@@ -17,9 +17,13 @@ var ResponseSource = (function () {
         this.stack = [];
         this.src = "";
         this.header = "";
+        this.footer = "";
     }
     ResponseSource.prototype.printlnHeader = function (s) {
         this.header += s + '\n';
+    };
+    ResponseSource.prototype.printlnFooter = function (s) {
+        this.footer += s + '\n';
     };
     ResponseSource.prototype.print = function (s, i) {
         if(i == null) {
@@ -46,6 +50,7 @@ var ResponseSource = (function () {
         for(var i = this.stack.length - 1; i >= 0; i--) {
             ret += this.stack[i];
         }
+        ret += this.footer;
         return ret;
     };
     return ResponseSource;
@@ -68,12 +73,20 @@ var DScriptExporter = (function (_super) {
         }
         return null;
     };
-    DScriptExporter.prototype.GetContextData = function (Children) {
+    DScriptExporter.prototype.GetContextMetaData = function (Children) {
         var ret = {
         };
         for(var i = 0; i < Children.length; i++) {
             var node = this.FindById(Children[i]);
             if(node.NodeType == 'Context') {
+                for(var i = 0; i < node.MetaData.length; i++) {
+                    if(node.MetaData[i].Type == "Parameter") {
+                        delete node.MetaData[i].Type;
+                        delete node.MetaData[i].Visible;
+                        delete node.MetaData[i].Description;
+                        ret = node.MetaData[i];
+                    }
+                }
             }
         }
         return ret;
@@ -83,39 +96,53 @@ var DScriptExporter = (function (_super) {
         if(node == null) {
             return;
         }
-        var ret = [];
-        var context = this.GetContextData(node.Children);
+        var ret = {
+            subGoalIds: [],
+            or: false
+        };
         for(var i = 0; i < node.Children.length; i++) {
             var c = this.FindById(node.Children[i]);
             if(c != null) {
                 if(c.NodeType == 'Goal') {
                     this.GenerateGoalCode(node.Children[i]);
-                    ret.push(node.Children[i]);
+                    ret.subGoalIds.push(node.Children[i]);
+                }
+                if(c.NodeType == 'Context') {
+                    ret.or = c.Description.match('||') != null ? true : false;
                 }
             }
         }
         return ret;
     };
-    DScriptExporter.prototype.GenerateGoalCode = function (id) {
+    DScriptExporter.prototype.GenerateGoalCode = function (id, b) {
         var node = this.FindById(id);
         if(node == null) {
             return;
         }
-        this.res.print("");
         var indent = this.res.push();
-        this.res.println("boolean Goal_" + id + "() {", indent);
+        this.res.println('/*', indent);
+        this.res.println('' + node.Description, indent);
+        this.res.println('*/', indent);
+        this.res.println("boolean Goal_" + id + "(Context parent) {", indent);
+        var context = this.GetContextMetaData(node.Children);
+        this.res.println('    Context con = new Context(' + JSON.stringify(context) + ');', indent);
+        this.res.println('    con.setParent(parent);', indent);
         for(var i = 0; i < node.Children.length; i++) {
             var c = this.FindById(node.Children[i]);
             if(c != null) {
                 if(c.NodeType == 'Strategy') {
-                    var subGoalIds = this.GenerateStrategyCode(node.Children[i]);
+                    var strategy = this.GenerateStrategyCode(node.Children[i]);
                     var run = "    return ";
-                    for(var i = 0; i < subGoalIds.length; i++) {
-                        run += "Goal_" + subGoalIds[i] + "() && ";
+                    var op = strategy.or ? "||" : "&&";
+                    for(var i = 0; i < strategy.subGoalIds.length; i++) {
+                        run += "Goal_" + strategy.subGoalIds[i] + "(con) " + op + " ";
                     }
                     run = run.slice(0, -4) + ";";
                     this.res.println(run, indent);
                 } else if(c.NodeType == 'Evidence') {
+                    this.res.println('    /*', indent);
+                    this.res.println('    ' + c.Description, indent);
+                    this.res.println('    */', indent);
                     this.res.println('    return true;', indent);
                 } else if(c.NodeType == 'Solution') {
                     this.res.println("    try {", indent);
@@ -144,9 +171,13 @@ var DScriptExporter = (function (_super) {
         this.root = this.FindById(json.TopGoalId);
         this.res.printlnHeader("//D-Script Generator v0.1");
         this.res.printlnHeader('');
-        this.res.printlnHeader("//" + this.root.Description.replace("\n", "").replace("\r", ""));
         this.res.printlnHeader('');
         this.GenerateGoalCode(json.TopGoalId);
+        this.res.printlnFooter("void main() {");
+        this.res.printlnFooter("    Goal_" + json.TopGoalId + "(null);");
+        this.res.printlnFooter("}");
+        this.res.printlnFooter("");
+        this.res.printlnFooter("main();");
         return this.res.emit();
     };
     return DScriptExporter;
