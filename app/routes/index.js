@@ -85,24 +85,24 @@ exports.login = function (req, res) {
         }
         res.cookie('userId', result.id);
         res.cookie('userName', result.loginName);
-        res.redirect('/');
+        res.redirect(CONFIG.ads.basePath + '/');
     });
 };
 exports.logout = function (req, res) {
     res.clearCookie('userId');
     res.clearCookie('userName');
-    res.redirect('/');
+    res.redirect(CONFIG.ads.basePath + '/');
 };
 exports.register = function (req, res) {
     var con = new db.Database();
     var userDAO = new model_user.UserDAO(con);
     userDAO.register(req.body.username, req.body.password, function (err, result) {
         if(err) {
-            res.redirect('/');
+            res.redirect(CONFIG.ads.basePath + '/');
             return;
         }
         res.cookie('userId', result.id);
         res.cookie('userName', result.loginName);
-        res.redirect('/');
+        res.redirect(CONFIG.ads.basePath + '/');
     });
 };

@@ -82,20 +82,20 @@ export var login = function(req: any, res: any) {
 	
 	userDAO.login(req.body.username, req.body.password, (err:any, result: model_user.User) => {
 		if (err) {
-			//TODO:エラー表示
+			// TODO: display error information
 			res.redirect('/');
 			return;
 		}
 		res.cookie('userId',result.id);
 		res.cookie('userName',result.loginName);
-		res.redirect('/');
+		res.redirect(CONFIG.ads.basePath+'/');
 	});
 };
 
 export var logout = function(req: any, res: any) {
 	res.clearCookie('userId');
 	res.clearCookie('userName');
-	res.redirect('/');
+	res.redirect(CONFIG.ads.basePath+'/');
 };
 
 export var register = function(req: any, res: any) {
@@ -104,13 +104,13 @@ export var register = function(req: any, res: any) {
 
 	userDAO.register(req.body.username, req.body.password, (err:any, result: model_user.User) => {
 		if (err) {
-			// TODO:エラー表示
-			res.redirect('/');
+			// TODO: display error information
+			res.redirect(CONFIG.ads.basePath+'/');
 			return;
 		}
 		res.cookie('userId', result.id);
 		res.cookie('userName', result.loginName);
-		res.redirect('/');
+		res.redirect(CONFIG.ads.basePath+'/');
 	});
 
 };
