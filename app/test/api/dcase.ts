@@ -17,7 +17,7 @@ var userId = constant.SYSTEM_USER_ID;
 describe('api', function() {
     var con;
 	beforeEach(function (done) {
-		testdata.load(['test/default-data.yaml'], (err:any) => {
+		testdata.load(['test/api/dcase.yaml'], (err:any) => {
 	        con = new db.Database();
 			done();
 		});

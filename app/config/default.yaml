@@ -18,9 +18,9 @@ rec:
 ldap:
 # When you make it operate by dummy OpenLDAP, please generate URL using dummyip and dummyport. 
 #  url: 'ldap://localhost/cn=root,dc=assureit,dc=org'
-  url: 'ldap://localhost:3040/cn=root,dc=assureit,dc=org'
-  dn: 'uid=$1,ou=user,dc=assureit,dc=org'
-  root: 'cn=root,dc=assureit,dc=org'
+  url: 'ldap://localhost:3040/cn=root,dc=assure-it,dc=org'
+  dn: 'uid=$1,ou=user,dc=assure-it,dc=org'
+  root: 'cn=root,dc=assure-it,dc=org'
   password: 'ROOTPASSWORD'
   dummy:
     ip: 'localhost'
