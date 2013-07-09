@@ -9,6 +9,8 @@ import error = module('../../api/error')
 import constant = module('../../constant')
 import testdata = module('../testdata')
 import util_test = module('../../util/test')
+import model_dcase = module('../../model/dcase')
+import model_commit = module('../../model/commit')
 
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
@@ -46,7 +48,7 @@ describe('api', function() {
 							]
 						}
 					};
-		testdata.load(['test/api/dcase.yaml'], (err:any) => {
+		testdata.load([], (err:any) => {
 	        con = new db.Database();
 			done();
 		});
@@ -61,8 +63,23 @@ describe('api', function() {
 				dcase.createDCase(validParam, userId, 
 					{
 						onSuccess: (result: any) => {
-							// console.log(result);
-							done();
+							expect(result).not.to.be(null);
+							expect(result).not.to.be(undefined);
+							expect(result.dcaseId).not.to.be(null);
+							expect(result.dcaseId).not.to.be(undefined);
+							expect(result.commitId).not.to.be(null);
+							expect(result.commitId).not.to.be(undefined);
+							var dcaseDAO = new model_dcase.DCaseDAO(con);
+							var commitDAO = new model_commit.CommitDAO(con);
+							dcaseDAO.get(result.dcaseId, (err:any, resultDCase:model_dcase.DCase) => {
+								expect(err).to.be(null);
+								expect(resultDCase.name).to.equal(validParam.dcaseName);
+								commitDAO.get(result.commitId, (err:any, resultCommit:model_commit.Commit) => {
+									expect(err).to.be(null);
+									expect(resultCommit.latestFlag).to.equal(true);
+									done();
+								});
+							});
 						}, 
 						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 					}

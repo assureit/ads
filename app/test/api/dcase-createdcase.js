@@ -5,6 +5,8 @@ var error = require('../../api/error')
 var constant = require('../../constant')
 var testdata = require('../testdata')
 var util_test = require('../../util/test')
+var model_dcase = require('../../model/dcase')
+var model_commit = require('../../model/commit')
 var expect = require('expect.js');
 var userId = constant.SYSTEM_USER_ID;
 describe('api', function () {
@@ -42,9 +44,7 @@ describe('api', function () {
                 ]
             }
         };
-        testdata.load([
-            'test/api/dcase.yaml'
-        ], function (err) {
+        testdata.load([], function (err) {
             con = new db.Database();
             done();
         });
@@ -59,7 +59,23 @@ describe('api', function () {
             it('should return result', function (done) {
                 dcase.createDCase(validParam, userId, {
                     onSuccess: function (result) {
-                        done();
+                        expect(result).not.to.be(null);
+                        expect(result).not.to.be(undefined);
+                        expect(result.dcaseId).not.to.be(null);
+                        expect(result.dcaseId).not.to.be(undefined);
+                        expect(result.commitId).not.to.be(null);
+                        expect(result.commitId).not.to.be(undefined);
+                        var dcaseDAO = new model_dcase.DCaseDAO(con);
+                        var commitDAO = new model_commit.CommitDAO(con);
+                        dcaseDAO.get(result.dcaseId, function (err, resultDCase) {
+                            expect(err).to.be(null);
+                            expect(resultDCase.name).to.equal(validParam.dcaseName);
+                            commitDAO.get(result.commitId, function (err, resultCommit) {
+                                expect(err).to.be(null);
+                                expect(resultCommit.latestFlag).to.equal(true);
+                                done();
+                            });
+                        });
                     },
                     onFailure: function (error) {
                         expect().fail(JSON.stringify(error));
