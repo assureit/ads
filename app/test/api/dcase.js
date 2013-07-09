@@ -10,7 +10,7 @@ describe('api', function () {
     var con;
     beforeEach(function (done) {
         testdata.load([
-            'test/default-data.yaml'
+            'test/api/dcase.yaml'
         ], function (err) {
             con = new db.Database();
             done();
