@@ -35,8 +35,13 @@ export class MethodNotFoundError extends RPCError {
 	}
 }
 export class InvalidParamsError extends RPCError {
-	constructor(msg: string, data: any) {
-		super(HTTP_STATUS.INTERNAL_SERVER_ERROR, -32602, 'Invalid params: ' + msg, data);
+	constructor(msg: string[], data: any);
+	constructor(msg: string, data: any);
+	constructor(msg: any, data: any) {
+		if (msg instanceof Array) {
+			msg = msg.join('\n');
+		}
+		super(HTTP_STATUS.OK, -32602, 'Invalid method parameter is found: \n' + msg, data);
 	}
 }
 export class InternalError extends RPCError {
@@ -73,17 +78,19 @@ export class LoginError extends ApplicationError {
 	}
 }
 
-enum RPC_ERROR {
+export enum RPC_ERROR {
 	INVALID_REQUEST = -32600,
 	METHOD_NOT_FOUND = -32601,
 	INVALID_PARAMS = -32602,
 	INTERNAL_ERROR = -32603,
 	PARSE_ERROR = -32700,
 
+	NOT_FOUND = 24000,
+
 	NOT_DEFINED = 19999
 }
 
-enum HTTP_STATUS {
+export enum HTTP_STATUS {
 	OK = 200,
 	BAD_REQUEST = 400, 	// Bad Request
 	NOT_FOUND = 404, 	// Not Found

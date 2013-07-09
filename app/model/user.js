@@ -13,6 +13,8 @@ var User = (function () {
         this.loginName = loginName;
         this.deleteFlag = deleteFlag;
         this.systemFlag = systemFlag;
+        this.deleteFlag = !!this.deleteFlag;
+        this.systemFlag = !!this.systemFlag;
     }
     return User;
 })();
