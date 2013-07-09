@@ -7,7 +7,7 @@ var model_node = require('../model/node')
 
 
 var model_user = require('../model/user')
-
+var error = require('./error')
 var async = require('async');
 function searchDCase(params, userId, callback) {
     var con = new db.Database();
@@ -124,6 +124,29 @@ function searchNode(params, userId, callback) {
 }
 exports.searchNode = searchNode;
 function createDCase(params, userId, callback) {
+    function validate(params) {
+        var checks = [];
+        if(!params) {
+            checks.push('Parameter is required.');
+        }
+        if(params && !params.dcaseName) {
+            checks.push('DCase name is required.');
+        }
+        if(params && params.dcaseName && params.dcaseName.length > 255) {
+            checks.push('DCase name should not exceed 255 characters.');
+        }
+        if(params && !params.contents) {
+            checks.push('Contents is required.');
+        }
+        if(checks.length > 0) {
+            callback.onFailure(new error.InvalidParamsError(checks, null));
+            return false;
+        }
+        return true;
+    }
+    if(!validate(params)) {
+        return;
+    }
     var con = new db.Database();
     con.begin(function (err, result) {
         var userDAO = new model_user.UserDAO(con);
