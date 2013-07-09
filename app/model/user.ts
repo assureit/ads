@@ -4,7 +4,10 @@ import error = module('../api/error')
 import net_ldap = module('../net/ldap')
 
 export class User {
-	constructor(public id:number, public loginName: string, public deleteFlag: bool, public systemFlag: bool) {}
+	constructor(public id:number, public loginName: string, public deleteFlag: bool, public systemFlag: bool) {
+		this.deleteFlag = !!this.deleteFlag;
+		this.systemFlag = !!this.systemFlag;
+	}
 }
 
 export class UserDAO extends model.DAO {

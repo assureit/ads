@@ -7,16 +7,22 @@ var model = require('./model')
 var model_commit = require('./commit')
 var model_user = require('./user')
 var model_pager = require('./pager')
+var error = require('../api/error')
+var async = require('async');
 var DCase = (function () {
     function DCase(id, name, userId, deleteFlag) {
         this.id = id;
         this.name = name;
         this.userId = userId;
         this.deleteFlag = deleteFlag;
+        this.deleteFlag = !!this.deleteFlag;
         if(deleteFlag === undefined) {
             this.deleteFlag = false;
         }
     }
+    DCase.tableToObject = function tableToObject(table) {
+        return new DCase(table.id, table.name, table.user_id, table.delete_flag);
+    };
     return DCase;
 })();
 exports.DCase = DCase;
@@ -26,6 +32,28 @@ var DCaseDAO = (function (_super) {
         _super.apply(this, arguments);
 
     }
+    DCaseDAO.prototype.get = function (id, callback) {
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query('SELECT * FROM dcase WHERE id = ?', [
+                    id
+                ], function (err, result) {
+                    return next(err, result);
+                });
+            }, 
+            function (result, next) {
+                if(result.length == 0) {
+                    next(new error.NotFoundError('DCase is not found.', {
+                        id: id
+                    }));
+                    return;
+                }
+                next(null, DCase.tableToObject(result[0]));
+            }        ], function (err, dcase) {
+            callback(err, dcase);
+        });
+    };
     DCaseDAO.prototype.insert = function (params, callback) {
         this.con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [
             params.userId, 

@@ -16,7 +16,9 @@ export interface InsertArg {
 }
 export class Commit {
 	public user: model_user.User;
-	constructor(public id:number, public prevCommitId: number, public dcaseId: number, public userId: number, public message:string, public data:string, public dateTime: Date, public latestFlag: bool) {}
+	constructor(public id:number, public prevCommitId: number, public dcaseId: number, public userId: number, public message:string, public data:string, public dateTime: Date, public latestFlag: bool) {
+		this.latestFlag = !!this.latestFlag;
+	}
 }
 export class CommitDAO extends model.DAO {
 	insert(params: InsertArg, callback: (err:any, commitId: number)=>void): void {

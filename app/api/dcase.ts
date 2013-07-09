@@ -120,6 +120,20 @@ export function searchNode(params:any, userId: number, callback: type.Callback) 
 }
 
 export function createDCase(params:any, userId: number, callback: type.Callback) {
+	function validate(params:any) {
+		var checks = [];
+		if (!params) checks.push('Parameter is required.');
+		if (params && !params.dcaseName) checks.push('DCase name is required.');
+		if (params && params.dcaseName && params.dcaseName.length > 255) checks.push('DCase name should not exceed 255 characters.');
+		if (params && !params.contents) checks.push('Contents is required.');
+		if (checks.length > 0) {
+			callback.onFailure(new error.InvalidParamsError(checks, null));
+			return false;
+		}
+		return true;
+	}
+	if (!validate(params)) return;
+
 	var con = new db.Database();
 	con.begin((err, result) => {
 		var userDAO = new model_user.UserDAO(con);
