@@ -48,6 +48,26 @@ function searchDCase(params, userId, callback) {
 }
 exports.searchDCase = searchDCase;
 function getDCase(params, userId, callback) {
+    function validate(params) {
+        var checks = [];
+        if(!params) {
+            checks.push('Parameter is required.');
+        }
+        if(params && !params.dcaseId) {
+            checks.push('DCase ID is required.');
+        }
+        if(params && params.dcaseId && !isFinite(params.dcaseId)) {
+            checks.push('DCase ID must be a number.');
+        }
+        if(checks.length > 0) {
+            callback.onFailure(new error.InvalidParamsError(checks, null));
+            return false;
+        }
+        return true;
+    }
+    if(!validate(params)) {
+        return;
+    }
     var con = new db.Database();
     con.query({
         sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?',
@@ -58,6 +78,11 @@ function getDCase(params, userId, callback) {
         if(err) {
             con.close();
             throw err;
+        }
+        if(result.length == 0) {
+            con.close();
+            callback.onFailure(new error.NotFoundError('Effective DCase does not exist.'));
+            return;
         }
         con.close();
         var c = result[0].c;

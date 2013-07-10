@@ -50,14 +50,34 @@ export function searchDCase(params:any, userId: number, callback: type.Callback)
 }
 
 export function getDCase(params:any, userId: number, callback: type.Callback) {
+	
+	function validate(params:any) {
+		var checks = [];
+		if (!params) checks.push('Parameter is required.');
+		if (params && !params.dcaseId) checks.push('DCase ID is required.');
+		if (params && params.dcaseId && !isFinite(params.dcaseId) ) checks.push('DCase ID must be a number.');
+		if (checks.length > 0) {
+			callback.onFailure(new error.InvalidParamsError(checks, null));
+			return false;
+		}
+		return true;
+	}
+
+	if (!validate(params)) return;
+
 	var con = new db.Database();
+
 	con.query({sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?', nestTables: true}, [params.dcaseId], (err, result) => {
 		if (err) {
 			con.close();
 			throw err;
 		}
-
-		// TODO: NotFound処理
+		if (result.length == 0) {
+			con.close();
+			callback.onFailure(new error.NotFoundError('Effective DCase does not exist.'));
+			return;
+		}
+	
 		con.close();
 		var c = result[0].c;
 		var d = result[0].d;
