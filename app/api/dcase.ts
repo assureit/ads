@@ -50,21 +50,62 @@ export function searchDCase(params:any, userId: number, callback: type.Callback)
 }
 
 export function getDCase(params:any, userId: number, callback: type.Callback) {
+	
+	function validate(params:any) {
+		var checks = [];
+		if (!params) checks.push('Parameter is required.');
+		if (params && !params.dcaseId) checks.push('DCase ID is required.');
+		if (params && params.dcaseId && !isFinite(params.dcaseId) ) checks.push('DCase ID must be a number.');
+		if (checks.length > 0) {
+			callback.onFailure(new error.InvalidParamsError(checks, null));
+			return false;
+		}
+		return true;
+	}
+
+	if (!validate(params)) return;
+
 	var con = new db.Database();
-	con.query({sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?', nestTables: true}, [params.dcaseId], (err, result) => {
+
+	con.query('SELECT COUNT(id) C FROM dcase WHERE id = ? AND delete_flag=FALSE', [params.dcaseId], (err, resultDcase) => {
 		if (err) {
 			con.close();
-			throw err;
+			callback.onFailure(err);
+			return;
 		}
+		if (resultDcase[0].C == 0) {
+			callback.onFailure(new error.NotFoundError('DCase is not found.'));
+			con.close();
+			return;
+		} 
+		con.query('SELECT COUNT(id) C FROM commit WHERE dcase_id = ? AND latest_flag = TRUE', [params.dcaseId], (err, resultCommit) => {
+			if (err) {
+				con.close();
+				callback.onFailure(err);
+				return false;
+			}
+			if (resultCommit[0].C == 0) {
+				callback.onFailure(new error.NotFoundError('Commit is not found.'));
+				con.close();
+				return;
+			}
 
-		// TODO: NotFound処理
-		con.close();
-		var c = result[0].c;
-		var d = result[0].d;
-		callback.onSuccess({
-			commitId: c.id,
-			dcaseName: d.name,
-			contents: c.data
+			con.query({sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?', nestTables: true}, [params.dcaseId], (err, result) => {
+				if (err) {
+					con.close();
+					throw err;
+				}
+		
+				// TODO: NotFound処理
+				con.close();
+				var c = result[0].c;
+				var d = result[0].d;
+				callback.onSuccess({
+					commitId: c.id,
+					dcaseName: d.name,
+					contents: c.data
+				});
+			});
 		});
 	});
 }
