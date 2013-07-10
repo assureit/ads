@@ -372,10 +372,10 @@ describe('api', function() {
 							expect(result).to.be(null);	
 							done();
 						}, 
-						onFailure: (error: error.RPCError) => {
-							expect(error.rpcHttpStatus).to.be(200);
-							expect(error.code).to.be(19999);
-							expect(error.message).to.be('UserId Not Found.');
+						onFailure: (err: error.RPCError) => {
+							expect(err.rpcHttpStatus).to.be(200);
+							expect(err.code).to.be(error.RPC_ERROR.NOT_FOUND);
+							expect(err.message).to.be('UserId Not Found.');
 							done();
 						},
 					}
@@ -405,10 +405,10 @@ describe('api', function() {
 							expect(result).to.be(null);	
 							done();
 						}, 
-						onFailure: (error: error.RPCError) => {
-							expect(error.rpcHttpStatus).to.be(200);
-							expect(error.code).to.be(19999);
-							expect(error.message).to.be('UserId Not Found.');
+						onFailure: (err: error.RPCError) => {
+							expect(err.rpcHttpStatus).to.be(200);
+							expect(err.code).to.be(error.RPC_ERROR.NOT_FOUND);
+							expect(err.message).to.be('UserId Not Found.');
 							done();
 						},
 					}
@@ -439,10 +439,10 @@ describe('api', function() {
 							expect(result).to.be(null);	
 							done();
 						}, 
-						onFailure: (error: error.RPCError) => {
-							expect(error.rpcHttpStatus).to.be(200);
-							expect(error.code).to.be(19999);
-							expect(error.message).to.be('UserId Not Found.');
+						onFailure: (err: error.RPCError) => {
+							expect(err.rpcHttpStatus).to.be(200);
+							expect(err.code).to.be(error.RPC_ERROR.NOT_FOUND);
+							expect(err.message).to.be('UserId Not Found.');
 							done();
 						},
 					}
@@ -584,10 +584,10 @@ describe('api', function() {
 							expect(result).to.be(null);	
 							done();
 						}, 
-						onFailure: (error: error.RPCError) => {
-							expect(error.rpcHttpStatus).to.be(200);
-							expect(error.code).to.be(19999);
-							expect(error.message).to.be('UserId Not Found.');
+						onFailure: (err: error.RPCError) => {
+							expect(err.rpcHttpStatus).to.be(200);
+							expect(err.code).to.be(error.RPC_ERROR.NOT_FOUND);
+							expect(err.message).to.be('UserId Not Found.');
 							done();
 						},
 					}

@@ -81,7 +81,7 @@ exports.ApplicationError = ApplicationError;
 var NotFoundError = (function (_super) {
     __extends(NotFoundError, _super);
     function NotFoundError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.NOT_DEFINED, msg, data);
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.NOT_FOUND, msg, data);
     }
     return NotFoundError;
 })(ApplicationError);
@@ -102,6 +102,14 @@ var LoginError = (function (_super) {
     return LoginError;
 })(ApplicationError);
 exports.LoginError = LoginError;
+var VersionConflictError = (function (_super) {
+    __extends(VersionConflictError, _super);
+    function VersionConflictError(msg, data) {
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.VERSION_CONFLICT, msg, data);
+    }
+    return VersionConflictError;
+})(ApplicationError);
+exports.VersionConflictError = VersionConflictError;
 (function (RPC_ERROR) {
     RPC_ERROR._map = [];
     RPC_ERROR.INVALID_REQUEST = -32600;
@@ -109,7 +117,8 @@ exports.LoginError = LoginError;
     RPC_ERROR.INVALID_PARAMS = -32602;
     RPC_ERROR.INTERNAL_ERROR = -32603;
     RPC_ERROR.PARSE_ERROR = -32700;
-    RPC_ERROR.NOT_FOUND = 24000;
+    RPC_ERROR.NOT_FOUND = 24001;
+    RPC_ERROR.VERSION_CONFLICT = 24002;
     RPC_ERROR.NOT_DEFINED = 19999;
 })(exports.RPC_ERROR || (exports.RPC_ERROR = {}));
 var RPC_ERROR = exports.RPC_ERROR;

@@ -4,8 +4,6 @@ var dcase = require('../../api/dcase')
 var error = require('../../api/error')
 var constant = require('../../constant')
 var testdata = require('../testdata')
-var util_test = require('../../util/test')
-var model_dcase = require('../../model/dcase')
 var model_commit = require('../../model/commit')
 var expect = require('expect.js');
 var userId = constant.SYSTEM_USER_ID;
@@ -14,7 +12,8 @@ describe('api', function () {
     var validParam;
     beforeEach(function (done) {
         validParam = {
-            dcaseName: 'test dcase',
+            commitId: 401,
+            commitMessage: 'test',
             contents: {
                 NodeCount: 3,
                 TopGoalId: 1,
@@ -25,7 +24,21 @@ describe('api', function () {
                         Children: [
                             2
                         ],
-                        NodeType: "Goal"
+                        NodeType: "Goal",
+                        MetaData: [
+                            {
+                                Type: "Issue",
+                                Subject: "このゴールを満たす必要がある",
+                                Description: "詳細な情報をここに記述する",
+                                Visible: "true"
+                            }, 
+                            {
+                                Type: "LastUpdated",
+                                User: "Shida",
+                                Visible: "false"
+                            }, 
+                            
+                        ]
                     }, 
                     {
                         ThisNodeId: 2,
@@ -33,18 +46,35 @@ describe('api', function () {
                         Children: [
                             3
                         ],
-                        NodeType: "Strategy"
+                        NodeType: "Strategy",
+                        MetaData: []
                     }, 
                     {
                         ThisNodeId: 3,
                         Description: "g1",
                         Children: [],
-                        NodeType: "Goal"
+                        NodeType: "Goal",
+                        MetaData: [
+                            {
+                                Type: "Issue",
+                                Subject: "2つ目のイシュー",
+                                Description: "あああ詳細な情報をここに記述する",
+                                Visible: "true"
+                            }, 
+                            {
+                                Type: "LastUpdated",
+                                User: "Shida",
+                                Visible: "false"
+                            }, 
+                            
+                        ]
                     }
                 ]
             }
         };
-        testdata.load([], function (err) {
+        testdata.load([
+            'test/api/dcase.yaml'
+        ], function (err) {
             con = new db.Database();
             done();
         });
@@ -55,26 +85,20 @@ describe('api', function () {
         });
     });
     describe('dcase', function () {
-        describe('createDCase', function () {
+        describe('commit', function () {
             it('should return result', function (done) {
-                dcase.createDCase(validParam, userId, {
+                this.timeout(15000);
+                dcase.commit(validParam, userId, {
                     onSuccess: function (result) {
                         expect(result).not.to.be(null);
                         expect(result).not.to.be(undefined);
-                        expect(result.dcaseId).not.to.be(null);
-                        expect(result.dcaseId).not.to.be(undefined);
                         expect(result.commitId).not.to.be(null);
                         expect(result.commitId).not.to.be(undefined);
-                        var dcaseDAO = new model_dcase.DCaseDAO(con);
                         var commitDAO = new model_commit.CommitDAO(con);
-                        dcaseDAO.get(result.dcaseId, function (err, resultDCase) {
+                        commitDAO.get(result.commitId, function (err, resultCommit) {
                             expect(err).to.be(null);
-                            expect(resultDCase.name).to.equal(validParam.dcaseName);
-                            commitDAO.get(result.commitId, function (err, resultCommit) {
-                                expect(err).to.be(null);
-                                expect(resultCommit.latestFlag).to.equal(true);
-                                done();
-                            });
+                            expect(resultCommit.latestFlag).to.equal(true);
+                            done();
                         });
                     },
                     onFailure: function (error) {
@@ -83,7 +107,8 @@ describe('api', function () {
                 });
             });
             it('UserId not found', function (done) {
-                dcase.createDCase(validParam, -1, {
+                this.timeout(15000);
+                dcase.commit(validParam, 99999, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -96,90 +121,97 @@ describe('api', function () {
                     }
                 });
             });
-            it('DCase name is empty', function (done) {
-                validParam.dcaseName = '';
-                dcase.createDCase(validParam, userId, {
+            it('prams is null', function (done) {
+                this.timeout(15000);
+                dcase.commit(null, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
                     },
                     onFailure: function (err) {
                         expect(err.rpcHttpStatus).to.be(200);
-                        expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
-                        expect(err.message).to.equal('Invalid method parameter is found: \nDCase name is required.');
+                        expect(err.code).to.be(error.RPC_ERROR.INVALID_PARAMS);
+                        expect(err.message).to.be('Invalid method parameter is found: \nParameter is required.');
                         done();
                     }
                 });
             });
-            it('DCase name is not set', function (done) {
-                delete validParam['dcaseName'];
-                dcase.createDCase(validParam, userId, {
+            it('commit id is not set', function (done) {
+                this.timeout(15000);
+                delete validParam['commitId'];
+                dcase.commit(validParam, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
                     },
                     onFailure: function (err) {
                         expect(err.rpcHttpStatus).to.be(200);
-                        expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
-                        expect(err.message).to.equal('Invalid method parameter is found: \nDCase name is required.');
+                        expect(err.code).to.be(error.RPC_ERROR.INVALID_PARAMS);
+                        expect(err.message).to.be('Invalid method parameter is found: \nCommit ID is required.');
                         done();
                     }
                 });
             });
-            it('DCase name is too long', function (done) {
-                validParam.dcaseName = util_test.str.random(256);
-                dcase.createDCase(validParam, userId, {
+            it('commit id is not a number', function (done) {
+                this.timeout(15000);
+                validParam.commitId = "a";
+                dcase.commit(validParam, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
                     },
                     onFailure: function (err) {
                         expect(err.rpcHttpStatus).to.be(200);
-                        expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
-                        expect(err.message).to.equal('Invalid method parameter is found: \nDCase name should not exceed 255 characters.');
+                        expect(err.code).to.be(error.RPC_ERROR.INVALID_PARAMS);
+                        expect(err.message).to.be('Invalid method parameter is found: \nCommit ID must be a number.');
+                        done();
+                    }
+                });
+            });
+            it('commit message is not set', function (done) {
+                this.timeout(15000);
+                delete validParam['commitMessage'];
+                dcase.commit(validParam, userId, {
+                    onSuccess: function (result) {
+                        expect(result).to.be(null);
+                        done();
+                    },
+                    onFailure: function (err) {
+                        expect(err.rpcHttpStatus).to.be(200);
+                        expect(err.code).to.be(error.RPC_ERROR.INVALID_PARAMS);
+                        expect(err.message).to.be('Invalid method parameter is found: \nCommit Message is required.');
                         done();
                     }
                 });
             });
             it('contents is not set', function (done) {
+                this.timeout(15000);
                 delete validParam['contents'];
-                dcase.createDCase(validParam, userId, {
+                dcase.commit(validParam, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
                     },
                     onFailure: function (err) {
                         expect(err.rpcHttpStatus).to.be(200);
-                        expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
-                        expect(err.message).to.equal('Invalid method parameter is found: \nContents is required.');
+                        expect(err.code).to.be(error.RPC_ERROR.INVALID_PARAMS);
+                        expect(err.message).to.be('Invalid method parameter is found: \nContents is required.');
                         done();
                     }
                 });
             });
-            it('param is null', function (done) {
-                dcase.createDCase(null, userId, {
+            it('Version Conflict', function (done) {
+                this.timeout(15000);
+                validParam.commitId = 422;
+                dcase.commit(validParam, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
                     },
                     onFailure: function (err) {
                         expect(err.rpcHttpStatus).to.be(200);
-                        expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
-                        expect(err.message).to.equal('Invalid method parameter is found: \nParameter is required.');
-                        done();
-                    }
-                });
-            });
-            it('param is undefined', function (done) {
-                dcase.createDCase(undefined, userId, {
-                    onSuccess: function (result) {
-                        expect(result).to.be(null);
-                        done();
-                    },
-                    onFailure: function (err) {
-                        expect(err.rpcHttpStatus).to.be(200);
-                        expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
-                        expect(err.message).to.equal('Invalid method parameter is found: \nParameter is required.');
+                        expect(err.code).to.be(error.RPC_ERROR.VERSION_CONFLICT);
+                        expect(err.message).to.be('CommitID is not the effective newest commitment.');
                         done();
                     }
                 });

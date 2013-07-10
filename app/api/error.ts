@@ -62,7 +62,7 @@ export class ApplicationError implements IRPCOverHTTPError {
 
 export class NotFoundError extends ApplicationError {
 	constructor(msg:string, data?:any) {
-		super(HTTP_STATUS.OK, RPC_ERROR.NOT_DEFINED, msg, data);
+		super(HTTP_STATUS.OK, RPC_ERROR.NOT_FOUND, msg, data);
 	}
 }
 
@@ -78,6 +78,12 @@ export class LoginError extends ApplicationError {
 	}
 }
 
+export class VersionConflictError extends ApplicationError {
+	constructor(msg:string, data?:any) {
+		super(HTTP_STATUS.OK, RPC_ERROR.VERSION_CONFLICT, msg, data);
+	}
+}
+
 export enum RPC_ERROR {
 	INVALID_REQUEST = -32600,
 	METHOD_NOT_FOUND = -32601,
@@ -85,7 +91,8 @@ export enum RPC_ERROR {
 	INTERNAL_ERROR = -32603,
 	PARSE_ERROR = -32700,
 
-	NOT_FOUND = 24000,
+	NOT_FOUND = 24001,
+	VERSION_CONFLICT = 24002,
 
 	NOT_DEFINED = 19999
 }
