@@ -69,51 +69,28 @@ function getDCase(params, userId, callback) {
         return;
     }
     var con = new db.Database();
-    con.query('SELECT COUNT(id) C FROM dcase WHERE id = ? AND delete_flag=FALSE', [
+    con.query({
+        sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?',
+        nestTables: true
+    }, [
         params.dcaseId
-    ], function (err, resultDcase) {
+    ], function (err, result) {
         if(err) {
             con.close();
-            callback.onFailure(err);
-            return;
+            throw err;
         }
-        if(resultDcase[0].C == 0) {
-            callback.onFailure(new error.NotFoundError('DCase is not found.'));
+        if(result.length == 0) {
             con.close();
+            callback.onFailure(new error.NotFoundError('Effective DCase does not exist.'));
             return;
         }
-        con.query('SELECT COUNT(id) C FROM commit WHERE dcase_id = ? AND latest_flag = TRUE', [
-            params.dcaseId
-        ], function (err, resultCommit) {
-            if(err) {
-                con.close();
-                callback.onFailure(err);
-                return false;
-            }
-            if(resultCommit[0].C == 0) {
-                callback.onFailure(new error.NotFoundError('Commit is not found.'));
-                con.close();
-                return;
-            }
-            con.query({
-                sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?',
-                nestTables: true
-            }, [
-                params.dcaseId
-            ], function (err, result) {
-                if(err) {
-                    con.close();
-                    throw err;
-                }
-                con.close();
-                var c = result[0].c;
-                var d = result[0].d;
-                callback.onSuccess({
-                    commitId: c.id,
-                    dcaseName: d.name,
-                    contents: c.data
-                });
-            });
+        con.close();
+        var c = result[0].c;
+        var d = result[0].d;
+        callback.onSuccess({
+            commitId: c.id,
+            dcaseName: d.name,
+            contents: c.data
         });
     });
 }

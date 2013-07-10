@@ -110,21 +110,7 @@ describe('api', function() {
 					onFailure: (err: error.RPCError) => {
 						expect(err.rpcHttpStatus).to.be(200);
 						expect(err.code).to.equal(error.RPC_ERROR.NOT_DEFINED);
-						expect(err.message).to.equal('DCase is not found.');
-						done();
-					},
-				});
-			});
-			it('Commit is not found', function(done) {
-				dcase.getDCase({dcaseId: 300}, userId, {
-					onSuccess: (result: any) => {
-						expect(result).to.be(null);
-						done();
-					},
-					onFailure: (err: error.RPCError) => {
-						expect(err.rpcHttpStatus).to.be(200);
-						expect(err.code).to.equal(error.RPC_ERROR.NOT_DEFINED);
-						expect(err.message).to.equal('Commit is not found.');
+						expect(err.message).to.equal('Effective DCase does not exist.');
 						done();
 					},
 				});
