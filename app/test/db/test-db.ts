@@ -35,7 +35,7 @@ describe('test-db', () => {
 					testDB.load('test/default-data.yaml', (err:any) => {next(err);});
 				}, 
 				(next:Function) => {
-					con.query('SELECT count(*) as cnt FROM USER WHERE id=101', (err:any, result:any) => {
+					con.query('SELECT count(*) as cnt FROM user WHERE id=101', (err:any, result:any) => {
 						expect(result.length).to.equal(1);
 						expect(result[0].cnt).to.equal(1);
 						next(err);
@@ -62,7 +62,7 @@ describe('test-db', () => {
 					});
 				}, 
 				(next:Function) => {
-					con.query('SELECT count(*) as cnt FROM USER WHERE id=101', (err:any, result:any) => {
+					con.query('SELECT count(*) as cnt FROM user WHERE id=101', (err:any, result:any) => {
 						expect(result.length).to.equal(1);
 						expect(result[0].cnt).to.equal(0);
 						next(err);
