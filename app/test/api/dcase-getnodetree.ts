@@ -8,8 +8,6 @@ import dcase = module('../../api/dcase')
 import error = module('../../api/error')
 import constant = module('../../constant')
 import testdata = module('../testdata')
-import model_dcase = module('../../model/dcase')
-import model_commit = module('../../model/commit')
 
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
@@ -17,7 +15,7 @@ var expect = require('expect.js');	// TODO: import module化
 var userId = constant.SYSTEM_USER_ID;
 
 describe('api', function() {
-	var con:db.Database;
+    var con;
 	beforeEach(function (done) {
 		testdata.load(['test/api/dcase.yaml'], (err:any) => {
 	        con = new db.Database();
@@ -28,39 +26,21 @@ describe('api', function() {
 		testdata.clear((err:any) => done());
 	});
 	describe('dcase', function() {
-		describe('getDCase', function() {
+		describe('getNodeTree', function() {
 			it('should return result', function(done) {
-				dcase.getDCase({dcaseId: 201}, userId, {
+				dcase.getNodeTree({commitId: 401}, userId, {
 					onSuccess: (result: any) => {
 						expect(result).not.to.be(null);
 						expect(result).not.to.be(undefined);
-						expect(result.commitId).not.to.be(null);
-						expect(result.commitId).not.to.be(undefined);
-						expect(result.dcaseName).not.to.be(null);
-						expect(result.dcaseName).not.to.be(undefined);	
 						expect(result.contents).not.to.be(null);
 						expect(result.contents).not.to.be(undefined);
-						var dcaseDAO = new model_dcase.DCaseDAO(con);
-						var commitDAO = new model_commit.CommitDAO(con);
-						commitDAO.get(result.commitId, (err:any, resultCommit:model_commit.Commit) => {
-							expect(err).to.be(null);
-							expect(resultCommit.latestFlag).to.equal(true);
-							dcaseDAO.get(resultCommit.dcaseId, (err:any, resultDCase:model_dcase.DCase) => {
-								expect(err).to.be(null);
-								expect(resultDCase.name).to.equal(result.dcaseName);
-								expect(resultDCase.deleteFlag).to.equal(false);
-								done();
-							});
-						});
-					}, 
-					onFailure: (err: error.RPCError) => {
-						expect().fail(JSON.stringify(err));
 						done();
-					},
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 				});
 			});
 			it('prams is null', function(done) {
-				dcase.getDCase(null, userId, {
+				dcase.getNodeTree(null, userId, {
 					onSuccess: (result: any) => {
 						expect(result).to.be(null);
 						done();
@@ -73,8 +53,8 @@ describe('api', function() {
 					},
 				});
 			});
-			it('DCase Id is not set', function(done) {
-				dcase.getDCase({}, userId, {
+			it('Commit ID is not set', function(done) {
+				dcase.getNodeTree({}, userId, {
 					onSuccess: (result: any) => {
 						expect(result).to.be(null);
 						done();
@@ -82,13 +62,13 @@ describe('api', function() {
 					onFailure: (err: error.RPCError) => {
 						expect(err.rpcHttpStatus).to.be(200);
 						expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
-						expect(err.message).to.equal('Invalid method parameter is found: \nDCase ID is required.');
+						expect(err.message).to.equal('Invalid method parameter is found: \nCommit ID is required.');
 						done();
 					},
 				});
 			});
-			it('DCase Id is not a number', function(done) {
-				dcase.getDCase({dcaseId: "a"}, userId, {
+			it('Commit ID is not a number', function(done) {
+				dcase.getNodeTree({commitId: "a"}, userId, {
 					onSuccess: (result: any) => {
 						expect(result).to.be(null);
 						done();
@@ -96,13 +76,13 @@ describe('api', function() {
 					onFailure: (err: error.RPCError) => {
 						expect(err.rpcHttpStatus).to.be(200);
 						expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
-						expect(err.message).to.equal('Invalid method parameter is found: \nDCase ID must be a number.');
+						expect(err.message).to.equal('Invalid method parameter is found: \nCommit ID must be a number.');
 						done();
 					},
 				});
 			});
-			it('DCase is not found', function(done) {
-				dcase.getDCase({dcaseId: 999}, userId, {
+			it('Commit is not found', function(done) {
+				dcase.getNodeTree({commitId: 99999}, userId, {
 					onSuccess: (result: any) => {
 						expect(result).to.be(null);
 						done();
@@ -110,7 +90,7 @@ describe('api', function() {
 					onFailure: (err: error.RPCError) => {
 						expect(err.rpcHttpStatus).to.be(200);
 						expect(err.code).to.equal(error.RPC_ERROR.NOT_FOUND);
-						expect(err.message).to.equal('Effective DCase does not exist.');
+						expect(err.message).to.equal('Effective Commit does not exist.');
 						done();
 					},
 				});

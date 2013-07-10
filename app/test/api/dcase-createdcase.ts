@@ -94,7 +94,7 @@ describe('api', function() {
 						}, 
 						onFailure: (err: error.RPCError) => {
 							expect(err.rpcHttpStatus).to.be(200);
-							expect(err.code).to.be(19999);
+							expect(err.code).to.be(error.RPC_ERROR.NOT_FOUND);
 							expect(err.message).to.be('UserId Not Found.');
 							done();
 						},
