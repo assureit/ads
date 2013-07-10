@@ -362,6 +362,26 @@ function editDCase(params, userId, callback) {
 }
 exports.editDCase = editDCase;
 function getCommitList(params, userId, callback) {
+    function validate(params) {
+        var checks = [];
+        if(!params) {
+            checks.push('Parameter is required.');
+        }
+        if(params && !params.dcaseId) {
+            checks.push('DCase ID is required.');
+        }
+        if(params && params.dcaseId && !isFinite(params.dcaseId)) {
+            checks.push('DCase ID must be a number.');
+        }
+        if(checks.length > 0) {
+            callback.onFailure(new error.InvalidParamsError(checks, null));
+            return false;
+        }
+        return true;
+    }
+    if(!validate(params)) {
+        return;
+    }
     var con = new db.Database();
     var commitDAO = new model_commit.CommitDAO(con);
     commitDAO.list(params.dcaseId, function (err, list) {
@@ -370,6 +390,10 @@ function getCommitList(params, userId, callback) {
             return;
         }
         con.close();
+        if(list.length == 0) {
+            callback.onFailure(new error.NotFoundError('Effective DCase does not exist.'));
+            return;
+        }
         var commitList = [];
         list.forEach(function (c) {
             commitList.push({
