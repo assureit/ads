@@ -33,7 +33,7 @@ describe('test-db', function () {
                     });
                 }, 
                 function (next) {
-                    con.query('SELECT count(*) as cnt FROM USER WHERE id=101', function (err, result) {
+                    con.query('SELECT count(*) as cnt FROM user WHERE id=101', function (err, result) {
                         expect(result.length).to.equal(1);
                         expect(result[0].cnt).to.equal(1);
                         next(err);
@@ -61,7 +61,7 @@ describe('test-db', function () {
                     });
                 }, 
                 function (next) {
-                    con.query('SELECT count(*) as cnt FROM USER WHERE id=101', function (err, result) {
+                    con.query('SELECT count(*) as cnt FROM user WHERE id=101', function (err, result) {
                         expect(result.length).to.equal(1);
                         expect(result[0].cnt).to.equal(0);
                         next(err);
