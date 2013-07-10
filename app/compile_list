@@ -22,6 +22,7 @@ test/api/dcase.ts
 test/api/dcase-createdcase.ts
 test/api/dcase-getdcase.ts
 test/api/dcase-commit.ts
+test/api/dcase-getnodetree.ts
 test/api/monitor.ts
 test/api/rec.ts
 test/model/user.ts

@@ -96,6 +96,26 @@ function getDCase(params, userId, callback) {
 }
 exports.getDCase = getDCase;
 function getNodeTree(params, userId, callback) {
+    function validate(params) {
+        var checks = [];
+        if(!params) {
+            checks.push('Parameter is required.');
+        }
+        if(params && !params.commitId) {
+            checks.push('Commit ID is required.');
+        }
+        if(params && params.commitId && !isFinite(params.commitId)) {
+            checks.push('Commit ID must be a number.');
+        }
+        if(checks.length > 0) {
+            callback.onFailure(new error.InvalidParamsError(checks, null));
+            return false;
+        }
+        return true;
+    }
+    if(!validate(params)) {
+        return;
+    }
     var con = new db.Database();
     con.query({
         sql: 'SELECT * FROM commit WHERE id = ?',
@@ -106,6 +126,10 @@ function getNodeTree(params, userId, callback) {
         if(err) {
             con.close();
             throw err;
+        }
+        if(result.length == 0) {
+            callback.onFailure(new error.NotFoundError('Effective Commit does not exist.'));
+            return;
         }
         con.close();
         var c = result[0].commit;
