@@ -55,13 +55,8 @@ node app
 ```
 OpenLDAPダミーサーバー起動方法
 ------------
-Unitテストで認証確認等が必要な場合
 ```
 npm run-script start_ldap
-```
-ブラウザで使用する場合
-```
-npm run-script start_ldap2
 ```
 
 本番環境構築
