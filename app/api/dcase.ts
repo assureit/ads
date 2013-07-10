@@ -192,6 +192,22 @@ export function createDCase(params:any, userId: number, callback: type.Callback)
 }
 
 export function commit(params: any, userId: number, callback: type.Callback) {
+	function validate(params:any) {
+		var checks = [];
+		if (!params) checks.push('Parameter is required.');
+		if (params && !params.commitId) checks.push('Commit ID is required.');
+		if (params && params.commitId && !isFinite(params.commitId) ) checks.push('Commit ID must be a number.');
+		if (params && !params.commitMessage) checks.push('Commit Message is required.');
+		if (params && !params.contents) checks.push('Contents is required.');
+		if (checks.length > 0) {
+			callback.onFailure(new error.InvalidParamsError(checks, null));
+			return false;
+		}
+		return true;
+	}
+
+	if (!validate(params)) return;
+
 	var con = new db.Database();
 	var commitDAO = new model_commit.CommitDAO(con);
 	con.begin((err, result) => {
@@ -201,16 +217,27 @@ export function commit(params: any, userId: number, callback: type.Callback) {
 				callback.onFailure(err);
 				return;
 			}
-		
-			// _commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
-			commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err, result) => {
-				con.commit((err, _result) =>{
-					if (err) {
-						callback.onFailure(err);
-						return;
-					}
-					callback.onSuccess(result);
-					con.close();
+
+			commitDAO.get(params.commitId, (err, resultCheck) => {
+				if (err) {
+					callback.onFailure(err);
+					return;
+				}
+				if (resultCheck.latestFlag == false) {
+					callback.onFailure(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
+					return;
+				}
+
+				// _commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
+				commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err, result) => {
+					con.commit((err, _result) =>{
+						if (err) {
+							callback.onFailure(err);
+							return;
+						}
+						callback.onSuccess(result);
+						con.close();
+					});
 				});
 			});
 		});

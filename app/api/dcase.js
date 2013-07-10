@@ -221,6 +221,32 @@ function createDCase(params, userId, callback) {
 }
 exports.createDCase = createDCase;
 function commit(params, userId, callback) {
+    function validate(params) {
+        var checks = [];
+        if(!params) {
+            checks.push('Parameter is required.');
+        }
+        if(params && !params.commitId) {
+            checks.push('Commit ID is required.');
+        }
+        if(params && params.commitId && !isFinite(params.commitId)) {
+            checks.push('Commit ID must be a number.');
+        }
+        if(params && !params.commitMessage) {
+            checks.push('Commit Message is required.');
+        }
+        if(params && !params.contents) {
+            checks.push('Contents is required.');
+        }
+        if(checks.length > 0) {
+            callback.onFailure(new error.InvalidParamsError(checks, null));
+            return false;
+        }
+        return true;
+    }
+    if(!validate(params)) {
+        return;
+    }
     var con = new db.Database();
     var commitDAO = new model_commit.CommitDAO(con);
     con.begin(function (err, result) {
@@ -230,14 +256,24 @@ function commit(params, userId, callback) {
                 callback.onFailure(err);
                 return;
             }
-            commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
-                con.commit(function (err, _result) {
-                    if(err) {
-                        callback.onFailure(err);
-                        return;
-                    }
-                    callback.onSuccess(result);
-                    con.close();
+            commitDAO.get(params.commitId, function (err, resultCheck) {
+                if(err) {
+                    callback.onFailure(err);
+                    return;
+                }
+                if(resultCheck.latestFlag == false) {
+                    callback.onFailure(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
+                    return;
+                }
+                commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
+                    con.commit(function (err, _result) {
+                        if(err) {
+                            callback.onFailure(err);
+                            return;
+                        }
+                        callback.onSuccess(result);
+                        con.close();
+                    });
                 });
             });
         });

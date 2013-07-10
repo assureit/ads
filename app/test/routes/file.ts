@@ -109,7 +109,7 @@ describe('api', function() {
 				.expect(200)
 				.end(function (err, res) {
 					assert.equal(res.body.rpcHttpStatus, 200);
-					assert.equal(res.body.code, 19999);
+					assert.equal(res.body.code, 24001);
 					done();
 				});
 		});
