@@ -14,6 +14,7 @@ import db = module('../../db/db')
 import testdata = module('../testdata')
 var request = require('supertest');	// TODO: supertestの宣言ファイル作成
 var async = require('async')
+import error = module('../../api/error')
 
 describe('api', function() {
     var con;
@@ -109,7 +110,7 @@ describe('api', function() {
 				.expect(200)
 				.end(function (err, res) {
 					assert.equal(res.body.rpcHttpStatus, 200);
-					assert.equal(res.body.code, 24001);
+					assert.equal(res.body.code, error.RPC_ERROR.NOT_FOUND);
 					done();
 				});
 		});

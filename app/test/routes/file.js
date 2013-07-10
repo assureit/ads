@@ -6,6 +6,7 @@ var db = require('../../db/db')
 var testdata = require('../testdata')
 var request = require('supertest');
 var async = require('async');
+var error = require('../../api/error')
 describe('api', function () {
     var con;
     beforeEach(function (done) {
@@ -99,7 +100,7 @@ describe('api', function () {
         it('not exist DB data', function (done) {
             request(app['app']).get('/file/10000').expect(200).end(function (err, res) {
                 assert.equal(res.body.rpcHttpStatus, 200);
-                assert.equal(res.body.code, 24001);
+                assert.equal(res.body.code, error.RPC_ERROR.NOT_FOUND);
                 done();
             });
         });
