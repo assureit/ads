@@ -18,7 +18,6 @@ test/db/db.ts
 test/db/test-db.ts
 test/routes/api.ts
 test/routes/file.ts
-test/api/dcase.ts
 test/api/dcase-createdcase.ts
 test/api/dcase-getdcase.ts
 test/api/dcase-commit.ts
@@ -27,6 +26,7 @@ test/api/dcase-getcommitlist.ts
 test/api/dcase-searchnode.ts
 test/api/dcase-searchdcase.ts
 test/api/dcase-deletedcase.ts
+test/api/dcase-editdcase.ts
 test/api/monitor.ts
 test/api/rec.ts
 test/model/user.ts

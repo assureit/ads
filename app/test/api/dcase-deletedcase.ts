@@ -78,7 +78,7 @@ describe('api', function() {
 						expect(err.rpcHttpStatus).to.be(200);
 						expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
 						expect(err.message).to.equal('Invalid method parameter is found: \nParameter is required.');
-						 done();
+						done();
 					},
 				});
 			});
@@ -92,7 +92,7 @@ describe('api', function() {
 						expect(err.rpcHttpStatus).to.be(200);
 						expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
 						expect(err.message).to.equal('Invalid method parameter is found: \nDCase ID is required.');
-						 done();
+						done();
 					},
 				});
 			});
@@ -106,7 +106,7 @@ describe('api', function() {
 						expect(err.rpcHttpStatus).to.be(200);
 						expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
 						expect(err.message).to.equal('Invalid method parameter is found: \nDCase ID must be a number.');
-						 done();
+						done();
 					},
 				});
 			});
@@ -120,7 +120,7 @@ describe('api', function() {
 						expect(err.rpcHttpStatus).to.be(200);
 						expect(err.code).to.equal(error.RPC_ERROR.NOT_FOUND);
 						expect(err.message).to.equal('DCase is not found.');
-						 done();
+						done();
 					},
 				});
 			});
@@ -134,7 +134,7 @@ describe('api', function() {
 						expect(err.rpcHttpStatus).to.be(200);
 						expect(err.code).to.equal(error.RPC_ERROR.NOT_FOUND);
 						expect(err.message).to.equal('Effective DCase does not exist.');
-						 done();
+						done();
 					},
 				});
 			});
