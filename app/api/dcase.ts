@@ -262,8 +262,19 @@ export function commit(params: any, userId: number, callback: type.Callback) {
 };
 
 export function deleteDCase(params:any, userId: number, callback: type.Callback) {
-	// TODO: 認証チェック
-	//var userId = constant.SYSTEM_USER_ID;	// TODO: ログインユーザIDに要変更
+	function validate(params:any) {
+		var checks = [];
+		if (!params) checks.push('Parameter is required.');
+		if (params && !params.dcaseId) checks.push('DCase ID is required.');
+		if (params && params.dcaseId && !isFinite(params.dcaseId) ) checks.push('DCase ID must be a number.');
+		if (checks.length > 0) {
+			callback.onFailure(new error.InvalidParamsError(checks, null));
+			return false;
+		}
+		return true;
+	}
+
+	if (!validate(params)) return;
 
 	var con = new db.Database();
 	con.begin((err, result) => {
@@ -274,14 +285,26 @@ export function deleteDCase(params:any, userId: number, callback: type.Callback)
 				return;
 			}
 			var dcaseDAO = new model_dcase.DCaseDAO(con);
-			dcaseDAO.remove(params.dcaseId, (err:any) => {
+
+			dcaseDAO.get(params.dcaseId, (err:any, result:model_dcase.DCase) => {
 				if (err) {
 					callback.onFailure(err);
 					return;
 				}
-				con.commit((err, result) =>{
-					callback.onSuccess({dcaseId: params.dcaseId});
-					con.close();
+				if (result.deleteFlag) {
+					callback.onFailure(new error.NotFoundError('Effective DCase does not exist.'));
+					return;
+				}
+
+				dcaseDAO.remove(params.dcaseId, (err:any) => {
+					if (err) {
+						callback.onFailure(err);
+						return;
+					}
+					con.commit((err, result) =>{
+						callback.onSuccess({dcaseId: params.dcaseId});
+						con.close();
+					});
 				});
 			});
 		});

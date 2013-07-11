@@ -306,6 +306,26 @@ function commit(params, userId, callback) {
 exports.commit = commit;
 ;
 function deleteDCase(params, userId, callback) {
+    function validate(params) {
+        var checks = [];
+        if(!params) {
+            checks.push('Parameter is required.');
+        }
+        if(params && !params.dcaseId) {
+            checks.push('DCase ID is required.');
+        }
+        if(params && params.dcaseId && !isFinite(params.dcaseId)) {
+            checks.push('DCase ID must be a number.');
+        }
+        if(checks.length > 0) {
+            callback.onFailure(new error.InvalidParamsError(checks, null));
+            return false;
+        }
+        return true;
+    }
+    if(!validate(params)) {
+        return;
+    }
     var con = new db.Database();
     con.begin(function (err, result) {
         var userDAO = new model_user.UserDAO(con);
@@ -315,16 +335,26 @@ function deleteDCase(params, userId, callback) {
                 return;
             }
             var dcaseDAO = new model_dcase.DCaseDAO(con);
-            dcaseDAO.remove(params.dcaseId, function (err) {
+            dcaseDAO.get(params.dcaseId, function (err, result) {
                 if(err) {
                     callback.onFailure(err);
                     return;
                 }
-                con.commit(function (err, result) {
-                    callback.onSuccess({
-                        dcaseId: params.dcaseId
+                if(result.deleteFlag) {
+                    callback.onFailure(new error.NotFoundError('Effective DCase does not exist.'));
+                    return;
+                }
+                dcaseDAO.remove(params.dcaseId, function (err) {
+                    if(err) {
+                        callback.onFailure(err);
+                        return;
+                    }
+                    con.commit(function (err, result) {
+                        callback.onSuccess({
+                            dcaseId: params.dcaseId
+                        });
+                        con.close();
                     });
-                    con.close();
                 });
             });
         });

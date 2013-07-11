@@ -26,6 +26,7 @@ test/api/dcase-getnodetree.ts
 test/api/dcase-getcommitlist.ts
 test/api/dcase-searchnode.ts
 test/api/dcase-searchdcase.ts
+test/api/dcase-deletedcase.ts
 test/api/monitor.ts
 test/api/rec.ts
 test/model/user.ts
