@@ -3,10 +3,28 @@ var assert = require('assert')
 var app = require('../../app')
 var fs = require('fs')
 var db = require('../../db/db')
+var testdata = require('../testdata')
 var request = require('supertest');
+var async = require('async');
+var error = require('../../api/error')
 describe('api', function () {
+    var con;
+    beforeEach(function (done) {
+        testdata.load([
+            'test/default-data.yaml'
+        ], function (err) {
+            con = new db.Database();
+            done();
+        });
+    });
+    afterEach(function (done) {
+        testdata.clear(function (err) {
+            return done();
+        });
+    });
     describe('upload', function () {
         it('should return HTTP200 return URL ', function (done) {
+            this.timeout(15000);
             request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
                 if(err) {
                     throw err;
@@ -75,21 +93,21 @@ describe('api', function () {
     });
     describe('download', function () {
         it('not exist file', function (done) {
-            request(app['app']).get('/file/111').expect(404).end(function (err, res) {
+            request(app['app']).get('/file/302').expect(404).end(function (err, res) {
                 done();
             });
         });
         it('not exist DB data', function (done) {
             request(app['app']).get('/file/10000').expect(200).end(function (err, res) {
                 assert.equal(res.body.rpcHttpStatus, 200);
-                assert.equal(res.body.code, 19999);
+                assert.equal(res.body.code, error.RPC_ERROR.NOT_FOUND);
                 done();
             });
         });
         it('should return name and fileBody', function (done) {
-            request(app['app']).get('/file/110').expect(200).end(function (err, res) {
-                assert.equal(res.header['content-type'], 'application/octet-stream');
-                assert.equal(res.header['content-disposition'], 'attachment; filename="uptest.txt"');
+            request(app['app']).get('/file/301').expect(200).end(function (err, res) {
+                assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
+                assert.equal(res.header['content-disposition'], 'attachment; filename="file1"');
                 assert.equal(res.text, 'アップロードテスト用のファイルです\n');
                 done();
             });

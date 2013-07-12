@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node app.js",
+    "start_ldap": "node ldap-dummy.js",
+    "start_ldap_mem": "node ldap-memory.js",
     "test": "sh ../scripts/test.sh",
     "test_debug": "sh ../scripts/test_debug.sh",
     "make": "tsc @compile_list"
@@ -16,7 +18,8 @@
     "js-yaml": "0.3.x",
     "async": "0.2.9",
     "underscore": "1.4.4",
-    "jade": "*"
+    "jade": "*",
+    "ldapjs": "0.6.3"
   },
   "devDependencies": {
     "typescript": "0.8.3",

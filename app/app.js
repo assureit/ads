@@ -41,6 +41,9 @@ app.get('/new', client.index);
 app.get('/dcase/:id', client.index);
 app.post('/export.*', client.exporter);
 app.get('/javascripts/config.js', js.config);
+app.post('/login', client.login);
+app.post('/logout', client.logout);
+app.post('/register', client.register);
 app.post('/file', file.upload);
 app.get('/file/:id', file.download);
 if(!module.parent) {

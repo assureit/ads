@@ -19,6 +19,7 @@ var Commit = (function () {
         this.data = data;
         this.dateTime = dateTime;
         this.latestFlag = latestFlag;
+        this.latestFlag = !!this.latestFlag;
     }
     return Commit;
 })();

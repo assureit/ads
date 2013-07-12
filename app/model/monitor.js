@@ -53,6 +53,32 @@ var MonitorDAO = (function (_super) {
                 });
             }, 
             function (result, next) {
+                if(result.length == 0) {
+                    next(new error.NotFoundError('The monitor node was not found. [ID: ' + id + ']'));
+                    return;
+                }
+                var monitor = MonitorNode.tableToObject(result[0]);
+                next(null, monitor);
+            }        ], function (err, monitor) {
+            callback(err, monitor);
+        });
+    };
+    MonitorDAO.prototype.findByThisNodeId = function (dcaseId, thisNodeId, callback) {
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query('SELECT * FROM monitor_node WHERE dcase_id=? AND this_node_id=?', [
+                    dcaseId, 
+                    thisNodeId
+                ], function (err, result) {
+                    next(err, result);
+                });
+            }, 
+            function (result, next) {
+                if(result.length == 0) {
+                    next(new error.NotFoundError('The monitor node was not found. [DCase ID: ' + dcaseId + ', This_Node_Id: ' + thisNodeId + ']'));
+                    return;
+                }
                 var monitor = MonitorNode.tableToObject(result[0]);
                 next(null, monitor);
             }        ], function (err, monitor) {
@@ -80,7 +106,27 @@ var MonitorDAO = (function (_super) {
             callback(err, result.insertId);
         });
     };
-    MonitorDAO.prototype.update = function (id, rebuttal_id, callback) {
+    MonitorDAO.prototype.update = function (monitor, callback) {
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query('UPDATE monitor_node SET dcase_id=?, this_node_id=?, watch_id=?, preset_id=?, params=?, rebuttal_this_node_id=?, publish_status=? WHERE id=?', [
+                    monitor.dcaseId, 
+                    monitor.thisNodeId, 
+                    monitor.watchId, 
+                    monitor.presetId, 
+                    JSON.stringify(monitor.params), 
+                    monitor.rebuttalThisNodeId, 
+                    monitor.publishStatus, 
+                    monitor.id
+                ], function (err, result) {
+                    next(err);
+                });
+            }        ], function (err) {
+            callback(err);
+        });
+    };
+    MonitorDAO.prototype.setRebuttalThisNodeId = function (id, rebuttal_id, callback) {
         this.con.query('UPDATE monitor_node  SET rebuttal_this_node_id = ? where id = ?', [
             rebuttal_id, 
             id
@@ -101,14 +147,14 @@ var MonitorDAO = (function (_super) {
                 return;
             }
             if(result.length == 0) {
-                callback(new error.NotFoundError('Specified id was not found. '), null, null, null);
+                callback(new error.NotFoundError('Specified id was not found. [id: ' + id + ']'), null, null, null);
                 return;
             }
             callback(err, result[0].dcase_id, result[0].this_node_id, result[0].rebuttal_this_node_id);
         });
     };
     MonitorDAO.prototype.getLatestCommit = function (dcaseId, callback) {
-        this.con.query('SELECT * FROM commit WHERE dcase_id = ? AND latest_flag = TRUE', [
+        this.con.query('SELECT * FROM commit WHERE dcase_id = ? AND latest_flag = TRUE ORDER BY id desc', [
             dcaseId
         ], function (err, result) {
             if(err) {

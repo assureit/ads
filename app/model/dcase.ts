@@ -2,6 +2,8 @@ import model = module('./model')
 import model_commit = module('./commit')
 import model_user = module('./user')
 import model_pager = module('./pager');
+import error = module('../api/error')
+var async = require('async');
 
 export interface InsertArg {
 	userId: number;
@@ -11,12 +13,32 @@ export class DCase {
 	public user: model_user.User;
 	public latestCommit: model_commit.Commit;
 	constructor(public id:number, public name:string, public userId:number, public deleteFlag:bool) {
+		this.deleteFlag = !!this.deleteFlag;
 		if (deleteFlag === undefined) {
 			this.deleteFlag = false;
 		}
 	}
+	static tableToObject(table: any) {
+		return new DCase(table.id, table.name, table.user_id, table.delete_flag);
+	}
 }
 export class DCaseDAO extends model.DAO {
+	get(id:number, callback: (err:any, dcase:DCase)=>void) {
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT * FROM dcase WHERE id = ?', [id], (err:any, result:any) => next(err, result));
+			},
+			(result:any, next) => {
+				if (result.length == 0)	{
+					next(new error.NotFoundError('DCase is not found.', {id: id}));
+					return;
+				}
+				next(null, DCase.tableToObject(result[0]));
+			}
+		], (err:any, dcase:DCase) => {
+			callback(err, dcase);
+		});
+	}
 	insert(params: InsertArg, callback: (err:any, dcaseId: number)=>void): void {
 		this.con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [params.userId, params.dcaseName], (err, result) => {
 			if (err) {
@@ -32,7 +54,7 @@ export class DCaseDAO extends model.DAO {
 	 */
 	list(page: number, callback: (err:any, summary: model_pager.Pager, list: DCase[])=>void): void {
 		var pager = new model_pager.Pager(page);
-		this.con.query({sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc LIMIT ? OFFSET ? ' , nestTables:true}, 
+		this.con.query({sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified, c.id desc LIMIT ? OFFSET ? ' , nestTables:true}, 
 			[pager.limit, pager.getOffset()], (err, result) => {
 			if (err) {
 				callback(err, null, null);

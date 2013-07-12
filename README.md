@@ -53,8 +53,11 @@ npm start
 ```
 node app
 ```
-
-
+OpenLDAPダミーサーバー起動方法
+------------
+```
+npm run-script start_ldap
+```
 
 本番環境構築
 ------------

@@ -46,7 +46,10 @@ exports.MethodNotFoundError = MethodNotFoundError;
 var InvalidParamsError = (function (_super) {
     __extends(InvalidParamsError, _super);
     function InvalidParamsError(msg, data) {
-        _super.call(this, HTTP_STATUS.INTERNAL_SERVER_ERROR, -32602, 'Invalid params: ' + msg, data);
+        if(msg instanceof Array) {
+            msg = msg.join('\n');
+        }
+        _super.call(this, HTTP_STATUS.OK, -32602, 'Invalid method parameter is found: \n' + msg, data);
     }
     return InvalidParamsError;
 })(RPCError);
@@ -78,7 +81,7 @@ exports.ApplicationError = ApplicationError;
 var NotFoundError = (function (_super) {
     __extends(NotFoundError, _super);
     function NotFoundError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.NOT_DEFINED, msg, data);
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.NOT_FOUND, msg, data);
     }
     return NotFoundError;
 })(ApplicationError);
@@ -99,7 +102,14 @@ var LoginError = (function (_super) {
     return LoginError;
 })(ApplicationError);
 exports.LoginError = LoginError;
-var RPC_ERROR;
+var VersionConflictError = (function (_super) {
+    __extends(VersionConflictError, _super);
+    function VersionConflictError(msg, data) {
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.VERSION_CONFLICT, msg, data);
+    }
+    return VersionConflictError;
+})(ApplicationError);
+exports.VersionConflictError = VersionConflictError;
 (function (RPC_ERROR) {
     RPC_ERROR._map = [];
     RPC_ERROR.INVALID_REQUEST = -32600;
@@ -107,13 +117,16 @@ var RPC_ERROR;
     RPC_ERROR.INVALID_PARAMS = -32602;
     RPC_ERROR.INTERNAL_ERROR = -32603;
     RPC_ERROR.PARSE_ERROR = -32700;
+    RPC_ERROR.NOT_FOUND = 24001;
+    RPC_ERROR.VERSION_CONFLICT = 24002;
     RPC_ERROR.NOT_DEFINED = 19999;
-})(RPC_ERROR || (RPC_ERROR = {}));
-var HTTP_STATUS;
+})(exports.RPC_ERROR || (exports.RPC_ERROR = {}));
+var RPC_ERROR = exports.RPC_ERROR;
 (function (HTTP_STATUS) {
     HTTP_STATUS._map = [];
     HTTP_STATUS.OK = 200;
     HTTP_STATUS.BAD_REQUEST = 400;
     HTTP_STATUS.NOT_FOUND = 404;
     HTTP_STATUS.INTERNAL_SERVER_ERROR = 500;
-})(HTTP_STATUS || (HTTP_STATUS = {}));
+})(exports.HTTP_STATUS || (exports.HTTP_STATUS = {}));
+var HTTP_STATUS = exports.HTTP_STATUS;

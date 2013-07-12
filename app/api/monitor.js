@@ -105,7 +105,7 @@ function modifyMonitorStatus(params, userId, callback) {
                         callback.onFailure(err);
                         return;
                     }
-                    monitorDAO.update(params.systemNodeId, rebuttalId, function (err) {
+                    monitorDAO.setRebuttalThisNodeId(params.systemNodeId, rebuttalId, function (err) {
                         if(err) {
                             callback.onFailure(err);
                             return;

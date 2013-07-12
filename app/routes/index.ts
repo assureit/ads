@@ -1,22 +1,26 @@
 ///<reference path='../DefinitelyTyped/node/node.d.ts'/>
 import childProcess = module('child_process')
 import fs           = module('fs')
-import lang = module('./lang')
+import lang       = module('./lang')
+import dscript    = module('./dscript')
+import model_user = module('../model/user')
+import db         = module('../db/db')
 var CONFIG = require('config')
 //import ex = module('./exporter')
 
 export var index = function(req: any, res: any) {
-	//if(req.cookies.userId !== null) {
-	//	res.render('signin', {title: 'Assurance DS', lang: lang.lang.ja });
-	//}else {
-	res.cookie('userId','1');
-	res.cookie('userName','System');
-	var params = {basepath: CONFIG.ads.basePath, title: 'Assurance DS', lang: lang.lang.ja, userName: 'System' };
+	var page = 'signin';
+	var params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja };
+	if(req.cookies.userId != null) {
+		page = 'signout';
+		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: req.cookies.userName };
+	}
+
 	if( req.cookies.lang == 'en') {
 		params.lang = lang.lang.en;
 	}
-	res.render('signout', params);
-	//}
+
+	res.render(page, params);
 };
 
 
@@ -41,6 +45,11 @@ export var exporter = function(req: any, res: any) {
 		case "json":
 			res.send(req.body.json);
 			return;
+		case "ds":
+			res.set('Content-type','text/plain; charset=utf-8');
+			var ex = new dscript.DScriptExporter();
+			res.send(ex.export(req.body.json));
+			return;
 		default:
 			res.send(400, "Bad Request");
 			return;
@@ -63,6 +72,45 @@ export var exporter = function(req: any, res: any) {
 				res.send(fs.readFileSync(resname));
 			});
 		});
+	});
+
+};
+
+export var login = function(req: any, res: any) {
+	var con = new db.Database();
+	var userDAO = new model_user.UserDAO(con);
+	
+	userDAO.login(req.body.username, req.body.password, (err:any, result: model_user.User) => {
+		if (err) {
+			// TODO: display error information
+			res.redirect('/');
+			return;
+		}
+		res.cookie('userId',result.id);
+		res.cookie('userName',result.loginName);
+		res.redirect(CONFIG.ads.basePath+'/');
+	});
+};
+
+export var logout = function(req: any, res: any) {
+	res.clearCookie('userId');
+	res.clearCookie('userName');
+	res.redirect(CONFIG.ads.basePath+'/');
+};
+
+export var register = function(req: any, res: any) {
+	var con = new db.Database();
+	var userDAO = new model_user.UserDAO(con);
+
+	userDAO.register(req.body.username, req.body.password, (err:any, result: model_user.User) => {
+		if (err) {
+			// TODO: display error information
+			res.redirect(CONFIG.ads.basePath+'/');
+			return;
+		}
+		res.cookie('userId', result.id);
+		res.cookie('userName', result.loginName);
+		res.redirect(CONFIG.ads.basePath+'/');
 	});
 
 };
