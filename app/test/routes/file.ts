@@ -26,12 +26,9 @@ describe('api', function() {
 		});
 	});
 	afterEach(function (done) {
-		var exec = require('child_process').exec;
-		exec('chmod 775 upload', function(err, stdout, stderr){
-			CONFIG.ads.uploadPath = CONFIG.getOriginalConfig().ads.uploadPath;
-			CONFIG.resetRuntime(function(err, written, buffer) {
-				testdata.clear((err:any) => done());
-			});
+		CONFIG.ads.uploadPath = CONFIG.getOriginalConfig().ads.uploadPath;
+		CONFIG.resetRuntime(function(err, written, buffer) {
+			testdata.clear((err:any) => done());
 		});
 	});
 	describe('upload', function() {
