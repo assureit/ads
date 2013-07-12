@@ -46,16 +46,19 @@ describe('model', function() {
 				if (err) {
 					throw err;
 				}
-				var client = ldap.createClient({url: CONFIG.ldap.url});
-				client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
-					var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
-					client.del(dn, function(err) {
-						var dn2 = CONFIG.ldap.dn.replace('$1', 'unittest02');
-						client.del(dn2, function(err) {
-							var dn3 = CONFIG.ldap.dn.replace('$1', 'system');
-							client.del(dn3, function(err) {
-								client.unbind(function(err) {
-									done();
+				CONFIG.ldap.root = CONFIG.getOriginalConfig().ldap.root;
+				CONFIG.resetRuntime(function(err, written, buffer) {
+					var client = ldap.createClient({url: CONFIG.ldap.url});
+					client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
+						var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
+						client.del(dn, function(err) {
+							var dn2 = CONFIG.ldap.dn.replace('$1', 'unittest02');
+							client.del(dn2, function(err) {
+								var dn3 = CONFIG.ldap.dn.replace('$1', 'system');
+								client.del(dn3, function(err) {
+									client.unbind(function(err) {
+										done();
+									});
 								});
 							});
 						});
@@ -167,6 +170,19 @@ describe('model', function() {
 					expect(err.rpcHttpStatus).to.be(200);
 					expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
 					expect(err.message).to.equal('Invalid method parameter is found: \nPassword is required.');
+					done();
+				});
+			});
+			it('root account authority went wrong', function(done) {
+				var loginName = 'unittest02';
+				var pwd = 'password';
+				CONFIG.ldap.root = '';
+				userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
+					expect(err).not.to.be(null);
+					expect(err instanceof error.ExternalParameterError).to.be(true);
+					expect(err.rpcHttpStatus).to.be(200);
+					expect(err.code).to.equal(error.RPC_ERROR.CONFIG_ERROR);
+					expect(err.message).to.equal('root account authority went wrong.');
 					done();
 				});
 			});

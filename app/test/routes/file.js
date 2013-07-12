@@ -6,6 +6,7 @@ var db = require('../../db/db')
 var testdata = require('../testdata')
 var request = require('supertest');
 var async = require('async');
+var CONFIG = require('config');
 
 describe('api', function () {
     var con;
@@ -18,8 +19,14 @@ describe('api', function () {
         });
     });
     afterEach(function (done) {
-        testdata.clear(function (err) {
-            return done();
+        var exec = require('child_process').exec;
+        exec('chmod 775 upload', function (err, stdout, stderr) {
+            CONFIG.ads.uploadPath = CONFIG.getOriginalConfig().ads.uploadPath;
+            CONFIG.resetRuntime(function (err, written, buffer) {
+                testdata.clear(function (err) {
+                    return done();
+                });
+            });
         });
     });
     describe('upload', function () {
@@ -91,8 +98,19 @@ describe('api', function () {
             });
         });
         it('Upload File Nothing', function (done) {
-            request(app['app']).post('/file').expect(400).end(function (err, res) {
-                assert.equal(res.text, 'Upload File not exists.');
+            request(app['app']).post('/file').expect(400).expect('Upload File not exists.').end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
+                done();
+            });
+        });
+        it('Config error', function (done) {
+            CONFIG.ads.uploadPath = '';
+            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(500).expect('The Upload path is not set.').end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
                 done();
             });
         });

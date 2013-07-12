@@ -14,6 +14,7 @@ import db = module('../../db/db')
 import testdata = module('../testdata')
 var request = require('supertest');	// TODO: supertestの宣言ファイル作成
 var async = require('async')
+var CONFIG = require('config')
 import error = module('../../api/error')
 
 describe('api', function() {
@@ -25,7 +26,13 @@ describe('api', function() {
 		});
 	});
 	afterEach(function (done) {
-		testdata.clear((err:any) => done());
+		var exec = require('child_process').exec;
+		exec('chmod 775 upload', function(err, stdout, stderr){
+			CONFIG.ads.uploadPath = CONFIG.getOriginalConfig().ads.uploadPath;
+			CONFIG.resetRuntime(function(err, written, buffer) {
+				testdata.clear((err:any) => done());
+			});
+		});
 	});
 	describe('upload', function() {
 		it('should return HTTP200 return URL ', function(done) {
@@ -46,6 +53,7 @@ describe('api', function() {
 			request(app['app'])	// TODO: 型制約を逃げている。要修正。
 				.post('/file')
 				.attach('upfile', 'test/routes/testfiles/uptest.txt')
+				.except(200)
 				.end(function (err, res) {
 					if (err) throw err;
 					
@@ -67,6 +75,7 @@ describe('api', function() {
 			request(app['app'])	// TODO: 型制約を逃げている。要修正。
 				.post('/file')
 				.attach('upfile', 'test/routes/testfiles/uptest.txt')
+				.except(200)
 				.end(function (err, res) {
 					if (err) throw err;
 					
@@ -98,6 +107,19 @@ describe('api', function() {
 				.post('/file')
 				.expect(400)
 				.expect('Upload File not exists.')
+				.end(function(err, res) {
+					if (err) throw err;
+					done();
+				});
+		});
+		it('Config error', function(done) {
+
+			CONFIG.ads.uploadPath = '';
+			request(app['app'])
+				.post('/file')
+				.attach('upfile', 'test/routes/testfiles/uptest.txt')
+				.expect(500)
+				.expect('The Upload path is not set.')
 				.end(function(err, res) {
 					if (err) throw err;
 					done();

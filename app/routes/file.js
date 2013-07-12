@@ -6,16 +6,18 @@ var utilFs = require('../util/fs')
 var error = require('../api/error')
 var CONFIG = require('config');
 exports.upload = function (req, res) {
-    function onError(err, upfile) {
+    function onError(err, errorCode, upfile) {
         if(fs.existsSync(upfile.path)) {
-            fs.unlink(upfile.path, function (err) {
-                if(err) {
-                    throw err;
+            fs.unlink(upfile.path, function (err2) {
+                if(err2) {
+                    res.send(err2, error.HTTP_STATUS.INTERNAL_SERVER_ERROR);
+                    return;
+                } else {
+                    res.send(err, errorCode);
                 }
-                res.send(err);
             });
         } else {
-            res.send(err);
+            res.send(err, errorCode);
         }
     }
     function getDestinationDirectory() {
@@ -44,34 +46,49 @@ exports.upload = function (req, res) {
         }
         return userId;
     }
-    if(!CONFIG.ads.uploadPath) {
-        res.send(500, 'The Upload path is not set.');
-        return;
-    }
     var userId = getUserId();
     var upfile = req.files.upfile;
+    if(!CONFIG.ads.uploadPath || CONFIG.ads.uploadPath.length == 0) {
+        onError('The Upload path is not set.', error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+        return;
+    }
     if(upfile) {
         var con = new db.Database();
         con.begin(function (err, result) {
             var fileDAO = new model_file.FileDAO(con);
             fileDAO.insert(upfile.name, userId, function (err, fileId) {
                 if(err) {
-                    onError(err, upfile);
+                    onError(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+                    con.close();
                     return;
                 }
                 var despath = getDestinationDirectory();
-                utilFs.mkdirpSync(despath);
+                try  {
+                    utilFs.mkdirpSync(despath);
+                } catch (err) {
+                    onError(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+                    con.close();
+                    return;
+                }
                 fileDAO.update(fileId, despath + '/' + fileId, function (err) {
                     if(err) {
-                        onError(err, upfile);
+                        onError(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+                        con.close();
                         return;
                     }
                     con.commit(function (err, result) {
                         if(err) {
-                            onError(err, upfile);
+                            onError(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+                            con.close();
                             return;
                         }
-                        fs.renameSync(upfile.path, despath + '/' + fileId);
+                        try  {
+                            fs.renameSync(upfile.path, despath + '/' + fileId);
+                        } catch (err) {
+                            onError(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+                            con.close();
+                            return;
+                        }
                         var body = 'URL=' + 'file/' + fileId;
                         con.close();
                         res.header('Content-Type', 'text/html');
@@ -81,7 +98,7 @@ exports.upload = function (req, res) {
             });
         });
     } else {
-        res.send(400, "Upload File not exists.");
+        res.send("Upload File not exists.", error.HTTP_STATUS.BAD_REQUEST);
     }
 };
 exports.download = function (req, res) {
@@ -98,7 +115,7 @@ exports.download = function (req, res) {
         }
         if(checks.length > 0) {
             var msg = checks.join('\n');
-            res.send(400, msg);
+            res.send(msg, error.HTTP_STATUS.BAD_REQUEST);
             return false;
         }
         return true;
@@ -111,7 +128,7 @@ exports.download = function (req, res) {
     fileDAO.select(req.params.id, function (err, path, name) {
         if(err) {
             if(err.code == error.RPC_ERROR.DATA_NOT_FOUND) {
-                res.send(404, 'File Not Found');
+                res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
                 return;
             } else {
                 res.send(err);
@@ -122,7 +139,7 @@ exports.download = function (req, res) {
             if(exists) {
                 res.download(path, name);
             } else {
-                res.send(404, 'File Not Found');
+                res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
             }
         });
     });
