@@ -43,7 +43,7 @@ describe('api', function () {
             });
         });
         it('Upload files have been move or ', function (done) {
-            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').end(function (err, res) {
+            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
                 if(err) {
                     throw err;
                 }
@@ -65,7 +65,7 @@ describe('api', function () {
             });
         });
         it('DB.file.path for any updates ', function (done) {
-            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').end(function (err, res) {
+            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
                 if(err) {
                     throw err;
                 }

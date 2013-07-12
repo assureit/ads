@@ -53,7 +53,7 @@ describe('api', function() {
 			request(app['app'])	// TODO: 型制約を逃げている。要修正。
 				.post('/file')
 				.attach('upfile', 'test/routes/testfiles/uptest.txt')
-				.except(200)
+				.expect(200)
 				.end(function (err, res) {
 					if (err) throw err;
 					
@@ -75,7 +75,7 @@ describe('api', function() {
 			request(app['app'])	// TODO: 型制約を逃げている。要修正。
 				.post('/file')
 				.attach('upfile', 'test/routes/testfiles/uptest.txt')
-				.except(200)
+				.expect(200)
 				.end(function (err, res) {
 					if (err) throw err;
 					
