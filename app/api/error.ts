@@ -62,7 +62,7 @@ export class ApplicationError implements IRPCOverHTTPError {
 
 export class NotFoundError extends ApplicationError {
 	constructor(msg:string, data?:any) {
-		super(HTTP_STATUS.OK, RPC_ERROR.NOT_FOUND, msg, data);
+		super(HTTP_STATUS.OK, RPC_ERROR.DATA_NOT_FOUND, msg, data);
 	}
 }
 
@@ -74,15 +74,22 @@ export class DuplicatedError extends ApplicationError {
 
 export class LoginError extends ApplicationError {
 	constructor(msg:string, data?:any) {
-		super(HTTP_STATUS.OK, RPC_ERROR.NOT_DEFINED, msg, data);
+		super(HTTP_STATUS.OK, RPC_ERROR.AUTH_ERROR, msg, data);
 	}
 }
 
 export class VersionConflictError extends ApplicationError {
 	constructor(msg:string, data?:any) {
-		super(HTTP_STATUS.OK, RPC_ERROR.VERSION_CONFLICT, msg, data);
+		super(HTTP_STATUS.OK, RPC_ERROR.DATA_VERSION_CONFLICT, msg, data);
 	}
 }
+
+export class ExternalParameterError extends ApplicationError {
+	constructor(msg:string, data?:any) {
+		super(HTTP_STATUS.OK, RPC_ERROR.CONFIG_ERROR, msg, data);
+	}
+}
+
 
 export enum RPC_ERROR {
 	INVALID_REQUEST = -32600,
@@ -90,9 +97,11 @@ export enum RPC_ERROR {
 	INVALID_PARAMS = -32602,
 	INTERNAL_ERROR = -32603,
 	PARSE_ERROR = -32700,
-
-	NOT_FOUND = 24001,
-	VERSION_CONFLICT = 24002,
+	CONFIG_ERROR = 22000,
+	AUTH_ERROR = 23000,
+	DATA_NOT_FOUND = 24001,
+	DATA_VERSION_CONFLICT = 24002,
+	DATA_DUPLICATE = 24003,
 
 	NOT_DEFINED = 19999
 }

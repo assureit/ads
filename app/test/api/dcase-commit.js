@@ -115,7 +115,7 @@ describe('api', function () {
                     },
                     onFailure: function (err) {
                         expect(err.rpcHttpStatus).to.be(200);
-                        expect(err.code).to.be(error.RPC_ERROR.NOT_FOUND);
+                        expect(err.code).to.be(error.RPC_ERROR.DATA_NOT_FOUND);
                         expect(err.message).to.be('UserId Not Found.');
                         done();
                     }
@@ -210,7 +210,7 @@ describe('api', function () {
                     },
                     onFailure: function (err) {
                         expect(err.rpcHttpStatus).to.be(200);
-                        expect(err.code).to.be(error.RPC_ERROR.VERSION_CONFLICT);
+                        expect(err.code).to.be(error.RPC_ERROR.DATA_VERSION_CONFLICT);
                         expect(err.message).to.be('CommitID is not the effective newest commitment.');
                         done();
                     }

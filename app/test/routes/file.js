@@ -100,7 +100,7 @@ describe('api', function () {
         it('not exist DB data', function (done) {
             request(app['app']).get('/file/10000').expect(200).end(function (err, res) {
                 assert.equal(res.body.rpcHttpStatus, 200);
-                assert.equal(res.body.code, error.RPC_ERROR.NOT_FOUND);
+                assert.equal(res.body.code, error.RPC_ERROR.DATA_NOT_FOUND);
                 done();
             });
         });

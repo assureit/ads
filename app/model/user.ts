@@ -12,6 +12,18 @@ export class User {
 
 export class UserDAO extends model.DAO {
 	login(loginName: string, password: string, callback: (err:any, user: User) => void) {
+		function validate(loginName: string, password: string) {
+			var checks = [];
+			if (loginName.length == 0) checks.push('Login name is required.');
+			if (loginName.length > 45) checks.push('Login name should not exceed 45 characters.'); 
+			if (checks.length > 0) {
+				callback(new error.InvalidParamsError(checks, null), null);
+				return false;
+			}
+			return true;
+		}
+		if (!validate(loginName, password)) return;
+
 		var ldap = new net_ldap.Ldap();
 		
 		ldap.auth(loginName, password, (err: any) => {
@@ -46,10 +58,23 @@ export class UserDAO extends model.DAO {
 	}
 
 	register(loginName: string, password: string, callback: (err:any, user: User) => void) {
+		function validate(loginName: string, password: string) {
+			var checks = [];
+			if (loginName.length == 0) checks.push('Login name is required.');
+			if (loginName.length > 45) checks.push('Login name should not exceed 45 characters.'); 
+			if (password.length == 0) checks.push('Password is required.');
+			if (checks.length > 0) {
+				callback(new error.InvalidParamsError(checks, null), null);
+				return false;
+			}
+			return true;
+		}
+		if (!validate(loginName, password)) return;
+		
+
 		var ldap = new net_ldap.Ldap();
 		ldap.add(loginName, password, (err: any) => {
 			if (err) {
-				err = new error.InternalError('OpenLDAP registration failure', err );
 				callback(err, null);
 				return;
 			}

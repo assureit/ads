@@ -1,4 +1,4 @@
-
+var error = require('../api/error')
 var CONFIG = require('config');
 var ldap = require('ldapjs');
 var Ldap = (function () {
@@ -31,12 +31,16 @@ var Ldap = (function () {
         };
         client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function (err) {
             if(err) {
-                callback(err);
+                callback(new error.ExternalParameterError('root account authority went wrong.', err));
                 return;
             }
             client.add(dn, entry, function (err) {
                 if(err) {
-                    callback(err);
+                    if(err.name === 'EntryAlreadyExistsError') {
+                        callback(new error.LoginError('Login Name is already exist.', err));
+                    } else {
+                        callback(err);
+                    }
                     return;
                 }
                 client.unbind(function (err) {

@@ -6,6 +6,8 @@ import db = module('../../db/db')
 import model_user = module('../../model/user')
 import error = module('../../api/error')
 import domain = module('domain')
+import testdata = module('../testdata')
+import util_test = module('../../util/test')
 var expect = require('expect.js');	// TODO: import module化
 var ldap = require('ldapjs');		// TODO: import module化
 var CONFIG = require('config');
@@ -15,8 +17,8 @@ describe('model', function() {
 		var con: db.Database
 		var userDAO: model_user.UserDAO;
 		beforeEach((done) => {
-			con = new db.Database();
-			con.begin((err, result) => {
+			testdata.begin(['test/default-data.yaml'], (err:any, c:db.Database) => {
+				con = c;
 				userDAO = new model_user.UserDAO(con);
 
 				var client = ldap.createClient({url: CONFIG.ldap.url});
@@ -39,29 +41,27 @@ describe('model', function() {
 		});
 
 		afterEach((done) => {
-			if (con) {
-				con.rollback((err, result) => {
-					con.close();
-					if (err) {
-						throw err;
-					}
-					var client = ldap.createClient({url: CONFIG.ldap.url});
-					client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
-						var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
-						client.del(dn, function(err) {
-							var dn2 = CONFIG.ldap.dn.replace('$1', 'unittest02');
-							client.del(dn2, function(err) {
-								var dn3 = CONFIG.ldap.dn.replace('$1', 'system');
-								client.del(dn3, function(err) {
-									client.unbind(function(err) {
-										done();
-									});
+			con.rollback((err, result) => {
+				con.close();
+				if (err) {
+					throw err;
+				}
+				var client = ldap.createClient({url: CONFIG.ldap.url});
+				client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
+					var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
+					client.del(dn, function(err) {
+						var dn2 = CONFIG.ldap.dn.replace('$1', 'unittest02');
+						client.del(dn2, function(err) {
+							var dn3 = CONFIG.ldap.dn.replace('$1', 'system');
+							client.del(dn3, function(err) {
+								client.unbind(function(err) {
+									done();
 								});
 							});
 						});
 					});
 				});
-			}
+			});
 		});
 
 		describe('register', function() {
@@ -104,8 +104,8 @@ describe('model', function() {
 					expect(err).to.be(null);
 					userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
 						expect(err).not.to.be(null);
-						expect(err instanceof error.InternalError).to.be(true);
-						expect(err.message).to.be('Internal error: OpenLDAP registration failure');
+						expect(err instanceof error.LoginError).to.be(true);
+						expect(err.message).to.be('Login Name is already exist.');
 						done();
 					});
 				});
@@ -131,6 +131,45 @@ describe('model', function() {
 					});
 				});
 			});
+			it('Login name is empty', function(done) {
+				var loginName = '';
+				var pwd = 'password';
+
+				userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
+					expect(err).not.to.be(null);
+					expect(err instanceof error.InvalidParamsError).to.be(true);
+					expect(err.rpcHttpStatus).to.be(200);
+					expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
+					expect(err.message).to.equal('Invalid method parameter is found: \nLogin name is required.');
+					done();
+				});
+			});
+			it('Login name is too long', function(done) {
+				var loginName = util_test.str.random(46);
+				var pwd = 'password';
+
+				userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
+					expect(err).not.to.be(null);
+					expect(err instanceof error.InvalidParamsError).to.be(true);
+					expect(err.rpcHttpStatus).to.be(200);
+					expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
+					expect(err.message).to.equal('Invalid method parameter is found: \nLogin name should not exceed 45 characters.');
+					done();
+				});
+			});
+			it('Password is empty', function(done) {
+				var loginName = 'system';
+				var pwd = '';
+
+				userDAO.register(loginName, pwd, (err:any, result: model_user.User) => {
+					expect(err).not.to.be(null);
+					expect(err instanceof error.InvalidParamsError).to.be(true);
+					expect(err.rpcHttpStatus).to.be(200);
+					expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
+					expect(err.message).to.equal('Invalid method parameter is found: \nPassword is required.');
+					done();
+				});
+			});
 		});
 		describe('login', function() {
 			it('should return User object property', function(done) {
@@ -143,13 +182,39 @@ describe('model', function() {
 					done();
 				});
 			});
-			it('login user not found', function(done) {
+			it('OpenLDAP auth error', function(done) {
 				var loginName = 'NoSetData';
 				var pwd = 'password';
 
 				userDAO.login(loginName, pwd, (err:any, result: model_user.User) => {
 					expect(err).not.to.be(null);
 					expect(err instanceof error.LoginError).to.be(true);
+					done();
+				});
+			});
+			it('Login name is empty', function(done) {
+				var loginName = '';
+				var pwd = 'password';
+
+				userDAO.login(loginName, pwd, (err:any, result: model_user.User) => {
+					expect(err).not.to.be(null);
+					expect(err instanceof error.InvalidParamsError).to.be(true);
+					expect(err.rpcHttpStatus).to.be(200);
+					expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
+					expect(err.message).to.equal('Invalid method parameter is found: \nLogin name is required.');
+					done();
+				});
+			});
+			it('Login name is too long', function(done) {
+				var loginName = util_test.str.random(46);
+				var pwd = 'password';
+
+				userDAO.login(loginName, pwd, (err:any, result: model_user.User) => {
+					expect(err).not.to.be(null);
+					expect(err instanceof error.InvalidParamsError).to.be(true);
+					expect(err.rpcHttpStatus).to.be(200);
+					expect(err.code).to.equal(error.RPC_ERROR.INVALID_PARAMS);
+					expect(err.message).to.equal('Invalid method parameter is found: \nLogin name should not exceed 45 characters.');
 					done();
 				});
 			});
