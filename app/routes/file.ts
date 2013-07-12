@@ -3,17 +3,23 @@ import constant = module('../constant')
 import model_file = module('../model/file')
 import fs = module('fs')
 import utilFs = module('../util/fs')
+import error = module('../api/error')
+var CONFIG = require('config');
 
 export var upload = function(req: any, res: any){
 
-	function onError(err: any, upfile: any) :void {
+	function onError(err: any, errorCode: number, upfile: any) :void {
 		if(fs.existsSync(upfile.path)) {
-			fs.unlink(upfile.path, (err) => {
-				if (err) throw err;
-				res.send(err);
+			fs.unlink(upfile.path, (err2) => {
+				if (err2) {
+					res.send(err2, error.HTTP_STATUS.INTERNAL_SERVER_ERROR);
+					return;
+				} else {
+					res.send(err, errorCode); 
+				}
 			});
 		} else {
-			res.send(err);
+			res.send(err, errorCode);
 		}
 		
 	}
@@ -26,7 +32,7 @@ export var upload = function(req: any, res: any){
 		if (mm.length == 1) mm = '0' + mm;
 		if (dd.length == 1) dd = '0' + dd;
 		
-		return 'upload/' + yy + '/' + mm + '/' + dd;	// TODO: 'upload'をconstantへ入れるか？
+		return CONFIG.ads.uploadPath + '/' + yy + '/' + mm + '/' + dd;	// TODO: 'upload'をconstantへ入れるか？
 	}
 
 	function getUserId() : number {
@@ -47,34 +53,52 @@ export var upload = function(req: any, res: any){
 	var userId = getUserId();
 
 	var upfile = req.files.upfile
+	if (!CONFIG.ads.uploadPath || CONFIG.ads.uploadPath.length == 0) {
+		onError('The Upload path is not set.', error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+		return;
+	}
 	if (upfile) {
 		var con = new db.Database();
 		con.begin((err, result) => {
 			var fileDAO = new model_file.FileDAO(con);
 			fileDAO.insert(upfile.name, userId, (err: any, fileId: number) => {
 				if (err) {
-					onError(err, upfile);
+					onError(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+					con.close();
 					return;
 				}
 
 				var despath = getDestinationDirectory();
-				utilFs.mkdirpSync(despath);
+				try {
+					utilFs.mkdirpSync(despath);
+				} catch(err) {
+					onError(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+					con.close();
+					return;
+				}
 	
 				fileDAO.update(fileId, despath + '/' + fileId, (err: any) => {
 					if (err) {
-						onError(err, upfile);
+						onError(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+						con.close();
 						return;
 					}
 					con.commit((err, result) => {
 						if (err) {
-							onError(err, upfile);
+							onError(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+							con.close();
 							return;
 						}
-
 						// if (!fs.existsSync(despath)) {
 						// 	fs.mkdirSync(despath);
 						// }
-						fs.renameSync(upfile.path, despath + '/' + fileId);
+						try {
+							fs.renameSync(upfile.path, despath + '/' + fileId);
+						} catch(err) {
+							onError(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
+							con.close();
+							return;
+						}
 						// var url = req.protocol + '://' + req.host + '/file/';
 						var body: any = 'URL=' + 'file/' + fileId;
 						con.close();
@@ -85,18 +109,41 @@ export var upload = function(req: any, res: any){
 			});
 		});
 	} else {
-		res.send(401, "Bad Request");
+		res.send("Upload File not exists.", error.HTTP_STATUS.BAD_REQUEST);
 	}
 }
 
 export var download = function(req: any, res: any) {
 
+	function validate(req:any, res: any) {
+		var checks = [];
+		if (!req.params) checks.push('Parameter is required.');
+		if (req.params && !req.params.id) checks.push('Id is required.');
+		if (req.params && req.params.id && !isFinite(req.params.id)) checks.push('Id must be a number.');
+
+		if (checks.length > 0) {
+			var msg = checks.join('\n');
+			res.send(msg, error.HTTP_STATUS.BAD_REQUEST);
+			return false;
+		}
+
+		return true;	
+	}
+
+	if (!validate(req, res)) return;
+
 	var con = new db.Database();
 	var fileDAO = new model_file.FileDAO(con);
+
 	fileDAO.select(req.params.id, (err: any, path: string, name: string) => {
 		if (err) {
-			res.send(err);
-			return;
+			if (err.code == error.RPC_ERROR.DATA_NOT_FOUND) {
+				res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
+				return;
+			} else {
+				res.send(err);
+				return;
+			}
 		}
 		fs.exists(path, (exists) => {
 			if (exists) {
@@ -108,7 +155,7 @@ export var download = function(req: any, res: any) {
 				// 	return;
 				// });
 			} else {
-				res.send(404, 'File Not Found');
+				res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
 			}
 		});
 	});

@@ -9,7 +9,6 @@ import error = module('../../api/error')
 import constant = module('../../constant')
 import testdata = module('../testdata')
 import model_dcase = module('../../model/dcase')
-import model_commit = module('../../model/commit')
 
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
@@ -17,7 +16,7 @@ var expect = require('expect.js');	// TODO: import module化
 var userId = constant.SYSTEM_USER_ID;
 
 describe('api', function() {
-	var con:db.Database;
+    var con;
 	beforeEach(function (done) {
 		testdata.load(['test/api/dcase.yaml'], (err:any) => {
 	        con = new db.Database();
@@ -28,39 +27,49 @@ describe('api', function() {
 		testdata.clear((err:any) => done());
 	});
 	describe('dcase', function() {
-		describe('getDCase', function() {
+		describe('deleteDCase', function() {
 			it('should return result', function(done) {
-				dcase.getDCase({dcaseId: 201}, userId, {
-					onSuccess: (result: any) => {
-						expect(result).not.to.be(null);
-						expect(result).not.to.be(undefined);
-						expect(result.commitId).not.to.be(null);
-						expect(result.commitId).not.to.be(undefined);
-						expect(result.dcaseName).not.to.be(null);
-						expect(result.dcaseName).not.to.be(undefined);	
-						expect(result.contents).not.to.be(null);
-						expect(result.contents).not.to.be(undefined);
-						var dcaseDAO = new model_dcase.DCaseDAO(con);
-						var commitDAO = new model_commit.CommitDAO(con);
-						commitDAO.get(result.commitId, (err:any, resultCommit:model_commit.Commit) => {
-							expect(err).to.be(null);
-							expect(resultCommit.latestFlag).to.equal(true);
-							dcaseDAO.get(resultCommit.dcaseId, (err:any, resultDCase:model_dcase.DCase) => {
+				dcase.deleteDCase(
+					{dcaseId: 201}, 
+					userId, 
+					{
+						onSuccess: (result: any) => {
+							expect(result).not.to.be(null);
+							expect(result).not.to.be(undefined);
+							expect(result.dcaseId).not.to.be(null);
+							expect(result.dcaseId).not.to.be(undefined);
+
+							var dcaseDAO = new model_dcase.DCaseDAO(con);
+							dcaseDAO.get(result.dcaseId, (err:any, resultDCase:model_dcase.DCase) => {
 								expect(err).to.be(null);
-								expect(resultDCase.name).to.equal(result.dcaseName);
-								expect(resultDCase.deleteFlag).to.equal(false);
+								expect(resultDCase.deleteFlag).to.equal(true);
 								done();
 							});
-						});
-					}, 
-					onFailure: (err: error.RPCError) => {
-						expect().fail(JSON.stringify(err));
-						done();
-					},
-				});
+						}, 
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					}
+				);
+			});
+			it('UserId Not Found', function(done) {
+				dcase.deleteDCase(
+					{dcaseId: 36}, 
+					99999, 
+					{
+						onSuccess: (result: any) => {
+							expect(result).to.be(null);	
+							done();
+						}, 
+						onFailure: (err: error.RPCError) => {
+							expect(err.rpcHttpStatus).to.be(200);
+							expect(err.code).to.be(error.RPC_ERROR.DATA_NOT_FOUND);
+							expect(err.message).to.be('UserId Not Found.');
+							done();
+						},
+					}
+				);
 			});
 			it('prams is null', function(done) {
-				dcase.getDCase(null, userId, {
+				dcase.deleteDCase(null, userId, {
 					onSuccess: (result: any) => {
 						expect(result).to.be(null);
 						done();
@@ -74,7 +83,7 @@ describe('api', function() {
 				});
 			});
 			it('DCase Id is not set', function(done) {
-				dcase.getDCase({}, userId, {
+				dcase.deleteDCase({}, userId, {
 					onSuccess: (result: any) => {
 						expect(result).to.be(null);
 						done();
@@ -88,7 +97,7 @@ describe('api', function() {
 				});
 			});
 			it('DCase Id is not a number', function(done) {
-				dcase.getDCase({dcaseId: "a"}, userId, {
+				dcase.deleteDCase({dcaseId: "a"}, userId, {
 					onSuccess: (result: any) => {
 						expect(result).to.be(null);
 						done();
@@ -101,8 +110,22 @@ describe('api', function() {
 					},
 				});
 			});
-			it('DCase is not found', function(done) {
-				dcase.getDCase({dcaseId: 999}, userId, {
+			it('DCase Id is not found', function(done) {
+				dcase.deleteDCase({dcaseId: 999}, userId, {
+					onSuccess: (result: any) => {
+						expect(result).to.be(null);
+						done();
+					},
+					onFailure: (err: error.RPCError) => {
+						expect(err.rpcHttpStatus).to.be(200);
+						expect(err.code).to.equal(error.RPC_ERROR.DATA_NOT_FOUND);
+						expect(err.message).to.equal('DCase is not found.');
+						done();
+					},
+				});
+			});
+			it('DCaseID is already deleted.', function(done) {
+				dcase.deleteDCase({dcaseId: 223}, userId, {
 					onSuccess: (result: any) => {
 						expect(result).to.be(null);
 						done();

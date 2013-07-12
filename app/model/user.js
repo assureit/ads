@@ -27,6 +27,23 @@ var UserDAO = (function (_super) {
     }
     UserDAO.prototype.login = function (loginName, password, callback) {
         var _this = this;
+        function validate(loginName, password) {
+            var checks = [];
+            if(loginName.length == 0) {
+                checks.push('Login name is required.');
+            }
+            if(loginName.length > 45) {
+                checks.push('Login name should not exceed 45 characters.');
+            }
+            if(checks.length > 0) {
+                callback(new error.InvalidParamsError(checks, null), null);
+                return false;
+            }
+            return true;
+        }
+        if(!validate(loginName, password)) {
+            return;
+        }
         var ldap = new net_ldap.Ldap();
         ldap.auth(loginName, password, function (err) {
             if(err) {
@@ -57,10 +74,29 @@ var UserDAO = (function (_super) {
     };
     UserDAO.prototype.register = function (loginName, password, callback) {
         var _this = this;
+        function validate(loginName, password) {
+            var checks = [];
+            if(loginName.length == 0) {
+                checks.push('Login name is required.');
+            }
+            if(loginName.length > 45) {
+                checks.push('Login name should not exceed 45 characters.');
+            }
+            if(password.length == 0) {
+                checks.push('Password is required.');
+            }
+            if(checks.length > 0) {
+                callback(new error.InvalidParamsError(checks, null), null);
+                return false;
+            }
+            return true;
+        }
+        if(!validate(loginName, password)) {
+            return;
+        }
         var ldap = new net_ldap.Ldap();
         ldap.add(loginName, password, function (err) {
             if(err) {
-                err = new error.InternalError('OpenLDAP registration failure', err);
                 callback(err, null);
                 return;
             }

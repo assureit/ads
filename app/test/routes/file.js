@@ -6,7 +6,8 @@ var db = require('../../db/db')
 var testdata = require('../testdata')
 var request = require('supertest');
 var async = require('async');
-var error = require('../../api/error')
+var CONFIG = require('config');
+
 describe('api', function () {
     var con;
     beforeEach(function (done) {
@@ -18,8 +19,11 @@ describe('api', function () {
         });
     });
     afterEach(function (done) {
-        testdata.clear(function (err) {
-            return done();
+        CONFIG.ads.uploadPath = CONFIG.getOriginalConfig().ads.uploadPath;
+        CONFIG.resetRuntime(function (err, written, buffer) {
+            testdata.clear(function (err) {
+                return done();
+            });
         });
     });
     describe('upload', function () {
@@ -36,7 +40,7 @@ describe('api', function () {
             });
         });
         it('Upload files have been move or ', function (done) {
-            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').end(function (err, res) {
+            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
                 if(err) {
                     throw err;
                 }
@@ -58,7 +62,7 @@ describe('api', function () {
             });
         });
         it('DB.file.path for any updates ', function (done) {
-            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').end(function (err, res) {
+            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
                 if(err) {
                     throw err;
                 }
@@ -90,25 +94,57 @@ describe('api', function () {
                 });
             });
         });
+        it('Upload File Nothing', function (done) {
+            request(app['app']).post('/file').expect(400).expect('Upload File not exists.').end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
+                done();
+            });
+        });
+        it('Config error', function (done) {
+            CONFIG.ads.uploadPath = '';
+            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(500).expect('The Upload path is not set.').end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
+                done();
+            });
+        });
     });
     describe('download', function () {
         it('not exist file', function (done) {
-            request(app['app']).get('/file/302').expect(404).end(function (err, res) {
+            request(app['app']).get('/file/302').expect(404).expect('File Not Found').end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
                 done();
             });
         });
         it('not exist DB data', function (done) {
-            request(app['app']).get('/file/10000').expect(200).end(function (err, res) {
-                assert.equal(res.body.rpcHttpStatus, 200);
-                assert.equal(res.body.code, error.RPC_ERROR.NOT_FOUND);
+            request(app['app']).get('/file/10000').expect(404).expect('File Not Found').end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
                 done();
             });
         });
         it('should return name and fileBody', function (done) {
             request(app['app']).get('/file/301').expect(200).end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
                 assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
                 assert.equal(res.header['content-disposition'], 'attachment; filename="file1"');
                 assert.equal(res.text, 'アップロードテスト用のファイルです\n');
+                done();
+            });
+        });
+        it('File ID is not a number', function (done) {
+            request(app['app']).get('/file/aaa').expect(400).expect('Id must be a number.').end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
                 done();
             });
         });

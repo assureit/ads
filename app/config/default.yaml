@@ -1,5 +1,6 @@
 ads:
   basePath: ""
+  uploadPath: "upload"
 redmine:
   host: "localhost"
   port: 80

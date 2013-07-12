@@ -14,6 +14,7 @@ import db = module('../../db/db')
 import testdata = module('../testdata')
 var request = require('supertest');	// TODO: supertestの宣言ファイル作成
 var async = require('async')
+var CONFIG = require('config')
 import error = module('../../api/error')
 
 describe('api', function() {
@@ -25,7 +26,10 @@ describe('api', function() {
 		});
 	});
 	afterEach(function (done) {
-		testdata.clear((err:any) => done());
+		CONFIG.ads.uploadPath = CONFIG.getOriginalConfig().ads.uploadPath;
+		CONFIG.resetRuntime(function(err, written, buffer) {
+			testdata.clear((err:any) => done());
+		});
 	});
 	describe('upload', function() {
 		it('should return HTTP200 return URL ', function(done) {
@@ -46,6 +50,7 @@ describe('api', function() {
 			request(app['app'])	// TODO: 型制約を逃げている。要修正。
 				.post('/file')
 				.attach('upfile', 'test/routes/testfiles/uptest.txt')
+				.expect(200)
 				.end(function (err, res) {
 					if (err) throw err;
 					
@@ -67,6 +72,7 @@ describe('api', function() {
 			request(app['app'])	// TODO: 型制約を逃げている。要修正。
 				.post('/file')
 				.attach('upfile', 'test/routes/testfiles/uptest.txt')
+				.expect(200)
 				.end(function (err, res) {
 					if (err) throw err;
 					
@@ -93,24 +99,48 @@ describe('api', function() {
 					});
 				});
 		});
+		it('Upload File Nothing', function(done) {
+			request(app['app'])
+				.post('/file')
+				.expect(400)
+				.expect('Upload File not exists.')
+				.end(function(err, res) {
+					if (err) throw err;
+					done();
+				});
+		});
+		it('Config error', function(done) {
 
+			CONFIG.ads.uploadPath = '';
+			request(app['app'])
+				.post('/file')
+				.attach('upfile', 'test/routes/testfiles/uptest.txt')
+				.expect(500)
+				.expect('The Upload path is not set.')
+				.end(function(err, res) {
+					if (err) throw err;
+					done();
+				});
+		});
 	})
 	describe('download', function() {
 		it('not exist file', function(done) {
 			request(app['app'])
 				.get('/file/302')
 				.expect(404)
+				.expect('File Not Found')
 				.end(function (err, res) {
+					if (err) throw err;
 					done();
 				});
 		});
 		it('not exist DB data', function(done) {
 			request(app['app'])
 				.get('/file/10000')
-				.expect(200)
+				.expect(404)
+				.expect('File Not Found')
 				.end(function (err, res) {
-					assert.equal(res.body.rpcHttpStatus, 200);
-					assert.equal(res.body.code, error.RPC_ERROR.NOT_FOUND);
+					if (err) throw err;
 					done();
 				});
 		});
@@ -119,11 +149,23 @@ describe('api', function() {
 				.get('/file/301')
 				.expect(200)
 				.end(function (err, res) {
+					if (err) throw err;
 					assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
 					assert.equal(res.header['content-disposition'], 'attachment; filename="file1"');
 					assert.equal(res.text, 'アップロードテスト用のファイルです\n');
 					done();
 				});
 		});
+		it('File ID is not a number', function(done) {
+			request(app['app'])
+				.get('/file/aaa')
+				.expect(400)
+				.expect('Id must be a number.')
+				.end(function (err, res) {
+					if (err) throw err;
+					done();
+				});
+		});
+
 	}) 
 })

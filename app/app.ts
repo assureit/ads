@@ -10,6 +10,7 @@ import path = module('path')
 import file = module('./routes/file')
 import constant = module('./constant')
 import utilFs = module('./util/fs')
+var CONFIG = require('config');
 
 var app = exports.app = <Express> express();
 
@@ -19,7 +20,7 @@ app.configure(function() {
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
 	app.use(express.favicon());
-	var uploadDir = path.join(__dirname, constant.UPLOAD_DIR);
+	var uploadDir = path.join(__dirname, CONFIG.ads.uploadPath);
 	console.log(uploadDir);
 	utilFs.mkdirpSync(uploadDir);
 	app.use(express.bodyParser({uploadDir: uploadDir}));

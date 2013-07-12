@@ -112,7 +112,7 @@ describe('api', function () {
                     },
                     onFailure: function (err) {
                         expect(err.rpcHttpStatus).to.be(200);
-                        expect(err.code).to.equal(error.RPC_ERROR.NOT_FOUND);
+                        expect(err.code).to.equal(error.RPC_ERROR.DATA_NOT_FOUND);
                         expect(err.message).to.equal('Effective DCase does not exist.');
                         done();
                     }

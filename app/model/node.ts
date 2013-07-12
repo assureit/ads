@@ -209,5 +209,22 @@ export class NodeDAO extends model.DAO {
 			});
 		});
 	}
+
+	get(commitId: number, callback: (err:any, list:Node[]) => void) {
+		this.con.query('SELECT * FROM node WHERE commit_id = ?', [commitId], (err, result) => {
+			if (err) {
+				callback(err, null);
+				return;
+			}
+			var list = new Node[];
+			result.forEach((row) => {
+				var node = new Node(row.id, row.commit_id, row.this_node_id, row.node_type, row.description);
+				list.push(node);
+			});
+			callback(err, list);
+	
+		});
+	}
+
 }
 
