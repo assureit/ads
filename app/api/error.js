@@ -81,7 +81,7 @@ exports.ApplicationError = ApplicationError;
 var NotFoundError = (function (_super) {
     __extends(NotFoundError, _super);
     function NotFoundError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.NOT_FOUND, msg, data);
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.DATA_NOT_FOUND, msg, data);
     }
     return NotFoundError;
 })(ApplicationError);
@@ -97,7 +97,7 @@ exports.DuplicatedError = DuplicatedError;
 var LoginError = (function (_super) {
     __extends(LoginError, _super);
     function LoginError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.NOT_DEFINED, msg, data);
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.AUTH_ERROR, msg, data);
     }
     return LoginError;
 })(ApplicationError);
@@ -105,11 +105,19 @@ exports.LoginError = LoginError;
 var VersionConflictError = (function (_super) {
     __extends(VersionConflictError, _super);
     function VersionConflictError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.VERSION_CONFLICT, msg, data);
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.DATA_VERSION_CONFLICT, msg, data);
     }
     return VersionConflictError;
 })(ApplicationError);
 exports.VersionConflictError = VersionConflictError;
+var ExternalParameterError = (function (_super) {
+    __extends(ExternalParameterError, _super);
+    function ExternalParameterError(msg, data) {
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.CONFIG_ERROR, msg, data);
+    }
+    return ExternalParameterError;
+})(ApplicationError);
+exports.ExternalParameterError = ExternalParameterError;
 (function (RPC_ERROR) {
     RPC_ERROR._map = [];
     RPC_ERROR.INVALID_REQUEST = -32600;
@@ -117,8 +125,11 @@ exports.VersionConflictError = VersionConflictError;
     RPC_ERROR.INVALID_PARAMS = -32602;
     RPC_ERROR.INTERNAL_ERROR = -32603;
     RPC_ERROR.PARSE_ERROR = -32700;
-    RPC_ERROR.NOT_FOUND = 24001;
-    RPC_ERROR.VERSION_CONFLICT = 24002;
+    RPC_ERROR.CONFIG_ERROR = 22000;
+    RPC_ERROR.AUTH_ERROR = 23000;
+    RPC_ERROR.DATA_NOT_FOUND = 24001;
+    RPC_ERROR.DATA_VERSION_CONFLICT = 24002;
+    RPC_ERROR.DATA_DUPLICATE = 24003;
     RPC_ERROR.NOT_DEFINED = 19999;
 })(exports.RPC_ERROR || (exports.RPC_ERROR = {}));
 var RPC_ERROR = exports.RPC_ERROR;

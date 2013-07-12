@@ -1,7 +1,7 @@
 
 
 var rec = require('../../api/rec')
-
+var error = require('../../api/error')
 
 var constant = require('../../constant')
 var userId = constant.SYSTEM_USER_ID;
@@ -35,6 +35,38 @@ describe('api', function () {
                     }
                 });
             });
+            it('Datatype is required when a parameter exists', function (done) {
+                rec.getRawItemList({
+                }, userId, {
+                    onSuccess: function (result) {
+                        expect(result).to.be(null);
+                        done();
+                    },
+                    onFailure: function (err) {
+                        expect(err.rpcHttpStatus).to.be(200);
+                        expect(err.code).to.be(error.RPC_ERROR.INVALID_PARAMS);
+                        expect(err.message).to.be('Invalid method parameter is found: \nDatatype is required when a parameter exists.');
+                        done();
+                    }
+                });
+            });
+            it('The unexpected parameter is specified', function (done) {
+                rec.getRawItemList({
+                    datatype: 'aaaa',
+                    aaa: 'aaa'
+                }, userId, {
+                    onSuccess: function (result) {
+                        expect(result).to.be(null);
+                        done();
+                    },
+                    onFailure: function (err) {
+                        expect(err.rpcHttpStatus).to.be(200);
+                        expect(err.code).to.be(error.RPC_ERROR.INVALID_PARAMS);
+                        expect(err.message).to.be('Invalid method parameter is found: \nThe unexpected parameter is specified.');
+                        done();
+                    }
+                });
+            });
         });
         describe('getPresetList', function () {
             it('call method', function (done) {
@@ -45,6 +77,22 @@ describe('api', function () {
                     },
                     onFailure: function (err) {
                         expect(err).to.be(null);
+                        done();
+                    }
+                });
+            });
+            it('do not specify the parameter ', function (done) {
+                rec.getPresetList({
+                    datatype: "aaa"
+                }, userId, {
+                    onSuccess: function (result) {
+                        expect(result).to.be(null);
+                        done();
+                    },
+                    onFailure: function (err) {
+                        expect(err.rpcHttpStatus).to.be(200);
+                        expect(err.code).to.be(error.RPC_ERROR.INVALID_PARAMS);
+                        expect(err.message).to.be('Invalid method parameter is found: \nDo not specify the parameter.');
                         done();
                     }
                 });

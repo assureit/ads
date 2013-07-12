@@ -200,6 +200,22 @@ var NodeDAO = (function (_super) {
             });
         });
     };
+    NodeDAO.prototype.get = function (commitId, callback) {
+        this.con.query('SELECT * FROM node WHERE commit_id = ?', [
+            commitId
+        ], function (err, result) {
+            if(err) {
+                callback(err, null);
+                return;
+            }
+            var list = new Array();
+            result.forEach(function (row) {
+                var node = new Node(row.id, row.commit_id, row.this_node_id, row.node_type, row.description);
+                list.push(node);
+            });
+            callback(err, list);
+        });
+    };
     return NodeDAO;
 })(model.DAO);
 exports.NodeDAO = NodeDAO;
