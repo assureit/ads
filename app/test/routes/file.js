@@ -99,19 +99,26 @@ describe('api', function () {
     });
     describe('download', function () {
         it('not exist file', function (done) {
-            request(app['app']).get('/file/302').expect(404).end(function (err, res) {
+            request(app['app']).get('/file/302').expect(404).expect('File Not Found').end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
                 done();
             });
         });
         it('not exist DB data', function (done) {
-            request(app['app']).get('/file/10000').expect(404).end(function (err, res) {
-                console.log(res);
-                assert.equal(res.text, 'File Not Found');
+            request(app['app']).get('/file/10000').expect(404).expect('File Not Found').end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
                 done();
             });
         });
         it('should return name and fileBody', function (done) {
             request(app['app']).get('/file/301').expect(200).end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
                 assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
                 assert.equal(res.header['content-disposition'], 'attachment; filename="file1"');
                 assert.equal(res.text, 'アップロードテスト用のファイルです\n');
@@ -119,8 +126,10 @@ describe('api', function () {
             });
         });
         it('File ID is not a number', function (done) {
-            request(app['app']).get('/file/aaa').expect(400).end(function (err, res) {
-                assert.equal(res.text, 'Id must be a number.');
+            request(app['app']).get('/file/aaa').expect(400).expect('Id must be a number.').end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
                 done();
             });
         });

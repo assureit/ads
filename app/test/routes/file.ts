@@ -97,8 +97,9 @@ describe('api', function() {
 			request(app['app'])
 				.post('/file')
 				.expect(400)
+				.expect('Upload File not exists.')
 				.end(function(err, res) {
-					assert.equal(res.text, 'Upload File not exists.');
+					if (err) throw err;
 					done();
 				});
 		});
@@ -108,7 +109,9 @@ describe('api', function() {
 			request(app['app'])
 				.get('/file/302')
 				.expect(404)
+				.expect('File Not Found')
 				.end(function (err, res) {
+					if (err) throw err;
 					done();
 				});
 		});
@@ -116,8 +119,9 @@ describe('api', function() {
 			request(app['app'])
 				.get('/file/10000')
 				.expect(404)
+				.expect('File Not Found')
 				.end(function (err, res) {
-					assert.equal(res.text, 'File Not Found');
+					if (err) throw err;
 					done();
 				});
 		});
@@ -126,6 +130,7 @@ describe('api', function() {
 				.get('/file/301')
 				.expect(200)
 				.end(function (err, res) {
+					if (err) throw err;
 					assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
 					assert.equal(res.header['content-disposition'], 'attachment; filename="file1"');
 					assert.equal(res.text, 'アップロードテスト用のファイルです\n');
@@ -136,8 +141,9 @@ describe('api', function() {
 			request(app['app'])
 				.get('/file/aaa')
 				.expect(400)
+				.expect('Id must be a number.')
 				.end(function (err, res) {
-					assert.equal(res.text, 'Id must be a number.');
+					if (err) throw err;
 					done();
 				});
 		});

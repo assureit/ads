@@ -98,7 +98,7 @@ exports.download = function (req, res) {
         }
         if(checks.length > 0) {
             var msg = checks.join('\n');
-            res.send(msg, 400);
+            res.send(400, msg);
             return false;
         }
         return true;
