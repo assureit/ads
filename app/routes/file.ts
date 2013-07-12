@@ -3,6 +3,8 @@ import constant = module('../constant')
 import model_file = module('../model/file')
 import fs = module('fs')
 import utilFs = module('../util/fs')
+import error = module('../api/error')
+var CONFIG = require('config');
 
 export var upload = function(req: any, res: any){
 
@@ -26,7 +28,7 @@ export var upload = function(req: any, res: any){
 		if (mm.length == 1) mm = '0' + mm;
 		if (dd.length == 1) dd = '0' + dd;
 		
-		return 'upload/' + yy + '/' + mm + '/' + dd;	// TODO: 'upload'をconstantへ入れるか？
+		return CONFIG.ads.uploadPath + '/' + yy + '/' + mm + '/' + dd;	// TODO: 'upload'をconstantへ入れるか？
 	}
 
 	function getUserId() : number {
@@ -42,6 +44,11 @@ export var upload = function(req: any, res: any){
 			userId = Number(cookies['userId']);
 		}
 		return userId;
+	}
+
+	if (!CONFIG.ads.uploadPath) {
+		res.send(500, 'The Upload path is not set.');
+		return;
 	}
 
 	var userId = getUserId();
@@ -85,18 +92,42 @@ export var upload = function(req: any, res: any){
 			});
 		});
 	} else {
-		res.send(401, "Bad Request");
+		res.send(400, "Upload File not exists.");
 	}
 }
 
 export var download = function(req: any, res: any) {
 
+	function validate(req:any, res: any) {
+		var checks = [];
+		if (!req.params) checks.push('Parameter is required.');
+		if (req.params && !req.params.id) checks.push('Id is required.');
+		if (req.params && req.params.id && !isFinite(req.params.id)) checks.push('Id must be a number.');
+
+		if (checks.length > 0) {
+			var msg = checks.join('\n');
+//			res.send(400, msg);
+			res.send(msg, 400);
+			return false;
+		}
+
+		return true;	
+	}
+
+	if (!validate(req, res)) return;
+
 	var con = new db.Database();
 	var fileDAO = new model_file.FileDAO(con);
+
 	fileDAO.select(req.params.id, (err: any, path: string, name: string) => {
 		if (err) {
-			res.send(err);
-			return;
+			if (err.code == error.RPC_ERROR.DATA_NOT_FOUND) {
+				res.send(404, 'File Not Found');
+				return;
+			} else {
+				res.send(err);
+				return;
+			}
 		}
 		fs.exists(path, (exists) => {
 			if (exists) {

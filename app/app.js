@@ -5,15 +5,16 @@ var client = require('./routes/index')
 var js = require('./routes/javascript')
 var path = require('path')
 var file = require('./routes/file')
-var constant = require('./constant')
+
 var utilFs = require('./util/fs')
+var CONFIG = require('config');
 var app = exports.app = express();
 app.configure(function () {
     app.set('port', process.env.PORT || 3000);
     app.set('views', __dirname + '/views');
     app.set('view engine', 'jade');
     app.use(express.favicon());
-    var uploadDir = path.join(__dirname, constant.UPLOAD_DIR);
+    var uploadDir = path.join(__dirname, CONFIG.ads.uploadPath);
     console.log(uploadDir);
     utilFs.mkdirpSync(uploadDir);
     app.use(express.bodyParser({

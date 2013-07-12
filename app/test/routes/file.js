@@ -6,7 +6,7 @@ var db = require('../../db/db')
 var testdata = require('../testdata')
 var request = require('supertest');
 var async = require('async');
-var error = require('../../api/error')
+
 describe('api', function () {
     var con;
     beforeEach(function (done) {
@@ -90,6 +90,12 @@ describe('api', function () {
                 });
             });
         });
+        it('Upload File Nothing', function (done) {
+            request(app['app']).post('/file').expect(400).end(function (err, res) {
+                assert.equal(res.text, 'Upload File not exists.');
+                done();
+            });
+        });
     });
     describe('download', function () {
         it('not exist file', function (done) {
@@ -98,9 +104,9 @@ describe('api', function () {
             });
         });
         it('not exist DB data', function (done) {
-            request(app['app']).get('/file/10000').expect(200).end(function (err, res) {
-                assert.equal(res.body.rpcHttpStatus, 200);
-                assert.equal(res.body.code, error.RPC_ERROR.DATA_NOT_FOUND);
+            request(app['app']).get('/file/10000').expect(404).end(function (err, res) {
+                console.log(res);
+                assert.equal(res.text, 'File Not Found');
                 done();
             });
         });
@@ -109,6 +115,12 @@ describe('api', function () {
                 assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
                 assert.equal(res.header['content-disposition'], 'attachment; filename="file1"');
                 assert.equal(res.text, 'アップロードテスト用のファイルです\n');
+                done();
+            });
+        });
+        it('File ID is not a number', function (done) {
+            request(app['app']).get('/file/aaa').expect(400).end(function (err, res) {
+                assert.equal(res.text, 'Id must be a number.');
                 done();
             });
         });

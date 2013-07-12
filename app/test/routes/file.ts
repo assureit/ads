@@ -93,7 +93,15 @@ describe('api', function() {
 					});
 				});
 		});
-
+		it('Upload File Nothing', function(done) {
+			request(app['app'])
+				.post('/file')
+				.expect(400)
+				.end(function(err, res) {
+					assert.equal(res.text, 'Upload File not exists.');
+					done();
+				});
+		});
 	})
 	describe('download', function() {
 		it('not exist file', function(done) {
@@ -107,10 +115,9 @@ describe('api', function() {
 		it('not exist DB data', function(done) {
 			request(app['app'])
 				.get('/file/10000')
-				.expect(200)
+				.expect(404)
 				.end(function (err, res) {
-					assert.equal(res.body.rpcHttpStatus, 200);
-					assert.equal(res.body.code, error.RPC_ERROR.DATA_NOT_FOUND);
+					assert.equal(res.text, 'File Not Found');
 					done();
 				});
 		});
@@ -125,5 +132,15 @@ describe('api', function() {
 					done();
 				});
 		});
+		it('File ID is not a number', function(done) {
+			request(app['app'])
+				.get('/file/aaa')
+				.expect(400)
+				.end(function (err, res) {
+					assert.equal(res.text, 'Id must be a number.');
+					done();
+				});
+		});
+
 	}) 
 })
