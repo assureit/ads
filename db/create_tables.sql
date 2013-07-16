@@ -110,26 +110,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `node_property`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `node_property` (
-  `id` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(32) NOT NULL COMMENT 'プロパティ名' ,
-  `value` VARCHAR(128) NOT NULL COMMENT 'プロパティ値' ,
-  `node_id` INT NOT NULL COMMENT '紐付くノードのノードID' ,
-  `created` DATETIME NULL ,
-  `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_node_property_node1_idx` (`node_id` ASC) ,
-  CONSTRAINT `fk_node_property_node1`
-    FOREIGN KEY (`node_id` )
-    REFERENCES `node` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `issue`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `issue` (
@@ -162,12 +142,52 @@ CREATE  TABLE IF NOT EXISTS `monitor_node` (
   `params` TEXT NULL ,
   `rebuttal_this_node_id` INT NULL ,
   `publish_status` INT NOT NULL DEFAULT 0 COMMENT 'REC登録状態\n0: 未\n1: 済\n2: 要更新' ,
+  `delete_flag` TINYINT(1) NOT NULL DEFAULT 0 ,
+  `created` DATETIME NULL ,
+  `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_monitor_node_dcase1` (`dcase_id` ASC) ,
   UNIQUE INDEX `unq_monitor_node1` (`dcase_id` ASC, `this_node_id` ASC) ,
   CONSTRAINT `fk_monitor_node_dcase1`
     FOREIGN KEY (`dcase_id` )
     REFERENCES `dcase` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `tag`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `tag` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `label` VARCHAR(1024) NOT NULL ,
+  `created` DATETIME NULL ,
+  `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `dcase_tag_rel`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `dcase_tag_rel` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `dcase_id` INT NOT NULL ,
+  `tag_id` INT NOT NULL ,
+  `created` DATETIME NULL ,
+  `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_dcase_tag_rel_dcase1` (`dcase_id` ASC) ,
+  INDEX `fk_dcase_tag_rel_tag1` (`tag_id` ASC) ,
+  CONSTRAINT `fk_dcase_tag_rel_dcase1`
+    FOREIGN KEY (`dcase_id` )
+    REFERENCES `dcase` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_dcase_tag_rel_tag1`
+    FOREIGN KEY (`tag_id` )
+    REFERENCES `tag` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
