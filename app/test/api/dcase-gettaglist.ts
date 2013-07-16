@@ -39,11 +39,11 @@ describe('api', function() {
 							expect(result).not.to.be(undefined);
 							expect(result.tagList).not.to.be(null);
 							expect(result.tagList).not.to.be(undefined);
-							expect(result.tagList).to.be.an(Array);
+							expect(result.tagList).to.be.an('array');
 							expect(result.tagList.length > 0).to.equal(true);
 							var checkDic = {};
 							result.tagList.forEach((it) => {
-								expect(it).to.be.an(String);
+								expect(it).to.be.an('string');
 								expect(it).not.to.equal('deleted_tag');
 								expect(it).not.to.equal('unlink_tag');
 								expect(checkDic[it]).to.be(undefined);

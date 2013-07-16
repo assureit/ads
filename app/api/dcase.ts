@@ -9,8 +9,10 @@ import model_node = module('../model/node')
 import model_pager = module('../model/pager')
 import model_issue = module('../model/issue')
 import model_user = module('../model/user')
+import model_tag = module('../model/tag')
 import error = module('./error')
 var async = require('async')
+var _ = require('underscore');
 
 export function searchDCase(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
@@ -408,26 +410,20 @@ export function getCommitList(params:any, userId: number, callback: type.Callbac
 
 export function getTagList(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
-	callback.onSuccess({});
-	// var commitDAO = new model_commit.CommitDAO(con);
-	// commitDAO.list(params.dcaseId, (err:any, list: model_commit.Commit[]) => {
-	// 	if (err) {
-	// 		callback.onFailure(err);
-	// 		return;
-	// 	}
-	// 	con.close();
-
-	// 	if (list.length == 0) {
-	// 		callback.onFailure(new error.NotFoundError('Effective DCase does not exist.'));
-	// 		return;
-	// 	}
-
-	// 	var commitList = [];
-	// 	list.forEach((c: model_commit.Commit) => {
-	// 		commitList.push({commitId: c.id, dateTime: c.dateTime, commitMessage: c.message, userId: c.userId, userName: c.user.loginName});
-	// 	});
-	// 	callback.onSuccess({
-	// 		commitList: commitList
-	// 	});
-	// });
+	var tagDAO = new model_tag.TagDAO(con);
+	async.waterfall([
+		(next) => {
+			tagDAO.list((err:any, list: model_tag.Tag[]) => {
+				next(err, list);
+			});
+		}
+	], (err:any, list:model_tag.Tag[]) => {
+		con.close();
+		if (err) {
+			callback.onFailure(err);
+			return;
+		}
+		var tagList = _.map(list, (tag:model_tag.Tag) => {return tag.label});
+		callback.onSuccess({tagList: tagList});
+	});
 }
