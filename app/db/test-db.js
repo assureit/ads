@@ -18,21 +18,30 @@ var TestDB = (function () {
             return;
         }
         this.load(filePathList[0], function (err) {
+            if(err) {
+                callback(err);
+                return;
+            }
             _this.loadAll(filePathList.slice(1), callback);
         });
     };
     TestDB.prototype.load = function (filePath, callback) {
         var _this = this;
         var fd = fs.readFileSync(filePath, 'utf8');
-        yaml.loadAll(fd, function (doc) {
-            var tables = _.keys(doc);
-            var loadFuncs = _.map(tables, function (table) {
-                return _this._buildLoadTableFunc(table, doc[table]);
+        try  {
+            yaml.loadAll(fd, function (doc) {
+                var tables = _.keys(doc);
+                var loadFuncs = _.map(tables, function (table) {
+                    return _this._buildLoadTableFunc(table, doc[table]);
+                });
+                async.waterfall(loadFuncs, function (err) {
+                    callback(err);
+                });
             });
-            async.waterfall(loadFuncs, function (err) {
-                callback(err);
-            });
-        });
+        } catch (e) {
+            callback(e);
+            return;
+        }
     };
     TestDB.prototype.loadTable = function (table, data, callback) {
         var _this = this;

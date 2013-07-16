@@ -6,6 +6,8 @@ mysql:
 test:
   database:
     tables:
+      - 'dcase_tag_rel'
+      - 'tag'
       - 'monitor_node'
       - 'issue'
       - 'node'

@@ -9,8 +9,10 @@ import model_node = module('../model/node')
 import model_pager = module('../model/pager')
 import model_issue = module('../model/issue')
 import model_user = module('../model/user')
+import model_tag = module('../model/tag')
 import error = module('./error')
 var async = require('async')
+var _ = require('underscore');
 
 export function searchDCase(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
@@ -403,5 +405,25 @@ export function getCommitList(params:any, userId: number, callback: type.Callbac
 		callback.onSuccess({
 			commitList: commitList
 		});
+	});
+}
+
+export function getTagList(params:any, userId: number, callback: type.Callback) {
+	var con = new db.Database();
+	var tagDAO = new model_tag.TagDAO(con);
+	async.waterfall([
+		(next) => {
+			tagDAO.list((err:any, list: model_tag.Tag[]) => {
+				next(err, list);
+			});
+		}
+	], (err:any, list:model_tag.Tag[]) => {
+		con.close();
+		if (err) {
+			callback.onFailure(err);
+			return;
+		}
+		var tagList = _.map(list, (tag:model_tag.Tag) => {return tag.label});
+		callback.onSuccess({tagList: tagList});
 	});
 }

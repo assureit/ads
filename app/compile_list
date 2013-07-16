@@ -23,6 +23,7 @@ test/api/dcase-getdcase.ts
 test/api/dcase-commit.ts
 test/api/dcase-getnodetree.ts
 test/api/dcase-getcommitlist.ts
+test/api/dcase-gettaglist.ts
 test/api/dcase-searchnode.ts
 test/api/dcase-searchdcase.ts
 test/api/dcase-deletedcase.ts

@@ -7,8 +7,10 @@ var model_node = require('../model/node')
 
 
 var model_user = require('../model/user')
+var model_tag = require('../model/tag')
 var error = require('./error')
 var async = require('async');
+var _ = require('underscore');
 function searchDCase(params, userId, callback) {
     var con = new db.Database();
     var dcaseDAO = new model_dcase.DCaseDAO(con);
@@ -476,3 +478,26 @@ function getCommitList(params, userId, callback) {
     });
 }
 exports.getCommitList = getCommitList;
+function getTagList(params, userId, callback) {
+    var con = new db.Database();
+    var tagDAO = new model_tag.TagDAO(con);
+    async.waterfall([
+        function (next) {
+            tagDAO.list(function (err, list) {
+                next(err, list);
+            });
+        }    ], function (err, list) {
+        con.close();
+        if(err) {
+            callback.onFailure(err);
+            return;
+        }
+        var tagList = _.map(list, function (tag) {
+            return tag.label;
+        });
+        callback.onSuccess({
+            tagList: tagList
+        });
+    });
+}
+exports.getTagList = getTagList;
