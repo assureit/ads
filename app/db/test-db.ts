@@ -19,6 +19,10 @@ export class TestDB {
 			return;
 		}
 		this.load(filePathList[0], (err:any) => {
+			if(err){
+				callback(err);
+				return;
+			}
 			this.loadAll(filePathList.slice(1), callback);
 		});
 	}
@@ -27,12 +31,18 @@ export class TestDB {
 	 * ユニットテスト用テストデータのローディング
 	 */
 	load(filePath:string, callback:(err:any)=>void) {
+		// console.log('LOADING: ' + filePath);
 		var fd = fs.readFileSync(filePath, 'utf8');
-		yaml.loadAll(fd, (doc) => {
-			var tables = _.keys(doc);
-			var loadFuncs = _.map(tables, (table)=> {return this._buildLoadTableFunc(table, doc[table])});
-			async.waterfall(loadFuncs, (err:any) => {callback(err);});
-		});
+		try {
+			yaml.loadAll(fd, (doc) => {
+				var tables = _.keys(doc);
+				var loadFuncs = _.map(tables, (table)=> {return this._buildLoadTableFunc(table, doc[table])});
+				async.waterfall(loadFuncs, (err:any) => {callback(err);});
+			});
+		} catch (e) {
+			callback(e);
+			return;
+		}
 	}
 
 	loadTable(table: string, data: any[], callback: (err:any)=>void) {

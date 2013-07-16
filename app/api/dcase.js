@@ -476,3 +476,9 @@ function getCommitList(params, userId, callback) {
     });
 }
 exports.getCommitList = getCommitList;
+function getTagList(params, userId, callback) {
+    var con = new db.Database();
+    callback.onSuccess({
+    });
+}
+exports.getTagList = getTagList;

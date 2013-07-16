@@ -405,3 +405,29 @@ export function getCommitList(params:any, userId: number, callback: type.Callbac
 		});
 	});
 }
+
+export function getTagList(params:any, userId: number, callback: type.Callback) {
+	var con = new db.Database();
+	callback.onSuccess({});
+	// var commitDAO = new model_commit.CommitDAO(con);
+	// commitDAO.list(params.dcaseId, (err:any, list: model_commit.Commit[]) => {
+	// 	if (err) {
+	// 		callback.onFailure(err);
+	// 		return;
+	// 	}
+	// 	con.close();
+
+	// 	if (list.length == 0) {
+	// 		callback.onFailure(new error.NotFoundError('Effective DCase does not exist.'));
+	// 		return;
+	// 	}
+
+	// 	var commitList = [];
+	// 	list.forEach((c: model_commit.Commit) => {
+	// 		commitList.push({commitId: c.id, dateTime: c.dateTime, commitMessage: c.message, userId: c.userId, userName: c.user.loginName});
+	// 	});
+	// 	callback.onSuccess({
+	// 		commitList: commitList
+	// 	});
+	// });
+}
