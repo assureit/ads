@@ -11,3 +11,5 @@ app/config/local.yaml
 app/config/runtime.json
 
 npm-debug.log
+
+app/config/local-test.yaml
