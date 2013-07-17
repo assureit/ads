@@ -16,7 +16,10 @@ function searchDCase(params, userId, callback) {
     var dcaseDAO = new model_dcase.DCaseDAO(con);
     params = params || {
     };
-    dcaseDAO.list(params.page, function (err, pager, result) {
+    var tagList = _.filter(params.tagList, function (it) {
+        return typeof (it) == 'string';
+    });
+    dcaseDAO.list(params.page, tagList, function (err, pager, result) {
         if(err) {
             callback.onFailure(err);
             return;

@@ -9,6 +9,7 @@ var model_user = require('./user')
 var model_pager = require('./pager')
 var error = require('../api/error')
 var async = require('async');
+var _ = require('underscore');
 var DCase = (function () {
     function DCase(id, name, userId, deleteFlag) {
         this.id = id;
@@ -66,16 +67,28 @@ var DCaseDAO = (function (_super) {
             callback(err, result.insertId);
         });
     };
-    DCaseDAO.prototype.list = function (page, callback) {
+    DCaseDAO.prototype.list = function (page, tagList, callback) {
         var _this = this;
         var pager = new model_pager.Pager(page);
-        this.con.query({
+        var query = {
             sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified, c.id desc LIMIT ? OFFSET ? ',
             nestTables: true
-        }, [
+        };
+        var params = [
             pager.limit, 
             pager.getOffset()
-        ], function (err, result) {
+        ];
+        if(tagList && tagList.length > 0) {
+            var tagVars = _.map(tagList, function (it) {
+                return '?';
+            }).join(',');
+            query.sql = 'SELECT * ' + 'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' + 'WHERE d.id = c.dcase_id ' + 'AND d.user_id = u.id ' + 'AND c.user_id = cu.id ' + 'AND t.id = r.tag_id  ' + 'AND r.dcase_id = d.id ' + 'AND c.latest_flag = TRUE ' + 'AND d.delete_flag = FALSE ' + 'AND t.label IN (' + tagVars + ') ' + 'GROUP BY c.id ' + 'HAVING COUNT(t.id) = ? ' + 'ORDER BY c.modified, c.id desc LIMIT ? OFFSET ?';
+            var tmp = tagList;
+            params = tmp.concat([
+                tagList.length
+            ]).concat(params);
+        }
+        this.con.query(query, params, function (err, result) {
             if(err) {
                 callback(err, null, null);
                 return;
@@ -88,7 +101,19 @@ var DCaseDAO = (function (_super) {
                 d.latestCommit.user = new model_user.User(row.cu.id, row.cu.login_name, row.cu.delete_flag, row.cu.system_flag);
                 list.push(d);
             });
-            _this.con.query('SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ', function (err, countResult) {
+            var countSQL = 'SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ';
+            var countParams = [];
+            if(tagList && tagList.length > 0) {
+                var tagVars = _.map(tagList, function (it) {
+                    return '?';
+                }).join(',');
+                query.sql = 'SELECT count(d.id) as cnt ' + 'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' + 'WHERE d.id = c.dcase_id ' + 'AND d.user_id = u.id ' + 'AND c.user_id = cu.id ' + 'AND t.id = r.tag_id  ' + 'AND r.dcase_id = d.id ' + 'AND c.latest_flag = TRUE ' + 'AND d.delete_flag = FALSE ' + 'AND t.label IN (' + tagVars + ') ' + 'GROUP BY c.id ' + 'HAVING COUNT(t.id) = ? ';
+                var tmp = tagList;
+                params = tmp.concat([
+                    tagList.length
+                ]).concat(params);
+            }
+            _this.con.query(countSQL, params, function (err, countResult) {
                 if(err) {
                     callback(err, null, null);
                     return;

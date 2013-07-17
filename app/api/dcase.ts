@@ -18,7 +18,8 @@ export function searchDCase(params:any, userId: number, callback: type.Callback)
 	var con = new db.Database();
 	var dcaseDAO = new model_dcase.DCaseDAO(con);
 	params = params || {};
-	dcaseDAO.list(params.page, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+	var tagList = _.filter(params.tagList, (it:string) => {return typeof(it) == 'string';});
+	dcaseDAO.list(params.page, tagList, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
 		if (err) {
 			callback.onFailure(err);
 			return;
