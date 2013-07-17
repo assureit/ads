@@ -14,20 +14,30 @@ var _ = require('underscore');
 function searchDCase(params, userId, callback) {
     var con = new db.Database();
     var dcaseDAO = new model_dcase.DCaseDAO(con);
+    var tagDAO = new model_tag.TagDAO(con);
     params = params || {
     };
     var tagList = _.filter(params.tagList, function (it) {
         return typeof (it) == 'string';
     });
-    dcaseDAO.list(params.page, tagList, function (err, pager, result) {
+    async.waterfall([
+        function (next) {
+            dcaseDAO.list(params.page, tagList, function (err, pager, result) {
+                next(err, pager, result);
+            });
+        }, 
+        function (pager, dcaseList, next) {
+            tagDAO.search(tagList, function (err, tagList) {
+                next(err, pager, dcaseList, tagList);
+            });
+        }    ], function (err, pager, dcaseList, tagList) {
+        con.close();
         if(err) {
             callback.onFailure(err);
             return;
         }
-        con.close();
-        var list = [];
-        result.forEach(function (val) {
-            list.push({
+        var resultDCaselist = _.map(dcaseList, function (val) {
+            return {
                 dcaseId: val.id,
                 dcaseName: val.name,
                 userName: val.user.loginName,
@@ -38,7 +48,10 @@ function searchDCase(params, userId, callback) {
                     userId: val.latestCommit.userId,
                     commitMessage: val.latestCommit.message
                 }
-            });
+            };
+        });
+        var resultTagList = _.map(tagList, function (tag) {
+            return tag.label;
         });
         callback.onSuccess({
             summary: {
@@ -47,7 +60,8 @@ function searchDCase(params, userId, callback) {
                 totalItems: pager.totalItems,
                 itemsPerPage: pager.limit
             },
-            dcaseList: list
+            dcaseList: resultDCaselist,
+            tagList: resultTagList
         });
     });
 }

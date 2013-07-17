@@ -106,6 +106,7 @@ tag:
   - {id: 704, label: 'tag4'}
   - {id: 705, label: 'deleted_tag'}
   - {id: 706, label: 'unlink_tag'}
+  - {id: 707, label: 'unrelational_tag'}
 dcase_tag_rel:
   - {id: 801, dcase_id: 201, tag_id: 701}
   - {id: 802, dcase_id: 202, tag_id: 701}
@@ -115,3 +116,4 @@ dcase_tag_rel:
   - {id: 806, dcase_id: 201, tag_id: 703}
   - {id: 807, dcase_id: 203, tag_id: 704}
   - {id: 808, dcase_id: 224, tag_id: 705}
+  - {id: 809, dcase_id: 222, tag_id: 707}

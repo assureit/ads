@@ -4,6 +4,7 @@ var dcase = require('../../api/dcase')
 
 var constant = require('../../constant')
 var testdata = require('../testdata')
+var model_tag = require('../../model/tag')
 var expect = require('expect.js');
 var _ = require('underscore');
 var userId = constant.SYSTEM_USER_ID;
@@ -28,6 +29,9 @@ describe('api', function () {
                 dcase.searchDCase(null, userId, {
                     onSuccess: function (result) {
                         expect(result).not.to.be(null);
+                        expect(result.dcaseList).not.to.be(null);
+                        expect(result.dcaseList).to.be.an('array');
+                        expect(result.dcaseList.length).greaterThan(0);
                         done();
                     },
                     onFailure: function (error) {
@@ -235,6 +239,54 @@ describe('api', function () {
                             expect(err).to.be(null);
                             done();
                         });
+                    },
+                    onFailure: function (error) {
+                        expect().fail(JSON.stringify(error));
+                        done();
+                    }
+                });
+            });
+            it('tagList should be all tag list if argument tagList is empty', function (done) {
+                dcase.searchDCase({
+                    page: 1
+                }, userId, {
+                    onSuccess: function (result) {
+                        expect(result.tagList).not.to.be(null);
+                        expect(result.tagList).to.be.an('array');
+                        var tagDAO = new model_tag.TagDAO(con);
+                        tagDAO.list(function (err, tagList) {
+                            expect(result.tagList.length).to.equal(tagList.length);
+                            var modelTagList = _.map(tagList, function (modelTag) {
+                                return modelTag.label;
+                            });
+                            expect(_.difference(result.tagList, modelTagList).length).to.equal(0);
+                            done();
+                        });
+                    },
+                    onFailure: function (error) {
+                        expect().fail(JSON.stringify(error));
+                        done();
+                    }
+                });
+            });
+            it('tagList should be filterd by search result dcase if argument tagList is not empty', function (done) {
+                var tags = [
+                    'tag1', 
+                    'tag2'
+                ];
+                dcase.searchDCase({
+                    tagList: tags,
+                    page: 1
+                }, userId, {
+                    onSuccess: function (result) {
+                        expect(result.tagList).not.to.be(null);
+                        expect(result.tagList).to.be.an('array');
+                        _.each(result.tagList, function (tag) {
+                            expect(tag).not.to.equal('deleted_tag');
+                            expect(tag).not.to.equal('unlink_tag');
+                            expect(tag).not.to.equal('unrelational_tag');
+                        });
+                        done();
                     },
                     onFailure: function (error) {
                         expect().fail(JSON.stringify(error));

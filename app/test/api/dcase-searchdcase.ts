@@ -8,6 +8,7 @@ import dcase = module('../../api/dcase')
 import error = module('../../api/error')
 import constant = module('../../constant')
 import testdata = module('../testdata')
+import model_tag = module('../../model/tag')
 
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
@@ -33,6 +34,9 @@ describe('api', function() {
 				dcase.searchDCase(null, userId, {
 					onSuccess: (result: any) => {
 						expect(result).not.to.be(null);
+						expect(result.dcaseList).not.to.be(null);
+						expect(result.dcaseList).to.be.an('array');
+						expect(result.dcaseList.length).greaterThan(0);
 						done();
 					}, 
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
@@ -182,6 +186,40 @@ describe('api', function() {
 							expect(err).to.be(null);
 							done();
 						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
+				});
+			});
+
+			it('tagList should be all tag list if argument tagList is empty', function(done) {
+				dcase.searchDCase({page: 1}, userId, {
+					onSuccess: (result: any) => {
+						expect(result.tagList).not.to.be(null);
+						expect(result.tagList).to.be.an('array');
+						var tagDAO = new model_tag.TagDAO(con);
+						tagDAO.list((err:any, tagList:model_tag.Tag[]) => {
+							expect(result.tagList.length).to.equal(tagList.length);
+							var modelTagList = _.map(tagList, (modelTag:model_tag.Tag) => {return modelTag.label;});
+							expect(_.difference(result.tagList, modelTagList).length).to.equal(0);
+							done();
+						})
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
+				});
+			});
+
+			it('tagList should be filterd by search result dcase if argument tagList is not empty', function(done) {
+				var tags = ['tag1', 'tag2'];
+				dcase.searchDCase({tagList:tags, page:1}, userId, {
+					onSuccess: (result: any) => {
+						expect(result.tagList).not.to.be(null);
+						expect(result.tagList).to.be.an('array');
+						_.each(result.tagList, (tag:string) => {
+							expect(tag).not.to.equal('deleted_tag');
+							expect(tag).not.to.equal('unlink_tag');
+							expect(tag).not.to.equal('unrelational_tag');
+						});
+						done();
 					}, 
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 				});
