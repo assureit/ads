@@ -76,7 +76,7 @@ describe('api', function() {
 			}
 		}
 
-		testdata.load(['test/api/dcase.yaml'], (err:any) => {
+		testdata.load(['test/api/dcase-commit.yaml'], (err:any) => {
 	        con = new db.Database();
 			done();
 		});
@@ -217,7 +217,7 @@ describe('api', function() {
 			});
 			it('Version Conflict', function(done) {
 				this.timeout(15000);
-				validParam.commitId = 422;	
+				validParam.commitId = 404;	
 				dcase.commit(validParam, userId, 
 					{
 						onSuccess: (result: any) => {
