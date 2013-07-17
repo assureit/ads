@@ -215,24 +215,11 @@ export class NodeDAO extends model.DAO {
 			}));
 		async.waterfall([
 			(next) => {
-				tagDAO.listDCaseTag(dcaseId, (err:any, list:model_tag.Tag[])=> next(err, list));
-			},
-			(dbTagList:model_tag.Tag[], next) => {
-				var removeList = _.filter(dbTagList, (dbTag:model_tag.Tag) => {return !_.contains(tagList, dbTag.label);});
-				var newList = _.filter(tagList, (tag: string)=> {
-						return !_.find(dbTagList, (dbTag:model_tag.Tag) => {return dbTag.label == tag;});
-					})
-				next(null, newList, removeList);
-			},
-			(newList: string[], removeList: model_tag.Tag[], next) => {
-				tagDAO.insertDCaseTagList(dcaseId, newList, (err:any) => next(err, removeList));
-			},
-			(removeList: model_tag.Tag[], next) => {
-				tagDAO.removeDCaseTagList(dcaseId, removeList, (err:any) => next(err));
+				tagDAO.replaceDCaseTag(dcaseId, tagList, (err:any)=> next(err));
 			},
 			], (err:any) => {
 				callback(err);
-			})
+			});
 	}
 
 	search(page: number, query: string, callback: (err:any, pager: model_pager.Pager, list: Node[]) => void) {

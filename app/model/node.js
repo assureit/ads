@@ -205,28 +205,7 @@ var NodeDAO = (function (_super) {
         }));
         async.waterfall([
             function (next) {
-                tagDAO.listDCaseTag(dcaseId, function (err, list) {
-                    return next(err, list);
-                });
-            }, 
-            function (dbTagList, next) {
-                var removeList = _.filter(dbTagList, function (dbTag) {
-                    return !_.contains(tagList, dbTag.label);
-                });
-                var newList = _.filter(tagList, function (tag) {
-                    return !_.find(dbTagList, function (dbTag) {
-                        return dbTag.label == tag;
-                    });
-                });
-                next(null, newList, removeList);
-            }, 
-            function (newList, removeList, next) {
-                tagDAO.insertDCaseTagList(dcaseId, newList, function (err) {
-                    return next(err, removeList);
-                });
-            }, 
-            function (removeList, next) {
-                tagDAO.removeDCaseTagList(dcaseId, removeList, function (err) {
+                tagDAO.replaceDCaseTag(dcaseId, tagList, function (err) {
                     return next(err);
                 });
             }, 

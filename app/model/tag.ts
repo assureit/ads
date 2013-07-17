@@ -108,6 +108,35 @@ export class TagDAO extends model.DAO {
 		});
 	}
 
+	/**
+	 * 指定のDCaseを指定のタグとひもづける。
+	 * 既存の余計なタグへのひもづけは削除する。
+	 */
+	replaceDCaseTag(dcaseId: number, labelList: string[], callback: (err:any)=>void) {
+		labelList = _.filter(_.map(labelList, (label: string) => {return label.trim();}), (label:string) => {return label.length > 0;});
+
+		async.waterfall([
+			(next) => {
+				this.listDCaseTag(dcaseId, (err:any, list:Tag[])=> next(err, list));
+			},
+			(dbTagList:Tag[], next) => {
+				var removeList = _.filter(dbTagList, (dbTag:Tag) => {return !_.contains(labelList, dbTag.label);});
+				var newList = _.filter(labelList, (tag: string)=> {
+						return !_.find(dbTagList, (dbTag:Tag) => {return dbTag.label == tag;});
+					})
+				next(null, newList, removeList);
+			},
+			(newList: string[], removeList: Tag[], next) => {
+				this.insertDCaseTagList(dcaseId, newList, (err:any) => next(err, removeList));
+			},
+			(removeList: Tag[], next) => {
+				this.removeDCaseTagList(dcaseId, removeList, (err:any) => next(err));
+			},
+			], (err:any) => {
+				callback(err);
+			})
+	}
+
 	insertDCaseTagList(dcaseId:number, tagList: string[], callback: (err:any)=>void) {
 		if (!tagList || tagList.length == 0) {
 			callback(null);

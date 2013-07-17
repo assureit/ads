@@ -103,6 +103,45 @@ var TagDAO = (function (_super) {
             callback(err, list);
         });
     };
+    TagDAO.prototype.replaceDCaseTag = function (dcaseId, labelList, callback) {
+        var _this = this;
+        labelList = _.filter(_.map(labelList, function (label) {
+            return label.trim();
+        }), function (label) {
+            return label.length > 0;
+        });
+        async.waterfall([
+            function (next) {
+                _this.listDCaseTag(dcaseId, function (err, list) {
+                    return next(err, list);
+                });
+            }, 
+            function (dbTagList, next) {
+                var removeList = _.filter(dbTagList, function (dbTag) {
+                    return !_.contains(labelList, dbTag.label);
+                });
+                var newList = _.filter(labelList, function (tag) {
+                    return !_.find(dbTagList, function (dbTag) {
+                        return dbTag.label == tag;
+                    });
+                });
+                next(null, newList, removeList);
+            }, 
+            function (newList, removeList, next) {
+                _this.insertDCaseTagList(dcaseId, newList, function (err) {
+                    return next(err, removeList);
+                });
+            }, 
+            function (removeList, next) {
+                _this.removeDCaseTagList(dcaseId, removeList, function (err) {
+                    return next(err);
+                });
+            }, 
+            
+        ], function (err) {
+            callback(err);
+        });
+    };
     TagDAO.prototype.insertDCaseTagList = function (dcaseId, tagList, callback) {
         var _this = this;
         if(!tagList || tagList.length == 0) {
