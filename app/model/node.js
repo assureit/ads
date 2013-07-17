@@ -7,6 +7,7 @@ var model = require('./model')
 var model_dcase = require('./dcase')
 var model_pager = require('./pager')
 var model_issue = require('./issue')
+var model_tag = require('./tag')
 var model_monitor = require('./monitor')
 var error = require('../api/error')
 var _ = require('underscore');
@@ -152,18 +153,86 @@ var NodeDAO = (function (_super) {
             callback(null);
             return;
         }
-        this.processNodeList(dcaseId, commitId, list, function (err) {
+        async.waterfall([
+            function (next) {
+                _this.processNodeList(dcaseId, commitId, list, function (err) {
+                    return next(err);
+                });
+            }, 
+            function (next) {
+                _this.registerTag(dcaseId, list, function (err) {
+                    return next(err);
+                });
+            }        ], function (err) {
             if(err) {
                 callback(err);
                 return;
             }
-            _this.insert(commitId, list[0], function (err, nodeId) {
-                if(err) {
-                    callback(err);
-                    return;
-                }
-                _this.insertList(dcaseId, commitId, list.slice(1), callback);
-            });
+            _this._insertList(dcaseId, commitId, list, callback);
+        });
+    };
+    NodeDAO.prototype._insertList = function (dcaseId, commitId, list, callback) {
+        var _this = this;
+        if(list.length == 0) {
+            callback(null);
+            return;
+        }
+        async.waterfall([
+            function (next) {
+                _this.insert(commitId, list[0], function (err, nodeId) {
+                    return next(err, nodeId);
+                });
+            }        ], function (err, nodeId) {
+            if(err) {
+                callback(err);
+                return;
+            }
+            _this._insertList(dcaseId, commitId, list.slice(1), callback);
+        });
+    };
+    NodeDAO.prototype.registerTag = function (dcaseId, list, callback) {
+        var tagDAO = new model_tag.TagDAO(this.con);
+        var metaDataList = _.flatten(_.map(list, function (node) {
+            return node.MetaData;
+        }));
+        metaDataList = _.filter(metaDataList, function (meta) {
+            return meta.Type == 'Tag';
+        });
+        var tagList = _.uniq(_.filter((_.map(metaDataList, function (meta) {
+            return meta.Tag;
+        })), function (tag) {
+            return typeof (tag) == 'string' && tag.length > 0;
+        }));
+        async.waterfall([
+            function (next) {
+                tagDAO.listDCaseTag(dcaseId, function (err, list) {
+                    return next(err, list);
+                });
+            }, 
+            function (dbTagList, next) {
+                var removeList = _.filter(dbTagList, function (dbTag) {
+                    return !_.contains(tagList, dbTag.label);
+                });
+                var newList = _.filter(tagList, function (tag) {
+                    return !_.find(dbTagList, function (dbTag) {
+                        return dbTag.label == tag;
+                    });
+                });
+                next(null, newList, removeList);
+            }, 
+            function (newList, removeList, next) {
+                tagDAO.insertDCaseTagList(dcaseId, newList, function (err) {
+                    return next(err, removeList);
+                });
+            }, 
+            function (removeList, next) {
+                tagDAO.removeDCaseTagList(dcaseId, removeList, function (err) {
+                    return next(err);
+                });
+            }, 
+            
+        ], function (err) {
+            callback(err);
         });
     };
     NodeDAO.prototype.search = function (page, query, callback) {

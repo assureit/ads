@@ -77,4 +77,94 @@ export class TagDAO extends model.DAO {
 			callback(err, list);
 		})
 	}
+
+	insert(label: string, callback: (err:any, tagId:number)=>void) {
+		async.waterfall([
+			(next) => {
+				this.con.query('INSERT INTO tag(label) VALUES(?)', [label], (err:any, result:any) => {
+						next(err, result);
+				});
+			},
+		], (err:any, result:any) => {
+			callback(err, result.insertId);
+		});
+	}
+
+	listDCaseTag(dcaseId: number, callback: (err:any, list:Tag[])=>void) {
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT t.* FROM tag t, dcase_tag_rel r WHERE t.id = r.tag_id AND r.dcase_id=?', [dcaseId], (err:any, result:any) => {
+						next(err, result);
+				});
+			},
+			(result:any, next) => {
+				var list:Tag[] = _.map(result, (row:any) => {
+						return Tag.tableToObject(row);
+					});
+				next(null, list);
+			}
+		], (err:any, list: Tag[]) => {
+			callback(err, list);
+		});
+	}
+
+	insertDCaseTagList(dcaseId:number, tagList: string[], callback: (err:any)=>void) {
+		if (!tagList || tagList.length == 0) {
+			callback(null);
+			return;
+		}
+		async.waterfall([
+			(next) => {
+				this.insertDCaseTag(dcaseId, tagList[0], (err:any) => next(err));
+			}],
+			(err:any) => {
+				if (err) {
+					callback(err);
+					return;
+				}
+				this.insertDCaseTagList(dcaseId, tagList.slice(1), callback);
+			}
+		);
+	}
+	insertDCaseTag(dcaseId: number, tag: string, callback: (err:any)=>void) {
+		tag = tag.trim();
+		if (tag.length == 0) {callback(null); return;}
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT id FROM tag WHERE label=?', [tag], (err:any, result:any) => next(err, result));
+			},
+			(result:any, next) => {
+				if (result.length > 0) {
+					next(null, result[0].id);
+					return;
+				}
+				this.insert(tag, (err:any, tagId:number) => next(err, tagId));
+			},
+			(tagId:number, next) => {
+				this.con.query('INSERT INTO dcase_tag_rel(dcase_id, tag_id) VALUES(?, ?)', [dcaseId, tagId], (err:any, result:any) => {
+						next(err);
+				});
+			}], 
+			(err:any) => {
+				callback(err);
+			}
+		);
+	}
+	removeDCaseTagList(dcaseId:number, tagList: Tag[], callback: (err:any)=>void) {
+		if (!tagList || tagList.length == 0) {
+			callback(null);
+			return;
+		}
+		async.waterfall([
+			(next) => {
+				var tagIdList = _.map(tagList, (tag:Tag) => {return tag.id;});
+				var tagVars = _.map(tagIdList, (id:number) => {return '?';}).join(',');
+				var params = [].concat([dcaseId]).concat(tagIdList);
+				this.con.query('DELETE FROM dcase_tag_rel WHERE dcase_id=? AND tag_id in (' + tagVars + ')', params, (err:any, result:any) => next(err));
+			}],
+			(err:any) => {
+				callback(err);
+			}
+		);
+	}
 }
