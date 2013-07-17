@@ -18,12 +18,16 @@ export var PUBLISH_STATUS_PUBLISHED = 1;
 export var PUBLISH_STATUS_UPDATED = 2;
 
 export class MonitorNode {
-	constructor(public id:number, public dcaseId:number, public thisNodeId:number, public watchId:string, public presetId:string, public params:any, public rebuttalThisNodeId?:number, public publishStatus?:number) {
+	constructor(public id:number, public dcaseId:number, public thisNodeId:number, public watchId:string, public presetId:string, public params:any, public rebuttalThisNodeId?:number, public publishStatus?:number, public deleteFlag?:bool) {
 		if (!this.publishStatus) this.publishStatus = PUBLISH_STATUS_NONE;
 		if (!this.params) this.params = {};
+		this.deleteFlag = !!this.deleteFlag;
+		if (this.deleteFlag === undefined) {
+			this.deleteFlag = false;
+		}
 	}
 	static tableToObject(table: any) {
-		return new MonitorNode(table.id, table.dcase_id, table.this_node_id, table.watch_id, table.preset_id, table.params ? JSON.parse(table.params) : {}, table.rebuttal_this_node_id, table.publish_status);
+		return new MonitorNode(table.id, table.dcase_id, table.this_node_id, table.watch_id, table.preset_id, table.params ? JSON.parse(table.params) : {}, table.rebuttal_this_node_id, table.publish_status, table.delete_flag);
 	}
 }
 
@@ -86,8 +90,8 @@ export class MonitorDAO extends model.DAO {
 	update(monitor: MonitorNode, callback: (err: any) => void) {
 		async.waterfall([
 			(next) => {
-				this.con.query('UPDATE monitor_node SET dcase_id=?, this_node_id=?, watch_id=?, preset_id=?, params=?, rebuttal_this_node_id=?, publish_status=? WHERE id=?', 
-						[monitor.dcaseId, monitor.thisNodeId , monitor.watchId, monitor.presetId, JSON.stringify(monitor.params), monitor.rebuttalThisNodeId, monitor.publishStatus, monitor.id], (err:any, result:any) => {
+				this.con.query('UPDATE monitor_node SET dcase_id=?, this_node_id=?, watch_id=?, preset_id=?, params=?, rebuttal_this_node_id=?, publish_status=?, delete_flag=? WHERE id=?', 
+						[monitor.dcaseId, monitor.thisNodeId , monitor.watchId, monitor.presetId, JSON.stringify(monitor.params), monitor.rebuttalThisNodeId, monitor.publishStatus, monitor.deleteFlag, monitor.id], (err:any, result:any) => {
 					next(err);
 				});
 			}
@@ -178,6 +182,27 @@ export class MonitorDAO extends model.DAO {
 			callback(err, monitor);
 		});
 	}
+
+	list(callback: (err:any, result:MonitorNode[]) => void) {
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT * FROM monitor_node where delete_flag = false', (err:any, result:any) => {
+					next(err, result);
+				});
+			}
+			,(result:any, next) => {
+				var list = [];
+				result.forEach((it:any) => {
+					list.push(MonitorNode.tableToObject(it));
+				});
+				next(null, list);
+			}
+		], (err:any, list:MonitorNode[]) => {
+			callback(err,list);
+		});
+
+	}
+
 
 	listNotPublished(dcaseId: number, callback: (err:any, result:MonitorNode[]) => void) {
 		async.waterfall([

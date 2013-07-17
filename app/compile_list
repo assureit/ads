@@ -36,6 +36,7 @@ test/model/node.ts
 test/model/monitor.ts
 test/net/redmine.ts
 test/net/ldap.ts
+test/job/monitor.ts
 public/javascripts/ads.ts
 public/javascripts/adsComponentView.ts
 public/javascripts/animation.ts
@@ -52,3 +53,4 @@ public/javascripts/index.ts
 public/javascripts/router.ts
 public/javascripts/sidemenu.ts
 public/javascripts/timeline.ts
+job/monitor.ts
