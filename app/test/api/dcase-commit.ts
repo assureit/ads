@@ -12,6 +12,7 @@ import model_commit = module('../../model/commit')
 
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
+var _ = require('underscore');
 
 var userId = constant.SYSTEM_USER_ID;
 
@@ -44,6 +45,11 @@ describe('api', function() {
 								User: "Shida",
 								Visible: "false",
 							},
+							{
+								Type: "Tag",
+								Tag: "tag1",
+								Visible: "true",
+							},
 						]
 					},
 					{
@@ -69,6 +75,21 @@ describe('api', function() {
 								Type: "LastUpdated",
 								User: "Shida",
 								Visible: "false",
+							},
+							{
+								Type: "Tag",
+								Tag: "tag1",
+								Visible: "true",
+							},
+							{
+								Type: "Tag",
+								Tag: "tag2",
+								Visible: "true",
+							},
+							{
+								Type: "Tag",
+								Tag: "newTag",
+								Visible: "true",
 							},
 						]
 					}
@@ -104,6 +125,27 @@ describe('api', function() {
 								done();
 							});
 
+						}, 
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					}
+				);
+			});
+			it('should atache tags', function(done) {
+				this.timeout(15000);
+				dcase.commit(validParam, userId, 
+					{
+						onSuccess: (result: any) => {
+							// console.log(result);
+							expect(result).not.to.be(null);
+							expect(result).not.to.be(undefined);
+							expect(result.commitId).not.to.be(null);
+							expect(result.commitId).not.to.be(undefined);
+							con.query('SELECT t.* FROM tag t, dcase_tag_rel r WHERE t.id = r.tag_id AND r.dcase_id=? ORDER BY t.label', [201], (err:any, result:any)=> {
+								var resultTags = _.map(result, (it:any) => {return it.label;});
+								var expectTags = ['newTag', 'tag1', 'tag2'];
+								expect(expectTags).to.eql(resultTags);
+								done();
+							});
 						}, 
 						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
 					}

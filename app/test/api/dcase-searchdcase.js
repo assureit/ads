@@ -259,7 +259,8 @@ describe('api', function () {
                             var modelTagList = _.map(tagList, function (modelTag) {
                                 return modelTag.label;
                             });
-                            expect(_.difference(result.tagList, modelTagList).length).to.equal(0);
+                            expect(_.difference(result.tagList, modelTagList)).to.be.empty();
+                            expect(_.difference(modelTagList, result.tagList)).to.be.empty();
                             done();
                         });
                     },

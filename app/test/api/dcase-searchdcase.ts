@@ -200,7 +200,8 @@ describe('api', function() {
 						tagDAO.list((err:any, tagList:model_tag.Tag[]) => {
 							expect(result.tagList.length).to.equal(tagList.length);
 							var modelTagList = _.map(tagList, (modelTag:model_tag.Tag) => {return modelTag.label;});
-							expect(_.difference(result.tagList, modelTagList).length).to.equal(0);
+							expect(_.difference(result.tagList, modelTagList)).to.be.empty();
+							expect(_.difference(modelTagList, result.tagList)).to.be.empty();
 							done();
 						})
 					}, 

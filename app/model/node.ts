@@ -4,6 +4,7 @@ import model = module('./model')
 import model_dcase = module('./dcase')
 import model_pager = module('./pager')
 import model_issue = module('./issue')
+import model_tag = module('./tag')
 import model_monitor = module('./monitor')
 import error = module('../api/error')
 // import _ = module('underscore')
@@ -21,6 +22,7 @@ export interface MetaData {
 	_MonitorNodeId?: number;
 	WatchId?: string;
 	PresetId?: string;
+	Tag?: string;
 }
 export interface NodeData {
 	ThisNodeId: number;
@@ -166,21 +168,59 @@ export class NodeDAO extends model.DAO {
 			callback(null);
 			return;
 		}
-		this.processNodeList(dcaseId, commitId, list, (err:any) => {
-			if (err) {
-				callback(err);
-				return;
-			}
-			this.insert(commitId, list[0], (err:any, nodeId: number) => {
+		async.waterfall([
+			(next) => {
+				this.processNodeList(dcaseId, commitId, list, (err:any) => next(err));
+			},
+			(next) => {
+				this.registerTag(dcaseId, list, (err:any) => next(err));
+			}],
+			(err:any) => {
 				if (err) {
 					callback(err);
 					return;
 				}
-				this.insertList(dcaseId, commitId, list.slice(1), callback);
-			});
-		});
+				this._insertList(dcaseId, commitId, list, callback);
+			}
+		);
 	}
 
+	_insertList(dcaseId:number, commitId: number, list: NodeData[], callback: (err:any)=> void): void {
+		if (list.length == 0) {
+			callback(null);
+			return;
+		}
+		async.waterfall([
+			(next) => {
+				this.insert(commitId, list[0], (err:any, nodeId: number) => next(err, nodeId));
+			}],
+			(err:any, nodeId) => {
+				if (err) {
+					callback(err);
+					return;
+				}
+				this._insertList(dcaseId, commitId, list.slice(1), callback);
+			}
+		);
+	}
+
+	registerTag(dcaseId:number, list: NodeData[], callback: (err:any) => void) {
+		var tagDAO = new model_tag.TagDAO(this.con);
+		var metaDataList: MetaData[] = _.flatten(_.map(list, (node: NodeData) => {return node.MetaData;}));
+		metaDataList = _.filter(metaDataList, (meta: MetaData) => {return meta && meta.Type == 'Tag'});
+		var tagList = _.uniq(_.filter(
+			(_.map(metaDataList, (meta: MetaData) => {return meta.Tag})),
+			(tag:string) => {
+				return typeof(tag) == 'string' && tag.length > 0;
+			}));
+		async.waterfall([
+			(next) => {
+				tagDAO.replaceDCaseTag(dcaseId, tagList, (err:any)=> next(err));
+			},
+			], (err:any) => {
+				callback(err);
+			});
+	}
 
 	search(page: number, query: string, callback: (err:any, pager: model_pager.Pager, list: Node[]) => void) {
 		// TODO: 全文検索エンジン対応
