@@ -121,7 +121,7 @@ CREATE  TABLE IF NOT EXISTS `issue` (
   `created` DATETIME NULL ,
   `modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_issue_dcase1` (`dcase_id` ASC) ,
+  INDEX `fk_issue_dcase1_idx` (`dcase_id` ASC) ,
   CONSTRAINT `fk_issue_dcase1`
     FOREIGN KEY (`dcase_id` )
     REFERENCES `dcase` (`id` )
@@ -146,7 +146,7 @@ CREATE  TABLE IF NOT EXISTS `monitor_node` (
   `created` DATETIME NULL ,
   `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_monitor_node_dcase1` (`dcase_id` ASC) ,
+  INDEX `fk_monitor_node_dcase1_idx` (`dcase_id` ASC) ,
   UNIQUE INDEX `unq_monitor_node1` (`dcase_id` ASC, `this_node_id` ASC) ,
   CONSTRAINT `fk_monitor_node_dcase1`
     FOREIGN KEY (`dcase_id` )
@@ -164,7 +164,8 @@ CREATE  TABLE IF NOT EXISTS `tag` (
   `label` VARCHAR(1024) NOT NULL ,
   `created` DATETIME NULL ,
   `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
-  PRIMARY KEY (`id`) )
+  PRIMARY KEY (`id`) ,
+  INDEX `idx_tag1` (`label` ASC) )
 ENGINE = InnoDB;
 
 
@@ -178,8 +179,9 @@ CREATE  TABLE IF NOT EXISTS `dcase_tag_rel` (
   `created` DATETIME NULL ,
   `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_dcase_tag_rel_dcase1` (`dcase_id` ASC) ,
-  INDEX `fk_dcase_tag_rel_tag1` (`tag_id` ASC) ,
+  INDEX `fk_dcase_tag_rel_dcase1_idx` (`dcase_id` ASC) ,
+  INDEX `fk_dcase_tag_rel_tag1_idx` (`tag_id` ASC) ,
+  UNIQUE INDEX `unq_dcase_tag_rel1` (`dcase_id` ASC, `tag_id` ASC) ,
   CONSTRAINT `fk_dcase_tag_rel_dcase1`
     FOREIGN KEY (`dcase_id` )
     REFERENCES `dcase` (`id` )

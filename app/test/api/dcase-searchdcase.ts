@@ -8,16 +8,18 @@ import dcase = module('../../api/dcase')
 import error = module('../../api/error')
 import constant = module('../../constant')
 import testdata = module('../testdata')
+import model_tag = module('../../model/tag')
 
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
+var _ = require('underscore');
 
 var userId = constant.SYSTEM_USER_ID;
 
 describe('api', function() {
     var con;
 	beforeEach(function (done) {
-		testdata.load(['test/api/dcase.yaml'], (err:any) => {
+		testdata.load(['test/api/dcase-searchdcase.yaml'], (err:any) => {
 	        con = new db.Database();
 			done();
 		});
@@ -32,9 +34,12 @@ describe('api', function() {
 				dcase.searchDCase(null, userId, {
 					onSuccess: (result: any) => {
 						expect(result).not.to.be(null);
+						expect(result.dcaseList).not.to.be(null);
+						expect(result.dcaseList).to.be.an('array');
+						expect(result.dcaseList.length).greaterThan(0);
 						done();
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 				});
 			});
 
@@ -44,7 +49,7 @@ describe('api', function() {
 						assert.equal(20, result.dcaseList.length);
 						done();
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 				});
 			});
 
@@ -66,7 +71,7 @@ describe('api', function() {
 							done();
 						});
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 				});
 			});
 
@@ -78,10 +83,10 @@ describe('api', function() {
 								assert.notEqual(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
 								done();
 							}, 
-							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 						});
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 				});
 			});
 
@@ -93,10 +98,10 @@ describe('api', function() {
 								assert.equal(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
 								done();
 							}, 
-							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 						});
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 				});
 			});
 
@@ -108,10 +113,10 @@ describe('api', function() {
 								assert.equal(result1st.dcaseList[0].dcaseId, result.dcaseList[0].dcaseId);
 								done();
 							}, 
-							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+							onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 						});
 					}, 
-					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 				});
 			});
 
@@ -128,11 +133,97 @@ describe('api', function() {
 							assert.equal(result.dcaseList[0].dcaseId, expectedResult[0].id);
 							done();
 						}, 
-						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 					});
 				});
 			});
 
+			var _assertHavingTags = (tagList:string[], dcaseId:number, callback: (err:any)=>void) => {
+				con.query('SELECT t.* FROM tag t, dcase_tag_rel r WHERE r.tag_id = t.id AND r.dcase_id=?', [dcaseId], (err, result) => {
+					if (err) {
+						callback(err);
+						return;
+					}
+					_.each(tagList, (tag:string) => {
+						var find = _.find(result, (it:any)=>{return it.label == tag});
+						expect(find).not.to.be(undefined);
+						expect(find).not.to.be(null);
+					});
+					callback(null);
+				});
+			}
+
+			var _assertHavingTagsAll = (tagList:string[], dcaseIdList:number[], callback: (err:any)=>void) => {
+				if (dcaseIdList.length == 0) {
+					callback(null);
+					return;
+				}
+				_assertHavingTags(tagList, dcaseIdList[0], (err:any)=> {
+					_assertHavingTagsAll(tagList, dcaseIdList.slice(1), callback);
+				});
+			}
+
+			it('should return relative dcase if tagList is not empty', function(done) {
+				var tags = ['tag1'];
+				dcase.searchDCase({tagList:tags, page:1}, userId, {
+					onSuccess: (result: any) => {
+						expect(result.dcaseList.length).greaterThan(0);
+						_assertHavingTagsAll(tags, _.map(result.dcaseList, (dcase:any) => {return dcase.dcaseId;}), (err:any)=> {
+							expect(err).to.be(null);
+							done();
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
+				});
+			});
+
+			it('multi tagList should be AND query', function(done) {
+				var tags = ['tag1', 'tag2'];
+				dcase.searchDCase({tagList:tags, page:1}, userId, {
+					onSuccess: (result: any) => {
+						expect(result.dcaseList.length).greaterThan(0);
+						_assertHavingTagsAll(tags, _.map(result.dcaseList, (dcase:any) => {return dcase.dcaseId;}), (err:any)=> {
+							expect(err).to.be(null);
+							done();
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
+				});
+			});
+
+			it('tagList should be all tag list if argument tagList is empty', function(done) {
+				dcase.searchDCase({page: 1}, userId, {
+					onSuccess: (result: any) => {
+						expect(result.tagList).not.to.be(null);
+						expect(result.tagList).to.be.an('array');
+						var tagDAO = new model_tag.TagDAO(con);
+						tagDAO.list((err:any, tagList:model_tag.Tag[]) => {
+							expect(result.tagList.length).to.equal(tagList.length);
+							var modelTagList = _.map(tagList, (modelTag:model_tag.Tag) => {return modelTag.label;});
+							expect(_.difference(result.tagList, modelTagList).length).to.equal(0);
+							done();
+						})
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
+				});
+			});
+
+			it('tagList should be filterd by search result dcase if argument tagList is not empty', function(done) {
+				var tags = ['tag1', 'tag2'];
+				dcase.searchDCase({tagList:tags, page:1}, userId, {
+					onSuccess: (result: any) => {
+						expect(result.tagList).not.to.be(null);
+						expect(result.tagList).to.be.an('array');
+						_.each(result.tagList, (tag:string) => {
+							expect(tag).not.to.equal('deleted_tag');
+							expect(tag).not.to.equal('unlink_tag');
+							expect(tag).not.to.equal('unrelational_tag');
+						});
+						done();
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
+				});
+			});
 		});
 	});
 });

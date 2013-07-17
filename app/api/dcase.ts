@@ -17,38 +17,53 @@ var _ = require('underscore');
 export function searchDCase(params:any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	var dcaseDAO = new model_dcase.DCaseDAO(con);
+	var tagDAO = new model_tag.TagDAO(con);
 	params = params || {};
-	dcaseDAO.list(params.page, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
-		if (err) {
-			callback.onFailure(err);
-			return;
-		}
-		con.close();
-		var list = [];
-		result.forEach((val) => {
-			list.push({
-				dcaseId: val.id, 
-				dcaseName: val.name,
-				userName: val.user.loginName,
-				latestCommit: {
-					dateTime: val.latestCommit.dateTime,
-					commitId: val.latestCommit.id,
-					userName: val.latestCommit.user.loginName,
-					userId: val.latestCommit.userId,
-					commitMessage: val.latestCommit.message
-				}
+	var tagList = _.filter(params.tagList, (it:string) => {return typeof(it) == 'string';});
+	async.waterfall([
+		(next) => {
+			dcaseDAO.list(params.page, tagList, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+				next(err, pager, result);
 			});
-		});
-		callback.onSuccess({
-			summary: {
-				currentPage: pager.getCurrentPage(),
-				maxPage: pager.getMaxPage(),
-				totalItems:pager.totalItems,
-				itemsPerPage: pager.limit
-			},
-			dcaseList:list
-		});
-	});
+		}, 
+		(pager:model_pager.Pager, dcaseList:model_dcase.DCase[], next) => {
+			tagDAO.search(tagList, (err:any, tagList:model_tag.Tag[]) => {
+				next(err, pager, dcaseList, tagList);
+			});
+		}],
+		(err:any, pager:model_pager.Pager, dcaseList:model_dcase.DCase[], tagList:model_tag.Tag[]) => {
+			con.close();
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
+			var resultDCaselist = _.map(dcaseList, (val: model_dcase.DCase) => {
+				return {
+					dcaseId: val.id, 
+					dcaseName: val.name,
+					userName: val.user.loginName,
+					latestCommit: {
+						dateTime: val.latestCommit.dateTime,
+						commitId: val.latestCommit.id,
+						userName: val.latestCommit.user.loginName,
+						userId: val.latestCommit.userId,
+						commitMessage: val.latestCommit.message
+					}
+				};
+			});
+			var resultTagList = _.map(tagList, (tag:model_tag.Tag) => {return tag.label});
+			callback.onSuccess({
+				summary: {
+					currentPage: pager.getCurrentPage(),
+					maxPage: pager.getMaxPage(),
+					totalItems:pager.totalItems,
+					itemsPerPage: pager.limit
+				},
+				dcaseList:resultDCaselist,
+				tagList:resultTagList
+			});
+		}
+	);
 }
 
 export function getDCase(params:any, userId: number, callback: type.Callback) {
