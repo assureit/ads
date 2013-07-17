@@ -207,7 +207,7 @@ export class NodeDAO extends model.DAO {
 	registerTag(dcaseId:number, list: NodeData[], callback: (err:any) => void) {
 		var tagDAO = new model_tag.TagDAO(this.con);
 		var metaDataList: MetaData[] = _.flatten(_.map(list, (node: NodeData) => {return node.MetaData;}));
-		metaDataList = _.filter(metaDataList, (meta: MetaData) => {return meta.Type == 'Tag'});
+		metaDataList = _.filter(metaDataList, (meta: MetaData) => {return meta && meta.Type == 'Tag'});
 		var tagList = _.uniq(_.filter(
 			(_.map(metaDataList, (meta: MetaData) => {return meta.Tag})),
 			(tag:string) => {

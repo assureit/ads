@@ -196,7 +196,7 @@ var NodeDAO = (function (_super) {
             return node.MetaData;
         }));
         metaDataList = _.filter(metaDataList, function (meta) {
-            return meta.Type == 'Tag';
+            return meta && meta.Type == 'Tag';
         });
         var tagList = _.uniq(_.filter((_.map(metaDataList, function (meta) {
             return meta.Tag;
