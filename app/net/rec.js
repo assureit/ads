@@ -22,8 +22,12 @@ var RecInterface = (function () {
         }
         return path;
     };
-    RecInterface.prototype.post = function (path, params, callback) {
+    RecInterface.prototype.post = function (params, callback) {
         var jsonParams = JSON.stringify(params);
+        if(!CONFIG.rec.api) {
+            throw new error.InternalError('REC API is not set', null);
+        }
+        var path = CONFIG.rec.api;
         try  {
             var req = this._buildRequest();
             req.post(this._resolvePath(path), jsonParams, function (err, result) {
@@ -59,7 +63,7 @@ var Rec = (function (_super) {
 
     }
     Rec.prototype.request = function (method, params, callback) {
-        _super.prototype.post.call(this, '/rec/api/1.0', {
+        _super.prototype.post.call(this, {
             "jsonrpc": "2.0",
             "method": method,
             "params": JSON.stringify(params),

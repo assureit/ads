@@ -39,6 +39,7 @@ test/model/dcase.ts
 test/model/file.ts
 test/net/redmine.ts
 test/net/ldap.ts
+test/net/rec.ts
 test/job/monitor.ts
 public/javascripts/ads.ts
 public/javascripts/adsComponentView.ts

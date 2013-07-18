@@ -17,6 +17,7 @@ rec:
   port: 3030
   basePath: "/"
   monitorUrl: "http://live.assure-it.org/rec/api/1.0/evidenceList?nodeID=$1"
+  api: "/rec/api/1.0"
 ldap:
 # When you make it operate by dummy OpenLDAP, please generate URL using dummyip and dummyport. 
 #  url: 'ldap://localhost/cn=root,dc=assureit,dc=org'
