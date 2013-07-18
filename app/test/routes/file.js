@@ -5,6 +5,7 @@ var fs = require('fs')
 var db = require('../../db/db')
 var testdata = require('../testdata')
 var request = require('supertest');
+var expect = require('expect.js');
 var async = require('async');
 var CONFIG = require('config');
 
@@ -36,6 +37,7 @@ describe('routes.file', function () {
                 assert.notStrictEqual(undefined, res.text);
                 assert.notStrictEqual(null, res.text);
                 assert.notEqual('', res.text);
+                expect(res.text).match(/URL=file\/[0-9]+\/uptest.txt$/);
                 done();
             });
         });
@@ -56,8 +58,9 @@ describe('routes.file', function () {
                 }
                 var todayDir = yy + '/' + mm + '/' + dd;
                 var url = res.text.split('=')[1];
-                var filename = url.substr(url.lastIndexOf('/'), url.length - url.lastIndexOf('/'));
-                assert.equal(true, fs.existsSync('upload/' + todayDir + filename));
+                var filename = url.replace(/.*file\/([0-9]+)\/.*/, '$1');
+                console.log(filename);
+                assert.equal(true, fs.existsSync('upload/' + todayDir + '/' + filename));
                 done();
             });
         });
@@ -67,7 +70,7 @@ describe('routes.file', function () {
                     throw err;
                 }
                 var url = res.text.split('=')[1];
-                var fileId = url.substr(url.lastIndexOf('/') + 1, url.length - url.lastIndexOf('/'));
+                var fileId = url.replace(/.*file\/([0-9]+)\/.*/, '$1');
                 var con = new db.Database();
                 con.query('select path from file where id = ?', [
                     fileId

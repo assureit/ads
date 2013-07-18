@@ -13,6 +13,7 @@ import db = module('../../db/db')
 // import testdb = module('../../db/test-db')
 import testdata = module('../testdata')
 var request = require('supertest');	// TODO: supertestの宣言ファイル作成
+var expect = require('expect.js');
 var async = require('async')
 var CONFIG = require('config')
 import error = module('../../api/error')
@@ -43,6 +44,7 @@ describe('routes.file', function() {
 					assert.notStrictEqual(undefined, res.text);
 					assert.notStrictEqual(null, res.text);
 					assert.notEqual('', res.text);
+					expect(res.text).match(/URL=file\/[0-9]+\/uptest.txt$/);
 					done();
 				});
 		});
@@ -62,8 +64,9 @@ describe('routes.file', function() {
 					if (dd.length == 1) dd = '0' + dd;
 					var todayDir: string = yy + '/' + mm + '/' + dd;
 					var url = res.text.split('=')[1];
-					var filename = url.substr(url.lastIndexOf('/'), url.length - url.lastIndexOf('/') );
-					assert.equal(true, fs.existsSync('upload/' + todayDir + filename)); 	
+					var filename = url.replace(/.*file\/([0-9]+)\/.*/, '$1');
+					console.log(filename);
+					assert.equal(true, fs.existsSync('upload/' + todayDir + '/' + filename)); 	
 
 					done();
 				});
@@ -77,7 +80,7 @@ describe('routes.file', function() {
 					if (err) throw err;
 					
 					var url = res.text.split('=')[1];
-					var fileId: number = url.substr(url.lastIndexOf('/') + 1, url.length - url.lastIndexOf('/'));
+					var fileId: number = url.replace(/.*file\/([0-9]+)\/.*/, '$1');
 					var con = new db.Database();	
 					con.query('select path from file where id = ?', [fileId], (err, expectedResult) => {
 						if (err) {

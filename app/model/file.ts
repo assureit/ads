@@ -8,9 +8,12 @@ export class File {
 	static tableToObject(table:any) {
 		return new File(table.id, table.name, table.path, table.user_id);
 	}
+	static encodePath(path: string) {
+		return encodeURI(path.replace(' ', '-'));
+	}
 
 	getEncodeName(): string {
-		return encodeURI(this.name.replace(' ', '-'));
+		return File.encodePath(this.name);
 	}
 }
 export class FileDAO extends model.DAO {

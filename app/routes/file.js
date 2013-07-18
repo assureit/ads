@@ -90,7 +90,7 @@ exports.upload = function (req, res) {
                             con.close();
                             return;
                         }
-                        var body = 'URL=' + 'file/' + fileId;
+                        var body = 'URL=file/' + fileId + '/' + model_file.File.encodePath(upfile.name);
                         con.close();
                         res.header('Content-Type', 'text/html');
                         res.send(body);

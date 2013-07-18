@@ -100,8 +100,7 @@ export var upload = function(req: any, res: any){
 							con.close();
 							return;
 						}
-						// var url = req.protocol + '://' + req.host + '/file/';
-						var body: any = 'URL=' + 'file/' + fileId;
+						var body = 'URL=file/' + fileId + '/' + model_file.File.encodePath(upfile.name);
 						con.close();
 						res.header('Content-Type', 'text/html');
 						res.send(body);

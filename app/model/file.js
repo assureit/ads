@@ -17,8 +17,11 @@ var File = (function () {
     File.tableToObject = function tableToObject(table) {
         return new File(table.id, table.name, table.path, table.user_id);
     };
+    File.encodePath = function encodePath(path) {
+        return encodeURI(path.replace(' ', '-'));
+    };
     File.prototype.getEncodeName = function () {
-        return encodeURI(this.name.replace(' ', '-'));
+        return File.encodePath(this.name);
     };
     return File;
 })();
