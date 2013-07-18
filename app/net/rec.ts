@@ -22,8 +22,12 @@ export class RecInterface {
 		return path;
 	}
 
-	post(path:string, params:any, callback:Callback) {
+	post(params:any, callback:Callback) {
 		var jsonParams = JSON.stringify(params);
+		if (!CONFIG.rec.api) {
+			throw new error.InternalError('REC API is not set', null);
+		}
+		var path = CONFIG.rec.api;
 		try {
 			var req = this._buildRequest();
 			req.post(this._resolvePath(path), jsonParams, (err:any, result:string) => {
@@ -57,11 +61,11 @@ export class Rec extends RecInterface {
 	// constructor(host:string, apiKey:string) {super(host, apiKey);}
 
 	request(method: string, params: any, callback:Callback) {
-		super.post('/rec/api/1.0',{	"jsonrpc": "2.0",
-						"method": method,
-						"params": JSON.stringify(params),
-						"id": 1
-					},
+		super.post({	"jsonrpc": "2.0",
+				"method": method,
+				"params": JSON.stringify(params),
+				"id": 1
+			},
 			callback);
 	}
 
