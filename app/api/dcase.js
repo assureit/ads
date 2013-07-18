@@ -275,9 +275,6 @@ function commit(params, userId, callback) {
         if(params && params.commitId && !isFinite(params.commitId)) {
             checks.push('Commit ID must be a number.');
         }
-        if(params && !params.commitMessage) {
-            checks.push('Commit Message is required.');
-        }
         if(params && !params.contents) {
             checks.push('Contents is required.');
         }
