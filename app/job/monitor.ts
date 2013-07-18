@@ -7,9 +7,6 @@ import model_node = module('../model/node')
 import model_monitor = module('../model/monitor')
 import net_rec = module('../net/rec')
 
-//var db = require('../db/db')
-//var model_dcase = require('../model/dcase')
-//var model_monitor = require('../model/monitor')
 var async = require('async')
 var CONFIG = require('config')
 
@@ -20,12 +17,14 @@ con.begin((err, result) => {
 	monitor.list((err:any, list:model_monitor.MonitorNode[]) => {
 		var procCnt = 0;
 		var skipCnt = 0;
+		console.log('------- Process Start ------');
 		if (err) {
 			console.log(err);
 			process.exit(1);
 		}
 		if (list.length == 0) {
-			console.log('no object data');
+			console.log('There is no processing object record.');
+			console.log('-------- processe end ---------');
 			process.exit(0);
 		}
 
@@ -34,31 +33,31 @@ con.begin((err, result) => {
 		
 			async.waterfall([
 				(callback) => {
-console.log('----------------');
-console.log('monitor_node_id=' + it.id);
+					console.log('----------------');
+					console.log('monitor_node_id=' + it.id);
 					dcase.get(it.dcaseId, (err, resultDCase:model_dcase.DCase) => {
 						callback(err, resultDCase, false, null);
 					});
 				},
 				(resultDCase:model_dcase.DCase, runFlag: bool, commitId, callback) => {
-console.log(resultDCase.name);
 					if (resultDCase.deleteFlag) {
 						callback(null, resultDCase, true, null);
 					} else {
+						console.log('DCaseName=' + resultDCase.name);
 						monitor.getLatestCommit(it.dcaseId, (err, resultCommit:model_commit.Commit) => {
 							if (resultCommit) {
 								callback(err, resultDCase, false, resultCommit.id); 
 							} else {
-								callback(err, resultDCase, true, null);
+								callback(null, resultDCase, true, null);
 							}
 						});
 					}
 				},
 				(resultDCase:model_dcase.DCase, runFlag: bool, commitId, callback) => {
-console.log('COMMITID=' + commitId);
 					if (runFlag) {
 						callback(null, resultDCase, true, commitId);				
 					} else {
+						console.log('COMMITID=' + commitId);
 						var node = new model_node.NodeDAO(con);
 						node.getNode(commitId, it.thisNodeId, (err, resultNode:model_node.Node) => {
 							if (resultNode) {
@@ -70,14 +69,14 @@ console.log('COMMITID=' + commitId);
 					}
 				},
 				(resultDCase:model_dcase.DCase, runFlag: bool, commitId, callback) => {
-console.log('Result=' + runFlag);
+					console.log('Processing object record=' + runFlag);
 					if (runFlag) {
 						var rec = new net_rec.Rec();
 						rec.request('deleteMonitor', {"nodeID ":it.id}, (err:any, resultMonitor:any) => {
 							if (err) {
 								callback(err, resultDCase, false, commitId);
 							} else {
-								if (!resultMonitor) {
+								if (!resultMonitor.result) {
 									callback(null,  resultDCase, true, commitId);
 								} else {
 									callback(new error.InvalidRequestError(null, resultMonitor), resultDCase, false, commitId);
@@ -113,9 +112,17 @@ console.log('Result=' + runFlag);
 				cb();
 			});
 		},() => {
-			console.log('SKIP:' + skipCnt);
-			console.log('PROC:' + procCnt);
-			process.exit(0);
+			con.commit((err, result) =>{
+				if (err) {
+					console.log(err);
+					process.exit(1);
+				}
+				con.close();
+				console.log('-------- processe end ---------');
+				console.log('SKIP:' + skipCnt);
+				console.log('PROC:' + procCnt);
+				process.exit(0);
+			});
 		});
 	});
 });

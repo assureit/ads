@@ -1,0 +1,12 @@
+# don't forget ' ' after ':'
+dcase:
+  - {id: 206, name: 'dcase6', user_id: 101}
+commit:
+  - {id: 406, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 1', dcase_id: 206, user_id: 101}
+node:
+  - {id: 530, this_node_id: 1, description: 'node401_1', node_type: 'Goal', commit_id: 406}
+  - {id: 541, this_node_id: 2, description: 'node401_2', node_type: 'Strategy', commit_id: 406}
+  - {id: 553, this_node_id: 3, description: 'node401_3', node_type: 'Goal', commit_id: 406}
+monitor_node:
+  - {id: 606, dcase_id: 206, this_node_id: 4, watch_id: 10, preset_id: 100, params: '{"a": "val_a", "b": 2}'}
+

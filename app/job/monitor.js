@@ -13,12 +13,14 @@ con.begin(function (err, result) {
     monitor.list(function (err, list) {
         var procCnt = 0;
         var skipCnt = 0;
+        console.log('------- Process Start ------');
         if(err) {
             console.log(err);
             process.exit(1);
         }
         if(list.length == 0) {
-            console.log('no object data');
+            console.log('There is no processing object record.');
+            console.log('-------- processe end ---------');
             process.exit(0);
         }
         async.forEachSeries(list, function (it, cb) {
@@ -32,24 +34,24 @@ con.begin(function (err, result) {
                     });
                 }, 
                 function (resultDCase, runFlag, commitId, callback) {
-                    console.log(resultDCase.name);
                     if(resultDCase.deleteFlag) {
                         callback(null, resultDCase, true, null);
                     } else {
+                        console.log('DCaseName=' + resultDCase.name);
                         monitor.getLatestCommit(it.dcaseId, function (err, resultCommit) {
                             if(resultCommit) {
                                 callback(err, resultDCase, false, resultCommit.id);
                             } else {
-                                callback(err, resultDCase, true, null);
+                                callback(null, resultDCase, true, null);
                             }
                         });
                     }
                 }, 
                 function (resultDCase, runFlag, commitId, callback) {
-                    console.log('COMMITID=' + commitId);
                     if(runFlag) {
                         callback(null, resultDCase, true, commitId);
                     } else {
+                        console.log('COMMITID=' + commitId);
                         var node = new model_node.NodeDAO(con);
                         node.getNode(commitId, it.thisNodeId, function (err, resultNode) {
                             if(resultNode) {
@@ -61,7 +63,7 @@ con.begin(function (err, result) {
                     }
                 }, 
                 function (resultDCase, runFlag, commitId, callback) {
-                    console.log('Result=' + runFlag);
+                    console.log('Processing object record=' + runFlag);
                     if(runFlag) {
                         var rec = new net_rec.Rec();
                         rec.request('deleteMonitor', {
@@ -70,7 +72,7 @@ con.begin(function (err, result) {
                             if(err) {
                                 callback(err, resultDCase, false, commitId);
                             } else {
-                                if(!resultMonitor) {
+                                if(!resultMonitor.result) {
                                     callback(null, resultDCase, true, commitId);
                                 } else {
                                     callback(new error.InvalidRequestError(null, resultMonitor), resultDCase, false, commitId);
@@ -105,9 +107,17 @@ con.begin(function (err, result) {
                 cb();
             });
         }, function () {
-            console.log('SKIP:' + skipCnt);
-            console.log('PROC:' + procCnt);
-            process.exit(0);
+            con.commit(function (err, result) {
+                if(err) {
+                    console.log(err);
+                    process.exit(1);
+                }
+                con.close();
+                console.log('-------- processe end ---------');
+                console.log('SKIP:' + skipCnt);
+                console.log('PROC:' + procCnt);
+                process.exit(0);
+            });
         });
     });
 });
