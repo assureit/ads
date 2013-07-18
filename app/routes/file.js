@@ -102,6 +102,7 @@ exports.upload = function (req, res) {
     }
 };
 exports.download = function (req, res) {
+    console.log(req.params);
     function validate(req, res) {
         var checks = [];
         if(!req.params) {
@@ -114,8 +115,7 @@ exports.download = function (req, res) {
             checks.push('Id must be a number.');
         }
         if(checks.length > 0) {
-            var msg = checks.join('\n');
-            res.send(msg, error.HTTP_STATUS.BAD_REQUEST);
+            res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
             return false;
         }
         return true;

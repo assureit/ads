@@ -114,7 +114,7 @@ export var upload = function(req: any, res: any){
 }
 
 export var download = function(req: any, res: any) {
-
+console.log(req.params);
 	function validate(req:any, res: any) {
 		var checks = [];
 		if (!req.params) checks.push('Parameter is required.');
@@ -122,8 +122,9 @@ export var download = function(req: any, res: any) {
 		if (req.params && req.params.id && !isFinite(req.params.id)) checks.push('Id must be a number.');
 
 		if (checks.length > 0) {
-			var msg = checks.join('\n');
-			res.send(msg, error.HTTP_STATUS.BAD_REQUEST);
+			// var msg = checks.join('\n');
+			// res.send(msg, error.HTTP_STATUS.BAD_REQUEST);
+			res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
 			return false;
 		}
 

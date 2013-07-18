@@ -17,7 +17,7 @@ var async = require('async')
 var CONFIG = require('config')
 import error = module('../../api/error')
 
-describe('api', function() {
+describe('routes.file', function() {
     var con;
 	beforeEach(function (done) {
 		testdata.load(['test/default-data.yaml'], (err:any) => {
@@ -124,29 +124,9 @@ describe('api', function() {
 		});
 	})
 	describe('download', function() {
-		it('not exist file', function(done) {
-			request(app['app'])
-				.get('/file/302')
-				.expect(404)
-				.expect('File Not Found')
-				.end(function (err, res) {
-					if (err) throw err;
-					done();
-				});
-		});
-		it('not exist DB data', function(done) {
-			request(app['app'])
-				.get('/file/10000')
-				.expect(404)
-				.expect('File Not Found')
-				.end(function (err, res) {
-					if (err) throw err;
-					done();
-				});
-		});
 		it('should return name and fileBody', function(done) {
 			request(app['app'])
-				.get('/file/301')
+				.get('/file/301/test-file1.txt')
 				.expect(200)
 				.end(function (err, res) {
 					if (err) throw err;
@@ -156,11 +136,53 @@ describe('api', function() {
 					done();
 				});
 		});
+		it('different file name', function(done) {
+			request(app['app'])
+				.get('/file/301/another-file.txt')
+				.expect(200)
+				.end(function (err, res) {
+					if (err) throw err;
+					assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
+					assert.equal(res.header['content-disposition'], 'attachment; filename="file1"');
+					assert.equal(res.text, 'アップロードテスト用のファイルです\n');
+					done();
+				});
+		});
+		it('not exist file', function(done) {
+			request(app['app'])
+				.get('/file/302/notfound')
+				.expect(404)
+				.expect('File Not Found')
+				.end(function (err, res) {
+					if (err) throw err;
+					done();
+				});
+		});
+		it('not exist DB data', function(done) {
+			request(app['app'])
+				.get('/file/10000/notfound')
+				.expect(404)
+				.expect('File Not Found')
+				.end(function (err, res) {
+					if (err) throw err;
+					done();
+				});
+		});
+		it('without file name', function(done) {
+			request(app['app'])
+				.get('/file/10000')
+				.expect(404)
+				// .expect('File Not Found')
+				.end(function (err, res) {
+					if (err) throw err;
+					done();
+				});
+		});
 		it('File ID is not a number', function(done) {
 			request(app['app'])
-				.get('/file/aaa')
-				.expect(400)
-				.expect('Id must be a number.')
+				.get('/file/aaa/filename')
+				.expect(404)
+				.expect('File Not Found')
 				.end(function (err, res) {
 					if (err) throw err;
 					done();

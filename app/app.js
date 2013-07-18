@@ -47,7 +47,7 @@ app.post('/login', client.login);
 app.post('/logout', client.logout);
 app.post('/register', client.register);
 app.post('/file', file.upload);
-app.get('/file/:id', file.download);
+app.get('/file/:id/:name', file.download);
 app.get('/monitor/:id', monitor.show);
 if(!module.parent) {
     http.createServer(app).listen(app.get('port'), function () {
