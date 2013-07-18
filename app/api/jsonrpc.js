@@ -59,7 +59,7 @@ function httpHandler(req, res) {
                 }), 200);
             },
             onFailure: function (err) {
-                if(!(error instanceof error.RPCError && error instanceof error.ApplicationError)) {
+                if(!(err instanceof error.RPCError || err instanceof error.ApplicationError)) {
                     err = new error.InternalError('Execution error is occured', JSON.stringify(err));
                 }
                 res.send(JSON.stringify({
