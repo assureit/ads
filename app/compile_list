@@ -35,6 +35,7 @@ test/model/user.ts
 test/model/node.ts
 test/model/monitor.ts
 test/model/commit.ts
+test/model/dcase.ts
 test/net/redmine.ts
 test/net/ldap.ts
 test/job/monitor.ts
