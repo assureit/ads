@@ -59,7 +59,6 @@ describe('routes.file', function () {
                 var todayDir = yy + '/' + mm + '/' + dd;
                 var url = res.text.split('=')[1];
                 var filename = url.replace(/.*file\/([0-9]+)\/.*/, '$1');
-                console.log(filename);
                 assert.equal(true, fs.existsSync('upload/' + todayDir + '/' + filename));
                 done();
             });

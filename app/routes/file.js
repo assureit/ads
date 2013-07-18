@@ -4,6 +4,7 @@ var model_file = require('../model/file')
 var fs = require('fs')
 var utilFs = require('../util/fs')
 var error = require('../api/error')
+var util_auth = require('../util/auth')
 var async = require('async');
 var CONFIG = require('config');
 exports.upload = function (req, res) {
@@ -35,15 +36,10 @@ exports.upload = function (req, res) {
         return CONFIG.ads.uploadPath + '/' + yy + '/' + mm + '/' + dd;
     }
     function getUserId() {
-        var userId = constant.SYSTEM_USER_ID;
-        var cookies = {
-        };
-        req.headers.cookie && req.headers.cookie.split(';').forEach(function (cookie) {
-            var parts = cookie.split('=');
-            cookies[parts[0].trim()] = (parts[1] || '').trim();
-        });
-        if(cookies['userId']) {
-            userId = Number(cookies['userId']);
+        var auth = new util_auth.Auth(req, res);
+        var userId = auth.getUserId();
+        if(!userId) {
+            userId = constant.SYSTEM_USER_ID;
         }
         return userId;
     }

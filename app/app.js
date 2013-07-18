@@ -21,7 +21,7 @@ app.configure(function () {
     app.use(express.bodyParser({
         uploadDir: uploadDir
     }));
-    app.use(express.cookieParser());
+    app.use(express.cookieParser(CONFIG.cookie.secret));
     app.use(express.methodOverride());
     app.use(app.router);
     app.use(express.static(path.join(__dirname, 'public')));

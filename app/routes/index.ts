@@ -5,15 +5,17 @@ import lang       = module('./lang')
 import dscript    = module('./dscript')
 import model_user = module('../model/user')
 import db         = module('../db/db')
+import util_auth = module('../util/auth')
 var CONFIG = require('config')
 //import ex = module('./exporter')
 
 export var index = function(req: any, res: any) {
 	var page = 'signin';
 	var params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja };
-	if(req.cookies.userId != null) {
+	var auth = new util_auth.Auth(req, res);
+	if(auth.isLogin()) {
 		page = 'signout';
-		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: req.cookies.userName };
+		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
 	}
 
 	if( req.cookies.lang == 'en') {
@@ -86,15 +88,15 @@ export var login = function(req: any, res: any) {
 			res.redirect('/');
 			return;
 		}
-		res.cookie('userId',result.id);
-		res.cookie('userName',result.loginName);
+		var auth = new util_auth.Auth(req, res);
+		auth.set(result.id, result.loginName);
 		res.redirect(CONFIG.ads.basePath+'/');
 	});
 };
 
 export var logout = function(req: any, res: any) {
-	res.clearCookie('userId');
-	res.clearCookie('userName');
+	var auth = new util_auth.Auth(req, res);
+	auth.clear();
 	res.redirect(CONFIG.ads.basePath+'/');
 };
 
@@ -108,8 +110,8 @@ export var register = function(req: any, res: any) {
 			res.redirect(CONFIG.ads.basePath+'/');
 			return;
 		}
-		res.cookie('userId', result.id);
-		res.cookie('userName', result.loginName);
+		var auth = new util_auth.Auth(req, res);
+		auth.set(result.id, result.loginName);
 		res.redirect(CONFIG.ads.basePath+'/');
 	});
 
