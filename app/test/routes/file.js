@@ -125,13 +125,10 @@ describe('routes.file', function () {
             });
         });
         it('different file name', function (done) {
-            request(app['app']).get('/file/301/another-file.txt').expect(200).end(function (err, res) {
+            request(app['app']).get('/file/301/another-file.txt').expect(404).expect('File Not Found').end(function (err, res) {
                 if(err) {
                     throw err;
                 }
-                assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
-                assert.equal(res.header['content-disposition'], 'attachment; filename="test file1.txt"');
-                assert.equal(res.text, 'アップロードテスト用のファイルです\n');
                 done();
             });
         });

@@ -4,6 +4,7 @@ var model_file = require('../model/file')
 var fs = require('fs')
 var utilFs = require('../util/fs')
 var error = require('../api/error')
+var async = require('async');
 var CONFIG = require('config');
 exports.upload = function (req, res) {
     function onError(err, errorCode, upfile) {
@@ -102,7 +103,6 @@ exports.upload = function (req, res) {
     }
 };
 exports.download = function (req, res) {
-    console.log(req.params);
     function validate(req, res) {
         var checks = [];
         if(!req.params) {
@@ -125,22 +125,38 @@ exports.download = function (req, res) {
     }
     var con = new db.Database();
     var fileDAO = new model_file.FileDAO(con);
-    fileDAO.get(req.params.id, function (err, file) {
+    async.waterfall([
+        function (next) {
+            fileDAO.get(req.params.id, function (err, file) {
+                return next(err, file);
+            });
+        }, 
+        function (file, next) {
+            fs.exists(file.path, function (exists) {
+                var err = null;
+                if(!exists) {
+                    err = new error.NotFoundError('File Not Found on file system.', {
+                        params: req.params,
+                        file: file
+                    });
+                } else if(file.getEncodeName() != req.params.fileName) {
+                    err = new error.NotFoundError('File Not Found on file system.', {
+                        params: req.params,
+                        file: file
+                    });
+                }
+                next(err, file);
+            });
+        }    ], function (err, file) {
         if(err) {
-            if(err.code == error.RPC_ERROR.DATA_NOT_FOUND) {
+            if(err instanceof error.NotFoundError) {
                 res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
                 return;
             } else {
-                res.send(err);
+                res.send(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR);
                 return;
             }
         }
-        fs.exists(file.path, function (exists) {
-            if(exists) {
-                res.download(file.path, file.name);
-            } else {
-                res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
-            }
-        });
+        res.download(file.path, file.name);
     });
 };
