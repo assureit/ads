@@ -231,7 +231,6 @@ export function commit(params: any, userId: number, callback: type.Callback) {
 		if (!params) checks.push('Parameter is required.');
 		if (params && !params.commitId) checks.push('Commit ID is required.');
 		if (params && params.commitId && !isFinite(params.commitId) ) checks.push('Commit ID must be a number.');
-		if (params && !params.commitMessage) checks.push('Commit Message is required.');
 		if (params && !params.contents) checks.push('Contents is required.');
 		if (checks.length > 0) {
 			callback.onFailure(new error.InvalidParamsError(checks, null));
