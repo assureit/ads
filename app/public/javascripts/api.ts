@@ -41,9 +41,12 @@ module DCaseAPI {
 
 	//-------------------------------------
 
-	export var searchDCase = function(pageIndex) {
+	export var searchDCase = function(pageIndex: any, tags?: string[]) {
+		if(tags == null) {
+			tags = [];
+		}
 		try{
-			return this.call("searchDCase", {page: pageIndex});
+			return this.call("searchDCase", {page: pageIndex, tagList: tags});
 		}catch(e){
 			return [];
 		}
@@ -56,6 +59,10 @@ module DCaseAPI {
 
 	export var getCommitList = function(dcaseId) {
 		return this.call("getCommitList", { dcaseId:dcaseId }).commitList;
+	};
+
+	export var getTagList = function() {
+		return this.call("getTagList", {});
 	};
 
 	export var commit = function(tree, msg, commitId) {
@@ -91,7 +98,7 @@ module DCaseAPI {
 	};
 	
 	export var searchDCaseHistory = function(dcaseId, text) {
-	    return this.call("searchDCaseHistory", {dcaseId: dcaseId, text: text});
+		return this.call("searchDCaseHistory", {dcaseId: dcaseId, text: text});
 	};
 	
 	export var createTicket = function(nodeId, subject, description, userName) {

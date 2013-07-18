@@ -32,10 +32,14 @@ var DCaseAPI;
             return JSON.parse(res.responseText).result;
         }
     };
-    DCaseAPI.searchDCase = function (pageIndex) {
+    DCaseAPI.searchDCase = function (pageIndex, tags) {
+        if(tags == null) {
+            tags = [];
+        }
         try  {
             return this.call("searchDCase", {
-                page: pageIndex
+                page: pageIndex,
+                tagList: tags
             });
         } catch (e) {
             return [];
@@ -51,6 +55,10 @@ var DCaseAPI;
         return this.call("getCommitList", {
             dcaseId: dcaseId
         }).commitList;
+    };
+    DCaseAPI.getTagList = function () {
+        return this.call("getTagList", {
+        });
     };
     DCaseAPI.commit = function (tree, msg, commitId) {
         return this.call("commit", {

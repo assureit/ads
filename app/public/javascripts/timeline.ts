@@ -84,6 +84,7 @@ class TimeLine {
 		}
 
 		var mm: any = {};
+		console.log(arg.getArgumentId());
 		var l: CommitInformation[] = DCaseAPI.getCommitList(arg.getArgumentId());
 		for(var i: number = 0; i < l.length - 1; i++) {
 			var x: number[] = [];

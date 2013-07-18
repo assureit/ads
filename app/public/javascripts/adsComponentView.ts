@@ -166,10 +166,11 @@ class SelectDCaseView {
 		this.manager.clear();
 	}
 
-	addElements(userId, pageIndex): void {
+	addElements(userId, pageIndex?: any, tags?: string[]): void {
 		if(pageIndex == null || pageIndex < 1) pageIndex = 1;
+		if(tags == null) tags = [];
 		this.pageIndex = pageIndex - 0;
-		var searchResults: any = DCaseAPI.searchDCase(this.pageIndex);
+		var searchResults: any = DCaseAPI.searchDCase(this.pageIndex, tags);
 		var dcaseList : any = searchResults.dcaseList;
 		this.maxPageSize  = searchResults.summary.maxPage;
 
@@ -281,4 +282,50 @@ class SearchView {
 				.appendTo($res);
 		}, ()=>{});
 	}
+}
+
+class TagListModel {
+	tagList: string[];
+	constructor() {
+		this.tagList = DCaseAPI.getTagList().tagList;
+	}
+
+	addTag(tag: string) {
+		this.tagList.push(tag);
+	}
+
+	getList(): string[] {
+		return this.tagList;
+	}
+}
+
+class TagListView {
+	constructor(public selecter: string, public model:TagListModel) {
+		this.clear();
+		this.update();
+	}
+
+	clear(): void {
+		$(this.selecter + ' *').remove();
+		$(this.selecter).append('<li><a href="'+Config.BASEPATH+'/#" id="alltags">All</a></li><li class="line"></li>');
+	}
+
+	update() {
+		var tagList: string[] = this.model.getList();
+		console.log(tagList.length);
+		for(var i:number = 0;i < tagList.length; i++) {
+			$(this.selecter).prepend('<li><a href="'+Config.BASEPATH+'/tag/'+tagList[i]+'" >'+tagList[i]+'</a></li>');
+		}
+	}
+}
+
+class TagListManager {
+	view:  TagListView;
+	model: TagListModel;
+
+	constructor() {
+		this.model = new TagListModel();
+		this.view = new TagListView('#dcase-tags-ul', this.model);
+	}
+
 }

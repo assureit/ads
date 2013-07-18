@@ -164,13 +164,16 @@ var SelectDCaseView = (function () {
     SelectDCaseView.prototype.clear = function () {
         this.manager.clear();
     };
-    SelectDCaseView.prototype.addElements = function (userId, pageIndex) {
+    SelectDCaseView.prototype.addElements = function (userId, pageIndex, tags) {
         var _this = this;
         if(pageIndex == null || pageIndex < 1) {
             pageIndex = 1;
         }
+        if(tags == null) {
+            tags = [];
+        }
         this.pageIndex = pageIndex - 0;
-        var searchResults = DCaseAPI.searchDCase(this.pageIndex);
+        var searchResults = DCaseAPI.searchDCase(this.pageIndex, tags);
         var dcaseList = searchResults.dcaseList;
         this.maxPageSize = searchResults.summary.maxPage;
         var isLogin = userId != null;
@@ -274,4 +277,43 @@ var SearchView = (function () {
         });
     };
     return SearchView;
+})();
+var TagListModel = (function () {
+    function TagListModel() {
+        this.tagList = DCaseAPI.getTagList().tagList;
+    }
+    TagListModel.prototype.addTag = function (tag) {
+        this.tagList.push(tag);
+    };
+    TagListModel.prototype.getList = function () {
+        return this.tagList;
+    };
+    return TagListModel;
+})();
+var TagListView = (function () {
+    function TagListView(selecter, model) {
+        this.selecter = selecter;
+        this.model = model;
+        this.clear();
+        this.update();
+    }
+    TagListView.prototype.clear = function () {
+        $(this.selecter + ' *').remove();
+        $(this.selecter).append('<li><a href="' + Config.BASEPATH + '/#" id="alltags">All</a></li><li class="line"></li>');
+    };
+    TagListView.prototype.update = function () {
+        var tagList = this.model.getList();
+        console.log(tagList.length);
+        for(var i = 0; i < tagList.length; i++) {
+            $(this.selecter).prepend('<li><a href="' + Config.BASEPATH + '/tag/' + tagList[i] + '" >' + tagList[i] + '</a></li>');
+        }
+    };
+    return TagListView;
+})();
+var TagListManager = (function () {
+    function TagListManager() {
+        this.model = new TagListModel();
+        this.view = new TagListView('#dcase-tags-ul', this.model);
+    }
+    return TagListManager;
 })();

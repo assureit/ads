@@ -5,6 +5,7 @@ var ADS = (function () {
         this.URL_EXPORT = Config.BASEPATH + "/export";
         this.selectDCaseView = new SelectDCaseView();
         this.selectDCaseView.initEvents();
+        this.tagListManager = new TagListManager();
         this.createDCaseView = new CreateDCaseView();
         var router = new Router();
         router.route("new", "new", function () {
@@ -12,16 +13,18 @@ var ADS = (function () {
             _this.initDefaultScreen(userId, 1, null);
             $("#newDCase").show();
             $("#selectDCase").hide();
+            $("#dcase-tags").hide();
             if(_this.isLogin(userId)) {
                 _this.createDCaseView.enableSubmit();
             } else {
                 _this.createDCaseView.disableSubmit();
             }
         });
-        var defaultRouter = function (pageIndex) {
-            _this.initDefaultScreen(_this.getLoginUserorNull(), pageIndex, _this.selectDCaseView);
+        var defaultRouter = function (pageIndex, tag) {
+            _this.initDefaultScreen(_this.getLoginUserorNull(), pageIndex, _this.selectDCaseView, tag);
             $("#newDCase").hide();
             $("#selectDCase").show();
+            $("#dcase-tags").show();
             var importFile = new ImportFile("#ase");
             importFile.read(function (file) {
                 var tree = JSON.parse(file.result);
@@ -33,6 +36,9 @@ var ADS = (function () {
                 }
             });
         };
+        router.route("tag/:tag", "tag", function (tag) {
+            defaultRouter(1, tag);
+        });
         router.route("page/:id", "page", function (pageIndex) {
             defaultRouter(pageIndex);
         });
@@ -45,6 +51,7 @@ var ADS = (function () {
             _this.clearTimeLine();
             $("#newDCase").hide();
             $("#selectDCase").hide();
+            $("#dcase-tags").hide();
             var userId = _this.getLoginUserorNull();
             $(".ads-view-menu").css("display", "block");
             $(".ads-edit-menu").css("display", "block");
@@ -100,7 +107,11 @@ var ADS = (function () {
             $(".timeline").remove();
         }
     };
-    ADS.prototype.initDefaultScreen = function (userId, pageIndex, selectDCaseView) {
+    ADS.prototype.initDefaultScreen = function (userId, pageIndex, selectDCaseView, tag) {
+        var tags = [];
+        if(tag != null) {
+            tags.push(tag);
+        }
         this.clearTimeLine();
         this.hideViewer();
         this.hideEditMenu();
@@ -108,7 +119,7 @@ var ADS = (function () {
         $("#dcase-manager").css("display", "block");
         if(selectDCaseView != null) {
             selectDCaseView.clear();
-            selectDCaseView.addElements(userId, pageIndex);
+            selectDCaseView.addElements(userId, pageIndex, tags);
         }
     };
     ADS.prototype.commit = function () {
@@ -123,7 +134,7 @@ var ADS = (function () {
                         alert("コミットしました");
                         var newCommitId = DCaseToBeCommit.commitId;
                         var tree = DCaseAPI.getNodeTree(newCommitId);
-                        this.viewer.setDCase(new DCaseModel(tree, tree.dcaseId, newCommitId));
+                        this.viewer.setDCase(new DCaseModel(tree, this.viewer.dcase.argId, newCommitId));
                         this.timelineView.repaint(this.viewer.getDCase());
                     }
                 }
