@@ -45,6 +45,7 @@ var TimeLine = (function () {
         }
         var mm = {
         };
+        console.log(arg.getArgumentId());
         var l = DCaseAPI.getCommitList(arg.getArgumentId());
         for(var i = 0; i < l.length - 1; i++) {
             var x = [];

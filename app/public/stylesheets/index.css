@@ -20,3 +20,13 @@ body {
 	margin-top: 60px;
 }
 
+#dcase-tags li.line {
+	border-style: solid;
+	border-width: 1px 0 0 0;
+	border-color: #eee;
+}
+
+#alltags {
+	color: #000;
+	font-weight: bold;
+}

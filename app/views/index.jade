@@ -75,7 +75,16 @@ block content
                         .control-group
                             .controls
                                 button.btn#dcase-create(type="button")= lang.create
-                #selectDCase.span6.offset3
+                #dcase-tags.span2.offset2
+                    h4 Tags
+                    hr
+                    ul#dcase-tags-ul.unstyled
+                        li
+                            a(href='#')#alltags All
+                        li.line
+                    a(href='#')
+                        div(align='right') タグを全て表示
+                #selectDCase.span6
                     h2 DCaseを選択
                     table.table.table-striped.table-hover
                         thead

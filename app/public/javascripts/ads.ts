@@ -8,10 +8,11 @@
 ///<reference path='dnode.ts'/>
 
 class ADS {
-	TITLE_SUFFIX:   string = " - Assurance DS";
-	URL_EXPORT: string = Config.BASEPATH + "/export";
-	viewer: DCaseViewer;
+	TITLE_SUFFIX   : string = " - Assurance DS";
+	URL_EXPORT     : string = Config.BASEPATH + "/export";
+	viewer         : DCaseViewer;
 	selectDCaseView: SelectDCaseView;
+	tagListManager : TagListManager;
 	createDCaseView: CreateDCaseView;
 	timelineView   : TimeLineView;
 
@@ -48,7 +49,11 @@ class ADS {
 		}
 	}
 
-	initDefaultScreen(userId: number, pageIndex: number, selectDCaseView: SelectDCaseView) { //FIXME
+	initDefaultScreen(userId: number, pageIndex: number, selectDCaseView: SelectDCaseView, tag?: string) { //FIXME
+		var tags = [];
+		if(tag != null) {
+			tags.push(tag);
+		}
 		this.clearTimeLine();
 		this.hideViewer();
 		this.hideEditMenu();
@@ -58,13 +63,14 @@ class ADS {
 
 		if(selectDCaseView != null) {
 			selectDCaseView.clear();
-			selectDCaseView.addElements(userId, pageIndex);
+			selectDCaseView.addElements(userId, pageIndex, tags);
 		}
 	}
 
 	constructor(body: HTMLElement) {
 		this.selectDCaseView = new SelectDCaseView();
 		this.selectDCaseView.initEvents();
+		this.tagListManager  = new TagListManager();
 		this.createDCaseView = new CreateDCaseView();
 
 		var router = new Router();
@@ -73,6 +79,7 @@ class ADS {
 			this.initDefaultScreen(userId, 1, null);
 			$("#newDCase").show();
 			$("#selectDCase").hide();
+			$("#dcase-tags").hide();
 
 			if(this.isLogin(userId)) {
 				this.createDCaseView.enableSubmit();
@@ -81,10 +88,11 @@ class ADS {
 			}
 		});
 
-		var defaultRouter = (pageIndex: any) => {
-			this.initDefaultScreen(this.getLoginUserorNull(), pageIndex, this.selectDCaseView);
+		var defaultRouter = (pageIndex: any, tag?: string) => {
+			this.initDefaultScreen(this.getLoginUserorNull(), pageIndex, this.selectDCaseView, tag);
 			$("#newDCase").hide();
 			$("#selectDCase").show();
+			$("#dcase-tags").show();
 			var importFile = new ImportFile("#ase");
 			importFile.read((file: DCaseFile) => {
 				var tree = JSON.parse(file.result); //TODO convert to Markdown
@@ -96,6 +104,10 @@ class ADS {
 				}
 			});
 		}
+
+		router.route("tag/:tag", "tag", (tag) => {
+			defaultRouter(1,tag);
+		});
 
 		router.route("page/:id", "page", (pageIndex) => {
 			defaultRouter(pageIndex);
@@ -111,6 +123,7 @@ class ADS {
 			this.clearTimeLine();
 			$("#newDCase").hide();
 			$("#selectDCase").hide();
+			$("#dcase-tags").hide();
 			var userId = this.getLoginUserorNull();
 
 			$(".ads-view-menu").css("display", "block");
@@ -162,7 +175,7 @@ class ADS {
 						alert("コミットしました");
 						var newCommitId = DCaseToBeCommit.commitId;
 						var tree = DCaseAPI.getNodeTree(newCommitId);
-						this.viewer.setDCase(new DCaseModel(tree, tree.dcaseId, newCommitId));
+						this.viewer.setDCase(new DCaseModel(tree, this.viewer.dcase.argId/*FIXME*/, newCommitId));
 						this.timelineView.repaint(this.viewer.getDCase());
 					}
 				}
