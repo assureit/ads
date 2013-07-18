@@ -114,6 +114,9 @@ exports.download = function (req, res) {
         if(req.params && req.params.id && !isFinite(req.params.id)) {
             checks.push('Id must be a number.');
         }
+        if(req.params && !req.params.fileName) {
+            checks.push('File name is required.');
+        }
         if(checks.length > 0) {
             res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
             return false;

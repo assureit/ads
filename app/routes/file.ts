@@ -120,6 +120,7 @@ export var download = function(req: any, res: any) {
 		if (!req.params) checks.push('Parameter is required.');
 		if (req.params && !req.params.id) checks.push('Id is required.');
 		if (req.params && req.params.id && !isFinite(req.params.id)) checks.push('Id must be a number.');
+		if (req.params && !req.params.fileName) checks.push('File name is required.');
 
 		if (checks.length > 0) {
 			// var msg = checks.join('\n');
