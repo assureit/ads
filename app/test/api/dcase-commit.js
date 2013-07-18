@@ -217,22 +217,6 @@ describe('api', function () {
                     }
                 });
             });
-            it('commit message is not set', function (done) {
-                this.timeout(15000);
-                delete validParam['commitMessage'];
-                dcase.commit(validParam, userId, {
-                    onSuccess: function (result) {
-                        expect(result).to.be(null);
-                        done();
-                    },
-                    onFailure: function (err) {
-                        expect(err.rpcHttpStatus).to.be(200);
-                        expect(err.code).to.be(error.RPC_ERROR.INVALID_PARAMS);
-                        expect(err.message).to.be('Invalid method parameter is found: \nCommit Message is required.');
-                        done();
-                    }
-                });
-            });
             it('contents is not set', function (done) {
                 this.timeout(15000);
                 delete validParam['contents'];
