@@ -266,5 +266,20 @@ export class NodeDAO extends model.DAO {
 		});
 	}
 
+	getNode(commitId: number, thisNodeId: number,callback: (err:any, node:Node) => void) {
+		this.con.query('SELECT * FROM node WHERE commit_id = ? AND this_node_id = ?', [commitId, thisNodeId], (err, result) => {
+			if (err) {
+				callback(err, null);
+			}
+			if (result.length > 0) {
+				var node = new Node(result[0].id, result[0].commit_id, result[0].this_node_id, result[0].node_type, result[0].description);
+				callback(err, node);
+			} else {
+				callback(err, null);
+			}
+			return;
+		});
+	}
+
 }
 

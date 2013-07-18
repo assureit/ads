@@ -264,6 +264,23 @@ var NodeDAO = (function (_super) {
             callback(err, list);
         });
     };
+    NodeDAO.prototype.getNode = function (commitId, thisNodeId, callback) {
+        this.con.query('SELECT * FROM node WHERE commit_id = ? AND this_node_id = ?', [
+            commitId, 
+            thisNodeId
+        ], function (err, result) {
+            if(err) {
+                callback(err, null);
+            }
+            if(result.length > 0) {
+                var node = new Node(result[0].id, result[0].commit_id, result[0].this_node_id, result[0].node_type, result[0].description);
+                callback(err, node);
+            } else {
+                callback(err, null);
+            }
+            return;
+        });
+    };
     return NodeDAO;
 })(model.DAO);
 exports.NodeDAO = NodeDAO;

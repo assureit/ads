@@ -12,7 +12,7 @@ exports.PUBLISH_STATUS_NONE = 0;
 exports.PUBLISH_STATUS_PUBLISHED = 1;
 exports.PUBLISH_STATUS_UPDATED = 2;
 var MonitorNode = (function () {
-    function MonitorNode(id, dcaseId, thisNodeId, watchId, presetId, params, rebuttalThisNodeId, publishStatus) {
+    function MonitorNode(id, dcaseId, thisNodeId, watchId, presetId, params, rebuttalThisNodeId, publishStatus, deleteFlag) {
         this.id = id;
         this.dcaseId = dcaseId;
         this.thisNodeId = thisNodeId;
@@ -21,6 +21,7 @@ var MonitorNode = (function () {
         this.params = params;
         this.rebuttalThisNodeId = rebuttalThisNodeId;
         this.publishStatus = publishStatus;
+        this.deleteFlag = deleteFlag;
         if(!this.publishStatus) {
             this.publishStatus = exports.PUBLISH_STATUS_NONE;
         }
@@ -28,10 +29,14 @@ var MonitorNode = (function () {
             this.params = {
             };
         }
+        this.deleteFlag = !!this.deleteFlag;
+        if(this.deleteFlag === undefined) {
+            this.deleteFlag = false;
+        }
     }
     MonitorNode.tableToObject = function tableToObject(table) {
         return new MonitorNode(table.id, table.dcase_id, table.this_node_id, table.watch_id, table.preset_id, table.params ? JSON.parse(table.params) : {
-        }, table.rebuttal_this_node_id, table.publish_status);
+        }, table.rebuttal_this_node_id, table.publish_status, table.delete_flag);
     };
     return MonitorNode;
 })();
@@ -110,7 +115,7 @@ var MonitorDAO = (function (_super) {
         var _this = this;
         async.waterfall([
             function (next) {
-                _this.con.query('UPDATE monitor_node SET dcase_id=?, this_node_id=?, watch_id=?, preset_id=?, params=?, rebuttal_this_node_id=?, publish_status=? WHERE id=?', [
+                _this.con.query('UPDATE monitor_node SET dcase_id=?, this_node_id=?, watch_id=?, preset_id=?, params=?, rebuttal_this_node_id=?, publish_status=?, delete_flag=? WHERE id=?', [
                     monitor.dcaseId, 
                     monitor.thisNodeId, 
                     monitor.watchId, 
@@ -118,6 +123,7 @@ var MonitorDAO = (function (_super) {
                     JSON.stringify(monitor.params), 
                     monitor.rebuttalThisNodeId, 
                     monitor.publishStatus, 
+                    monitor.deleteFlag, 
                     monitor.id
                 ], function (err, result) {
                     next(err);
@@ -196,6 +202,24 @@ var MonitorDAO = (function (_super) {
                 });
             }        ], function (err) {
             callback(err, monitor);
+        });
+    };
+    MonitorDAO.prototype.list = function (callback) {
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query('SELECT * FROM monitor_node where delete_flag = false', function (err, result) {
+                    next(err, result);
+                });
+            }, 
+            function (result, next) {
+                var list = [];
+                result.forEach(function (it) {
+                    list.push(MonitorNode.tableToObject(it));
+                });
+                next(null, list);
+            }        ], function (err, list) {
+            callback(err, list);
         });
     };
     MonitorDAO.prototype.listNotPublished = function (dcaseId, callback) {
