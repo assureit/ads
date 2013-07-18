@@ -4,6 +4,7 @@ var model_file = require('../model/file')
 var fs = require('fs')
 var utilFs = require('../util/fs')
 var error = require('../api/error')
+var async = require('async');
 var CONFIG = require('config');
 exports.upload = function (req, res) {
     function onError(err, errorCode, upfile) {
@@ -89,7 +90,7 @@ exports.upload = function (req, res) {
                             con.close();
                             return;
                         }
-                        var body = 'URL=' + 'file/' + fileId;
+                        var body = 'URL=file/' + fileId + '/' + model_file.File.encodePath(upfile.name);
                         con.close();
                         res.header('Content-Type', 'text/html');
                         res.send(body);
@@ -113,9 +114,11 @@ exports.download = function (req, res) {
         if(req.params && req.params.id && !isFinite(req.params.id)) {
             checks.push('Id must be a number.');
         }
+        if(req.params && !req.params.fileName) {
+            checks.push('File name is required.');
+        }
         if(checks.length > 0) {
-            var msg = checks.join('\n');
-            res.send(msg, error.HTTP_STATUS.BAD_REQUEST);
+            res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
             return false;
         }
         return true;
@@ -125,22 +128,38 @@ exports.download = function (req, res) {
     }
     var con = new db.Database();
     var fileDAO = new model_file.FileDAO(con);
-    fileDAO.select(req.params.id, function (err, path, name) {
+    async.waterfall([
+        function (next) {
+            fileDAO.get(req.params.id, function (err, file) {
+                return next(err, file);
+            });
+        }, 
+        function (file, next) {
+            fs.exists(file.path, function (exists) {
+                var err = null;
+                if(!exists) {
+                    err = new error.NotFoundError('File Not Found on file system.', {
+                        params: req.params,
+                        file: file
+                    });
+                } else if(file.getEncodeName() != req.params.fileName) {
+                    err = new error.NotFoundError('File Not Found on file system.', {
+                        params: req.params,
+                        file: file
+                    });
+                }
+                next(err, file);
+            });
+        }    ], function (err, file) {
         if(err) {
-            if(err.code == error.RPC_ERROR.DATA_NOT_FOUND) {
+            if(err instanceof error.NotFoundError) {
                 res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
                 return;
             } else {
-                res.send(err);
+                res.send(err, error.HTTP_STATUS.INTERNAL_SERVER_ERROR);
                 return;
             }
         }
-        fs.exists(path, function (exists) {
-            if(exists) {
-                res.download(path, name);
-            } else {
-                res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
-            }
-        });
+        res.download(file.path, file.name);
     });
 };
