@@ -6,6 +6,23 @@ var __extends = this.__extends || function (d, b) {
 var model = require('./model')
 
 var error = require('../api/error')
+var async = require('async');
+var File = (function () {
+    function File(id, name, path, userId) {
+        this.id = id;
+        this.name = name;
+        this.path = path;
+        this.userId = userId;
+    }
+    File.tableToObject = function tableToObject(table) {
+        return new File(table.id, table.name, table.path, table.user_id);
+    };
+    File.prototype.getEncodeName = function () {
+        return encodeURI(this.name.replace(' ', '-'));
+    };
+    return File;
+})();
+exports.File = File;
 var FileDAO = (function (_super) {
     __extends(FileDAO, _super);
     function FileDAO() {
@@ -51,6 +68,26 @@ var FileDAO = (function (_super) {
                 return;
             }
             callback(err, result[0].path, result[0].name);
+        });
+    };
+    FileDAO.prototype.get = function (id, callback) {
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query('SELECT * from file where id = ?', [
+                    id
+                ], function (err, result) {
+                    return next(err, result);
+                });
+            }, 
+            function (result, next) {
+                if(result.length == 0) {
+                    next(new error.NotFoundError('The information on the target file was not found.'), null);
+                    return;
+                }
+                next(null, File.tableToObject(result[0]));
+            }        ], function (err, file) {
+            callback(err, file);
         });
     };
     return FileDAO;

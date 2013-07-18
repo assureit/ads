@@ -136,7 +136,7 @@ console.log(req.params);
 	var con = new db.Database();
 	var fileDAO = new model_file.FileDAO(con);
 
-	fileDAO.select(req.params.id, (err: any, path: string, name: string) => {
+	fileDAO.get(req.params.id, (err: any, file:model_file.File) => {
 		if (err) {
 			if (err.code == error.RPC_ERROR.DATA_NOT_FOUND) {
 				res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
@@ -146,9 +146,9 @@ console.log(req.params);
 				return;
 			}
 		}
-		fs.exists(path, (exists) => {
+		fs.exists(file.path, (exists) => {
 			if (exists) {
-				res.download(path, name);
+				res.download(file.path, file.name);
 				// fs.readFile(path, (err, data) => {
 				// 	var responseFile = data.toString('base64');
 				// 	var body: any = {name: name, fileBody: responseFile};

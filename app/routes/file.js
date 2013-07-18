@@ -125,7 +125,7 @@ exports.download = function (req, res) {
     }
     var con = new db.Database();
     var fileDAO = new model_file.FileDAO(con);
-    fileDAO.select(req.params.id, function (err, path, name) {
+    fileDAO.get(req.params.id, function (err, file) {
         if(err) {
             if(err.code == error.RPC_ERROR.DATA_NOT_FOUND) {
                 res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
@@ -135,9 +135,9 @@ exports.download = function (req, res) {
                 return;
             }
         }
-        fs.exists(path, function (exists) {
+        fs.exists(file.path, function (exists) {
             if(exists) {
-                res.download(path, name);
+                res.download(file.path, file.name);
             } else {
                 res.send('File Not Found', error.HTTP_STATUS.NOT_FOUND);
             }

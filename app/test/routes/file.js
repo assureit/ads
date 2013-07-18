@@ -119,7 +119,7 @@ describe('routes.file', function () {
                     throw err;
                 }
                 assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
-                assert.equal(res.header['content-disposition'], 'attachment; filename="file1"');
+                assert.equal(res.header['content-disposition'], 'attachment; filename="test file1.txt"');
                 assert.equal(res.text, 'アップロードテスト用のファイルです\n');
                 done();
             });
@@ -130,7 +130,7 @@ describe('routes.file', function () {
                     throw err;
                 }
                 assert.equal(res.header['content-type'], 'text/plain; charset=UTF-8');
-                assert.equal(res.header['content-disposition'], 'attachment; filename="file1"');
+                assert.equal(res.header['content-disposition'], 'attachment; filename="test file1.txt"');
                 assert.equal(res.text, 'アップロードテスト用のファイルです\n');
                 done();
             });
