@@ -1,3 +1,5 @@
+cookie:
+  secret: 'REPLACE SECRET IN LOCAL.YAML'
 ads:
   basePath: ""
   uploadPath: "upload"

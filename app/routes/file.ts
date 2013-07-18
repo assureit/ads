@@ -4,6 +4,7 @@ import model_file = module('../model/file')
 import fs = module('fs')
 import utilFs = module('../util/fs')
 import error = module('../api/error')
+import util_auth = module('../util/auth')
 var async = require('async');
 var CONFIG = require('config');
 
@@ -37,18 +38,22 @@ export var upload = function(req: any, res: any){
 	}
 
 	function getUserId() : number {
-		var userId: number = constant.SYSTEM_USER_ID;
-
-		var cookies = {};
-		req.headers.cookie && req.headers.cookie.split(';').forEach(function( cookie ) {
-		var parts = cookie.split('=');
-			cookies[ parts[ 0 ].trim() ] = ( parts[ 1 ] || '' ).trim();
-		});
-
-		if (cookies['userId']) {
-			userId = Number(cookies['userId']);
-		}
+		var auth = new util_auth.Auth(req, res);
+		var userId = auth.getUserId();
+		if (!userId) userId = constant.SYSTEM_USER_ID;
 		return userId;
+		// var userId: number = constant.SYSTEM_USER_ID;
+
+		// var cookies = {};
+		// req.headers.cookie && req.headers.cookie.split(';').forEach(function( cookie ) {
+		// var parts = cookie.split('=');
+		// 	cookies[ parts[ 0 ].trim() ] = ( parts[ 1 ] || '' ).trim();
+		// });
+
+		// if (cookies['userId']) {
+		// 	userId = Number(cookies['userId']);
+		// }
+		// return userId;
 	}
 
 	var userId = getUserId();

@@ -10,6 +10,7 @@ import error = module("./error")
 import type = module('./type')
 import domain = module('domain')
 import constant = module('../constant')
+import util_auth = module('../util/auth')
 
 export var methods: {[key: string]: type.Method;} = {};
 export function add(key:string, method: type.Method) {
@@ -33,20 +34,24 @@ export function httpHandler(req: any, res: any) {
 			}), error.rpcHttpStatus);
 	}
 
-        function getUserId() : number {
-		var userId: number = constant.SYSTEM_USER_ID;
-
-		var cookies = {};
-		req.headers.cookie && req.headers.cookie.split(';').forEach(function( cookie ) {
-			var parts = cookie.split('=');
-			cookies[ parts[ 0 ].trim() ] = ( parts[ 1 ] || '' ).trim();
-		});
-
-		if (cookies['userId']) {
-			userId = Number(cookies['userId']);
-		}
+    function getUserId() : number {
+		var auth = new util_auth.Auth(req, res);
+		var userId = auth.getUserId();
+		if (!userId) userId = constant.SYSTEM_USER_ID;
 		return userId;
-        }
+		// var userId: number = constant.SYSTEM_USER_ID;
+
+		// var cookies = {};
+		// req.headers.cookie && req.headers.cookie.split(';').forEach(function( cookie ) {
+		// 	var parts = cookie.split('=');
+		// 	cookies[ parts[ 0 ].trim() ] = ( parts[ 1 ] || '' ).trim();
+		// });
+
+		// if (cookies['userId']) {
+		// 	userId = Number(cookies['userId']);
+		// }
+		// return userId;
+    }
 
 
 	res.header('Content-Type', 'application/json');

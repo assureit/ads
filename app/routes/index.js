@@ -4,6 +4,7 @@ var lang = require('./lang')
 var dscript = require('./dscript')
 var model_user = require('../model/user')
 var db = require('../db/db')
+var util_auth = require('../util/auth')
 var CONFIG = require('config');
 exports.index = function (req, res) {
     var page = 'signin';
@@ -12,13 +13,14 @@ exports.index = function (req, res) {
         title: 'Assure-It',
         lang: lang.lang.ja
     };
-    if(req.cookies.userId != null) {
+    var auth = new util_auth.Auth(req, res);
+    if(auth.isLogin()) {
         page = 'signout';
         params = {
             basepath: CONFIG.ads.basePath,
             title: 'Assure-It',
             lang: lang.lang.ja,
-            userName: req.cookies.userName
+            userName: auth.getLoginName()
         };
     }
     if(req.cookies.lang == 'en') {
@@ -83,14 +85,14 @@ exports.login = function (req, res) {
             res.redirect('/');
             return;
         }
-        res.cookie('userId', result.id);
-        res.cookie('userName', result.loginName);
+        var auth = new util_auth.Auth(req, res);
+        auth.set(result.id, result.loginName);
         res.redirect(CONFIG.ads.basePath + '/');
     });
 };
 exports.logout = function (req, res) {
-    res.clearCookie('userId');
-    res.clearCookie('userName');
+    var auth = new util_auth.Auth(req, res);
+    auth.clear();
     res.redirect(CONFIG.ads.basePath + '/');
 };
 exports.register = function (req, res) {
@@ -101,8 +103,8 @@ exports.register = function (req, res) {
             res.redirect(CONFIG.ads.basePath + '/');
             return;
         }
-        res.cookie('userId', result.id);
-        res.cookie('userName', result.loginName);
+        var auth = new util_auth.Auth(req, res);
+        auth.set(result.id, result.loginName);
         res.redirect(CONFIG.ads.basePath + '/');
     });
 };

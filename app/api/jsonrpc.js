@@ -3,6 +3,7 @@ var error = require("./error")
 
 var domain = require('domain')
 var constant = require('../constant')
+var util_auth = require('../util/auth')
 exports.methods = {
 };
 function add(key, method) {
@@ -26,15 +27,10 @@ function httpHandler(req, res) {
         }), error.rpcHttpStatus);
     }
     function getUserId() {
-        var userId = constant.SYSTEM_USER_ID;
-        var cookies = {
-        };
-        req.headers.cookie && req.headers.cookie.split(';').forEach(function (cookie) {
-            var parts = cookie.split('=');
-            cookies[parts[0].trim()] = (parts[1] || '').trim();
-        });
-        if(cookies['userId']) {
-            userId = Number(cookies['userId']);
+        var auth = new util_auth.Auth(req, res);
+        var userId = auth.getUserId();
+        if(!userId) {
+            userId = constant.SYSTEM_USER_ID;
         }
         return userId;
     }

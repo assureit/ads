@@ -55,7 +55,7 @@ export class DCaseDAO extends model.DAO {
 	 */
 	list(page: number, tagList:string[], callback: (err:any, summary: model_pager.Pager, list: DCase[])=>void): void {
 		var pager = new model_pager.Pager(page);
-		var query = {sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified, c.id desc LIMIT ? OFFSET ? ' , nestTables:true};
+		var query = {sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ? ' , nestTables:true};
 		var params:any[] = [pager.limit, pager.getOffset()];
 		if (tagList && tagList.length > 0) {
 			var tagVars:string = _.map(tagList, (it:string) => {return '?'}).join(',');
