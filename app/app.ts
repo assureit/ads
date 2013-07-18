@@ -26,7 +26,7 @@ app.configure(function() {
 	utilFs.mkdirpSync(uploadDir);
 	app.use(express.bodyParser({uploadDir: uploadDir}));
 	// app.use(express.bodyParser({uploadDir:'./upload'}));
-	app.use(express.cookieParser());
+	app.use(express.cookieParser(CONFIG.cookie.secret));
 //	app.use(express.cookieSession());
 	app.use(express.methodOverride());
 	// app.use(function(req, res, next) {

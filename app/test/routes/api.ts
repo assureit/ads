@@ -10,7 +10,7 @@ import http = module('http')
 import app = module('../../app')
 var request = require('supertest');	// TODO: supertestの宣言ファイル作成
 
-describe('api', function() {
+describe('routes.api', function() {
 	describe('jsonrpc', function() {
 		it('should return HTTP400 and -32600 when JSON RPC version is invalid or missing', function() {
 			request(app['app'])	// TODO: 型制約を逃げている。要修正。
@@ -100,7 +100,8 @@ describe('api', function() {
 		it('UserId Check', function(done) {
 			request(app['app'])     // TODO: 型制約を逃げている。要修正。
 				.post('/api/1.0/')
-				.set('cookie', 'userId=1318;')
+				.set('cookie', 'sessionUserId=s%3A2.VahsKVbwfM9%2FffWlMmaYvrLbwqO2JEV%2Bp3Oli%2BT%2FTrg; sessionUserName=s%3Ahisaboh.KCuRiQt0qkpAGD4HzqZEYti9gW2zkUc%2F9DEEu5Ohh6k')
+				// .set('cookie', 'userId=s%3A2.VahsKVbwfM9%2FffWlMmaYvrLbwqO2JEV%2Bp3Oli%2BT%2FTrg;')
 				.send({jsonrpc:"2.0", method:"ping2", id:100})
 				.expect(200)
 				.end(function (err, res) {
@@ -108,7 +109,7 @@ describe('api', function() {
 					assert.equal(100, res.body.id);
 					assert.strictEqual(null, res.body.error);
 					assert.notStrictEqual(undefined, res.body.result);
-					assert.equal(1318, res.body.result);
+					assert.equal(2, res.body.result);
 					done();	
 				});
 
