@@ -3,6 +3,7 @@ var express = require('express')
 var api = require('./routes/api')
 var client = require('./routes/index')
 var js = require('./routes/javascript')
+var monitor = require('./routes/monitor')
 var path = require('path')
 var file = require('./routes/file')
 
@@ -47,6 +48,7 @@ app.post('/logout', client.logout);
 app.post('/register', client.register);
 app.post('/file', file.upload);
 app.get('/file/:id', file.download);
+app.get('/monitor/:id', monitor.show);
 if(!module.parent) {
     http.createServer(app).listen(app.get('port'), function () {
         console.log('Express server listening on port ' + app.get('port'));

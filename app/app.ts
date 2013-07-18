@@ -6,6 +6,7 @@ import express = module('express')
 import api = module('./routes/api')
 import client = module('./routes/index')
 import js = module('./routes/javascript')
+import monitor = module('./routes/monitor')
 import path = module('path')
 import file = module('./routes/file')
 import constant = module('./constant')
@@ -71,6 +72,8 @@ app.post('/register', client.register);
 
 app.post('/file', file.upload);
 app.get('/file/:id', file.download);
+
+app.get('/monitor/:id', monitor.show);
 
 if (!module.parent) {
 	http.createServer(app).listen(app.get('port'), function(){
