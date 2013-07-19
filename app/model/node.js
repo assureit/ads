@@ -102,7 +102,7 @@ var NodeDAO = (function (_super) {
                 }, 
                 function (monitor, next) {
                     if(monitor) {
-                        if(meta.WatchId != monitor.watchId || meta.PresetId != monitor.watchId || JSON.stringify(params) != JSON.stringify(monitor.params)) {
+                        if(meta.WatchId != monitor.watchId || meta.PresetId != monitor.presetId || JSON.stringify(params) != JSON.stringify(monitor.params)) {
                             monitor.watchId = meta.WatchId;
                             monitor.presetId = meta.PresetId;
                             monitor.params = params;
