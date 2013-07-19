@@ -4,6 +4,7 @@ var error = require("./error")
 var domain = require('domain')
 var constant = require('../constant')
 var util_auth = require('../util/auth')
+var _ = require('underscore');
 exports.methods = {
 };
 function add(key, method) {
@@ -18,7 +19,16 @@ function addModule(module) {
     }
 }
 exports.addModule = addModule;
+var authMethods = [];
+function requireAuth(newAuthMethods) {
+    authMethods = authMethods.concat(newAuthMethods);
+}
+exports.requireAuth = requireAuth;
+function isAuthRequired(methodName) {
+    return _.contains(authMethods, methodName);
+}
 function httpHandler(req, res) {
+    var auth = new util_auth.Auth(req, res);
     function onError(id, statusCode, error) {
         res.send(JSON.stringify({
             jsonrpc: '2.0',
@@ -27,7 +37,6 @@ function httpHandler(req, res) {
         }), error.rpcHttpStatus);
     }
     function getUserId() {
-        var auth = new util_auth.Auth(req, res);
         var userId = auth.getUserId();
         if(!userId) {
             userId = constant.SYSTEM_USER_ID;
@@ -42,6 +51,10 @@ function httpHandler(req, res) {
     var method = exports.methods[req.body.method];
     if(!method) {
         onError(req.body.id, 404, new error.MethodNotFoundError(req.body.method, null));
+        return;
+    }
+    if(isAuthRequired(req.body.method) && !auth.isLogin()) {
+        onError(req.body.id, 200, new error.UnauthorizedError('You have to login before processing ' + method, null));
         return;
     }
     var d = domain.create();

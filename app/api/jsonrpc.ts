@@ -11,6 +11,7 @@ import type = module('./type')
 import domain = module('domain')
 import constant = module('../constant')
 import util_auth = module('../util/auth')
+var _ = require('underscore');
 
 export var methods: {[key: string]: type.Method;} = {};
 export function add(key:string, method: type.Method) {
@@ -21,10 +22,19 @@ export function addModule(module:any) {
 		if (typeof module[fn] === 'function') add(fn, module[fn]);
 	}
 }
+
+var authMethods: string[] = [];
+export function requireAuth(newAuthMethods:string[]) {
+	authMethods = authMethods.concat(newAuthMethods);
+}
+function isAuthRequired(methodName:string) {
+	return _.contains(authMethods, methodName);
+}
 /**
  * handle method call
  */
 export function httpHandler(req: any, res: any) {
+	var auth = new util_auth.Auth(req, res);
 
 	function onError(id: any, statusCode: number, error: error.IRPCOverHTTPError) : void {
 		res.send(JSON.stringify({
@@ -35,7 +45,6 @@ export function httpHandler(req: any, res: any) {
 	}
 
     function getUserId() : number {
-		var auth = new util_auth.Auth(req, res);
 		var userId = auth.getUserId();
 		if (!userId) userId = constant.SYSTEM_USER_ID;
 		return userId;
@@ -63,6 +72,10 @@ export function httpHandler(req: any, res: any) {
 	var method: type.Method =  methods[req.body.method];
 	if (!method) {
 		onError(req.body.id, 404, new error.MethodNotFoundError(req.body.method, null));
+		return;
+	}
+	if (isAuthRequired(req.body.method) && !auth.isLogin()) {
+		onError(req.body.id, 200, new error.UnauthorizedError('You have to login before processing ' + method, null));
 		return;
 	}
 
