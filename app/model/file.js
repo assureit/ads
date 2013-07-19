@@ -58,21 +58,6 @@ var FileDAO = (function (_super) {
             callback(err);
         });
     };
-    FileDAO.prototype.select = function (id, callback) {
-        this.con.query('SELECT path, name from file where id = ?', [
-            id
-        ], function (err, result) {
-            if(err) {
-                callback(err, null, null);
-                return;
-            }
-            if(result.length == 0) {
-                callback(new error.NotFoundError('The information on the target file was not found.'), null, null);
-                return;
-            }
-            callback(err, result[0].path, result[0].name);
-        });
-    };
     FileDAO.prototype.get = function (id, callback) {
         var _this = this;
         async.waterfall([
