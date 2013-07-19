@@ -8,6 +8,7 @@ var util_auth = require('../util/auth')
 var async = require('async');
 var CONFIG = require('config');
 exports.upload = function (req, res) {
+    var auth = new util_auth.Auth(req, res);
     function onError(err, errorCode, upfile) {
         if(fs.existsSync(upfile.path)) {
             fs.unlink(upfile.path, function (err2) {
@@ -36,7 +37,6 @@ exports.upload = function (req, res) {
         return CONFIG.ads.uploadPath + '/' + yy + '/' + mm + '/' + dd;
     }
     function getUserId() {
-        var auth = new util_auth.Auth(req, res);
         var userId = auth.getUserId();
         if(!userId) {
             userId = constant.SYSTEM_USER_ID;
@@ -48,6 +48,9 @@ exports.upload = function (req, res) {
     if(!CONFIG.ads.uploadPath || CONFIG.ads.uploadPath.length == 0) {
         onError('The Upload path is not set.', error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
         return;
+    }
+    if(!auth.isLogin()) {
+        onError('You have to login before uploading files.', error.HTTP_STATUS.UNAUTHORIZED, upfile);
     }
     if(upfile) {
         var con = new db.Database();

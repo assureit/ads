@@ -9,5 +9,6 @@ jsonrpc.add('version', function(params: any, userId: number, callback: type.Call
 
 jsonrpc.addModule(dcase);
 jsonrpc.addModule(rec);
+jsonrpc.requireAuth(['createDCase', 'commit', 'editDCase', 'deleteDCase']);
 
 export var httpHandler = jsonrpc.httpHandler;

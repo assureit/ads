@@ -78,6 +78,12 @@ export class LoginError extends ApplicationError {
 	}
 }
 
+export class UnauthorizedError extends ApplicationError {
+	constructor(msg:string, data?:any) {
+		super(HTTP_STATUS.OK, RPC_ERROR.AUTH_ERROR, msg, data);
+	}
+}
+
 export class VersionConflictError extends ApplicationError {
 	constructor(msg:string, data?:any) {
 		super(HTTP_STATUS.OK, RPC_ERROR.DATA_VERSION_CONFLICT, msg, data);
@@ -109,6 +115,8 @@ export enum RPC_ERROR {
 export enum HTTP_STATUS {
 	OK = 200,
 	BAD_REQUEST = 400, 	// Bad Request
+	UNAUTHORIZED = 401,	// Unauthorized
+	FORBIDDEN = 403,	// Forbidden
 	NOT_FOUND = 404, 	// Not Found
 	INTERNAL_SERVER_ERROR = 500 // Internal Server Error
 /*

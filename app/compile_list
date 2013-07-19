@@ -17,6 +17,7 @@ db/db.ts
 test/db/db.ts
 test/db/test-db.ts
 test/routes/api.ts
+test/routes/api-auth.ts
 test/routes/file.ts
 test/routes/monitor.ts
 test/api/dcase-createdcase.ts

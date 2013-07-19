@@ -9,6 +9,7 @@ var async = require('async');
 var CONFIG = require('config');
 
 export var upload = function(req: any, res: any){
+	var auth = new util_auth.Auth(req, res);
 
 	function onError(err: any, errorCode: number, upfile: any) :void {
 		if(fs.existsSync(upfile.path)) {
@@ -38,7 +39,6 @@ export var upload = function(req: any, res: any){
 	}
 
 	function getUserId() : number {
-		var auth = new util_auth.Auth(req, res);
 		var userId = auth.getUserId();
 		if (!userId) userId = constant.SYSTEM_USER_ID;
 		return userId;
@@ -57,12 +57,15 @@ export var upload = function(req: any, res: any){
 	}
 
 	var userId = getUserId();
-
 	var upfile = req.files.upfile
 	if (!CONFIG.ads.uploadPath || CONFIG.ads.uploadPath.length == 0) {
 		onError('The Upload path is not set.', error.HTTP_STATUS.INTERNAL_SERVER_ERROR, upfile);
 		return;
 	}
+	if (!auth.isLogin()) {
+		onError('You have to login before uploading files.', error.HTTP_STATUS.UNAUTHORIZED, upfile);
+	}
+
 	if (upfile) {
 		var con = new db.Database();
 		con.begin((err, result) => {

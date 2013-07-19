@@ -153,7 +153,7 @@ describe('api', function () {
             });
             it('should start from offset 0', function (done) {
                 var con = new db.Database();
-                con.query('SELECT d.* FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified, c.id desc LIMIT 1', function (err, expectedResult) {
+                con.query('SELECT d.* FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified desc, c.id desc LIMIT 1', function (err, expectedResult) {
                     if(err) {
                         con.close();
                         throw err;

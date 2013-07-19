@@ -108,7 +108,7 @@ describe('routes.api', function () {
             });
         });
         it('UserId Check', function (done) {
-            request(app['app']).post('/api/1.0/').set('cookie', 'sessionUserId=s%3A2.VahsKVbwfM9%2FffWlMmaYvrLbwqO2JEV%2Bp3Oli%2BT%2FTrg; sessionUserName=s%3Ahisaboh.KCuRiQt0qkpAGD4HzqZEYti9gW2zkUc%2F9DEEu5Ohh6k').send({
+            request(app['app']).post('/api/1.0/').set('cookie', 'sessionUserId=s%3A101.SQWKjEKxpbMKXLHsW9rfisXGiw4OmNiufkVaJYEOOmc').send({
                 jsonrpc: "2.0",
                 method: "ping2",
                 id: 100
@@ -119,7 +119,7 @@ describe('routes.api', function () {
                 assert.equal(100, res.body.id);
                 assert.strictEqual(null, res.body.error);
                 assert.notStrictEqual(undefined, res.body.result);
-                assert.equal(2, res.body.result);
+                assert.equal(101, res.body.result);
                 done();
             });
         });

@@ -102,6 +102,14 @@ var LoginError = (function (_super) {
     return LoginError;
 })(ApplicationError);
 exports.LoginError = LoginError;
+var UnauthorizedError = (function (_super) {
+    __extends(UnauthorizedError, _super);
+    function UnauthorizedError(msg, data) {
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.AUTH_ERROR, msg, data);
+    }
+    return UnauthorizedError;
+})(ApplicationError);
+exports.UnauthorizedError = UnauthorizedError;
 var VersionConflictError = (function (_super) {
     __extends(VersionConflictError, _super);
     function VersionConflictError(msg, data) {
@@ -137,6 +145,8 @@ var RPC_ERROR = exports.RPC_ERROR;
     HTTP_STATUS._map = [];
     HTTP_STATUS.OK = 200;
     HTTP_STATUS.BAD_REQUEST = 400;
+    HTTP_STATUS.UNAUTHORIZED = 401;
+    HTTP_STATUS.FORBIDDEN = 403;
     HTTP_STATUS.NOT_FOUND = 404;
     HTTP_STATUS.INTERNAL_SERVER_ERROR = 500;
 })(exports.HTTP_STATUS || (exports.HTTP_STATUS = {}));

@@ -8,7 +8,7 @@ var request = require('supertest');
 var expect = require('expect.js');
 var async = require('async');
 var CONFIG = require('config');
-
+var error = require('../../api/error')
 describe('routes.file', function () {
     var con;
     beforeEach(function (done) {
@@ -30,7 +30,7 @@ describe('routes.file', function () {
     describe('upload', function () {
         it('should return HTTP200 return URL ', function (done) {
             this.timeout(15000);
-            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
+            request(app['app']).post('/file').set('cookie', 'sessionUserId=s%3A101.SQWKjEKxpbMKXLHsW9rfisXGiw4OmNiufkVaJYEOOmc').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
                 if(err) {
                     throw err;
                 }
@@ -41,8 +41,21 @@ describe('routes.file', function () {
                 done();
             });
         });
+        it('auth required ', function (done) {
+            this.timeout(15000);
+            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(error.HTTP_STATUS.UNAUTHORIZED).end(function (err, res) {
+                if(err) {
+                    throw err;
+                }
+                assert.notStrictEqual(undefined, res.text);
+                assert.notStrictEqual(null, res.text);
+                assert.notEqual('', res.text);
+                expect(res.text).to.eql('You have to login before uploading files.');
+                done();
+            });
+        });
         it('Upload files have been move or ', function (done) {
-            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
+            request(app['app']).post('/file').set('cookie', 'sessionUserId=s%3A101.SQWKjEKxpbMKXLHsW9rfisXGiw4OmNiufkVaJYEOOmc').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
                 if(err) {
                     throw err;
                 }
@@ -64,7 +77,7 @@ describe('routes.file', function () {
             });
         });
         it('DB.file.path for any updates ', function (done) {
-            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
+            request(app['app']).post('/file').set('cookie', 'sessionUserId=s%3A101.SQWKjEKxpbMKXLHsW9rfisXGiw4OmNiufkVaJYEOOmc').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(200).end(function (err, res) {
                 if(err) {
                     throw err;
                 }
@@ -97,7 +110,7 @@ describe('routes.file', function () {
             });
         });
         it('Upload File Nothing', function (done) {
-            request(app['app']).post('/file').expect(400).expect('Upload File not exists.').end(function (err, res) {
+            request(app['app']).post('/file').set('cookie', 'sessionUserId=s%3A101.SQWKjEKxpbMKXLHsW9rfisXGiw4OmNiufkVaJYEOOmc').expect(400).expect('Upload File not exists.').end(function (err, res) {
                 if(err) {
                     throw err;
                 }
@@ -106,7 +119,7 @@ describe('routes.file', function () {
         });
         it('Config error', function (done) {
             CONFIG.ads.uploadPath = '';
-            request(app['app']).post('/file').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(500).expect('The Upload path is not set.').end(function (err, res) {
+            request(app['app']).post('/file').set('cookie', 'sessionUserId=s%3A101.SQWKjEKxpbMKXLHsW9rfisXGiw4OmNiufkVaJYEOOmc').attach('upfile', 'test/routes/testfiles/uptest.txt').expect(500).expect('The Upload path is not set.').end(function (err, res) {
                 if(err) {
                     throw err;
                 }
