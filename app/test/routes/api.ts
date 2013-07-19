@@ -9,6 +9,7 @@ import assert = module('assert')
 import http = module('http')
 import app = module('../../app')
 var request = require('supertest');	// TODO: supertestの宣言ファイル作成
+var expect = require('expect.js');
 
 describe('routes.api', function() {
 	describe('jsonrpc', function() {
@@ -19,10 +20,14 @@ describe('routes.api', function() {
 				.expect(400)
 				.end(function (err, res) {
 					if (err) throw err;
-					assert.equal(100, res.body.id);
-					assert.notStrictEqual(undefined, res.body.error);
-					assert.notStrictEqual(undefined, res.body.error.code);
-					assert.equal(-32600, res.body.error.code);
+					expect(res.body.id).to.equal(100);
+					expect(res.body.error).not.to.be(undefined);
+					expect(res.body.error.code).not.to.be(undefined);
+					expect(res.body.error.code).to.equal(-32600);
+					// assert.equal(100, res.body.id);
+					// assert.notStrictEqual(undefined, res.body.error);
+					// assert.notStrictEqual(undefined, res.body.error.code);
+					// assert.equal(-32600, res.body.error.code);
 				});
 			request(app['app'])	// TODO: 型制約を逃げている。要修正。
 				.post('/api/1.0')
@@ -30,10 +35,14 @@ describe('routes.api', function() {
 				.expect(400)
 				.end(function (err, res) {
 					if (err) throw err;
-					assert.equal(100, res.body.id);
-					assert.notStrictEqual(undefined, res.body.error);
-					assert.notStrictEqual(undefined, res.body.error.code);
-					assert.equal(-32600, res.body.error.code);
+					expect(res.body.id).to.equal(100);
+					expect(res.body.error).not.to.be(undefined);
+					expect(res.body.error.code).not.to.be(undefined);
+					expect(res.body.error.code).to.equal(-32600);
+					// assert.equal(100, res.body.id);
+					// assert.notStrictEqual(undefined, res.body.error);
+					// assert.notStrictEqual(undefined, res.body.error.code);
+					// assert.equal(-32600, res.body.error.code);
 				});
 		});
 		it('should return content-type application/json', function() {

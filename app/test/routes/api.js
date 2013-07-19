@@ -2,6 +2,7 @@ var assert = require('assert');
 
 var app = require('../../app');
 var request = require('supertest');
+var expect = require('expect.js');
 
 describe('routes.api', function () {
     describe('jsonrpc', function () {
@@ -9,18 +10,18 @@ describe('routes.api', function () {
             request(app['app']).post('/api/1.0').send({ "jsonrpc": "1.0", "method": "test", "id": 100, "params": { "hoge": "hogev" } }).expect(400).end(function (err, res) {
                 if (err)
                     throw err;
-                assert.equal(100, res.body.id);
-                assert.notStrictEqual(undefined, res.body.error);
-                assert.notStrictEqual(undefined, res.body.error.code);
-                assert.equal(-32600, res.body.error.code);
+                expect(res.body.id).to.equal(100);
+                expect(res.body.error).not.to.be(undefined);
+                expect(res.body.error.code).not.to.be(undefined);
+                expect(res.body.error.code).to.equal(-32600);
             });
             request(app['app']).post('/api/1.0').send({ "method": "test", "id": 100, "params": { "hoge": "hogev" } }).expect(400).end(function (err, res) {
                 if (err)
                     throw err;
-                assert.equal(100, res.body.id);
-                assert.notStrictEqual(undefined, res.body.error);
-                assert.notStrictEqual(undefined, res.body.error.code);
-                assert.equal(-32600, res.body.error.code);
+                expect(res.body.id).to.equal(100);
+                expect(res.body.error).not.to.be(undefined);
+                expect(res.body.error.code).not.to.be(undefined);
+                expect(res.body.error.code).to.equal(-32600);
             });
         });
         it('should return content-type application/json', function () {
