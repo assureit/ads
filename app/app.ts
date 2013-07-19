@@ -4,6 +4,7 @@
 import http = module('http')
 import express = module('express')
 import api = module('./routes/api')
+import privateAPI = module('./routes/api-private')
 import client = module('./routes/index')
 import js = module('./routes/javascript')
 import monitor = module('./routes/monitor')
@@ -59,6 +60,7 @@ app.configure('production', function() {
 });
 
 app.post('/api/1.0', api.httpHandler);
+app.post('/api/1.0/private', privateAPI.httpHandler);
 app.get('/', client.index);
 app.get('/page/:id', client.index);
 app.get('/tag/:t', client.index);

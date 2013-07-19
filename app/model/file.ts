@@ -43,20 +43,20 @@ export class FileDAO extends model.DAO {
 
 	}
 
-	select(id: number, callback: (err: any, path: string, name: string) => void) {
-		this.con.query('SELECT path, name from file where id = ?', [id], (err, result) => {
-			if (err) {
-				callback(err, null, null);
-				return;
-			}
-			if (result.length == 0)
-			{
-				callback(new error.NotFoundError('The information on the target file was not found.'), null, null); 
-				return;
-			}
-			callback(err, result[0].path, result[0].name);
-		});
-	} 
+//	select(id: number, callback: (err: any, path: string, name: string) => void) {
+//		this.con.query('SELECT path, name from file where id = ?', [id], (err, result) => {
+//			if (err) {
+//				callback(err, null, null);
+//				return;
+//			}
+//			if (result.length == 0)
+//			{
+//				callback(new error.NotFoundError('The information on the target file was not found.'), null, null); 
+//				return;
+//			}
+//			callback(err, result[0].path, result[0].name);
+//		});
+//	} 
 
 	get(id: number, callback: (err: any, file:File) => void) {
 		async.waterfall([

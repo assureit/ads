@@ -1,6 +1,7 @@
 var http = require('http')
 var express = require('express')
 var api = require('./routes/api')
+var privateAPI = require('./routes/api-private')
 var client = require('./routes/index')
 var js = require('./routes/javascript')
 var monitor = require('./routes/monitor')
@@ -37,6 +38,7 @@ app.configure('production', function () {
     app.use(express.errorHandler());
 });
 app.post('/api/1.0', api.httpHandler);
+app.post('/api/1.0/private', privateAPI.httpHandler);
 app.get('/', client.index);
 app.get('/page/:id', client.index);
 app.get('/tag/:t', client.index);
