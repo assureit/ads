@@ -78,6 +78,12 @@ export class LoginError extends ApplicationError {
 	}
 }
 
+export class PermissionError extends ApplicationError {
+	constructor(msg:string, data?:any) {
+		super(HTTP_STATUS.OK, RPC_ERROR.AUTH_ERROR, msg, data);
+	}
+}
+
 export class VersionConflictError extends ApplicationError {
 	constructor(msg:string, data?:any) {
 		super(HTTP_STATUS.OK, RPC_ERROR.DATA_VERSION_CONFLICT, msg, data);

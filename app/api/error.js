@@ -102,6 +102,14 @@ var LoginError = (function (_super) {
     return LoginError;
 })(ApplicationError);
 exports.LoginError = LoginError;
+var PermissionError = (function (_super) {
+    __extends(PermissionError, _super);
+    function PermissionError(msg, data) {
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.AUTH_ERROR, msg, data);
+    }
+    return PermissionError;
+})(ApplicationError);
+exports.PermissionError = PermissionError;
 var VersionConflictError = (function (_super) {
     __extends(VersionConflictError, _super);
     function VersionConflictError(msg, data) {
