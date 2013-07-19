@@ -7,7 +7,7 @@ var CONFIG = require('config');
 var app = express();
 var serverError = true;
 app.use(express.bodyParser());
-app.post('/posttest', function (req, res) {
+app.post('/test/post', function (req, res) {
     res.header('Content-Type', 'text/plain');
     if(serverError) {
         res.send('post normal response');
@@ -15,7 +15,7 @@ app.post('/posttest', function (req, res) {
         res.send(500);
     }
 });
-app.put('/puttest', function (req, res) {
+app.put('/test/put', function (req, res) {
     res.header('Content-Type', 'text/plain');
     if(serverError) {
         res.send('put normal response');
@@ -23,19 +23,19 @@ app.put('/puttest', function (req, res) {
         res.send(500);
     }
 });
-app.post('/headercheck', function (req, res) {
+app.post('/test/header', function (req, res) {
     res.header('Content-Type', 'text/plain');
     res.send(req.headers.test_header);
 });
-app.put('/headercheck', function (req, res) {
+app.put('/test/header', function (req, res) {
     res.header('Content-Type', 'text/plain');
     res.send(req.headers.test_header);
 });
-app.post('/contenttypecheck', function (req, res) {
+app.post('/test/contenttype', function (req, res) {
     res.header('Content-Type', 'text/plain');
     res.send(req.headers['content-type']);
 });
-app.put('/contenttypecheck', function (req, res) {
+app.put('/test/contenttype', function (req, res) {
     res.header('Content-Type', 'text/plain');
     res.send(req.headers['content-type']);
 });
@@ -56,7 +56,7 @@ describe('net', function () {
                     port: 3030
                 };
                 var req = new rest.Request(options);
-                req.post('/posttest', 'post string', function (err, result) {
+                req.post('/test/post', 'post string', function (err, result) {
                     expect(err).to.be(null);
                     expect(result).to.eql('post normal response');
                     done();
@@ -70,7 +70,7 @@ describe('net', function () {
                 };
                 var req = new rest.Request(options);
                 req.setHeader('test_header', 'return_string');
-                req.post('/headercheck', 'post string', function (err, result) {
+                req.post('/test/header', 'post string', function (err, result) {
                     expect(err).to.be(null);
                     expect(result).to.eql('return_string');
                     done();
@@ -84,7 +84,7 @@ describe('net', function () {
                 };
                 var req = new rest.Request(options);
                 req.setContentType('text/plain');
-                req.post('/contenttypecheck', 'post string', function (err, result) {
+                req.post('/test/contenttype', 'post string', function (err, result) {
                     expect(err).to.be(null);
                     expect(result).to.eql('text/plain');
                     done();
@@ -96,7 +96,7 @@ describe('net', function () {
                     port: 3030
                 };
                 var req = new rest.Request(options);
-                req.post('/posttest', 'post string', function (err, result) {
+                req.post('/test/post', 'post string', function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err.rpcHttpStatus).to.be(500);
                     expect(err.code).to.be(error.RPC_ERROR.INTERNAL_ERROR);
@@ -111,7 +111,7 @@ describe('net', function () {
                     port: 3030
                 };
                 var req = new rest.Request(options);
-                req.post('/posttest', 'post string', function (err, result) {
+                req.post('/test/post', 'post string', function (err, result) {
                     expect(err).not.to.be(null);
                     done();
                 });
@@ -122,7 +122,7 @@ describe('net', function () {
                     host: 'localhost'
                 };
                 var req = new rest.Request(options);
-                req.post('/posttest', 'post string', function (err, result) {
+                req.post('/test/post', 'post string', function (err, result) {
                     expect(err).not.to.be(null);
                     done();
                 });
@@ -134,7 +134,7 @@ describe('net', function () {
                     port: 3030
                 };
                 var req = new rest.Request(options);
-                req.post('/posttest_nothing', 'post string', function (err, result) {
+                req.post('/test/nothing', 'post string', function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err.rpcHttpStatus).to.be(500);
                     expect(err.code).to.be(error.RPC_ERROR.INTERNAL_ERROR);
@@ -150,7 +150,7 @@ describe('net', function () {
                     port: 3030
                 };
                 var req = new rest.Request(options);
-                req.post('/posttest', 'post string', function (err, result) {
+                req.post('/test/post', 'post string', function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err.rpcHttpStatus).to.be(500);
                     expect(err.code).to.be(error.RPC_ERROR.INTERNAL_ERROR);
@@ -168,7 +168,7 @@ describe('net', function () {
                     port: 3030
                 };
                 var req = new rest.Request(options);
-                req.put('/puttest', 'put string', function (err, result) {
+                req.put('/test/put', 'put string', function (err, result) {
                     expect(err).to.be(null);
                     expect(result).to.eql('put normal response');
                     done();
@@ -182,7 +182,7 @@ describe('net', function () {
                 };
                 var req = new rest.Request(options);
                 req.setHeader('test_header', 'return_string');
-                req.put('/headercheck', 'put string', function (err, result) {
+                req.put('/test/header', 'put string', function (err, result) {
                     expect(err).to.be(null);
                     expect(result).to.eql('return_string');
                     done();
@@ -196,7 +196,7 @@ describe('net', function () {
                 };
                 var req = new rest.Request(options);
                 req.setContentType('text/plain');
-                req.put('/contenttypecheck', 'put string', function (err, result) {
+                req.put('/test/contenttype', 'put string', function (err, result) {
                     expect(err).to.be(null);
                     expect(result).to.eql('text/plain');
                     done();
@@ -208,7 +208,7 @@ describe('net', function () {
                     port: 3030
                 };
                 var req = new rest.Request(options);
-                req.put('/puttest', 'put string', function (err, result) {
+                req.put('/test/put', 'put string', function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err.rpcHttpStatus).to.be(500);
                     expect(err.code).to.be(error.RPC_ERROR.INTERNAL_ERROR);
@@ -223,7 +223,7 @@ describe('net', function () {
                     port: 3030
                 };
                 var req = new rest.Request(options);
-                req.put('/puttest', 'put string', function (err, result) {
+                req.put('/test/put', 'put string', function (err, result) {
                     expect(err).not.to.be(null);
                     done();
                 });
@@ -234,7 +234,7 @@ describe('net', function () {
                     host: 'localhost'
                 };
                 var req = new rest.Request(options);
-                req.put('/puttest', 'put string', function (err, result) {
+                req.put('/test/put', 'put string', function (err, result) {
                     expect(err).not.to.be(null);
                     done();
                 });
@@ -246,7 +246,7 @@ describe('net', function () {
                     port: 3030
                 };
                 var req = new rest.Request(options);
-                req.put('/puttest_nothing', 'put string', function (err, result) {
+                req.put('/test/nothing', 'put string', function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err.rpcHttpStatus).to.be(500);
                     expect(err.code).to.be(error.RPC_ERROR.INTERNAL_ERROR);
@@ -262,7 +262,7 @@ describe('net', function () {
                     port: 3030
                 };
                 var req = new rest.Request(options);
-                req.put('/puttest', 'post string', function (err, result) {
+                req.put('/test/put', 'post string', function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err.rpcHttpStatus).to.be(500);
                     expect(err.code).to.be(error.RPC_ERROR.INTERNAL_ERROR);
