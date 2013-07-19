@@ -55,7 +55,7 @@ exports.exporter = function (req, res) {
     }
 
     exec("/bin/mktemp -q /tmp/svg.XXXXXX", function (error, stdout, stderr) {
-        var filename = stdout;
+        var filename = stdout.toString();
         var svgname = filename.trim();
         var resname = filename.trim() + "." + type;
         fs.writeFile(svgname, req.body.svg, function (err) {

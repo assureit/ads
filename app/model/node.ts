@@ -250,7 +250,7 @@ export class NodeDAO extends model.DAO {
 		});
 	}
 
-	get(commitId: number, callback: (err:any, list:ArrayNode[]) => void) {
+	get(commitId: number, callback: (err:any, list:Node[]) => void) {
 		this.con.query('SELECT * FROM node WHERE commit_id = ?', [commitId], (err, result) => {
 			if (err) {
 				callback(err, null);
