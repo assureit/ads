@@ -67,21 +67,21 @@ describe('model', function() {
 				});
 			});	
 		});
-		describe('select', function() {
-			it('normal end', function(done) {
-				fileDAO.select(301, (err:any, path:string, name:string) => {
-					expect(err).to.be(null);
-					con.query('SELECT * FROM file WHERE id=301', (err, result) => {
-						expect(err).to.be(null);
-						expect(result).not.to.be(null);
-						expect(result).not.to.be(undefined);
-						expect(result[0].path).to.eql(path);
-						expect(result[0].name).to.eql(name);
-						done();
-					});
-				});
-			});
-		});
+//		describe('select', function() {
+//			it('normal end', function(done) {
+//				fileDAO.select(301, (err:any, path:string, name:string) => {
+//					expect(err).to.be(null);
+//					con.query('SELECT * FROM file WHERE id=301', (err, result) => {
+//						expect(err).to.be(null);
+//						expect(result).not.to.be(null);
+//						expect(result).not.to.be(undefined);
+//						expect(result[0].path).to.eql(path);
+//						expect(result[0].name).to.eql(name);
+//						done();
+//					});
+//				});
+//			});
+//		});
 		describe('get', function() {
 			it('normal end', function(done) {
 				fileDAO.get(301, (err:any, file:model_file.File) => {
