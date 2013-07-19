@@ -29,7 +29,7 @@ var TagDAO = (function (_super) {
         var _this = this;
         async.waterfall([
             function (next) {
-                _this.con.query('SELECT * FROM (SELECT t.id, t.label, COUNT(t.id) as cnt FROM tag t, dcase_tag_rel r, dcase d WHERE t.id = r.tag_id AND d.id = r.dcase_id AND d.delete_flag = FALSE GROUP BY t.id, t.label) v ORDER BY v.cnt DESC', function (err, result) {
+                _this.con.query('SELECT * FROM (SELECT t.id, t.label, COUNT(t.id) as cnt FROM tag t, dcase_tag_rel r, dcase d, commit c WHERE t.id = r.tag_id AND d.id = r.dcase_id AND d.id = c.dcase_id AND c.latest_flag = TRUE AND d.delete_flag = FALSE GROUP BY t.id, t.label) v ORDER BY v.cnt DESC', function (err, result) {
                     next(err, result);
                 });
             }, 

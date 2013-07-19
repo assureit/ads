@@ -116,7 +116,7 @@ export class NodeDAO extends model.DAO {
 				(monitor:model_monitor.MonitorNode, next: Function) => {
 					if (monitor) {
 						if (meta.WatchId != monitor.watchId
-							|| meta.PresetId != monitor.watchId
+							|| meta.PresetId != monitor.presetId
 							|| JSON.stringify(params) != JSON.stringify(monitor.params)) {
 
 							monitor.watchId = meta.WatchId;

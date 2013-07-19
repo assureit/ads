@@ -94,7 +94,7 @@ export class DCaseDAO extends model.DAO {
 		var countParams:any[] = [];
 		if (tagList && tagList.length > 0) {
 			var tagVars:string = _.map(tagList, (it:string) => {return '?'}).join(',');
-			query.sql = 'SELECT count(d.id) as cnt ' +
+			countSQL = 'SELECT count(d.id) as cnt ' +
 						'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' +
 						'WHERE d.id = c.dcase_id ' +
 						'AND d.user_id = u.id ' +
@@ -107,14 +107,17 @@ export class DCaseDAO extends model.DAO {
 						'GROUP BY c.id ' +
 						'HAVING COUNT(t.id) = ? ';
 			var tmp:any[] = tagList;
-			params = tmp.concat([tagList.length]).concat(params);
+			countParams = tmp.concat([tagList.length]);
 		}
-			this.con.query(countSQL, params,(err, countResult) => {
+			this.con.query(countSQL, countParams,(err, countResult) => {
 				if (err) {
 					callback(err, null, null);
 					return;
 				}
-				pager.totalItems = countResult[0].cnt;
+				pager.totalItems = 0;
+				if (countResult.length > 0) {
+					pager.totalItems = countResult[0].cnt;
+				}
 				callback(err, pager, list);
 			}); 
 
