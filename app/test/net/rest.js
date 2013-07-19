@@ -5,11 +5,11 @@ var expect = require('expect.js');
 var express = require('express');
 var CONFIG = require('config');
 var app = express();
-var serverError = true;
+var serverOK = true;
 app.use(express.bodyParser());
 app.post('/test/post', function (req, res) {
     res.header('Content-Type', 'text/plain');
-    if(serverError) {
+    if(serverOK) {
         res.send('post normal response');
     } else {
         res.send(500);
@@ -17,7 +17,7 @@ app.post('/test/post', function (req, res) {
 });
 app.put('/test/put', function (req, res) {
     res.header('Content-Type', 'text/plain');
-    if(serverError) {
+    if(serverOK) {
         res.send('put normal response');
     } else {
         res.send(500);
@@ -39,6 +39,14 @@ app.put('/test/contenttype', function (req, res) {
     res.header('Content-Type', 'text/plain');
     res.send(req.headers['content-type']);
 });
+app.post('/test/check/post', function (req, res) {
+    res.header('Content-Type', 'text/plain');
+    res.send(req.method);
+});
+app.put('/test/check/put', function (req, res) {
+    res.header('Content-Type', 'text/plain');
+    res.send(req.method);
+});
 describe('net', function () {
     var server = null;
     before(function (done) {
@@ -50,7 +58,7 @@ describe('net', function () {
     describe('rest', function () {
         describe('post', function () {
             it('normal end', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -63,7 +71,7 @@ describe('net', function () {
                 });
             });
             it('normal end plus header', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -77,7 +85,7 @@ describe('net', function () {
                 });
             });
             it('normal end plus Content-Type', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -90,8 +98,21 @@ describe('net', function () {
                     done();
                 });
             });
+            it('normal end method post', function (done) {
+                serverOK = true;
+                var options = {
+                    host: 'localhost',
+                    port: 3030
+                };
+                var req = new rest.Request(options);
+                req.post('/test/check/post', 'post string', function (err, result) {
+                    expect(err).to.be(null);
+                    expect(result).to.eql('POST');
+                    done();
+                });
+            });
             it('host is not set', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     port: 3030
                 };
@@ -105,7 +126,7 @@ describe('net', function () {
                 });
             });
             it('host error', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'Xlocalhost',
                     port: 3030
@@ -117,7 +138,7 @@ describe('net', function () {
                 });
             });
             it('port error', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'localhost'
                 };
@@ -128,7 +149,7 @@ describe('net', function () {
                 });
             });
             it('path error', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -144,7 +165,7 @@ describe('net', function () {
                 });
             });
             it('return internal server error', function (done) {
-                serverError = false;
+                serverOK = false;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -162,7 +183,7 @@ describe('net', function () {
         });
         describe('put', function () {
             it('normal end', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -175,7 +196,7 @@ describe('net', function () {
                 });
             });
             it('normal end plus header', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -189,7 +210,7 @@ describe('net', function () {
                 });
             });
             it('normal end plus Content-Type', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -202,8 +223,21 @@ describe('net', function () {
                     done();
                 });
             });
+            it('normal end method put', function (done) {
+                serverOK = true;
+                var options = {
+                    host: 'localhost',
+                    port: 3030
+                };
+                var req = new rest.Request(options);
+                req.put('/test/check/put', 'post string', function (err, result) {
+                    expect(err).to.be(null);
+                    expect(result).to.eql('PUT');
+                    done();
+                });
+            });
             it('host is not set', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     port: 3030
                 };
@@ -217,7 +251,7 @@ describe('net', function () {
                 });
             });
             it('host error', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'Xlocalhost',
                     port: 3030
@@ -229,7 +263,7 @@ describe('net', function () {
                 });
             });
             it('port error', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'localhost'
                 };
@@ -240,7 +274,7 @@ describe('net', function () {
                 });
             });
             it('path error', function (done) {
-                serverError = true;
+                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -256,7 +290,7 @@ describe('net', function () {
                 });
             });
             it('return internal server error', function (done) {
-                serverError = false;
+                serverOK = false;
                 var options = {
                     host: 'localhost',
                     port: 3030
