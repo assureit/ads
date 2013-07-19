@@ -77,22 +77,4 @@ describe('routes.api', function () {
             });
         });
     });
-    describe('uploadFile', function () {
-        it('require auth', function () {
-            request(app['app']).post('/api/1.0').send({
-                "jsonrpc": "2.0",
-                "method": "uploadFile",
-                "id": 100,
-                "params": {
-                }
-            }).expect(200).end(function (err, res) {
-                if(err) {
-                    throw err;
-                }
-                assert.notStrictEqual(undefined, res.body.error);
-                assert.notStrictEqual(undefined, res.body.error.code);
-                expect(res.body.error.code).to.eql(error.RPC_ERROR.AUTH_ERROR);
-            });
-        });
-    });
 });

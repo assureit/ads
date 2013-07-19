@@ -54,7 +54,7 @@ function httpHandler(req, res) {
         return;
     }
     if(isAuthRequired(req.body.method) && !auth.isLogin()) {
-        onError(req.body.id, 200, new error.PermissionError('You have to login before processing ' + method, null));
+        onError(req.body.id, 200, new error.UnauthorizedError('You have to login before processing ' + method, null));
         return;
     }
     var d = domain.create();
