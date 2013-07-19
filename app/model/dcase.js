@@ -107,18 +107,21 @@ var DCaseDAO = (function (_super) {
                 var tagVars = _.map(tagList, function (it) {
                     return '?';
                 }).join(',');
-                query.sql = 'SELECT count(d.id) as cnt ' + 'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' + 'WHERE d.id = c.dcase_id ' + 'AND d.user_id = u.id ' + 'AND c.user_id = cu.id ' + 'AND t.id = r.tag_id  ' + 'AND r.dcase_id = d.id ' + 'AND c.latest_flag = TRUE ' + 'AND d.delete_flag = FALSE ' + 'AND t.label IN (' + tagVars + ') ' + 'GROUP BY c.id ' + 'HAVING COUNT(t.id) = ? ';
+                countSQL = 'SELECT count(d.id) as cnt ' + 'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' + 'WHERE d.id = c.dcase_id ' + 'AND d.user_id = u.id ' + 'AND c.user_id = cu.id ' + 'AND t.id = r.tag_id  ' + 'AND r.dcase_id = d.id ' + 'AND c.latest_flag = TRUE ' + 'AND d.delete_flag = FALSE ' + 'AND t.label IN (' + tagVars + ') ' + 'GROUP BY c.id ' + 'HAVING COUNT(t.id) = ? ';
                 var tmp = tagList;
-                params = tmp.concat([
+                countParams = tmp.concat([
                     tagList.length
-                ]).concat(params);
+                ]);
             }
-            _this.con.query(countSQL, params, function (err, countResult) {
+            _this.con.query(countSQL, countParams, function (err, countResult) {
                 if(err) {
                     callback(err, null, null);
                     return;
                 }
-                pager.totalItems = countResult[0].cnt;
+                pager.totalItems = 0;
+                if(countResult.length > 0) {
+                    pager.totalItems = countResult[0].cnt;
+                }
                 callback(err, pager, list);
             });
         });
