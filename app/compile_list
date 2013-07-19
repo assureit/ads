@@ -39,6 +39,7 @@ test/model/dcase.ts
 test/model/file.ts
 test/model/issue.ts
 test/model/tag.ts
+test/model/pager.ts
 test/net/redmine.ts
 test/net/ldap.ts
 test/net/rec.ts
