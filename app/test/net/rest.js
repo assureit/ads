@@ -1,15 +1,17 @@
 
-var rest = require('../../net/rest')
-var error = require('../../api/error')
+var rest = require('../../net/rest');
+var error = require('../../api/error');
 var expect = require('expect.js');
 var express = require('express');
 var CONFIG = require('config');
+
 var app = express();
 var serverOK = true;
+
 app.use(express.bodyParser());
 app.post('/test/post', function (req, res) {
     res.header('Content-Type', 'text/plain');
-    if(serverOK) {
+    if (serverOK) {
         res.send('post normal response');
     } else {
         res.send(500);
@@ -17,7 +19,7 @@ app.post('/test/post', function (req, res) {
 });
 app.put('/test/put', function (req, res) {
     res.header('Content-Type', 'text/plain');
-    if(serverOK) {
+    if (serverOK) {
         res.send('put normal response');
     } else {
         res.send(500);
@@ -47,6 +49,7 @@ app.put('/test/check/put', function (req, res) {
     res.header('Content-Type', 'text/plain');
     res.send(req.method);
 });
+
 describe('net', function () {
     var server = null;
     before(function (done) {
@@ -55,6 +58,7 @@ describe('net', function () {
     after(function () {
         server.close();
     });
+
     describe('rest', function () {
         describe('post', function () {
             it('normal end', function (done) {
@@ -308,3 +312,4 @@ describe('net', function () {
         });
     });
 });
+
