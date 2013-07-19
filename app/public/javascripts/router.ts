@@ -45,9 +45,9 @@ class Router{
 
 	route(router, name : string, callback : (args :string)=>void) : void {
 		this.table[name] = callback;
-	};
+	}
 
 	start() : void {
 		this.onChange();
-	};
+	}
 };

@@ -1,39 +1,36 @@
-var childProcess = require('child_process')
-var fs = require('fs')
-var lang = require('./lang')
-var dscript = require('./dscript')
-var model_user = require('../model/user')
-var db = require('../db/db')
-var util_auth = require('../util/auth')
+var childProcess = require('child_process');
+var fs = require('fs');
+var lang = require('./lang');
+var dscript = require('./dscript');
+var model_user = require('../model/user');
+var db = require('../db/db');
+var util_auth = require('../util/auth');
 var CONFIG = require('config');
+
 exports.index = function (req, res) {
     var page = 'signin';
-    var params = {
-        basepath: CONFIG.ads.basePath,
-        title: 'Assure-It',
-        lang: lang.lang.ja
-    };
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja };
     var auth = new util_auth.Auth(req, res);
-    if(auth.isLogin()) {
+    if (auth.isLogin()) {
         page = 'signout';
-        params = {
-            basepath: CONFIG.ads.basePath,
-            title: 'Assure-It',
-            lang: lang.lang.ja,
-            userName: auth.getLoginName()
-        };
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
     }
-    if(req.cookies.lang == 'en') {
+
+    if (req.cookies.lang == 'en') {
         params.lang = lang.lang.en;
     }
+
     res.render(page, params);
 };
+
 exports.exporter = function (req, res) {
     var exec = childProcess.exec;
+
     var type = req.body.type;
     var mime = "text/plain";
+
     res.set('Content-type', 'application/octet-stream; charset=utf-8');
-    switch(type) {
+    switch (type) {
         case "png":
             mime = "image/png";
             break;
@@ -56,19 +53,20 @@ exports.exporter = function (req, res) {
             res.send(400, "Bad Request");
             return;
     }
+
     exec("/bin/mktemp -q /tmp/svg.XXXXXX", function (error, stdout, stderr) {
         var filename = stdout;
         var svgname = filename.trim();
         var resname = filename.trim() + "." + type;
         fs.writeFile(svgname, req.body.svg, function (err) {
-            if(err) {
+            if (err)
                 throw err;
-            }
+
             var rsvg_convert = "rsvg-convert " + svgname + " -f " + type + " -o " + resname;
             exec(rsvg_convert, function (r_error, r_stdout, r_stderr) {
-                if(r_error) {
+                if (r_error)
                     throw r_error;
-                }
+
                 var stat = fs.statSync(resname);
                 res.set("Content-Length", stat.size);
                 res.set("Content-type", mime);
@@ -77,11 +75,13 @@ exports.exporter = function (req, res) {
         });
     });
 };
+
 exports.login = function (req, res) {
     var con = new db.Database();
     var userDAO = new model_user.UserDAO(con);
+
     userDAO.login(req.body.username, req.body.password, function (err, result) {
-        if(err) {
+        if (err) {
             res.redirect('/');
             return;
         }
@@ -90,16 +90,19 @@ exports.login = function (req, res) {
         res.redirect(CONFIG.ads.basePath + '/');
     });
 };
+
 exports.logout = function (req, res) {
     var auth = new util_auth.Auth(req, res);
     auth.clear();
     res.redirect(CONFIG.ads.basePath + '/');
 };
+
 exports.register = function (req, res) {
     var con = new db.Database();
     var userDAO = new model_user.UserDAO(con);
+
     userDAO.register(req.body.username, req.body.password, function (err, result) {
-        if(err) {
+        if (err) {
             res.redirect(CONFIG.ads.basePath + '/');
             return;
         }
@@ -108,3 +111,4 @@ exports.register = function (req, res) {
         res.redirect(CONFIG.ads.basePath + '/');
     });
 };
+

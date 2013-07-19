@@ -1,18 +1,17 @@
 
-var model_tag = require('../../model/tag')
+var model_tag = require('../../model/tag');
 
-var testdata = require('../testdata')
+var testdata = require('../testdata');
 var expect = require('expect.js');
 var async = require('async');
+
 describe('model', function () {
     var testDB;
     var con;
     var tagDAO;
+
     beforeEach(function (done) {
-        testdata.begin([
-            'test/default-data.yaml', 
-            'test/model/tag.yaml'
-        ], function (err, c) {
+        testdata.begin(['test/default-data.yaml', 'test/model/tag.yaml'], function (err, c) {
             con = c;
             tagDAO = new model_tag.TagDAO(con);
             done();
@@ -21,7 +20,7 @@ describe('model', function () {
     afterEach(function (done) {
         con.rollback(function (err, result) {
             con.close();
-            if(err) {
+            if (err) {
                 throw err;
             }
             done();
@@ -39,10 +38,7 @@ describe('model', function () {
         });
         describe('search', function () {
             it('normal end', function (done) {
-                tagDAO.search([
-                    'tag1', 
-                    'tag2'
-                ], function (err, list) {
+                tagDAO.search(['tag1', 'tag2'], function (err, list) {
                     expect(err).to.be(null);
                     expect(list).not.to.be(null);
                     done();
@@ -54,9 +50,7 @@ describe('model', function () {
                 tagDAO.insert('test tag', function (err, tagId) {
                     expect(err).to.be(null);
                     expect(tagId).not.to.be(null);
-                    con.query('SELECT * FROM tag WHERE id = ?', [
-                        tagId
-                    ], function (err, resultTag) {
+                    con.query('SELECT * FROM tag WHERE id = ?', [tagId], function (err, resultTag) {
                         expect(err).to.be(null);
                         expect(resultTag).not.to.be(null);
                         expect(resultTag[0].label).to.eql('test tag');
@@ -76,11 +70,7 @@ describe('model', function () {
         });
         describe('replaceDCaseTag', function () {
             it('normal end tag3->deleted_tag', function (done) {
-                tagDAO.replaceDCaseTag(201, [
-                    'tag1', 
-                    'tag2', 
-                    'deleted_tag'
-                ], function (err) {
+                tagDAO.replaceDCaseTag(201, ['tag1', 'tag2', 'deleted_tag'], function (err) {
                     expect(err).to.be(null);
                     con.query('SELECT * FROM dcase_tag_rel WHERE dcase_id = 201 ORDER BY tag_id DESC', function (err, resultREL) {
                         expect(err).to.be(null);
@@ -92,12 +82,7 @@ describe('model', function () {
                 });
             });
             it('normal end add new_tag', function (done) {
-                tagDAO.replaceDCaseTag(201, [
-                    'tag1', 
-                    'tag2', 
-                    'deleted_tag', 
-                    'new_tag'
-                ], function (err) {
+                tagDAO.replaceDCaseTag(201, ['tag1', 'tag2', 'deleted_tag', 'new_tag'], function (err) {
                     expect(err).to.be(null);
                     con.query('SELECT COUNT(id) as cnt FROM dcase_tag_rel WHERE dcase_id = 201', function (err, resultREL) {
                         expect(err).to.be(null);
@@ -126,10 +111,7 @@ describe('model', function () {
         });
         describe('insertDCaseTagList', function () {
             it('normal end', function (done) {
-                tagDAO.insertDCaseTagList(902, [
-                    'tag1', 
-                    'tag2'
-                ], function (err) {
+                tagDAO.insertDCaseTagList(902, ['tag1', 'tag2'], function (err) {
                     expect(err).to.be(null);
                     con.query('SELECT COUNT(id) as cnt FROM dcase_tag_rel WHERE dcase_id = 902', function (err, resultREL) {
                         expect(err).to.be(null);
@@ -140,11 +122,7 @@ describe('model', function () {
                 });
             });
             it('normal end add new_tag', function (done) {
-                tagDAO.insertDCaseTagList(902, [
-                    'tag1', 
-                    'tag2', 
-                    'new_tag'
-                ], function (err) {
+                tagDAO.insertDCaseTagList(902, ['tag1', 'tag2', 'new_tag'], function (err) {
                     expect(err).to.be(null);
                     con.query('SELECT COUNT(id) as cnt FROM dcase_tag_rel WHERE dcase_id = 902', function (err, resultREL) {
                         expect(err).to.be(null);
@@ -178,3 +156,4 @@ describe('model', function () {
         });
     });
 });
+

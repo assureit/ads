@@ -1,5 +1,6 @@
-var model_pager = require('../../model/pager')
+var model_pager = require('../../model/pager');
 var expect = require('expect.js');
+
 describe('model', function () {
     describe('pager', function () {
         describe('getMaxPage', function () {
@@ -49,3 +50,4 @@ describe('model', function () {
         });
     });
 });
+

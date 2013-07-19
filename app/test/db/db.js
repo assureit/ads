@@ -1,5 +1,6 @@
-var assert = require('assert')
-var db = require('../../db/db')
+var assert = require('assert');
+var db = require('../../db/db');
+
 describe('db', function () {
     describe('query', function () {
         it('should return result', function (done) {
@@ -16,3 +17,4 @@ describe('db', function () {
         });
     });
 });
+

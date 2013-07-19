@@ -1,11 +1,14 @@
 var DCaseAPI;
 (function (DCaseAPI) {
     DCaseAPI.uri = Config.BASEPATH + "/api/1.0/";
+
     DCaseAPI.default_success_callback = function (result) {
     };
+
     DCaseAPI.default_error_callback = function (req, stat, err) {
         alert("ajax error");
     };
+
     DCaseAPI.call = function (method, params) {
         var cmd = {
             jsonrpc: "2.0",
@@ -28,38 +31,37 @@ var DCaseAPI;
             },
             error: error_callback
         });
-        if(!async) {
+        if (!async) {
             return JSON.parse(res.responseText).result;
         }
     };
+
     DCaseAPI.searchDCase = function (pageIndex, tags) {
-        if(tags == null) {
+        if (tags == null) {
             tags = [];
         }
         try  {
-            return this.call("searchDCase", {
-                page: pageIndex,
-                tagList: tags
-            });
+            return this.call("searchDCase", { page: pageIndex, tagList: tags });
         } catch (e) {
             return [];
         }
     };
+
     DCaseAPI.createDCase = function (name, tree) {
         return this.call("createDCase", {
             dcaseName: name,
             contents: tree
         });
     };
+
     DCaseAPI.getCommitList = function (dcaseId) {
-        return this.call("getCommitList", {
-            dcaseId: dcaseId
-        }).commitList;
+        return this.call("getCommitList", { dcaseId: dcaseId }).commitList;
     };
+
     DCaseAPI.getTagList = function () {
-        return this.call("getTagList", {
-        });
+        return this.call("getTagList", {});
     };
+
     DCaseAPI.commit = function (tree, msg, commitId) {
         return this.call("commit", {
             contents: tree,
@@ -67,38 +69,34 @@ var DCaseAPI;
             commitId: commitId
         }).commitId;
     };
+
     DCaseAPI.getDCase = function (dcaseId) {
-        return this.call("getDCase", {
-            dcaseId: dcaseId
-        });
+        return this.call("getDCase", { dcaseId: dcaseId });
     };
+
     DCaseAPI.editDCase = function (dcaseId, name) {
         return this.call("editDCase", {
             dcaseId: dcaseId,
             dcaseName: name
         });
     };
+
     DCaseAPI.deleteDCase = function (dcaseId) {
-        return this.call("deleteDCase", {
-            dcaseId: dcaseId
-        });
+        return this.call("deleteDCase", { dcaseId: dcaseId });
     };
+
     DCaseAPI.getNodeTree = function (commitId) {
-        return JSON.parse(this.call("getNodeTree", {
-            commitId: commitId
-        }).contents);
+        return JSON.parse(this.call("getNodeTree", { commitId: commitId }).contents);
     };
+
     DCaseAPI.searchNode = function (text) {
-        return this.call("searchNode", {
-            text: text
-        }).searchResultList;
+        return this.call("searchNode", { text: text }).searchResultList;
     };
+
     DCaseAPI.searchDCaseHistory = function (dcaseId, text) {
-        return this.call("searchDCaseHistory", {
-            dcaseId: dcaseId,
-            text: text
-        });
+        return this.call("searchDCaseHistory", { dcaseId: dcaseId, text: text });
     };
+
     DCaseAPI.createTicket = function (nodeId, subject, description, userName) {
         return this.call("createTicket", {
             nodeId: nodeId,

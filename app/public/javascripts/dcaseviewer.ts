@@ -345,7 +345,7 @@ class DCaseViewer {
 	
 	structureUpdated() {
 		this.setDCase(this.dcase);
-	};
+	}
 	
 	nodeInserted(parent: DCaseNodeModel, node: DCaseNodeModel, index: number) {
 		var parentView = this.getNodeView(parent);

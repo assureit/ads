@@ -42,7 +42,7 @@ class ImportFile {
 			}
 			return false;
 		});
-	};
+	}
 
 	upload(callback: (data: any, target: HTMLElement)=> void): void {
 		$(this.selector).on('drop', (e) => {

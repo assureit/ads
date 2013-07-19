@@ -1,19 +1,20 @@
 
-var db = require('../../db/db')
-var dcase = require('../../api/dcase')
-var error = require('../../api/error')
-var constant = require('../../constant')
-var testdata = require('../testdata')
-var model_dcase = require('../../model/dcase')
-var util_test = require('../../util/test')
+var db = require('../../db/db');
+var dcase = require('../../api/dcase');
+var error = require('../../api/error');
+var constant = require('../../constant');
+var testdata = require('../testdata');
+var model_dcase = require('../../model/dcase');
+var util_test = require('../../util/test');
+
 var expect = require('expect.js');
+
 var userId = constant.SYSTEM_USER_ID;
+
 describe('api', function () {
     var con;
     beforeEach(function (done) {
-        testdata.load([
-            'test/api/dcase.yaml'
-        ], function (err) {
+        testdata.load(['test/api/dcase.yaml'], function (err) {
             con = new db.Database();
             done();
         });
@@ -26,10 +27,7 @@ describe('api', function () {
     describe('dcase', function () {
         describe('editDCase', function () {
             it('should return result', function (done) {
-                dcase.editDCase({
-                    dcaseId: 201,
-                    dcaseName: 'modified dcase name'
-                }, userId, {
+                dcase.editDCase({ dcaseId: 201, dcaseName: 'modified dcase name' }, userId, {
                     onSuccess: function (result) {
                         expect(result).not.to.be(null);
                         expect(result).not.to.be(undefined);
@@ -48,10 +46,7 @@ describe('api', function () {
                 });
             });
             it('UserId Not Found', function (done) {
-                dcase.editDCase({
-                    dcaseId: 201,
-                    dcaseName: 'modified dcase name'
-                }, 99999, {
+                dcase.editDCase({ dcaseId: 201, dcaseName: 'modified dcase name' }, 99999, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -79,9 +74,7 @@ describe('api', function () {
                 });
             });
             it('DCase Id is not set', function (done) {
-                dcase.editDCase({
-                    dcaseName: 'modified dcase name'
-                }, userId, {
+                dcase.editDCase({ dcaseName: 'modified dcase name' }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -95,10 +88,7 @@ describe('api', function () {
                 });
             });
             it('DCase Id is not a number', function (done) {
-                dcase.editDCase({
-                    dcaseId: 'a',
-                    dcaseName: 'modified dcase name'
-                }, userId, {
+                dcase.editDCase({ dcaseId: 'a', dcaseName: 'modified dcase name' }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -112,10 +102,7 @@ describe('api', function () {
                 });
             });
             it('DCase name is empty', function (done) {
-                dcase.editDCase({
-                    dcaseId: 201,
-                    dcaseName: ''
-                }, userId, {
+                dcase.editDCase({ dcaseId: 201, dcaseName: '' }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -129,9 +116,7 @@ describe('api', function () {
                 });
             });
             it('DCase name is not set', function (done) {
-                dcase.editDCase({
-                    dcaseId: 201
-                }, userId, {
+                dcase.editDCase({ dcaseId: 201 }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -145,10 +130,7 @@ describe('api', function () {
                 });
             });
             it('DCase name is too long', function (done) {
-                dcase.editDCase({
-                    dcaseId: 201,
-                    dcaseName: util_test.str.random(256)
-                }, userId, {
+                dcase.editDCase({ dcaseId: 201, dcaseName: util_test.str.random(256) }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -162,10 +144,7 @@ describe('api', function () {
                 });
             });
             it('DCase Id is not found', function (done) {
-                dcase.editDCase({
-                    dcaseId: 999,
-                    dcaseName: 'modified dcase name'
-                }, userId, {
+                dcase.editDCase({ dcaseId: 999, dcaseName: 'modified dcase name' }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -179,10 +158,7 @@ describe('api', function () {
                 });
             });
             it('DCase Id is deleted', function (done) {
-                dcase.editDCase({
-                    dcaseId: 223,
-                    dcaseName: 'modified dcase name'
-                }, userId, {
+                dcase.editDCase({ dcaseId: 223, dcaseName: 'modified dcase name' }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -198,3 +174,4 @@ describe('api', function () {
         });
     });
 });
+

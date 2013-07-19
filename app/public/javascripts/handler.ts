@@ -3,7 +3,7 @@
 
 // <!-- for pointer.js
 
-declare interface Pointer {
+export interface Pointer {
 	clientX: number;
 	clientY: number;
 	screenX: number;
@@ -18,11 +18,11 @@ declare interface Pointer {
 	identifier: number;
 }
 
-declare interface PointerEvent extends Event {
+export interface PointerEvent extends Event {
 	getPointerList(): Pointer[];
 }
 
-declare interface GestureScaleEvent extends Event {
+export interface GestureScaleEvent extends Event {
 	centerX: number;
 	centerY: number;
 	scale: number;

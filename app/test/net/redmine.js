@@ -1,6 +1,7 @@
 
-var redmine = require('../../net/redmine')
+var redmine = require('../../net/redmine');
 var expect = require('expect.js');
+
 describe('net', function () {
     describe('redmine', function () {
         var issue = new redmine.Issue();
@@ -35,3 +36,4 @@ describe('net', function () {
         });
     });
 });
+

@@ -1,26 +1,22 @@
 
-var rec = require('../../net/rec')
+var rec = require('../../net/rec');
 var expect = require('expect.js');
 var express = require('express');
 var CONFIG = require('config');
+
 var app = express();
+
 var responseFlag = true;
 app.use(express.bodyParser());
 app.post('/rec/api/1.0', function (req, res) {
     res.header('Content-Type', 'application/json');
-    if(responseFlag) {
-        res.send(JSON.stringify({
-            jsonrpc: "2.0",
-            result: null,
-            id: 1
-        }));
+    if (responseFlag) {
+        res.send(JSON.stringify({ jsonrpc: "2.0", result: null, id: 1 }));
     } else {
-        res.send(JSON.stringify({
-            jsonrpc: "2.0",
-            id: 1
-        }), 500);
+        res.send(JSON.stringify({ jsonrpc: "2.0", id: 1 }), 500);
     }
 });
+
 describe('net', function () {
     var server = null;
     before(function (done) {
@@ -29,13 +25,13 @@ describe('net', function () {
     after(function () {
         server.close();
     });
+
     describe('rec', function () {
         describe('request', function () {
             it('normal end', function (done) {
                 responseFlag = true;
                 var rc = new rec.Rec();
-                rc.request('test_method', {
-                }, function (err, result) {
+                rc.request('test_method', {}, function (err, result) {
                     expect(err).to.be(null);
                     expect(result).not.to.be(null);
                     expect(result).not.to.be(undefined);
@@ -48,8 +44,7 @@ describe('net', function () {
             it('abnormal end', function (done) {
                 responseFlag = false;
                 var rc = new rec.Rec();
-                rc.request('test_method', {
-                }, function (err, result) {
+                rc.request('test_method', {}, function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err.rpcHttpStatus).not.to.be(null);
                     expect(err.rpcHttpStatus).not.to.be(undefined);
@@ -60,3 +55,4 @@ describe('net', function () {
         });
     });
 });
+

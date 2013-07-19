@@ -1,27 +1,35 @@
 
 
-var rec = require('../../api/rec')
-var error = require('../../api/error')
+var rec = require('../../api/rec');
+var error = require('../../api/error');
 
-var constant = require('../../constant')
+var constant = require('../../constant');
+
 var userId = constant.SYSTEM_USER_ID;
+
 var expect = require('expect.js');
 var express = require('express');
+
 var app = express();
 app.use(express.bodyParser());
+
 app.post('/rec/api/1.0', function (req, res) {
     res.header('Content-Type', 'application/json');
     res.send(req.body);
 });
+
 describe('api', function () {
     describe('rec', function () {
         var server = null;
+
         before(function (done) {
             server = app.listen(3030).on('listening', done);
         });
+
         after(function () {
             server.close();
         });
+
         describe('getRawItemList', function () {
             it('call method', function (done) {
                 rec.getRawItemList(null, userId, {
@@ -36,8 +44,7 @@ describe('api', function () {
                 });
             });
             it('Datatype is required when a parameter exists', function (done) {
-                rec.getRawItemList({
-                }, userId, {
+                rec.getRawItemList({}, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -51,10 +58,7 @@ describe('api', function () {
                 });
             });
             it('The unexpected parameter is specified', function (done) {
-                rec.getRawItemList({
-                    datatype: 'aaaa',
-                    aaa: 'aaa'
-                }, userId, {
+                rec.getRawItemList({ datatype: 'aaaa', aaa: 'aaa' }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -82,9 +86,7 @@ describe('api', function () {
                 });
             });
             it('do not specify the parameter ', function (done) {
-                rec.getPresetList({
-                    datatype: "aaa"
-                }, userId, {
+                rec.getPresetList({ datatype: "aaa" }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -100,3 +102,4 @@ describe('api', function () {
         });
     });
 });
+

@@ -1,12 +1,14 @@
 var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var model = require('./model')
+var model = require('./model');
 
 
-var redmine = require('../net/redmine')
+var redmine = require('../net/redmine');
+
 var Issue = (function () {
     function Issue(id, dcaseId, itsId, subject, description) {
         this.id = id;
@@ -18,19 +20,15 @@ var Issue = (function () {
     return Issue;
 })();
 exports.Issue = Issue;
+
 var IssueDAO = (function (_super) {
     __extends(IssueDAO, _super);
     function IssueDAO() {
         _super.apply(this, arguments);
-
     }
     IssueDAO.prototype.insert = function (issue, callback) {
-        this.con.query('INSERT INTO issue(dcase_id, subject, description) VALUES(?, ?, ?) ', [
-            issue.dcaseId, 
-            issue.subject, 
-            issue.description
-        ], function (err, result) {
-            if(err) {
+        this.con.query('INSERT INTO issue(dcase_id, subject, description) VALUES(?, ?, ?) ', [issue.dcaseId, issue.subject, issue.description], function (err, result) {
+            if (err) {
                 callback(err, null);
                 return;
             }
@@ -38,12 +36,10 @@ var IssueDAO = (function (_super) {
             callback(null, issue);
         });
     };
+
     IssueDAO.prototype.updatePublished = function (issue, callback) {
-        this.con.query('UPDATE issue SET its_id=? WHERE id=?', [
-            issue.itsId, 
-            issue.id
-        ], function (err, result) {
-            if(err) {
+        this.con.query('UPDATE issue SET its_id=? WHERE id=?', [issue.itsId, issue.id], function (err, result) {
+            if (err) {
                 callback(err, null);
                 return;
             }
@@ -51,11 +47,10 @@ var IssueDAO = (function (_super) {
             callback(null, issue);
         });
     };
+
     IssueDAO.prototype.listNotPublished = function (dcaseId, callback) {
-        this.con.query('SELECT * FROM issue WHERE dcase_id=? AND its_id is null', [
-            dcaseId
-        ], function (err, result) {
-            if(err) {
+        this.con.query('SELECT * FROM issue WHERE dcase_id=? AND its_id is null', [dcaseId], function (err, result) {
+            if (err) {
                 callback(err, null);
                 return;
             }
@@ -66,32 +61,34 @@ var IssueDAO = (function (_super) {
             callback(null, list);
         });
     };
+
     IssueDAO.prototype.publish = function (dcaseId, callback) {
         var _this = this;
         this.listNotPublished(dcaseId, function (err, issueList) {
-            if(err) {
+            if (err) {
                 callback(err);
                 return;
             }
             _this._publish(issueList, callback);
         });
     };
+
     IssueDAO.prototype._publish = function (issueList, callback) {
         var _this = this;
-        if(!issueList || issueList.length == 0) {
+        if (!issueList || issueList.length == 0) {
             callback(null);
             return;
         }
         var issue = issueList[0];
         var redmineIssue = new redmine.Issue();
         redmineIssue.createSimple(issue.subject, issue.description, function (err, result) {
-            if(err) {
+            if (err) {
                 callback(err);
                 return;
             }
             issue.itsId = result.issue.id;
             _this.updatePublished(issue, function (err, updated) {
-                if(err) {
+                if (err) {
                     callback(err);
                     return;
                 }
@@ -102,3 +99,4 @@ var IssueDAO = (function (_super) {
     return IssueDAO;
 })(model.DAO);
 exports.IssueDAO = IssueDAO;
+

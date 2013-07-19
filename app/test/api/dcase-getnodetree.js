@@ -1,17 +1,18 @@
 
-var db = require('../../db/db')
-var dcase = require('../../api/dcase')
-var error = require('../../api/error')
-var constant = require('../../constant')
-var testdata = require('../testdata')
+var db = require('../../db/db');
+var dcase = require('../../api/dcase');
+var error = require('../../api/error');
+var constant = require('../../constant');
+var testdata = require('../testdata');
+
 var expect = require('expect.js');
+
 var userId = constant.SYSTEM_USER_ID;
+
 describe('api', function () {
     var con;
     beforeEach(function (done) {
-        testdata.load([
-            'test/api/dcase.yaml'
-        ], function (err) {
+        testdata.load(['test/api/dcase.yaml'], function (err) {
             con = new db.Database();
             done();
         });
@@ -24,9 +25,7 @@ describe('api', function () {
     describe('dcase', function () {
         describe('getNodeTree', function () {
             it('should return result', function (done) {
-                dcase.getNodeTree({
-                    commitId: 401
-                }, userId, {
+                dcase.getNodeTree({ commitId: 401 }, userId, {
                     onSuccess: function (result) {
                         expect(result).not.to.be(null);
                         expect(result).not.to.be(undefined);
@@ -54,8 +53,7 @@ describe('api', function () {
                 });
             });
             it('Commit ID is not set', function (done) {
-                dcase.getNodeTree({
-                }, userId, {
+                dcase.getNodeTree({}, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -69,9 +67,7 @@ describe('api', function () {
                 });
             });
             it('Commit ID is not a number', function (done) {
-                dcase.getNodeTree({
-                    commitId: "a"
-                }, userId, {
+                dcase.getNodeTree({ commitId: "a" }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -85,9 +81,7 @@ describe('api', function () {
                 });
             });
             it('Commit is not found', function (done) {
-                dcase.getNodeTree({
-                    commitId: 99999
-                }, userId, {
+                dcase.getNodeTree({ commitId: 99999 }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -103,3 +97,4 @@ describe('api', function () {
         });
     });
 });
+

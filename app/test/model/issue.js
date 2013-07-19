@@ -1,18 +1,17 @@
 
-var model_issue = require('../../model/issue')
+var model_issue = require('../../model/issue');
 
-var testdata = require('../testdata')
+var testdata = require('../testdata');
 var expect = require('expect.js');
 var async = require('async');
+
 describe('model', function () {
     var testDB;
     var con;
     var issueDAO;
+
     beforeEach(function (done) {
-        testdata.begin([
-            'test/default-data.yaml', 
-            'test/model/issue.yaml'
-        ], function (err, c) {
+        testdata.begin(['test/default-data.yaml', 'test/model/issue.yaml'], function (err, c) {
             con = c;
             issueDAO = new model_issue.IssueDAO(con);
             done();
@@ -21,7 +20,7 @@ describe('model', function () {
     afterEach(function (done) {
         con.rollback(function (err, result) {
             con.close();
-            if(err) {
+            if (err) {
                 throw err;
             }
             done();
@@ -34,9 +33,7 @@ describe('model', function () {
                 issueDAO.insert(params, function (err, result) {
                     expect(err).to.be(null);
                     expect(result).not.to.be(null);
-                    con.query('SELECT * FROM issue WHERE id=?', [
-                        result.id
-                    ], function (err, resultIssue) {
+                    con.query('SELECT * FROM issue WHERE id=?', [result.id], function (err, resultIssue) {
                         expect(err).to.be(null);
                         expect(resultIssue).not.to.be(null);
                         expect(result.id).to.be(resultIssue[0].id);
@@ -95,3 +92,4 @@ describe('model', function () {
         });
     });
 });
+
