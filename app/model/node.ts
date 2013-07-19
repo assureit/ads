@@ -23,6 +23,7 @@ export interface MetaData {
 	WatchId?: string;
 	PresetId?: string;
 	Tag?: string;
+	User?: string;
 }
 export interface NodeData {
 	ThisNodeId: number;

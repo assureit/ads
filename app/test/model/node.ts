@@ -36,7 +36,7 @@ describe('model', function() {
 	describe('node', function() {
 		describe('process', function() {
 			it('should create issue if metadata exists', function(done) {
-				var node = {
+				var node: model_node.NodeData = {
 					NodeType: "Goal",
 					Description: "description",
 					ThisNodeId: 1,
@@ -80,7 +80,7 @@ describe('model', function() {
 						},
 					]
 				};
-				var nodeList = [
+				var nodeList: model_node.NodeData[] = [
 					node, 
 					{
 						NodeType: "Context",
@@ -125,9 +125,9 @@ describe('model', function() {
 				];
 				nodeDAO.processMetaDataList(201, 401, node, node.MetaData, nodeList, (err: any) => {
 					expect(err).to.be(null);
-					expect(node.MetaData[0]._MonitorNodeId).not.to.be(null);
-					expect(node.MetaData[0]._MonitorNodeId).not.to.be(undefined);
-					monitorDAO.get(node.MetaData[0]._MonitorNodeId, (err:any, result:model_monitor.MonitorNode) => {
+					expect(node.MetaData[0]['_MonitorNodeId']).not.to.be(null);
+					expect(node.MetaData[0]['_MonitorNodeId']).not.to.be(undefined);
+					monitorDAO.get(node.MetaData[0]['_MonitorNodeId'], (err:any, result:model_monitor.MonitorNode) => {
 						expect(err).to.be(null);
 						expect(result.thisNodeId).to.equal(1);
 						expect(result.params.A).to.equal('Value A2');

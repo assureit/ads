@@ -120,9 +120,9 @@ describe('model', function () {
                 ];
                 nodeDAO.processMetaDataList(201, 401, node, node.MetaData, nodeList, function (err) {
                     expect(err).to.be(null);
-                    expect(node.MetaData[0]._MonitorNodeId).not.to.be(null);
-                    expect(node.MetaData[0]._MonitorNodeId).not.to.be(undefined);
-                    monitorDAO.get(node.MetaData[0]._MonitorNodeId, function (err, result) {
+                    expect(node.MetaData[0]['_MonitorNodeId']).not.to.be(null);
+                    expect(node.MetaData[0]['_MonitorNodeId']).not.to.be(undefined);
+                    monitorDAO.get(node.MetaData[0]['_MonitorNodeId'], function (err, result) {
                         expect(err).to.be(null);
                         expect(result.thisNodeId).to.equal(1);
                         expect(result.params.A).to.equal('Value A2');
