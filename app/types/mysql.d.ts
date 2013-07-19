@@ -1,8 +1,8 @@
 ///<reference path='../DefinitelyTyped/node/node.d.ts'/>
 declare module 'mysql' {
     import events = module('events')
-    declare function createConnection(config: any): Connection;
-    declare function createPool(config: any);
+    function createConnection(config: any): Connection;
+    function createPool(config: any);
 
     interface QueryCallback {
         (err:any, result:any) : void;
