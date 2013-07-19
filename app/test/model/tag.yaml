@@ -1,0 +1,19 @@
+dcase:
+  - {id: 901, name: 'deleted_dcase', user_id: 101, delete_flag: true}
+  - {id: 902, name: 'dcase902', user_id: 101 }
+tag:
+  - {id: 701, label: 'tag1'}
+  - {id: 702, label: 'tag2'}
+  - {id: 703, label: 'tag3'}
+  - {id: 704, label: 'tag4'}
+  - {id: 705, label: 'deleted_tag'}
+  - {id: 706, label: 'unlink_tag'}
+dcase_tag_rel:
+  - {id: 801, dcase_id: 201, tag_id: 701}
+  - {id: 802, dcase_id: 202, tag_id: 701}
+  - {id: 803, dcase_id: 203, tag_id: 701}
+  - {id: 804, dcase_id: 201, tag_id: 702}
+  - {id: 805, dcase_id: 202, tag_id: 702}
+  - {id: 806, dcase_id: 201, tag_id: 703}
+  - {id: 807, dcase_id: 203, tag_id: 704}
+  - {id: 808, dcase_id: 901, tag_id: 705}
