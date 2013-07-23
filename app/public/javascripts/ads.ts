@@ -269,7 +269,7 @@ class ADS {
 		var doc = header + $dummydiv.html();
 		$svg.empty().remove();
 		return doc;
-	};
+	}
 
 	executePost(action, data): void {
 		var $body = $(document.body);
@@ -315,7 +315,7 @@ class ADS {
 		//var commitId = this.viewer.getDCase().commitId;
 		//var url = this.URL_EXPORT + "?" + commitId + "." + type;
 		//window.open(url, "_blank");
-	};
+	}
 
 	initDefaultEventListeners(): void {
 

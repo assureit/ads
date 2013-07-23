@@ -40,13 +40,13 @@ class CreateDCaseView {
 		$("#dcase-create").removeClass("disabled");
 		$("#inputDCaseName").removeAttr("disabled");
 		$("#inputDesc").removeAttr("disabled");
-	};
+	}
 
 	disableSubmit(): void{
 		$("#dcase-create").addClass("disabled");
 		$("#inputDCaseName").attr("disabled", "");
 		$("#inputDesc").attr("disabled", "");
-	};
+	}
 }
 
 class SelectDCaseContent {

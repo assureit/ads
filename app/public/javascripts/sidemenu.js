@@ -5,6 +5,7 @@ var SideMenu = (function () {
     }
     return SideMenu;
 })();
+
 var SideMenuSubItem = (function () {
     function SideMenuSubItem(label, href, parentItem) {
         this.label = label;
@@ -13,6 +14,7 @@ var SideMenuSubItem = (function () {
     }
     return SideMenuSubItem;
 })();
+
 var SideMenuItem = (function () {
     function SideMenuItem(label, href) {
         this.label = label;
@@ -20,6 +22,7 @@ var SideMenuItem = (function () {
     }
     return SideMenuItem;
 })();
+
 var SideMenuModel = (function () {
     function SideMenuModel() {
     }
@@ -28,12 +31,14 @@ var SideMenuModel = (function () {
     };
     return SideMenuModel;
 })();
+
 var SideMenuView = (function () {
     function SideMenuView(model) {
         this.model = model;
         var menu = $("#drop-menu");
+
         $('#menu-button').click(function (e) {
-            if(!menu.hasClass("clicked")) {
+            if (!menu.hasClass("clicked")) {
                 menu.addClass("clicked");
             } else {
                 menu.removeClass("clicked");

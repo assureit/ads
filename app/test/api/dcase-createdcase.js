@@ -1,14 +1,17 @@
 
-var db = require('../../db/db')
-var dcase = require('../../api/dcase')
-var error = require('../../api/error')
-var constant = require('../../constant')
-var testdata = require('../testdata')
-var util_test = require('../../util/test')
-var model_dcase = require('../../model/dcase')
-var model_commit = require('../../model/commit')
+var db = require('../../db/db');
+var dcase = require('../../api/dcase');
+var error = require('../../api/error');
+var constant = require('../../constant');
+var testdata = require('../testdata');
+var util_test = require('../../util/test');
+var model_dcase = require('../../model/dcase');
+var model_commit = require('../../model/commit');
+
 var expect = require('expect.js');
+
 var userId = constant.SYSTEM_USER_ID;
+
 describe('api', function () {
     var con;
     var validParam;
@@ -22,19 +25,15 @@ describe('api', function () {
                     {
                         ThisNodeId: 1,
                         Description: "dcase1",
-                        Children: [
-                            2
-                        ],
+                        Children: [2],
                         NodeType: "Goal"
-                    }, 
+                    },
                     {
                         ThisNodeId: 2,
                         Description: "s1",
-                        Children: [
-                            3
-                        ],
+                        Children: [3],
                         NodeType: "Strategy"
-                    }, 
+                    },
                     {
                         ThisNodeId: 3,
                         Description: "g1",
@@ -187,3 +186,4 @@ describe('api', function () {
         });
     });
 });
+

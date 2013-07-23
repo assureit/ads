@@ -1,27 +1,30 @@
-var db = require('../db/db')
+var db = require('../db/db');
 
-var constant = require('../constant')
-var model_commit = require('../model/commit')
-var model_monitor = require('../model/monitor')
-var model_dcase = require('../model/dcase')
-var model_node = require('../model/node')
-var redmine = require('../net/redmine')
-var error = require('./error')
+var constant = require('../constant');
+var model_commit = require('../model/commit');
+var model_monitor = require('../model/monitor');
+var model_dcase = require('../model/dcase');
+var model_node = require('../model/node');
+var redmine = require('../net/redmine');
+var error = require('./error');
+
 function modifyMonitorStatus(params, userId, callback) {
     var commitMessage = 'monitor status exchange';
+
     function addRebuttalNode(nodeList, params, thisNodeId) {
         var maxThisNodeId = 0;
+
         nodeList.forEach(function (node) {
-            if(maxThisNodeId < node.ThisNodeId) {
+            if (maxThisNodeId < node.ThisNodeId)
                 maxThisNodeId = node.ThisNodeId;
-            }
         });
         maxThisNodeId++;
         nodeList.forEach(function (node) {
-            if(thisNodeId == node.ThisNodeId) {
+            if (thisNodeId == node.ThisNodeId) {
                 node.Children.push(maxThisNodeId);
             }
         });
+
         var metaData = {
             Type: 'Issue',
             Subject: constant.REBUTTAL_SUBJECT,
@@ -34,108 +37,107 @@ function modifyMonitorStatus(params, userId, callback) {
             Description: params.comment,
             Children: [],
             NodeType: 'Rebuttal',
-            MetaData: [
-                metaData
-            ]
+            MetaData: [metaData]
         };
+
         nodeList.push(node);
+
         return maxThisNodeId;
     }
+
     function removeRebuttalNode(nodeList, thisNodeId, rebuttalThisNodeId) {
         var rebuttalNodePos = -1;
         var rebuttalChildrenPos = -1;
         var issueId = -1;
-        for(var i = 0; i < nodeList.length; i++) {
+
+        for (var i = 0; i < nodeList.length; i++) {
             var node = nodeList[i];
-            if(thisNodeId == node.ThisNodeId) {
-                for(var j = 0; j < node.Children.length; j++) {
-                    if(node.Children[j] == rebuttalThisNodeId) {
+            if (thisNodeId == node.ThisNodeId) {
+                for (var j = 0; j < node.Children.length; j++) {
+                    if (node.Children[j] == rebuttalThisNodeId) {
                         rebuttalChildrenPos = j;
                     }
                 }
-                if(rebuttalChildrenPos > -1) {
+                if (rebuttalChildrenPos > -1)
                     node.Children.splice(rebuttalChildrenPos, 1);
-                }
             }
-            if(rebuttalThisNodeId == node.ThisNodeId) {
+
+            if (rebuttalThisNodeId == node.ThisNodeId) {
                 rebuttalNodePos = i;
                 issueId = node.MetaData._IssueId;
             }
         }
-        if(rebuttalNodePos > -1) {
+        if (rebuttalNodePos > -1)
             nodeList.splice(rebuttalNodePos, 1);
-        }
+
         return issueId;
     }
+
     function validate(params) {
         var checks = [];
-        if(!params) {
+        if (!params)
             checks.push('Parameter is required.');
-        }
-        if(params && !params.evidenceId) {
+        if (params && !params.evidenceId)
             checks.push('Evidence ID is required.');
-        }
-        if(params && params.evidenceId && !isFinite(params.evidenceId)) {
+        if (params && params.evidenceId && !isFinite(params.evidenceId))
             checks.push('Evidence ID must be a number.');
-        }
-        if(params && !params.systemNodeId) {
+        if (params && !params.systemNodeId)
             checks.push('System Node ID is required.');
-        }
-        if(params && params.systemNodeId && !isFinite(params.systemNodeId)) {
+        if (params && params.systemNodeId && !isFinite(params.systemNodeId))
             checks.push('System Node ID must be a number.');
-        }
-        if(params && !params.timestamp) {
+        if (params && !params.timestamp)
             checks.push('Timestamp is required.');
-        }
-        if(params && !params.comment) {
+        if (params && !params.comment)
             checks.push('Comment is required.');
-        }
-        if(params && !params.status) {
+        if (params && !params.status)
             checks.push('Status is required.');
-        }
-        if(params && params.status && !(params.status == 'OK' || params.status == 'NG')) {
+        if (params && params.status && !(params.status == 'OK' || params.status == 'NG'))
             checks.push('Status is OK or NG.');
-        }
-        if(checks.length > 0) {
+
+        if (checks.length > 0) {
             callback.onFailure(new error.InvalidParamsError(checks, null));
             return false;
         }
         return true;
     }
-    if(!validate(params)) {
+
+    if (!validate(params))
         return;
-    }
+
     var con = new db.Database();
+
     con.begin(function (err, result) {
         var monitorDAO = new model_monitor.MonitorDAO(con);
         monitorDAO.select(params.systemNodeId, function (err, dcaseId, thisNodeId, rebuttalThisNodeId) {
-            if(err) {
+            if (err) {
                 callback.onFailure(err);
                 con.close();
                 return;
             }
             monitorDAO.getLatestCommit(dcaseId, function (err, latestCommit) {
-                if(err) {
+                if (err) {
                     callback.onFailure(err);
                     con.close();
                     return;
                 }
+
                 var nodeDAO = new model_node.NodeDAO(con);
                 nodeDAO.get(latestCommit.id, function (err, nodeList) {
-                    if(err) {
+                    if (err) {
                         callback.onFailure(err);
                         con.close();
                         return;
                     }
-                    if(nodeList.length == 0) {
+                    if (nodeList.length == 0) {
                         callback.onSuccess(null);
                         con.close();
                         return;
                     }
+
                     var dcaseDAO = new model_dcase.DCaseDAO(con);
                     dcaseDAO.get(dcaseId, function (err, dcase) {
-                        if(err) {
-                            if(err.code == error.RPC_ERROR.DATA_NOT_FOUND) {
+                        if (err) {
+                            if (err.code == error.RPC_ERROR.DATA_NOT_FOUND) {
                                 callback.onSuccess(null);
                                 con.close();
                                 return;
@@ -145,16 +147,18 @@ function modifyMonitorStatus(params, userId, callback) {
                                 return;
                             }
                         }
-                        if(dcase.deleteFlag) {
+                        if (dcase.deleteFlag) {
                             callback.onSuccess(null);
                             return;
                         }
+
                         var data = JSON.parse(latestCommit.data);
                         var nodeList = data.NodeList;
                         var rebuttalId = null;
                         var issueId = null;
-                        if(rebuttalThisNodeId) {
-                            if(params.status == 'OK') {
+
+                        if (rebuttalThisNodeId) {
+                            if (params.status == 'OK') {
                                 issueId = removeRebuttalNode(nodeList, thisNodeId, rebuttalThisNodeId);
                                 data.NodeCount--;
                             } else {
@@ -162,7 +166,7 @@ function modifyMonitorStatus(params, userId, callback) {
                                 return;
                             }
                         } else {
-                            if(params.status == 'NG') {
+                            if (params.status == 'NG') {
                                 rebuttalId = addRebuttalNode(nodeList, params, thisNodeId);
                                 data.NodeCount++;
                             } else {
@@ -170,26 +174,28 @@ function modifyMonitorStatus(params, userId, callback) {
                                 return;
                             }
                         }
+
                         var commitDAO = new model_commit.CommitDAO(con);
                         commitDAO.commit(userId, latestCommit.id, commitMessage, data, function (err, result) {
-                            if(err) {
+                            if (err) {
                                 callback.onFailure(err);
                                 return;
                             }
+
                             monitorDAO.setRebuttalThisNodeId(params.systemNodeId, rebuttalId, function (err) {
-                                if(err) {
+                                if (err) {
                                     callback.onFailure(err);
                                     return;
                                 }
-                                if(issueId) {
+                                if (issueId) {
                                     monitorDAO.getItsId(issueId, function (err, itsId) {
-                                        if(err) {
+                                        if (err) {
                                             callback.onFailure(err);
                                             return;
                                         }
                                         var redmineIssue = new redmine.Issue();
                                         redmineIssue.addComment(itsId, params.comment, function (err, result) {
-                                            if(err) {
+                                            if (err) {
                                                 callback.onFailure(err);
                                                 return;
                                             }
@@ -214,3 +220,4 @@ function modifyMonitorStatus(params, userId, callback) {
     });
 }
 exports.modifyMonitorStatus = modifyMonitorStatus;
+

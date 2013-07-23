@@ -1,10 +1,12 @@
 
-var db = require('../../db/db')
-var monitor = require('../../api/monitor')
-var error = require('../../api/error')
-var constant = require('../../constant')
-var testdata = require('../testdata')
+var db = require('../../db/db');
+var monitor = require('../../api/monitor');
+var error = require('../../api/error');
+var constant = require('../../constant');
+var testdata = require('../testdata');
+
 var expect = require('expect.js');
+
 var express = require('express');
 var app = express();
 app.use(express.bodyParser());
@@ -12,15 +14,15 @@ app.post('/rec/api/1.0', function (req, res) {
     res.header('Content-Type', 'application/json');
     res.send(req.body);
 });
+
 var userId = constant.SYSTEM_USER_ID;
+
 describe('api', function () {
     var con;
     var validParams;
+
     beforeEach(function (done) {
-        testdata.load([
-            'test/default-data.yaml', 
-            'test/api/monitor.yaml'
-        ], function (err) {
+        testdata.load(['test/default-data.yaml', 'test/api/monitor.yaml'], function (err) {
             con = new db.Database();
             validParams = {
                 evidenceId: 1,
@@ -29,6 +31,7 @@ describe('api', function () {
                 comment: 'Unit Test Run',
                 status: 'OK'
             };
+
             done();
         });
     });
@@ -42,9 +45,11 @@ describe('api', function () {
         before(function (done) {
             server = app.listen(3030).on('listening', done);
         });
+
         after(function () {
             server.close();
         });
+
         describe('modifyMonitorStatus', function () {
             it('system node ID not existing is specified ', function (done) {
                 validParams.systemNodeId = 99999;
@@ -67,9 +72,7 @@ describe('api', function () {
                 monitor.modifyMonitorStatus(validParams, userId, {
                     onSuccess: function (result) {
                         var con = new db.Database();
-                        con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = ? AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', [
-                            validParams.systemNodeId
-                        ], function (err, expectedResult) {
+                        con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = ? AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', [validParams.systemNodeId], function (err, expectedResult) {
                             expect(err).to.be(null);
                             expect(1).to.be(expectedResult.length);
                             con.close();
@@ -88,9 +91,7 @@ describe('api', function () {
                 monitor.modifyMonitorStatus(validParams, userId, {
                     onSuccess: function (result) {
                         var con = new db.Database();
-                        con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = ? AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', [
-                            validParams.systemNodeId
-                        ], function (err, expectedResult) {
+                        con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = ? AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', [validParams.systemNodeId], function (err, expectedResult) {
                             expect(err).to.be(null);
                             expect(0).to.be(expectedResult.length);
                             con.close();
@@ -266,3 +267,4 @@ describe('api', function () {
         });
     });
 });
+

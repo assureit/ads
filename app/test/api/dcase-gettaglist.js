@@ -1,18 +1,20 @@
 
 
-var dcase = require('../../api/dcase')
+var dcase = require('../../api/dcase');
 
-var constant = require('../../constant')
-var testdata = require('../testdata')
+var constant = require('../../constant');
+var testdata = require('../testdata');
+
 
 var expect = require('expect.js');
+
 var userId = constant.SYSTEM_USER_ID;
+
 describe('api', function () {
     var con;
+
     beforeEach(function (done) {
-        testdata.load([
-            'test/api/dcase-gettaglist.yaml'
-        ], function (err) {
+        testdata.load(['test/api/dcase-gettaglist.yaml'], function (err) {
             done();
         });
     });
@@ -24,8 +26,7 @@ describe('api', function () {
     describe('dcase', function () {
         describe('getTagList', function () {
             it('should return result', function (done) {
-                dcase.getTagList({
-                }, userId, {
+                dcase.getTagList({}, userId, {
                     onSuccess: function (result) {
                         expect(result).not.to.be(null);
                         expect(result).not.to.be(undefined);
@@ -33,8 +34,7 @@ describe('api', function () {
                         expect(result.tagList).not.to.be(undefined);
                         expect(result.tagList).to.be.an('array');
                         expect(result.tagList.length > 0).to.equal(true);
-                        var checkDic = {
-                        };
+                        var checkDic = {};
                         result.tagList.forEach(function (it) {
                             expect(it).to.be.an('string');
                             expect(it).not.to.equal('deleted_tag');
@@ -53,3 +53,4 @@ describe('api', function () {
         });
     });
 });
+

@@ -1,12 +1,13 @@
 
-var model_commit = require('../../model/commit')
+var model_commit = require('../../model/commit');
 
 
 
 
-var testdata = require('../testdata')
+var testdata = require('../testdata');
 var expect = require('expect.js');
 var async = require('async');
+
 var express = require('express');
 var app = express();
 app.use(express.bodyParser());
@@ -14,11 +15,13 @@ app.post('/rec/api/1.0', function (req, res) {
     res.header('Content-Type', 'application/json');
     res.send(req.body);
 });
+
 describe('model', function () {
     var testDB;
     var con;
     var commitDAO;
     var validParam;
+
     var server = null;
     before(function (done) {
         server = app.listen(3030).on('listening', done);
@@ -26,6 +29,7 @@ describe('model', function () {
     after(function () {
         server.close();
     });
+
     beforeEach(function (done) {
         validParam = {
             commitId: 401,
@@ -37,9 +41,7 @@ describe('model', function () {
                     {
                         ThisNodeId: 1,
                         Description: "dcase1",
-                        Children: [
-                            2
-                        ],
+                        Children: [2],
                         NodeType: "Goal",
                         MetaData: [
                             {
@@ -47,29 +49,26 @@ describe('model', function () {
                                 Subject: "このゴールを満たす必要がある",
                                 Description: "詳細な情報をここに記述する",
                                 Visible: "true"
-                            }, 
+                            },
                             {
                                 Type: "LastUpdated",
                                 User: "Shida",
                                 Visible: "false"
-                            }, 
+                            },
                             {
                                 Type: "Tag",
                                 Tag: "tag1",
                                 Visible: "true"
-                            }, 
-                            
+                            }
                         ]
-                    }, 
+                    },
                     {
                         ThisNodeId: 2,
                         Description: "s1",
-                        Children: [
-                            3
-                        ],
+                        Children: [3],
                         NodeType: "Strategy",
                         MetaData: []
-                    }, 
+                    },
                     {
                         ThisNodeId: 3,
                         Description: "g1",
@@ -81,36 +80,34 @@ describe('model', function () {
                                 Subject: "2つ目のイシュー",
                                 Description: "あああ詳細な情報をここに記述する",
                                 Visible: "true"
-                            }, 
+                            },
                             {
                                 Type: "LastUpdated",
                                 User: "Shida",
                                 Visible: "false"
-                            }, 
+                            },
                             {
                                 Type: "Tag",
                                 Tag: "tag1",
                                 Visible: "true"
-                            }, 
+                            },
                             {
                                 Type: "Tag",
                                 Tag: "tag2",
                                 Visible: "true"
-                            }, 
+                            },
                             {
                                 Type: "Tag",
                                 Tag: "newTag",
                                 Visible: "true"
-                            }, 
-                            
+                            }
                         ]
                     }
                 ]
             }
         };
-        testdata.begin([
-            'test/default-data.yaml'
-        ], function (err, c) {
+
+        testdata.begin(['test/default-data.yaml'], function (err, c) {
             con = c;
             commitDAO = new model_commit.CommitDAO(con);
             done();
@@ -119,7 +116,7 @@ describe('model', function () {
     afterEach(function (done) {
         con.rollback(function (err, result) {
             con.close();
-            if(err) {
+            if (err) {
                 throw err;
             }
             done();
@@ -138,11 +135,10 @@ describe('model', function () {
                 commitDAO.insert(params, function (err, commitId) {
                     expect(err).to.be(null);
                     expect(commitId).not.to.be(null);
-                    con.query('SELECT * FROM commit WHERE id=?', [
-                        commitId
-                    ], function (err, result) {
+                    con.query('SELECT * FROM commit WHERE id=?', [commitId], function (err, result) {
                         expect(err).to.be(null);
                         expect(result[0].id).to.be(commitId);
+
                         con.query('SELECT * FROM commit WHERE id = 401', function (err, result) {
                             expect(err).to.be(null);
                             expect(result[0].latest_flag).to.eql(false);
@@ -241,9 +237,7 @@ describe('model', function () {
                     expect(result).not.to.be(undefined);
                     expect(result.commitId).not.to.be(null);
                     expect(result.commitId).not.to.be(undefined);
-                    con.query('SELECT * FROM commit WHERE id=?', [
-                        result.commitId
-                    ], function (err, resultCommit) {
+                    con.query('SELECT * FROM commit WHERE id=?', [result.commitId], function (err, resultCommit) {
                         expect(err).to.be(null);
                         expect(resultCommit[0].latest_flag).to.eql(true);
                         done();
@@ -253,3 +247,4 @@ describe('model', function () {
         });
     });
 });
+

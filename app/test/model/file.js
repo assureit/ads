@@ -1,16 +1,16 @@
 
-var model_file = require('../../model/file')
+var model_file = require('../../model/file');
 
-var testdata = require('../testdata')
+var testdata = require('../testdata');
 var expect = require('expect.js');
+
 describe('model', function () {
     var testDB;
     var con;
     var fileDAO;
+
     beforeEach(function (done) {
-        testdata.begin([
-            'test/default-data.yaml'
-        ], function (err, c) {
+        testdata.begin(['test/default-data.yaml'], function (err, c) {
             con = c;
             fileDAO = new model_file.FileDAO(con);
             done();
@@ -19,7 +19,7 @@ describe('model', function () {
     afterEach(function (done) {
         con.rollback(function (err, result) {
             con.close();
-            if(err) {
+            if (err) {
                 throw err;
             }
             done();
@@ -31,9 +31,7 @@ describe('model', function () {
                 fileDAO.insert('filename', 1, function (err, fileId) {
                     expect(err).to.be(null);
                     expect(fileId).not.to.be(null);
-                    con.query('SELECT * FROM file WHERE id=?', [
-                        fileId
-                    ], function (err, result) {
+                    con.query('SELECT * FROM file WHERE id=?', [fileId], function (err, result) {
                         expect(err).to.be(null);
                         expect(result).not.to.be(null);
                         expect(result).not.to.be(undefined);
@@ -65,6 +63,7 @@ describe('model', function () {
                 });
             });
         });
+
         describe('get', function () {
             it('normal end', function (done) {
                 fileDAO.get(301, function (err, file) {
@@ -86,3 +85,4 @@ describe('model', function () {
         });
     });
 });
+

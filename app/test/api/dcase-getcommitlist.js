@@ -1,17 +1,18 @@
 
-var db = require('../../db/db')
-var dcase = require('../../api/dcase')
-var error = require('../../api/error')
-var constant = require('../../constant')
-var testdata = require('../testdata')
+var db = require('../../db/db');
+var dcase = require('../../api/dcase');
+var error = require('../../api/error');
+var constant = require('../../constant');
+var testdata = require('../testdata');
+
 var expect = require('expect.js');
+
 var userId = constant.SYSTEM_USER_ID;
+
 describe('api', function () {
     var con;
     beforeEach(function (done) {
-        testdata.load([
-            'test/api/dcase.yaml'
-        ], function (err) {
+        testdata.load(['test/api/dcase.yaml'], function (err) {
             con = new db.Database();
             done();
         });
@@ -24,9 +25,7 @@ describe('api', function () {
     describe('dcase', function () {
         describe('getCommitList', function () {
             it('should return result', function (done) {
-                dcase.getCommitList({
-                    dcaseId: 201
-                }, userId, {
+                dcase.getCommitList({ dcaseId: 201 }, userId, {
                     onSuccess: function (result) {
                         expect(result.commitList.length > 0).to.be(true);
                         done();
@@ -52,8 +51,7 @@ describe('api', function () {
                 });
             });
             it('DCase Id is not set', function (done) {
-                dcase.getCommitList({
-                }, userId, {
+                dcase.getCommitList({}, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         ;
@@ -68,9 +66,7 @@ describe('api', function () {
                 });
             });
             it('DCase Id is not a number', function (done) {
-                dcase.getCommitList({
-                    dcaseId: "a"
-                }, userId, {
+                dcase.getCommitList({ dcaseId: "a" }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         ;
@@ -85,9 +81,7 @@ describe('api', function () {
                 });
             });
             it('DCase is not found', function (done) {
-                dcase.getCommitList({
-                    dcaseId: 99999
-                }, userId, {
+                dcase.getCommitList({ dcaseId: 99999 }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         ;
@@ -104,3 +98,4 @@ describe('api', function () {
         });
     });
 });
+

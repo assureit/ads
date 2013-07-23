@@ -81,7 +81,7 @@ export class DCaseDAO extends model.DAO {
 				return;
 			}
 
-			var list = new DCase[];
+			var list = new Array<DCase>();
 			result.forEach((row) => {
 				var d = new DCase(row.d.id, row.d.name, row.d.user_id, row.d.delete_flag);
 				d.user = new model_user.User(row.u.id, row.u.login_name, row.u.delete_flag, row.u.system_flag);

@@ -1,19 +1,20 @@
 
-var db = require('../../db/db')
-var dcase = require('../../api/dcase')
-var error = require('../../api/error')
-var constant = require('../../constant')
-var testdata = require('../testdata')
-var model_dcase = require('../../model/dcase')
-var model_commit = require('../../model/commit')
+var db = require('../../db/db');
+var dcase = require('../../api/dcase');
+var error = require('../../api/error');
+var constant = require('../../constant');
+var testdata = require('../testdata');
+var model_dcase = require('../../model/dcase');
+var model_commit = require('../../model/commit');
+
 var expect = require('expect.js');
+
 var userId = constant.SYSTEM_USER_ID;
+
 describe('api', function () {
     var con;
     beforeEach(function (done) {
-        testdata.load([
-            'test/api/dcase.yaml'
-        ], function (err) {
+        testdata.load(['test/api/dcase.yaml'], function (err) {
             con = new db.Database();
             done();
         });
@@ -26,9 +27,7 @@ describe('api', function () {
     describe('dcase', function () {
         describe('getDCase', function () {
             it('should return result', function (done) {
-                dcase.getDCase({
-                    dcaseId: 201
-                }, userId, {
+                dcase.getDCase({ dcaseId: 201 }, userId, {
                     onSuccess: function (result) {
                         expect(result).not.to.be(null);
                         expect(result).not.to.be(undefined);
@@ -72,8 +71,7 @@ describe('api', function () {
                 });
             });
             it('DCase Id is not set', function (done) {
-                dcase.getDCase({
-                }, userId, {
+                dcase.getDCase({}, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -87,9 +85,7 @@ describe('api', function () {
                 });
             });
             it('DCase Id is not a number', function (done) {
-                dcase.getDCase({
-                    dcaseId: "a"
-                }, userId, {
+                dcase.getDCase({ dcaseId: "a" }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -103,9 +99,7 @@ describe('api', function () {
                 });
             });
             it('DCase is not found', function (done) {
-                dcase.getDCase({
-                    dcaseId: 999
-                }, userId, {
+                dcase.getDCase({ dcaseId: 999 }, userId, {
                     onSuccess: function (result) {
                         expect(result).to.be(null);
                         done();
@@ -121,3 +115,4 @@ describe('api', function () {
         });
     });
 });
+

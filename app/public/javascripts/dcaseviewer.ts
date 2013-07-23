@@ -8,12 +8,64 @@
 
 //interface DCaseViewerAddon {}
 //interface DNodeViewAddon {} //FIXME
-interface DCaseTheme {
-	selected: string;
-	hovered: string;
-	stroke;
-	fill;
+// interface DCaseTheme {
+// 	selected: string;
+// 	hovered: string;
+// 	stroke;
+// 	fill;
+// }
+interface Pointer {
+	clientX: number;
+	clientY: number;
+	screenX: number;
+	screenY: number;
+	pageX: number;
+	pageY: number;
+	tiltX: number;
+	tiltY: number;
+	pressure: number;
+	hwTimestamp: number;
+	pointerType: string;
+	identifier: number;
 }
+
+interface PointerEvent extends Event {
+	getPointerList(): Pointer[];
+}
+
+interface GestureScaleEvent extends Event {
+	centerX: number;
+	centerY: number;
+	scale: number;
+}
+declare class Rectangle {
+	// constructor(public l: number, public r: number, public t: number, public b: number);
+}
+declare class PointerHandler {
+	viewer: DCaseViewer;
+	x0: number;
+	y0: number;
+	bounds: Rectangle;
+	mainPointerId: number;
+	pointers: Pointer[];
+	scale0: number;
+	root: JQuery;
+	constructor(viewer: DCaseViewer);
+	dragStart(x: number, y: number): void;
+	drag(x: number, y: number): void;
+	dragCancel(): void;
+	dragEnd(view: DNodeView): void;
+	getMainPointer(): Pointer;
+	onPointerDown(): (e: PointerEvent) => void;
+	onPointerMove(): (e: PointerEvent) => void;
+	onPointerUp(): (e: PointerEvent) => void;
+	getRect(): ClientRect;
+	setScale(cx: number, cy: number, b: number): void;
+	onScale(): (e: GestureScaleEvent) => void;
+	onWheel(): (e: MouseEvent, delta: number) => void;
+}
+
+
 
 var ANIME_MSEC = 250;
 var SCALE_MIN = 0.1;
@@ -345,7 +397,7 @@ class DCaseViewer {
 	
 	structureUpdated() {
 		this.setDCase(this.dcase);
-	};
+	}
 	
 	nodeInserted(parent: DCaseNodeModel, node: DCaseNodeModel, index: number) {
 		var parentView = this.getNodeView(parent);
@@ -447,7 +499,7 @@ class DCaseViewer {
 		this.moving = true;
 		var begin = new Date();
 		var id = setInterval(() => {
-			var time = (<any>new Date()) - begin;
+			var time = (<any>new Date()) - <any>begin;
 			var r = time / ms;
 			if(r < 1.0) {
 				a.anime(r);
@@ -529,12 +581,12 @@ function createArgumentBorderElement(){
 class DNodeView {
 	svgShape: GsnShape;
 	$rootsvg: JQuery;
-	$div    : JQuery = $("<div></div>").addClass("node-container");
+	$div    : JQuery; // = $("<div></div>").addClass("node-container");
 	$undevel: JQuery;
 	$argBorder: JQuery;
-	$divName: JQuery = $("<div></div>").addClass("node-name").appendTo(this.$div);
-	$divText: JQuery = $("<div></div>").addClass("node-text").appendTo(this.$div);
-	$divNodes: JQuery= $("<div></div>").addClass("node-closednodes").appendTo(this.$div);
+	$divName: JQuery; // = $("<div></div>").addClass("node-name").appendTo(this.$div);
+	$divText: JQuery; // = $("<div></div>").addClass("node-text").appendTo(this.$div);
+	$divNodes: JQuery; //= $("<div></div>").addClass("node-closednodes").appendTo(this.$div);
 	$line   : JQuery;
 
 	children: DNodeView[] = [];
@@ -560,6 +612,13 @@ class DNodeView {
 			public viewer: DCaseViewer,
 			public node: DCaseNodeModel,
 			public parentView: DNodeView) {
+
+		this.$div = $("<div></div>").addClass("node-container");
+		this.$divName = $("<div></div>").addClass("node-name").appendTo(this.$div);
+		this.$divText = $("<div></div>").addClass("node-text").appendTo(this.$div);
+		this.$divNodes= $("<div></div>").addClass("node-closednodes").appendTo(this.$div);
+
+
 		var $root = viewer.$dom;
 		this.$rootsvg = viewer.$svg;
 		this.$div
