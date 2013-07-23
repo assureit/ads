@@ -11,6 +11,7 @@ var Ldap = (function () {
 
         client.bind(dn, password, function (err) {
             if (err) {
+                console.error(err);
                 callback(err);
                 return;
             }
@@ -33,6 +34,7 @@ var Ldap = (function () {
 
         client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function (err) {
             if (err) {
+                console.error(err);
                 callback(new error.ExternalParameterError('root account authority went wrong.', err));
                 return;
             }
@@ -59,6 +61,7 @@ var Ldap = (function () {
 
         client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function (err) {
             if (err) {
+                console.error(err);
                 callback(err);
                 return;
             }

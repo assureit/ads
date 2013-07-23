@@ -102,6 +102,7 @@ export class Database extends events.EventEmitter {
 	_bindErrorHandler(callback: mysql.QueryCallback): mysql.QueryCallback {
 		return (err: any, result:any) => {
 			if (err) {
+				console.error(err);
 				this._rollback((err:any, result:any) => {
 					this.close();
 				});
