@@ -1,4 +1,5 @@
 var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
@@ -30,6 +31,7 @@ var DCaseTheme = (function () {
     }
     return DCaseTheme;
 })();
+
 var TiffanyblueTheme = (function (_super) {
     __extends(TiffanyblueTheme, _super);
     function TiffanyblueTheme() {
@@ -47,6 +49,7 @@ var TiffanyblueTheme = (function (_super) {
     }
     return TiffanyblueTheme;
 })(DCaseTheme);
+
 var SimpleTheme = (function (_super) {
     __extends(SimpleTheme, _super);
     function SimpleTheme() {
@@ -74,6 +77,7 @@ var SimpleTheme = (function (_super) {
     }
     return SimpleTheme;
 })(DCaseTheme);
+
 var ColorSets = (function () {
     function ColorSets(viewer) {
         this.viewer = viewer;
@@ -87,9 +91,11 @@ var ColorSets = (function () {
     }
     ColorSets.prototype.add = function (theme) {
     };
+
     ColorSets.prototype.get = function (name) {
         return this.ThemeSets[name];
     };
+
     ColorSets.prototype.createDropMenu = function () {
         var _this = this;
         var $ul = $("#menu-change-theme");

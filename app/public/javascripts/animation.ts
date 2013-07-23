@@ -16,7 +16,7 @@ class Animation {
 		this.moveList = [];
 		this.fadeInList = [];
 		this.fadeOutList = [];
-	};
+	}
 
 	private getAttrSetter(dom: HTMLElement);
 	private getAttrSetter(dom: JQuery);
@@ -58,7 +58,7 @@ class Animation {
 			this.move(dom, key, json[key]);
 		}
 		return this;
-	};
+	}
 
 	public movePolygon(dom: any, points: any): void {
 		var from = [];
@@ -67,7 +67,7 @@ class Animation {
 			this.move(p, "x", points[i].x);
 			this.move(p, "y", points[i].y);
 		}
-	};
+	}
 	public show(dom: any, visible: bool): any {
 		var target = this.getAttrSetter(dom);
 		var disp = target.get("display");
@@ -85,7 +85,7 @@ class Animation {
 			target.set("display", "block");
 		}
 		return this;
-	};
+	}
 
 	public anime(r: number): void {
 		$.each(this.moveList, function(i, e) {
@@ -97,7 +97,7 @@ class Animation {
 		$.each(this.fadeOutList, function(i, e) {
 			e.set("opacity", 1.0 - r);
 		});
-	};
+	}
 
 	public animeFinish(): void {
 		$.each(this.moveList, function(i: number, e: MoveTask) {
@@ -110,5 +110,5 @@ class Animation {
 			e.set("opacity", 1.0);
 			e.set("display", "none");
 		});
-	};
+	}
 }

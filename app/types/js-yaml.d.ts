@@ -1,9 +1,9 @@
 declare module 'js-yaml' {
-	declare function scan(stream:any, callback:Function, Loader:any) : void;
-	declare function compose(stream:any, Loader:any) : any;
-	declare function load(stream:any, Loader:any) : any;
-	declare function loadAll(stream:any, callback:Function, Loader:any) : void;
-	declare function load(stream:any) : any;
-	declare function loadAll(stream:any, callback:Function) : void;
-	declare function addConstructor(tag:any, constructor:Function, Loader:any) : void;
+	function scan(stream:any, callback:Function, Loader:any) : void;
+	function compose(stream:any, Loader:any) : any;
+	function load(stream:any, Loader:any) : any;
+	function loadAll(stream:any, callback:Function, Loader:any) : void;
+	function load(stream:any) : any;
+	function loadAll(stream:any, callback:Function) : void;
+	function addConstructor(tag:any, constructor:Function, Loader:any) : void;
 }

@@ -1,16 +1,20 @@
 
-var db = require('../../db/db')
-var dcase = require('../../api/dcase')
-var error = require('../../api/error')
-var constant = require('../../constant')
-var testdata = require('../testdata')
-var model_commit = require('../../model/commit')
+var db = require('../../db/db');
+var dcase = require('../../api/dcase');
+var error = require('../../api/error');
+var constant = require('../../constant');
+var testdata = require('../testdata');
+var model_commit = require('../../model/commit');
+
 var expect = require('expect.js');
 var _ = require('underscore');
+
 var userId = constant.SYSTEM_USER_ID;
+
 describe('api', function () {
     var con;
     var validParam;
+
     beforeEach(function (done) {
         validParam = {
             commitId: 401,
@@ -22,9 +26,7 @@ describe('api', function () {
                     {
                         ThisNodeId: 1,
                         Description: "dcase1",
-                        Children: [
-                            2
-                        ],
+                        Children: [2],
                         NodeType: "Goal",
                         MetaData: [
                             {
@@ -32,29 +34,26 @@ describe('api', function () {
                                 Subject: "このゴールを満たす必要がある",
                                 Description: "詳細な情報をここに記述する",
                                 Visible: "true"
-                            }, 
+                            },
                             {
                                 Type: "LastUpdated",
                                 User: "Shida",
                                 Visible: "false"
-                            }, 
+                            },
                             {
                                 Type: "Tag",
                                 Tag: "tag1",
                                 Visible: "true"
-                            }, 
-                            
+                            }
                         ]
-                    }, 
+                    },
                     {
                         ThisNodeId: 2,
                         Description: "s1",
-                        Children: [
-                            3
-                        ],
+                        Children: [3],
                         NodeType: "Strategy",
                         MetaData: []
-                    }, 
+                    },
                     {
                         ThisNodeId: 3,
                         Description: "g1",
@@ -66,36 +65,34 @@ describe('api', function () {
                                 Subject: "2つ目のイシュー",
                                 Description: "あああ詳細な情報をここに記述する",
                                 Visible: "true"
-                            }, 
+                            },
                             {
                                 Type: "LastUpdated",
                                 User: "Shida",
                                 Visible: "false"
-                            }, 
+                            },
                             {
                                 Type: "Tag",
                                 Tag: "tag1",
                                 Visible: "true"
-                            }, 
+                            },
                             {
                                 Type: "Tag",
                                 Tag: "tag2",
                                 Visible: "true"
-                            }, 
+                            },
                             {
                                 Type: "Tag",
                                 Tag: "newTag",
                                 Visible: "true"
-                            }, 
-                            
+                            }
                         ]
                     }
                 ]
             }
         };
-        testdata.load([
-            'test/api/dcase-commit.yaml'
-        ], function (err) {
+
+        testdata.load(['test/api/dcase-commit.yaml'], function (err) {
             con = new db.Database();
             done();
         });
@@ -135,17 +132,11 @@ describe('api', function () {
                         expect(result).not.to.be(undefined);
                         expect(result.commitId).not.to.be(null);
                         expect(result.commitId).not.to.be(undefined);
-                        con.query('SELECT t.* FROM tag t, dcase_tag_rel r WHERE t.id = r.tag_id AND r.dcase_id=? ORDER BY t.label', [
-                            201
-                        ], function (err, result) {
+                        con.query('SELECT t.* FROM tag t, dcase_tag_rel r WHERE t.id = r.tag_id AND r.dcase_id=? ORDER BY t.label', [201], function (err, result) {
                             var resultTags = _.map(result, function (it) {
                                 return it.label;
                             });
-                            var expectTags = [
-                                'newTag', 
-                                'tag1', 
-                                'tag2'
-                            ];
+                            var expectTags = ['newTag', 'tag1', 'tag2'];
                             expect(expectTags).to.eql(resultTags);
                             done();
                         });
@@ -217,6 +208,7 @@ describe('api', function () {
                     }
                 });
             });
+
             it('contents is not set', function (done) {
                 this.timeout(15000);
                 delete validParam['contents'];
@@ -252,3 +244,4 @@ describe('api', function () {
         });
     });
 });
+

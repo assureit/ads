@@ -1,14 +1,16 @@
-var assert = require('assert')
-var db = require('../../db/db')
+
+var db = require('../../db/db');
+var expect = require('expect.js');
+
 describe('db', function () {
     describe('query', function () {
         it('should return result', function (done) {
             console.log(process.env.NODE_ENV);
             var con = new db.Database();
             con.query('SELECT 1', function (err, result) {
-                assert.strictEqual(err, null);
-                assert.equal(1, result.length);
-                assert.equal(result[0]['1'], 1);
+                expect(err).to.be(null);
+                expect(result.length).to.equal(1);
+                expect(result[0]['1']).to.equal(1);
                 con.close(function (err, result) {
                 });
                 done();
@@ -16,3 +18,4 @@ describe('db', function () {
         });
     });
 });
+

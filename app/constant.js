@@ -3,3 +3,4 @@ exports.UPLOAD_DIR = 'upload';
 exports.basepath = "";
 exports.REBUTTAL_SUBJECT = '監視項目の状態が変更されました。';
 exports.REBUTTAL_DESCRIPTION = '監視項目の状態を確認し対処してください。';
+

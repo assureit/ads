@@ -1,20 +1,21 @@
-var assert = require('assert')
+var assert = require('assert');
 var expect = require('expect.js');
+
 var ldap = require('ldapjs');
-var net_ldap = require('../../net/ldap')
+var net_ldap = require('../../net/ldap');
 var CONFIG = require('config');
+
 describe('net', function () {
     describe('ldap', function () {
         before(function (done) {
-            var client = ldap.createClient({
-                url: CONFIG.ldap.url
-            });
+            var client = ldap.createClient({ url: CONFIG.ldap.url });
             var entry = {
                 cn: 'unittest01',
                 sn: 'unittest01',
                 objectClass: 'inetOrgPerson',
                 userPassword: 'unittest01'
             };
+
             client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function (err) {
                 var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
                 client.add(dn, entry, function (err) {
@@ -24,10 +25,9 @@ describe('net', function () {
                 });
             });
         });
+
         after(function (done) {
-            var client = ldap.createClient({
-                url: CONFIG.ldap.url
-            });
+            var client = ldap.createClient({ url: CONFIG.ldap.url });
             client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function (err) {
                 var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
                 client.del(dn, function (err) {
@@ -40,6 +40,7 @@ describe('net', function () {
                 });
             });
         });
+
         describe('auth', function () {
             it('auth OK', function (done) {
                 var ld = new net_ldap.Ldap();
@@ -54,9 +55,7 @@ describe('net', function () {
                 var ld = new net_ldap.Ldap();
                 ld.add('unittest02', 'unittest02', function (err) {
                     assert.ifError(err);
-                    var client = ldap.createClient({
-                        url: CONFIG.ldap.url
-                    });
+                    var client = ldap.createClient({ url: CONFIG.ldap.url });
                     var dn = CONFIG.ldap.dn.replace('$1', 'unittest02');
                     client.bind(dn, 'unittest02', function (err) {
                         assert.ifError(err);
@@ -70,3 +69,4 @@ describe('net', function () {
         });
     });
 });
+

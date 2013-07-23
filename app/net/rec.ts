@@ -6,7 +6,7 @@ import url = module('url')
 import rest = module('./rest')
 var CONFIG = require('config');
 
-interface Callback {
+export interface Callback {
 	(err:any, result:any): void;
 }
 export class RecInterface {

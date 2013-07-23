@@ -2,7 +2,7 @@ import http = module('http')
 import error = module('../api/error')
 import querystring = module('querystring')
 
-interface Callback {
+export interface Callback {
 	(err:any, result:string): void;
 }
 

@@ -1,18 +1,18 @@
 
-var model_dcase = require('../../model/dcase')
+var model_dcase = require('../../model/dcase');
 
 
-var testdata = require('../testdata')
+var testdata = require('../testdata');
 var expect = require('expect.js');
 var async = require('async');
+
 describe('model', function () {
     var testDB;
     var con;
     var dcaseDAO;
+
     beforeEach(function (done) {
-        testdata.begin([
-            'test/model/dcase.yaml'
-        ], function (err, c) {
+        testdata.begin(['test/model/dcase.yaml'], function (err, c) {
             con = c;
             dcaseDAO = new model_dcase.DCaseDAO(con);
             done();
@@ -21,7 +21,7 @@ describe('model', function () {
     afterEach(function (done) {
         con.rollback(function (err, result) {
             con.close();
-            if(err) {
+            if (err) {
                 throw err;
             }
             done();
@@ -50,12 +50,11 @@ describe('model', function () {
                     userId: 1,
                     dcaseName: 'insert test'
                 };
+
                 dcaseDAO.insert(params, function (err, dcaseId) {
                     expect(err).to.be(null);
                     expect(dcaseId).not.to.be(null);
-                    con.query('SELECT * FROM dcase WHERE id=?', [
-                        dcaseId
-                    ], function (err, result) {
+                    con.query('SELECT * FROM dcase WHERE id=?', [dcaseId], function (err, result) {
                         expect(err).to.be(null);
                         expect(dcaseId).to.eql(result[0].id);
                         expect(params.userId).to.eql(result[0].user_id);
@@ -94,9 +93,7 @@ describe('model', function () {
                 });
             });
             it('normal end plus tag', function (done) {
-                dcaseDAO.list(1, [
-                    "tag1"
-                ], function (err, pager, result) {
+                dcaseDAO.list(1, ["tag1"], function (err, pager, result) {
                     expect(err).to.be(null);
                     expect(pager).not.to.be(null);
                     expect(pager).not.to.be(undefined);
@@ -113,9 +110,7 @@ describe('model', function () {
                 });
             });
             it('tag is not exists', function (done) {
-                dcaseDAO.list(1, [
-                    "QQQ"
-                ], function (err, pager, result) {
+                dcaseDAO.list(1, ["QQQ"], function (err, pager, result) {
                     expect(err).to.be(null);
                     expect(pager).not.to.be(null);
                     expect(pager).not.to.be(undefined);
@@ -158,3 +153,4 @@ describe('model', function () {
         });
     });
 });
+

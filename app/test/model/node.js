@@ -1,19 +1,18 @@
 
-var model_node = require('../../model/node')
-var model_monitor = require('../../model/monitor')
+var model_node = require('../../model/node');
+var model_monitor = require('../../model/monitor');
 
-var testdata = require('../testdata')
+var testdata = require('../testdata');
 var expect = require('expect.js');
 var async = require('async');
+
 describe('model', function () {
     var testDB;
     var con;
     var nodeDAO;
     var monitorDAO;
     beforeEach(function (done) {
-        testdata.begin([
-            'test/default-data.yaml'
-        ], function (err, c) {
+        testdata.begin(['test/default-data.yaml'], function (err, c) {
             con = c;
             nodeDAO = new model_node.NodeDAO(con);
             monitorDAO = new model_monitor.MonitorDAO(con);
@@ -23,7 +22,7 @@ describe('model', function () {
     afterEach(function (done) {
         con.rollback(function (err, result) {
             con.close();
-            if(err) {
+            if (err) {
                 throw err;
             }
             done();
@@ -44,33 +43,28 @@ describe('model', function () {
                             Subject: "このゴールを満たす必要がある",
                             Description: "詳細な情報をここに記述する",
                             Visible: "true"
-                        }, 
+                        },
                         {
                             Type: "LastUpdated",
                             User: "Shida",
                             Visible: "false"
-                        }, 
-                        
+                        }
                     ]
                 };
-                nodeDAO.processMetaDataList(201, 401, node, node.MetaData, [
-                    node
-                ], function (err) {
+                nodeDAO.processMetaDataList(201, 401, node, node.MetaData, [node], function (err) {
                     expect(err).to.be(null);
                     expect(node.MetaData[0]._IssueId).not.to.be(null);
                     expect(node.MetaData[0]._IssueId).not.to.be(undefined);
                     done();
                 });
             });
+
             it('should create montor_node if metadata exists', function (done) {
                 var node = {
                     NodeType: "Monitor",
                     Description: "description",
                     ThisNodeId: 1,
-                    Children: [
-                        2, 
-                        3
-                    ],
+                    Children: [2, 3],
                     Contexts: [],
                     MetaData: [
                         {
@@ -78,12 +72,11 @@ describe('model', function () {
                             PresetId: "123",
                             WatchId: "456",
                             Visible: "true"
-                        }, 
-                        
+                        }
                     ]
                 };
                 var nodeList = [
-                    node, 
+                    node,
                     {
                         NodeType: "Context",
                         Description: "description",
@@ -96,15 +89,14 @@ describe('model', function () {
                                 A: "Value A",
                                 B: "Value B",
                                 Visible: "true"
-                            }, 
+                            },
                             {
                                 Type: "LastUpdated",
                                 User: "Shida",
                                 Visible: "false"
-                            }, 
-                            
+                            }
                         ]
-                    }, 
+                    },
                     {
                         NodeType: "Context",
                         Description: "description",
@@ -117,21 +109,20 @@ describe('model', function () {
                                 C: "Value C",
                                 A: "Value A2",
                                 Visible: "true"
-                            }, 
+                            },
                             {
                                 Type: "LastUpdated",
                                 User: "Shida",
                                 Visible: "false"
-                            }, 
-                            
+                            }
                         ]
                     }
                 ];
                 nodeDAO.processMetaDataList(201, 401, node, node.MetaData, nodeList, function (err) {
                     expect(err).to.be(null);
-                    expect(node.MetaData[0]._MonitorNodeId).not.to.be(null);
-                    expect(node.MetaData[0]._MonitorNodeId).not.to.be(undefined);
-                    monitorDAO.get(node.MetaData[0]._MonitorNodeId, function (err, result) {
+                    expect(node.MetaData[0]['_MonitorNodeId']).not.to.be(null);
+                    expect(node.MetaData[0]['_MonitorNodeId']).not.to.be(undefined);
+                    monitorDAO.get(node.MetaData[0]['_MonitorNodeId'], function (err, result) {
                         expect(err).to.be(null);
                         expect(result.thisNodeId).to.equal(1);
                         expect(result.params.A).to.equal('Value A2');
@@ -144,3 +135,4 @@ describe('model', function () {
         });
     });
 });
+
