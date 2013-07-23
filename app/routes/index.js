@@ -82,7 +82,9 @@ exports.login = function (req, res) {
 
     userDAO.login(req.body.username, req.body.password, function (err, result) {
         if (err) {
-            res.redirect('/');
+            console.error(err);
+            res.redirect(CONFIG.ads.basePath + '/');
+
             return;
         }
         var auth = new util_auth.Auth(req, res);

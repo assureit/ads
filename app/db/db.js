@@ -100,6 +100,7 @@ var Database = (function (_super) {
         var _this = this;
         return function (err, result) {
             if (err) {
+                console.error(err);
                 _this._rollback(function (err, result) {
                     _this.close();
                 });
