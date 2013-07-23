@@ -515,10 +515,6 @@ var DNodeView = (function () {
         this.viewer = viewer;
         this.node = node;
         this.parentView = parentView;
-        this.$div = $("<div></div>").addClass("node-container");
-        this.$divName = $("<div></div>").addClass("node-name").appendTo(this.$div);
-        this.$divText = $("<div></div>").addClass("node-text").appendTo(this.$div);
-        this.$divNodes = $("<div></div>").addClass("node-closednodes").appendTo(this.$div);
         this.children = [];
         this.context = null;
         this.subject = null;
@@ -532,6 +528,11 @@ var DNodeView = (function () {
         this.childVisible = true;
         this.selected = false;
         this.hovered = false;
+        this.$div = $("<div></div>").addClass("node-container");
+        this.$divName = $("<div></div>").addClass("node-name").appendTo(this.$div);
+        this.$divText = $("<div></div>").addClass("node-text").appendTo(this.$div);
+        this.$divNodes = $("<div></div>").addClass("node-closednodes").appendTo(this.$div);
+
         var $root = viewer.$dom;
         this.$rootsvg = viewer.$svg;
         this.$div.width(DEF_WIDTH).css("left", $(document).width() / viewer.scale).appendTo($root);
