@@ -28,6 +28,7 @@ export class UserDAO extends model.DAO {
 		
 		ldap.auth(loginName, password, (err: any) => {
 			if (err) {
+				console.error(err);
 				err = new error.LoginError('Login name or Password is invalid.');
 				callback(err, null);
 				return;

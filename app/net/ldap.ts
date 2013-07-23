@@ -12,6 +12,7 @@ export class Ldap {
 
 		client.bind(dn, password, function(err) {
 			if (err) {
+				console.error(err);
 				callback(err);
 				return;
 			}
@@ -34,6 +35,7 @@ export class Ldap {
 
 		client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
 			if (err) {
+				console.error(err);
 				callback(new error.ExternalParameterError('root account authority went wrong.', err));
 				return;
 			}
@@ -62,6 +64,7 @@ export class Ldap {
 
 		client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
 			if (err) {
+				console.error(err);
 				callback(err);
 				return;
 			}

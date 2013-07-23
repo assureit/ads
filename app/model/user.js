@@ -48,6 +48,7 @@ var UserDAO = (function (_super) {
 
         ldap.auth(loginName, password, function (err) {
             if (err) {
+                console.error(err);
                 err = new error.LoginError('Login name or Password is invalid.');
                 callback(err, null);
                 return;
