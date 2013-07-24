@@ -7,6 +7,7 @@ var model_dcase = require('../model/dcase');
 var model_node = require('../model/node');
 var redmine = require('../net/redmine');
 var error = require('./error');
+var _ = require('underscore');
 
 function modifyMonitorStatus(params, userId, callback) {
     var commitMessage = 'monitor status exchange';
@@ -48,7 +49,7 @@ function modifyMonitorStatus(params, userId, callback) {
     function removeRebuttalNode(nodeList, thisNodeId, rebuttalThisNodeId) {
         var rebuttalNodePos = -1;
         var rebuttalChildrenPos = -1;
-        var issueId = -1;
+        var issueId = undefined;
 
         for (var i = 0; i < nodeList.length; i++) {
             var node = nodeList[i];
@@ -64,7 +65,11 @@ function modifyMonitorStatus(params, userId, callback) {
 
             if (rebuttalThisNodeId == node.ThisNodeId) {
                 rebuttalNodePos = i;
-                issueId = node.MetaData._IssueId;
+                var metaList = _.filter(node.MetaData, function (meta) {
+                    return meta.Type == 'Issue';
+                });
+                if (metaList.length > 0)
+                    issueId = metaList[0]._IssueId;
             }
         }
         if (rebuttalNodePos > -1)
