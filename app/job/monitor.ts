@@ -72,7 +72,7 @@ con.begin((err, result) => {
 					console.log('Processing object record=' + runFlag);
 					if (runFlag) {
 						var rec = new net_rec.Rec();
-						rec.request('deleteMonitor', {"nodeID ":it.id}, (err:any, resultMonitor:any) => {
+						rec.request('deleteMonitor', {"nodeID":it.id}, (err:any, resultMonitor:any) => {
 							if (err) {
 								callback(err, resultDCase, false, commitId);
 							} else {
