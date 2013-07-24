@@ -73,6 +73,7 @@ export class Request {
 			});
 
 			res.on('end', (event:any) => {
+				console.log(body);
 				callback(null, body);
 			});
 		});
