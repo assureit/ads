@@ -45,10 +45,10 @@ var Request = (function () {
         this.options.path = path;
 
         var req = http.request(this.options, function (res) {
+            var reqError = null;
             if (res.statusCode != 200 && res.statusCode != 201) {
-                console.error(res);
-                callback(new error.InternalError('Failed to access: ' + res.statusCode, res), null);
-                return;
+                reqError = new error.InternalError('Failed to access: ' + res.statusCode, res);
+                console.error(reqError);
             }
 
             res.setEncoding('utf8');
@@ -60,7 +60,7 @@ var Request = (function () {
 
             res.on('end', function (event) {
                 console.log(body);
-                callback(null, body);
+                callback(reqError, body);
             });
         });
 
