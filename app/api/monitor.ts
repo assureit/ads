@@ -7,6 +7,7 @@ import model_dcase = module('../model/dcase');
 import model_node = module('../model/node');
 import redmine = module('../net/redmine')
 import error = module('./error')
+var _ = require('underscore');
 
 export function modifyMonitorStatus(params:any, userId:number, callback: type.Callback) {
 	var commitMessage = 'monitor status exchange';
@@ -43,7 +44,7 @@ export function modifyMonitorStatus(params:any, userId:number, callback: type.Ca
 	function removeRebuttalNode(nodeList: any, thisNodeId: number, rebuttalThisNodeId: number) : number {
 		var rebuttalNodePos: number = -1;
 		var rebuttalChildrenPos: number = -1;
-		var issueId: number = -1;
+		var issueId: number = undefined;
 
 		for (var i = 0; i < nodeList.length; i++) {
 			var node = nodeList[i];
@@ -58,7 +59,9 @@ export function modifyMonitorStatus(params:any, userId:number, callback: type.Ca
 
 			if (rebuttalThisNodeId == node.ThisNodeId) {
 				rebuttalNodePos = i;
-				issueId = node.MetaData._IssueId;
+				var metaList = _.filter(node.MetaData, (meta:any) => {return meta.Type == 'Issue';});
+				if (metaList.length > 0)
+					issueId = metaList[0]._IssueId;
 			}
 		}
 		if (rebuttalNodePos > -1) nodeList.splice(rebuttalNodePos, 1);
