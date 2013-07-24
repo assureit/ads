@@ -9,7 +9,8 @@ export class File {
 		return new File(table.id, table.name, table.path, table.user_id);
 	}
 	static encodePath(path: string) {
-		return encodeURI(path.replace(' ', '-'));
+		return encodeURI(path);
+		// return encodeURI(path.replace(' ', '-'));
 	}
 
 	getEncodeName(): string {

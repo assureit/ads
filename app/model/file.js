@@ -20,7 +20,7 @@ var File = (function () {
         return new File(table.id, table.name, table.path, table.user_id);
     };
     File.encodePath = function (path) {
-        return encodeURI(path.replace(' ', '-'));
+        return encodeURI(path);
     };
 
     File.prototype.getEncodeName = function () {

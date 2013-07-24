@@ -158,7 +158,6 @@ describe('model', function () {
                     expect(node.MetaData[0]['_MonitorNodeId']).not.to.be(undefined);
                     monitorDAO.get(node.MetaData[0]['_MonitorNodeId'], function (err, result) {
                         expect(err).to.be(null);
-                        console.log(result);
                         expect(result.thisNodeId).to.equal(1);
                         expect(result.presetId).to.equal('123');
                         expect(result.watchId).to.equal('456');
