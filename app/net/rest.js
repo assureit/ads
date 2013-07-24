@@ -59,6 +59,7 @@ var Request = (function () {
             });
 
             res.on('end', function (event) {
+                console.log(body);
                 callback(null, body);
             });
         });
