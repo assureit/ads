@@ -46,6 +46,7 @@ var Request = (function () {
 
         var req = http.request(this.options, function (res) {
             if (res.statusCode != 200 && res.statusCode != 201) {
+                console.error(res);
                 callback(new error.InternalError('Failed to access: ' + res.statusCode, res), null);
                 return;
             }
@@ -63,8 +64,12 @@ var Request = (function () {
         });
 
         req.on('error', function (err) {
+            console.error(err);
             callback(err, null);
         });
+
+        console.log(this.options);
+        console.log(data);
 
         req.write(data);
 

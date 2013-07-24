@@ -60,6 +60,7 @@ export class Request {
 
 		var req = http.request(this.options, (res:any) => {
 			if (res.statusCode != 200 && res.statusCode != 201) {
+				console.error(res);
 				callback(new error.InternalError('Failed to access: ' + res.statusCode, res), null);
 				return ;
 			}
@@ -77,8 +78,12 @@ export class Request {
 		});
 
 		req.on('error', (err:any) => {
+			console.error(err);
 			callback(err, null);
 		});
+
+		console.log(this.options);
+		console.log(data);
 
 		req.write(data);
 		// req.write(data, 'utf8');
