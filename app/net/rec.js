@@ -71,7 +71,7 @@ var Rec = (function (_super) {
         _super.prototype.post.call(this, {
             "jsonrpc": "2.0",
             "method": method,
-            "params": JSON.stringify(params),
+            "params": params,
             "id": 1
         }, callback);
     };
