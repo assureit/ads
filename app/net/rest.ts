@@ -61,8 +61,8 @@ export class Request {
 		var req = http.request(this.options, (res:any) => {
 			var reqError = null;
 			if (res.statusCode != 200 && res.statusCode != 201) {
-				console.error(res);
 				reqError = new error.InternalError('Failed to access: ' + res.statusCode, res);
+				console.error(reqError);
 				// callback(new error.InternalError('Failed to access: ' + res.statusCode, res), null);
 				// return ;
 			}

@@ -47,8 +47,8 @@ var Request = (function () {
         var req = http.request(this.options, function (res) {
             var reqError = null;
             if (res.statusCode != 200 && res.statusCode != 201) {
-                console.error(res);
                 reqError = new error.InternalError('Failed to access: ' + res.statusCode, res);
+                console.error(reqError);
             }
 
             res.setEncoding('utf8');
