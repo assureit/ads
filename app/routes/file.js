@@ -146,7 +146,7 @@ exports.download = function (req, res) {
                 var err = null;
                 if (!exists) {
                     err = new error.NotFoundError('File Not Found on file system.', { params: req.params, file: file });
-                } else if (file.getEncodeName() != req.params.fileName) {
+                } else if (file.name != req.params.fileName) {
                     err = new error.NotFoundError('File Not Found on file system.', { params: req.params, file: file });
                 }
                 next(err, file);

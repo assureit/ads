@@ -148,7 +148,7 @@ describe('routes.file', function() {
 	describe('download', function() {
 		it('should return name and fileBody', function(done) {
 			request(app['app'])
-				.get('/file/301/test-file1.txt')
+				.get('/file/301/test%20file1.txt')
 				.expect(200)
 				.end(function (err, res) {
 					if (err) throw err;

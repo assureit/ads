@@ -28,16 +28,16 @@ tsc @compile_list
 テスト
 ------------
 ```
-mocha --recursive
+npm start_ldap_mem
+npm run-script test
 ```
 
 テストデバッグ実行
 ------------
 https://github.com/visionmedia/mocha/issues/247
 ```
-npm -g install node-inspector
-node-inspector
-mocha --debug-brk --recursive
+npm start_ldap_mem
+npm run-script test_debug
 ```
 Launch http://127.0.0.1:8080/debug?port=5858 in Chrome.
 
