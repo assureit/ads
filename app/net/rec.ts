@@ -63,7 +63,7 @@ export class Rec extends RecInterface {
 	request(method: string, params: any, callback:Callback) {
 		super.post({	"jsonrpc": "2.0",
 				"method": method,
-				"params": JSON.stringify(params),
+				"params": params,
 				"id": 1
 			},
 			callback);
