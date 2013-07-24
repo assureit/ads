@@ -59,10 +59,12 @@ export class Request {
 		this.options.path = path;
 
 		var req = http.request(this.options, (res:any) => {
+			var reqError = null;
 			if (res.statusCode != 200 && res.statusCode != 201) {
 				console.error(res);
-				callback(new error.InternalError('Failed to access: ' + res.statusCode, res), null);
-				return ;
+				reqError = new error.InternalError('Failed to access: ' + res.statusCode, res);
+				// callback(new error.InternalError('Failed to access: ' + res.statusCode, res), null);
+				// return ;
 			}
 
 			res.setEncoding('utf8');
@@ -74,7 +76,7 @@ export class Request {
 
 			res.on('end', (event:any) => {
 				console.log(body);
-				callback(null, body);
+				callback(reqError, body);
 			});
 		});
 
