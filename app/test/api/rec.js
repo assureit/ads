@@ -15,7 +15,15 @@ app.use(express.bodyParser());
 
 app.post('/rec/api/1.0', function (req, res) {
     res.header('Content-Type', 'application/json');
-    res.send(req.body);
+    var resbody;
+
+    if (req.body.method == 'getRawItemList') {
+        resbody = { "jsonrpc": "2.0", "result": { "list": [{ "watchID": "serverA_CPU", "name": "サーバAのCPU負荷", "datatype": "linux_cpu" }] }, "id": 1 };
+    } else {
+        resbody = { "jsonrpc": "2.0", "result": { "items": [{ "presetID": "CPU_upper_Check", "name": "CPU高負荷チェック", "datatype": "linux_cpu", "paramName": ["between", "reference"], "normalComment": "$$0は正常に稼働しています。", "errorComment": "$$0が高負荷です（$$1秒間の平均ロードアベレージが$$2以上です）" }] }, "id": 1 };
+    }
+
+    res.send(resbody);
 });
 
 describe('api', function () {
@@ -34,7 +42,10 @@ describe('api', function () {
             it('call method', function (done) {
                 rec.getRawItemList(null, userId, {
                     onSuccess: function (result) {
-                        expect(result.method).to.eql('getRawItemList');
+                        expect(result.list).not.to.be(null);
+                        expect(result.list[0].watchID).not.to.be(null);
+                        expect(result.list[0].watchID).not.to.be(undefined);
+                        expect(result.list[0].watchID).to.eql('serverA_CPU');
                         done();
                     },
                     onFailure: function (err) {
@@ -76,7 +87,10 @@ describe('api', function () {
             it('call method', function (done) {
                 rec.getPresetList(null, userId, {
                     onSuccess: function (result) {
-                        expect(result.method).to.eql('getPresetList');
+                        expect(result.items).not.to.be(null);
+                        expect(result.items[0].presetID).not.to.be(null);
+                        expect(result.items[0].presetID).not.to.be(undefined);
+                        expect(result.items[0].presetID).to.eql('CPU_upper_Check');
                         done();
                     },
                     onFailure: function (err) {

@@ -30,12 +30,16 @@ function getRawItemList(params, userId, callback) {
         return;
 
     var rc = new rec.Rec();
-    rc.request(method, params, function (err, result) {
+    rc.request(method, params, function (err, res) {
         if (err) {
             callback.onFailure(err);
             return;
         }
-        callback.onSuccess(result);
+        if (!res.result) {
+            callback.onFailure(new error.InternalError('Response result is nothing', null));
+            return;
+        }
+        callback.onSuccess(res.result);
     });
 }
 exports.getRawItemList = getRawItemList;
@@ -59,12 +63,16 @@ function getPresetList(params, userId, callback) {
         return;
 
     var rc = new rec.Rec();
-    rc.request(method, params, function (err, result) {
+    rc.request(method, params, function (err, res) {
         if (err) {
             callback.onFailure(err);
             return;
         }
-        callback.onSuccess(result);
+        if (!res.result) {
+            callback.onFailure(new error.InternalError('Response result is nothing', null));
+            return;
+        }
+        callback.onSuccess(res.result);
     });
 }
 exports.getPresetList = getPresetList;
