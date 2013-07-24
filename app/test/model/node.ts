@@ -17,7 +17,7 @@ describe('model', function() {
 	var nodeDAO: model_node.NodeDAO;
 	var monitorDAO: model_monitor.MonitorDAO;
 	beforeEach(function (done) {
-		testdata.begin(['test/default-data.yaml'], (err:any, c:db.Database) => {
+		testdata.begin([], (err:any, c:db.Database) => {
 			con = c;
 			nodeDAO = new model_node.NodeDAO(con);
 			monitorDAO = new model_monitor.MonitorDAO(con);
@@ -133,6 +133,39 @@ describe('model', function() {
 						expect(result.params.A).to.equal('Value A2');
 						expect(result.params.B).to.equal('Value B');
 						expect(result.params.C).to.equal('Value C');
+						done();
+					});
+				});
+			});
+			it('should update montor_node if metadata is changed', function(done) {
+				var node = {
+					NodeType: "Monitor",
+					Description: "description",
+					ThisNodeId: 1,
+					Children: [], 
+					Contexts: [], 
+					MetaData: [
+						{   
+							Type: "Monitor",
+							_MonitorNodeId: 1001,
+							PresetId: "123",
+							WatchId: "456",
+							Visible: "true",
+						},
+					]
+				};
+				var nodeList: model_node.NodeData[] = [
+					node, 
+				];
+				nodeDAO.processMetaDataList(201, 401, node, node.MetaData, nodeList, (err: any) => {
+					expect(err).to.be(null);
+					expect(node.MetaData[0]['_MonitorNodeId']).not.to.be(null);
+					expect(node.MetaData[0]['_MonitorNodeId']).not.to.be(undefined);
+					monitorDAO.get(node.MetaData[0]['_MonitorNodeId'], (err:any, result:model_monitor.MonitorNode) => {
+						expect(err).to.be(null);
+						expect(result.thisNodeId).to.equal(1);
+						expect(result.presetId).to.equal('123');
+						expect(result.watchId).to.equal('456');
 						done();
 					});
 				});

@@ -88,7 +88,7 @@ export class NodeDAO extends model.DAO {
 				callback(null);
 			});
 			return;
-		} else if (meta.Type == 'Monitor' && !meta._MonitorNodeId) {
+		} else if (meta.Type == 'Monitor') {
 			// TODO: 必要項目チェック
 			var monitorDAO = new model_monitor.MonitorDAO(this.con);
 			var params = 
