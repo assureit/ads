@@ -187,7 +187,7 @@ class SelectDCaseView {
 			var i = this.pageIndex - 0;
 			if(i > 1) {
 				this.pageIndex = i - 1;
-				location.href = "/page/" + this.pageIndex;
+				location.href = Config.BASEPATH + "/page/" + this.pageIndex;
 			}
 			e.preventDefault();
 		});
@@ -196,7 +196,7 @@ class SelectDCaseView {
 			var i = this.pageIndex - 0;
 			if(this.maxPageSize >= i + 1) {
 				this.pageIndex = i + 1;
-				location.href = "/page/" + this.pageIndex;
+				location.href = Config.BASEPATH + "/page/" + this.pageIndex;
 			}
 			e.preventDefault();
 		});
