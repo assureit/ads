@@ -26,12 +26,16 @@ export function getRawItemList(params:any, userId:number, callback: type.Callbac
 	if (!validate(params)) return;
 
 	var rc = new rec.Rec();
-	rc.request(method, params, (err:any, result:any) => {
+	rc.request(method, params, (err:any, res:any) => {
 		if (err) {
 			callback.onFailure(err);
 			return;
 		}
-		callback.onSuccess(result);
+		if (!res.result) {
+			callback.onFailure(new error.InternalError('Response result is nothing', null));
+			return;
+		}
+		callback.onSuccess(res.result);
 	});
 }
 
@@ -52,11 +56,15 @@ export function getPresetList(params:any, userId:number, callback: type.Callback
 	if (!validate(params)) return;
 
 	var rc = new rec.Rec();
-	rc.request(method, params, (err:any, result:any) => {
+	rc.request(method, params, (err:any, res:any) => {
 		if (err) {
 			callback.onFailure(err);
 			return;
 		}
-		callback.onSuccess(result);
+		if (!res.result) {
+			callback.onFailure(new error.InternalError('Response result is nothing', null));
+			return;
+		}
+		callback.onSuccess(res.result);
 	});
 }
