@@ -11,41 +11,34 @@ var expect = require('expect.js');	// TODO: import module化
 var ldap = require('ldapjs');
 import net_ldap = module('../../net/ldap')
 var CONFIG = require('config');
+var ldapDummy = require('../ldap');
 
 describe('net', () => {
 	describe('ldap', () => {
+		var server = null;
 		before((done) => {
-			var client = ldap.createClient({url: CONFIG.ldap.url});
-			var entry = {
-				cn: 'unittest01',
-				sn: 'unittest01',
-				objectClass: 'inetOrgPerson',
-				userPassword: 'unittest01'
-				};
+			server = ldapDummy.app.listen(CONFIG.ldap.dummy.port, CONFIG.ldap.dummy.ip, function() {
+				var client = ldap.createClient({url: CONFIG.ldap.url});
+				var entry = {
+					cn: 'unittest01',
+					sn: 'unittest01',
+					objectClass: 'inetOrgPerson',
+					userPassword: 'unittest01'
+					};
 				
-			client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
-				var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
-				client.add(dn, entry, function(err) {
-					client.unbind(function(err) {
-						done();
+				client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
+					var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
+					client.add(dn, entry, function(err) {
+						client.unbind(function(err) {
+							done();
+						});
 					});
 				});
 			});
 		});
 
-		after((done) => {
-			var client = ldap.createClient({url: CONFIG.ldap.url});
-			client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
-				var dn = CONFIG.ldap.dn.replace('$1', 'unittest01');
-				client.del(dn, function(err) {
-					var dn2 = CONFIG.ldap.dn.replace('$1', 'unittest02');
-					client.del(dn2, function(err) {
-						client.unbind(function(err) {
-							done();		
-						});
-					});
-				});
-			});
+		after(() => {
+			server.close();
 		});
 
 

@@ -11,11 +11,23 @@ import util_test = module('../../util/test')
 var expect = require('expect.js');	// TODO: import module化
 var ldap = require('ldapjs');		// TODO: import module化
 var CONFIG = require('config');
+var ldapDummy = require('../ldap');
 
 describe('model', function() {
 	describe('user', function() {
 		var con: db.Database
 		var userDAO: model_user.UserDAO;
+		var server = null;
+
+		before((done) => {
+			server = ldapDummy.app.listen(CONFIG.ldap.dummy.port, CONFIG.ldap.dummy.ip, function() {
+				done();
+			});
+		});
+		after(() => {
+			server.close();
+		});
+
 		beforeEach((done) => {
 			testdata.begin(['test/default-data.yaml'], (err:any, c:db.Database) => {
 				con = c;
@@ -28,7 +40,7 @@ describe('model', function() {
 					objectClass: 'inetOrgPerson',
 					userPassword: 'password'
 					};
-
+	
 				client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function(err) {
 					var dn = CONFIG.ldap.dn.replace('$1', 'system');
 					client.add(dn, entry, function(err) {
