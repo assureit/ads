@@ -15,6 +15,14 @@ var expect = require('expect.js');	// TODO: import module化
 var _ = require('underscore');
 
 var userId = constant.SYSTEM_USER_ID;
+var express = require('express');
+var app = express();
+app.use(express.bodyParser());
+app.post('/rec/api/1.0', function (req: any, res: any) {
+	res.header('Content-Type', 'application/json');
+	res.send(JSON.stringify({ jsonrpc: "2.0", result: null, id:1}));
+});
+
 
 describe('api', function() {
 	var con:db.Database;
@@ -105,6 +113,15 @@ describe('api', function() {
 	afterEach(function (done) {
 		testdata.clear((err:any) => done());
 	});
+
+	var server = null;
+	before((done) => {
+		server = app.listen(3030).on('listening', done);
+	});
+	after(() => {
+		server.close();
+	});
+
 	describe('dcase', function() {
 		///////////////////////////////////////////////
 		describe('commit', function() {

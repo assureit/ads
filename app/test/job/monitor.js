@@ -13,6 +13,10 @@ var responseFlag = true;
 app.use(express.bodyParser());
 app.post('/rec/api/1.0', function (req, res) {
     res.header('Content-Type', 'application/json');
+
+    if (!req.body.params.nodeID) {
+        responseFlag = false;
+    }
     if (responseFlag) {
         res.send(JSON.stringify({ jsonrpc: "2.0", result: null, id: 1 }));
     } else {

@@ -10,6 +10,13 @@ var expect = require('expect.js');
 var _ = require('underscore');
 
 var userId = constant.SYSTEM_USER_ID;
+var express = require('express');
+var app = express();
+app.use(express.bodyParser());
+app.post('/rec/api/1.0', function (req, res) {
+    res.header('Content-Type', 'application/json');
+    res.send(JSON.stringify({ jsonrpc: "2.0", result: null, id: 1 }));
+});
 
 describe('api', function () {
     var con;
@@ -102,6 +109,15 @@ describe('api', function () {
             return done();
         });
     });
+
+    var server = null;
+    before(function (done) {
+        server = app.listen(3030).on('listening', done);
+    });
+    after(function () {
+        server.close();
+    });
+
     describe('dcase', function () {
         describe('commit', function () {
             it('should return result', function (done) {
