@@ -9,14 +9,13 @@ var express = require('express');
 
 var app = express();
 var responseFlag = true;
+var recRequestBody;
 
 app.use(express.bodyParser());
 app.post('/rec/api/1.0', function (req, res) {
     res.header('Content-Type', 'application/json');
 
-    if (!req.body.params.nodeID) {
-        responseFlag = false;
-    }
+    recRequestBody = req.body;
     if (responseFlag) {
         res.send(JSON.stringify({ jsonrpc: "2.0", result: null, id: 1 }));
     } else {
@@ -41,6 +40,7 @@ describe('job', function () {
     beforeEach(function (done) {
         testdata.load(['test/default-data.yaml'], function (err) {
             con = new db.Database();
+            recRequestBody = null;
             done();
         });
     });
@@ -64,6 +64,9 @@ describe('job', function () {
                         monitor.get(604, function (err, resultMonitor) {
                             expect(err).to.be(null);
                             expect(resultMonitor.deleteFlag).to.be(true);
+                            expect(recRequestBody).not.to.be(null);
+                            expect(recRequestBody.method).to.be('deleteMonitor');
+                            expect(recRequestBody.params.nodeID).to.be(604);
                             done();
                         });
                     });
@@ -78,6 +81,9 @@ describe('job', function () {
                         monitor.get(605, function (err, resultMonitor) {
                             expect(err).to.be(null);
                             expect(resultMonitor.deleteFlag).to.be(true);
+                            expect(recRequestBody).not.to.be(null);
+                            expect(recRequestBody.method).to.be('deleteMonitor');
+                            expect(recRequestBody.params.nodeID).to.be(605);
                             done();
                         });
                     });
@@ -92,6 +98,9 @@ describe('job', function () {
                         monitor.get(606, function (err, resultMonitor) {
                             expect(err).to.be(null);
                             expect(resultMonitor.deleteFlag).to.be(true);
+                            expect(recRequestBody).not.to.be(null);
+                            expect(recRequestBody.method).to.be('deleteMonitor');
+                            expect(recRequestBody.params.nodeID).to.be(606);
                             done();
                         });
                     });
