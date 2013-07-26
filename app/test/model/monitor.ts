@@ -10,13 +10,15 @@ import testdata = module('../testdata')
 var expect = require('expect.js');	// TODO: import module化
 var async = require('async');
 var express = require('express');
-
 var app = express();
-app.use(express.bodyParser());
 
+var recRequestBody:any;
+
+app.use(express.bodyParser());
 app.post('/rec/api/1.0', function (req: any, res: any) {
         res.header('Content-Type', 'application/json');
-        res.send(req.body);
+	recRequestBody = req.body;
+        res.send(JSON.stringify({ jsonrpc: "2.0", result: null, id:1}));
 });
 
 
@@ -37,6 +39,7 @@ describe('model', function() {
 			testdata.begin(['test/default-data.yaml', 'test/model/monitor.yaml'], (err:any, c:db.Database) => {
 				con = c;
 				monitorDAO = new model_monitor.MonitorDAO(con);
+				recRequestBody = null;
 				done();
 			});
 		});
@@ -88,6 +91,70 @@ describe('model', function() {
 							expect(list).not.to.be(null);
 							expect(list.length).to.equal(0);
 							next(err);
+						});
+					}
+				], (err:any, result:any) => {
+					expect(err).to.be(null);
+					done();
+				});
+			});
+			it('rec api registMonitor parameter check', function(done) {
+				async.waterfall([
+					(next) => {
+						monitorDAO.publish(202, (err:any) => {
+							next(err);
+						});
+					}
+					, (next) => {
+						monitorDAO.listNotPublished(202, (err:any, list:model_monitor.MonitorNode[]) => {
+							expect(list).not.to.be(null);
+							expect(list.length).to.equal(0);
+							next(err);
+						});
+					}
+					, (next) => {
+						con.query('SELECT * FROM monitor_node WHERE dcase_id = 202', (err:any, resultMonitor:any) => {
+							expect(err).to.be(null);
+							expect(resultMonitor).not.to.be(null);
+							expect(resultMonitor.length).to.eql(1);
+							expect(recRequestBody).not.to.be(null);
+							expect(recRequestBody.method).to.eql('registMonitor');
+							expect(recRequestBody.params.nodeID).to.eql(resultMonitor[0].id);
+							expect(recRequestBody.params.watchID).to.eql(resultMonitor[0].watch_id);
+							expect(recRequestBody.params.presetID).to.eql(resultMonitor[0].preset_id);
+							next(err);	
+						});
+					}
+				], (err:any, result:any) => {
+					expect(err).to.be(null);
+					done();
+				});
+			});
+			it('rec api updateMonitor parameter check', function(done) {
+				async.waterfall([
+					(next) => {
+						monitorDAO.publish(203, (err:any) => {
+							next(err);
+						});
+					}
+					, (next) => {
+						monitorDAO.listNotPublished(203, (err:any, list:model_monitor.MonitorNode[]) => {
+							expect(list).not.to.be(null);
+							expect(list.length).to.equal(0);
+							next(err);
+						});
+					}
+					, (next) => {
+						con.query('SELECT * FROM monitor_node WHERE dcase_id = 203', (err:any, resultMonitor:any) => {
+							expect(err).to.be(null);
+							expect(resultMonitor).not.to.be(null);
+							expect(resultMonitor.length).to.eql(1);
+							expect(recRequestBody).not.to.be(null);
+							expect(recRequestBody.method).to.eql('updateMonitor');
+							expect(recRequestBody.params.nodeID).to.eql(resultMonitor[0].id);
+							expect(recRequestBody.params.watchID).to.eql(resultMonitor[0].watch_id);
+							expect(recRequestBody.params.presetID).to.eql(resultMonitor[0].preset_id);
+							next(err);	
 						});
 					}
 				], (err:any, result:any) => {

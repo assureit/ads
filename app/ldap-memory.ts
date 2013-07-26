@@ -36,11 +36,11 @@ server.bind(rootSUFFIX, function(req, res, next) {
 		if (val.cn) cn = val.cn;
 	});
 
-	if (cn !== 'root' || req.credentials !== CONFIG.ldap.password)
-	{
-		console.log('bind root error');
-		return next(new ldap.InvalidCredentialsError());
-	}
+//	if (cn !== 'root' || req.credentials !== CONFIG.ldap.password)
+//	{
+//		console.log('bind root error');
+//		return next(new ldap.InvalidCredentialsError());
+//	}
 	console.log('---- BIND OK ----');
 	res.end();
 	return next();

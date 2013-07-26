@@ -129,6 +129,10 @@ var CommitDAO = (function (_super) {
                 });
             }
         ], function (err, result) {
+            if (err) {
+                _this.con.rollback();
+            }
+            ;
             commitCallback(err, result);
         });
     };
