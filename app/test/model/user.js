@@ -7,11 +7,23 @@ var util_test = require('../../util/test');
 var expect = require('expect.js');
 var ldap = require('ldapjs');
 var CONFIG = require('config');
+var ldapDummy = require('../ldap');
 
 describe('model', function () {
     describe('user', function () {
         var con;
         var userDAO;
+        var server = null;
+
+        before(function (done) {
+            server = ldapDummy.app.listen(CONFIG.ldap.dummy.port, CONFIG.ldap.dummy.ip, function () {
+                done();
+            });
+        });
+        after(function () {
+            server.close();
+        });
+
         beforeEach(function (done) {
             testdata.begin(['test/default-data.yaml'], function (err, c) {
                 con = c;
