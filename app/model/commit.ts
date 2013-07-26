@@ -111,6 +111,9 @@ export class CommitDAO extends model.DAO {
 				});
 			} 
 		], (err:any, result:any) => {
+			if (err) {
+				this.con.rollback();
+			};
 			commitCallback(err, result);
 		});
 	}

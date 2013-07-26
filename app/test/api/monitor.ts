@@ -8,21 +8,49 @@ import monitor = module('../../api/monitor')
 import error = module('../../api/error')
 import constant = module('../../constant')
 import testdata = module('../testdata')
+
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
+var CONFIG = require('config')
+
+var responseOK = true;
+var redmineCall = true;
+var redmineRequestBody:any;
+
 
 var express = require('express');
 var app = express();
 app.use(express.bodyParser());
 app.post('/rec/api/1.0', function (req: any, res: any) {
 	res.header('Content-Type', 'application/json');
-	res.send(req.body);
+	if (responseOK) {
+		res.send(JSON.stringify({ jsonrpc: "2.0", result: null, id:1}));
+	} else {
+		res.send(JSON.stringify({ jsonrpc: "2.0", id:1}), 500);
+	}
 });
+app.post('/issues.json', function (req: any, res: any) {
+	res.header('Content-Type', 'application/json');
+	if (	req.body.issue.project_id == CONFIG.redmine.projectId ) 
+	{
+		redmineRequestBody = req.body;
+		res.send(JSON.stringify({"issue":{"id":3825}}));
+	} else {
+		res.send(JSON.stringify({ jsonrpc: "2.0", id:1}), 500);
+	}
+});
+
+app.put('/issues/:itsId', function(req: any, res:any) {
+	redmineCall = true;
+	redmineRequestBody = req.body;
+	res.send(200);
+});
+
 
 var userId = constant.SYSTEM_USER_ID;
 
 describe('api', function() {
-	var con;
+	var con:db.Database;
 	var validParams:any;
 
 	beforeEach(function (done) {
@@ -35,7 +63,9 @@ describe('api', function() {
 				comment:'Unit Test Run',
 				status:'OK'
 				}
-
+			responseOK = true;
+			redmineCall = false;
+			redmineRequestBody = null;
 			done();
 		});
 	});
@@ -45,11 +75,14 @@ describe('api', function() {
 	describe('monitor', function() {
 		var server = null;
 		before((done) => {
+			CONFIG.redmine.port = 3030;	
 			server = app.listen(3030).on('listening', done);
 		});
 
 		after(() => {
 			server.close();
+			CONFIG.redmine.port = CONFIG.getOriginalConfig().redmine.port;
+			CONFIG.resetRuntime((err, written, buffer) => {}); 
 		});
 
 		// var con = new db.Database();
@@ -76,13 +109,15 @@ describe('api', function() {
 			it('status change OK->NG', function(done) {
 				validParams.systemNodeId = 603;
 				validParams.status = 'NG';
+				
 				monitor.modifyMonitorStatus(validParams, userId, {
 					onSuccess: (result: any) => {
-						var con = new db.Database();
 						con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = ? AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', [validParams.systemNodeId], (err, expectedResult) => {
 							expect(err).to.be(null);
 							expect(1).to.be(expectedResult.length);
-							con.close();
+							expect(redmineRequestBody).not.to.be(null);
+							expect(redmineRequestBody.issue.subject).to.eql(constant.REBUTTAL_SUBJECT);
+							expect(redmineRequestBody.issue.description).to.eql(constant.REBUTTAL_DESCRIPTION+ '\r\n' + validParams.comment);
 							done();
 						});
 					}, 
@@ -97,11 +132,11 @@ describe('api', function() {
 				validParams.status = 'OK';
 				monitor.modifyMonitorStatus(validParams, userId, {
 					onSuccess: (result: any) => {
-						var con = new db.Database();
 						con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = ? AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', [validParams.systemNodeId], (err, expectedResult) => {
 							expect(err).to.be(null);
 							expect(0).to.be(expectedResult.length);
-							con.close();
+							expect(redmineRequestBody).not.to.be(null);
+							expect(redmineRequestBody.issue.notes).to.eql(validParams.comment);
 							done();
 						});
 					}, 
@@ -266,6 +301,40 @@ describe('api', function() {
 						done();	
 					},
 					onFailure: (err: error.RPCError) => {
+						expect(err).to.be(null);
+						done();
+					},
+				});
+			});
+			it('It is not connectable with rec. ', function(done) {
+				validParams.systemNodeId = 603;
+				validParams.status = 'NG';
+				responseOK = false;
+				monitor.modifyMonitorStatus(validParams, userId, {
+					onSuccess: (result: any) => {
+						expect(result).to.be(null);
+						done();
+					}, 
+					onFailure: (err: error.RPCError) => {
+						expect(err).not.to.be(null);
+						con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = ? AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', [validParams.systemNodeId], (err, expectedResult) => {
+							expect(err).to.be(null);
+							expect(0).to.be(expectedResult.length);
+							done();
+						});
+					},
+				});
+			});
+			it('Since issueId could not be acquired, redmine was not able to be called. ', function(done) {
+				validParams.systemNodeId = 1002;
+				validParams.status = 'OK';
+				monitor.modifyMonitorStatus(validParams, userId, {
+					onSuccess: (result: any) => {
+						expect(result).to.be(null);
+						expect(redmineCall).to.be(false);
+						done();
+					}, 
+					onFailure: (err: any) => {
 						expect(err).to.be(null);
 						done();
 					},
