@@ -7,28 +7,8 @@ var model_commit = require('../../model/commit');
 var testdata = require('../testdata');
 var expect = require('expect.js');
 var async = require('async');
-var express = require('express');
-var app = express();
 var CONFIG = require('config');
-
-var redmineRequestBody;
-var recRequestBody;
-
-app.use(express.bodyParser());
-app.post('/rec/api/1.0', function (req, res) {
-    res.header('Content-Type', 'application/json');
-    recRequestBody = req.body;
-    res.send(JSON.stringify({ jsonrpc: "2.0", result: null, id: 1 }));
-});
-app.post('/issues.json', function (req, res) {
-    res.header('Content-Type', 'application/json');
-    if (req.body.issue.project_id == CONFIG.redmine.projectId) {
-        redmineRequestBody = req.body;
-        res.send(JSON.stringify({ "issue": { "id": 3825 } }));
-    } else {
-        res.send(JSON.stringify({ jsonrpc: "2.0", id: 1 }), 500);
-    }
-});
+var dSvr = require('../server');
 
 describe('model', function () {
     var testDB;
@@ -39,7 +19,7 @@ describe('model', function () {
     var server = null;
     before(function (done) {
         CONFIG.redmine.port = 3030;
-        server = app.listen(3030).on('listening', done);
+        server = dSvr.app.listen(3030).on('listening', done);
     });
     after(function () {
         server.close();
@@ -128,8 +108,9 @@ describe('model', function () {
         testdata.begin(['test/default-data.yaml', 'test/model/commit.yaml'], function (err, c) {
             con = c;
             commitDAO = new model_commit.CommitDAO(con);
-            redmineRequestBody = null;
-            recRequestBody = null;
+            dSvr.setResponseOK(true);
+            dSvr.setRedmineRequestBody(null);
+            dSvr.setRecRequestBody(null);
             done();
         });
     });
@@ -273,9 +254,9 @@ describe('model', function () {
                     expect(result).not.to.be(undefined);
                     expect(result.commitId).not.to.be(null);
                     expect(result.commitId).not.to.be(undefined);
-                    expect(redmineRequestBody).not.to.be(null);
-                    expect(redmineRequestBody.issue.subject).to.eql(validParam.contents.NodeList[0].MetaData[0].Subject);
-                    expect(redmineRequestBody.issue.description).to.eql(validParam.contents.NodeList[0].MetaData[0].Description);
+                    expect(dSvr.getRedmineRequestBody()).not.to.be(null);
+                    expect(dSvr.getRedmineRequestBody().issue.subject).to.eql(validParam.contents.NodeList[0].MetaData[0].Subject);
+                    expect(dSvr.getRedmineRequestBody().issue.description).to.eql(validParam.contents.NodeList[0].MetaData[0].Description);
                     con.query('SELECT * FROM commit WHERE id=?', [result.commitId], function (err, resultCommit) {
                         expect(err).to.be(null);
                         expect(resultCommit[0].latest_flag).to.eql(true);
@@ -299,11 +280,11 @@ describe('model', function () {
                             expect(errMonitor).to.be(null);
                             expect(resultMonitor).not.to.be(null);
                             expect(resultMonitor.length).to.eql(1);
-                            expect(recRequestBody).not.to.be(null);
-                            expect(recRequestBody.method).to.eql('registMonitor');
-                            expect(recRequestBody.params.nodeID).to.eql(resultMonitor[0].id);
-                            expect(recRequestBody.params.watchID).to.eql(resultMonitor[0].watch_id);
-                            expect(recRequestBody.params.presetID).to.eql(resultMonitor[0].preset_id);
+                            expect(dSvr.getRecRequestBody).not.to.be(null);
+                            expect(dSvr.getRecRequestBody().method).to.eql('registMonitor');
+                            expect(dSvr.getRecRequestBody().params.nodeID).to.eql(resultMonitor[0].id);
+                            expect(dSvr.getRecRequestBody().params.watchID).to.eql(resultMonitor[0].watch_id);
+                            expect(dSvr.getRecRequestBody().params.presetID).to.eql(resultMonitor[0].preset_id);
                             done();
                         });
                     });
@@ -324,11 +305,11 @@ describe('model', function () {
                             expect(errMonitor).to.be(null);
                             expect(resultMonitor).not.to.be(null);
                             expect(resultMonitor.length).to.eql(1);
-                            expect(recRequestBody).not.to.be(null);
-                            expect(recRequestBody.method).to.eql('updateMonitor');
-                            expect(recRequestBody.params.nodeID).to.eql(resultMonitor[0].id);
-                            expect(recRequestBody.params.watchID).to.eql(resultMonitor[0].watch_id);
-                            expect(recRequestBody.params.presetID).to.eql(resultMonitor[0].preset_id);
+                            expect(dSvr.getRecRequestBody()).not.to.be(null);
+                            expect(dSvr.getRecRequestBody().method).to.eql('updateMonitor');
+                            expect(dSvr.getRecRequestBody().params.nodeID).to.eql(resultMonitor[0].id);
+                            expect(dSvr.getRecRequestBody().params.watchID).to.eql(resultMonitor[0].watch_id);
+                            expect(dSvr.getRecRequestBody().params.presetID).to.eql(resultMonitor[0].preset_id);
                             done();
                         });
                     });

@@ -4,23 +4,13 @@ var model_monitor = require('../../model/monitor');
 var testdata = require('../testdata');
 var expect = require('expect.js');
 var async = require('async');
-var express = require('express');
-var app = express();
-
-var recRequestBody;
-
-app.use(express.bodyParser());
-app.post('/rec/api/1.0', function (req, res) {
-    res.header('Content-Type', 'application/json');
-    recRequestBody = req.body;
-    res.send(JSON.stringify({ jsonrpc: "2.0", result: null, id: 1 }));
-});
+var dSvr = require('../server');
 
 describe('model', function () {
     describe('monitor', function () {
         var server = null;
         before(function (done) {
-            server = app.listen(3030).on('listening', done);
+            server = dSvr.app.listen(3030).on('listening', done);
         });
 
         after(function () {
@@ -33,7 +23,7 @@ describe('model', function () {
             testdata.begin(['test/default-data.yaml', 'test/model/monitor.yaml'], function (err, c) {
                 con = c;
                 monitorDAO = new model_monitor.MonitorDAO(con);
-                recRequestBody = null;
+                dSvr.getRecRequestBody(null);
                 done();
             });
         });
@@ -111,11 +101,11 @@ describe('model', function () {
                             expect(err).to.be(null);
                             expect(resultMonitor).not.to.be(null);
                             expect(resultMonitor.length).to.eql(1);
-                            expect(recRequestBody).not.to.be(null);
-                            expect(recRequestBody.method).to.eql('registMonitor');
-                            expect(recRequestBody.params.nodeID).to.eql(resultMonitor[0].id);
-                            expect(recRequestBody.params.watchID).to.eql(resultMonitor[0].watch_id);
-                            expect(recRequestBody.params.presetID).to.eql(resultMonitor[0].preset_id);
+                            expect(dSvr.getRecRequestBody()).not.to.be(null);
+                            expect(dSvr.getRecRequestBody().method).to.eql('registMonitor');
+                            expect(dSvr.getRecRequestBody().params.nodeID).to.eql(resultMonitor[0].id);
+                            expect(dSvr.getRecRequestBody().params.watchID).to.eql(resultMonitor[0].watch_id);
+                            expect(dSvr.getRecRequestBody().params.presetID).to.eql(resultMonitor[0].preset_id);
                             next(err);
                         });
                     }
@@ -143,11 +133,11 @@ describe('model', function () {
                             expect(err).to.be(null);
                             expect(resultMonitor).not.to.be(null);
                             expect(resultMonitor.length).to.eql(1);
-                            expect(recRequestBody).not.to.be(null);
-                            expect(recRequestBody.method).to.eql('updateMonitor');
-                            expect(recRequestBody.params.nodeID).to.eql(resultMonitor[0].id);
-                            expect(recRequestBody.params.watchID).to.eql(resultMonitor[0].watch_id);
-                            expect(recRequestBody.params.presetID).to.eql(resultMonitor[0].preset_id);
+                            expect(dSvr.getRecRequestBody()).not.to.be(null);
+                            expect(dSvr.getRecRequestBody().method).to.eql('updateMonitor');
+                            expect(dSvr.getRecRequestBody().params.nodeID).to.eql(resultMonitor[0].id);
+                            expect(dSvr.getRecRequestBody().params.watchID).to.eql(resultMonitor[0].watch_id);
+                            expect(dSvr.getRecRequestBody().params.presetID).to.eql(resultMonitor[0].preset_id);
                             next(err);
                         });
                     }

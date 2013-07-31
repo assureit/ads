@@ -1,68 +1,27 @@
+var _this = this;
 
 var rest = require('../../net/rest');
 var error = require('../../api/error');
 var expect = require('expect.js');
-var express = require('express');
 var CONFIG = require('config');
-
-var app = express();
-var serverOK = true;
-
-app.use(express.bodyParser());
-app.post('/test/post', function (req, res) {
-    res.header('Content-Type', 'text/plain');
-    if (serverOK) {
-        res.send('post normal response');
-    } else {
-        res.send(500);
-    }
-});
-app.put('/test/put', function (req, res) {
-    res.header('Content-Type', 'text/plain');
-    if (serverOK) {
-        res.send('put normal response');
-    } else {
-        res.send(500);
-    }
-});
-app.post('/test/header', function (req, res) {
-    res.header('Content-Type', 'text/plain');
-    res.send(req.headers.test_header);
-});
-app.put('/test/header', function (req, res) {
-    res.header('Content-Type', 'text/plain');
-    res.send(req.headers.test_header);
-});
-app.post('/test/contenttype', function (req, res) {
-    res.header('Content-Type', 'text/plain');
-    res.send(req.headers['content-type']);
-});
-app.put('/test/contenttype', function (req, res) {
-    res.header('Content-Type', 'text/plain');
-    res.send(req.headers['content-type']);
-});
-app.post('/test/check/post', function (req, res) {
-    res.header('Content-Type', 'text/plain');
-    res.send(req.method);
-});
-app.put('/test/check/put', function (req, res) {
-    res.header('Content-Type', 'text/plain');
-    res.send(req.method);
-});
+var dSvr = require('../server');
 
 describe('net', function () {
     var server = null;
     before(function (done) {
-        server = app.listen(3030).on('listening', done);
+        server = dSvr.app.listen(3030).on('listening', done);
     });
     after(function () {
         server.close();
+    });
+    beforeEach(function (done) {
+        dSvr.setResponseOK(true);
+        done();
     });
 
     describe('rest', function () {
         describe('post', function () {
             it('normal end', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -75,7 +34,6 @@ describe('net', function () {
                 });
             });
             it('normal end plus header', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -89,7 +47,6 @@ describe('net', function () {
                 });
             });
             it('normal end plus Content-Type', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -103,7 +60,6 @@ describe('net', function () {
                 });
             });
             it('normal end method post', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -116,7 +72,6 @@ describe('net', function () {
                 });
             });
             it('host is not set', function (done) {
-                serverOK = true;
                 var options = {
                     port: 3030
                 };
@@ -130,7 +85,7 @@ describe('net', function () {
                 });
             });
             it('host error', function (done) {
-                serverOK = true;
+                this.timeout(15000);
                 var options = {
                     host: 'Xlocalhost',
                     port: 3030
@@ -142,7 +97,6 @@ describe('net', function () {
                 });
             });
             it('port error', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost'
                 };
@@ -153,7 +107,6 @@ describe('net', function () {
                 });
             });
             it('path error', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -169,7 +122,7 @@ describe('net', function () {
                 });
             });
             it('return internal server error', function (done) {
-                serverOK = false;
+                dSvr.setResponseOK(false);
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -187,7 +140,6 @@ describe('net', function () {
         });
         describe('put', function () {
             it('normal end', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -200,7 +152,6 @@ describe('net', function () {
                 });
             });
             it('normal end plus header', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -214,7 +165,6 @@ describe('net', function () {
                 });
             });
             it('normal end plus Content-Type', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -228,7 +178,6 @@ describe('net', function () {
                 });
             });
             it('normal end method put', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -241,7 +190,6 @@ describe('net', function () {
                 });
             });
             it('host is not set', function (done) {
-                serverOK = true;
                 var options = {
                     port: 3030
                 };
@@ -255,7 +203,7 @@ describe('net', function () {
                 });
             });
             it('host error', function (done) {
-                serverOK = true;
+                this.timeout(15000);
                 var options = {
                     host: 'Xlocalhost',
                     port: 3030
@@ -267,7 +215,6 @@ describe('net', function () {
                 });
             });
             it('port error', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost'
                 };
@@ -278,7 +225,6 @@ describe('net', function () {
                 });
             });
             it('path error', function (done) {
-                serverOK = true;
                 var options = {
                     host: 'localhost',
                     port: 3030
@@ -294,7 +240,7 @@ describe('net', function () {
                 });
             });
             it('return internal server error', function (done) {
-                serverOK = false;
+                dSvr.setResponseOK(false);
                 var options = {
                     host: 'localhost',
                     port: 3030
