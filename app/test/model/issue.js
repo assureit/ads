@@ -5,16 +5,7 @@ var testdata = require('../testdata');
 var expect = require('expect.js');
 var async = require('async');
 var CONFIG = require('config');
-var express = require('express');
-
-var redmineRequestBody;
-var app = express();
-app.use(express.bodyParser());
-app.post('/issues.json', function (req, res) {
-    res.header('Content-Type', 'application/json');
-    redmineRequestBody = req.body;
-    res.send(JSON.stringify({ "issue": { "id": 3825 } }));
-});
+var dSvr = require('../server');
 
 describe('model', function () {
     var testDB;
@@ -24,7 +15,7 @@ describe('model', function () {
 
     before(function (done) {
         CONFIG.redmine.port = 3030;
-        server = app.listen(3030).on('listening', done);
+        server = dSvr.app.listen(3030).on('listening', done);
     });
     after(function () {
         server.close();
@@ -37,6 +28,7 @@ describe('model', function () {
         testdata.begin(['test/default-data.yaml', 'test/model/issue.yaml'], function (err, c) {
             con = c;
             issueDAO = new model_issue.IssueDAO(con);
+            dSvr.setRedmineRequestBody(null);
             done();
         });
     });
@@ -115,9 +107,9 @@ describe('model', function () {
             it('redmine parameter check', function (done) {
                 issueDAO.publish(202, function (err) {
                     expect(err).to.be(null);
-                    expect(redmineRequestBody).not.to.be(null);
-                    expect(redmineRequestBody.issue.subject).to.eql('test data04');
-                    expect(redmineRequestBody.issue.description).to.eql('test description04');
+                    expect(dSvr.getRedmineRequestBody()).not.to.be(null);
+                    expect(dSvr.getRedmineRequestBody().issue.subject).to.eql('test data04');
+                    expect(dSvr.getRedmineRequestBody().issue.description).to.eql('test description04');
                     con.query('SELECT * FROM issue WHERE dcase_id=202 AND its_id is null', function (err, resultIssue) {
                         expect(err).to.be(null);
                         expect(resultIssue).not.to.be(null);

@@ -12,23 +12,7 @@ import model_monitor = module('../../model/monitor')
 
 var expect = require('expect.js');      
 var exec = require('child_process').exec
-var express = require('express');
-
-var app = express();
-var responseFlag = true;
-var recRequestBody:any;
-
-app.use(express.bodyParser());
-app.post('/rec/api/1.0', function (req: any, res: any) {
-	res.header('Content-Type', 'application/json');
-
-	recRequestBody = req.body;
-	if (responseFlag) {
-		res.send(JSON.stringify({ jsonrpc: "2.0", result: null, id:1}));
-	} else {
-		res.send(JSON.stringify({ jsonrpc: "2.0", error: { code:100 , message:'error'  }, id:1}), 500);
-	}
-});
+var dSvr = require('../server')
 
 describe('job', function() {
 	var con = null;
@@ -36,7 +20,7 @@ describe('job', function() {
 	var cmd = 'npm run-script clean_monitor';
 
 	before((done) => {
-		server = app.listen(3030).on('listening', done);
+		server = dSvr.app.listen(3030).on('listening', done);
 	});
 	after(() => {
 		server.close();
@@ -47,7 +31,8 @@ describe('job', function() {
 	beforeEach(function(done) {
 		testdata.load(['test/default-data.yaml'], (err:any) => {
 			con = new db.Database();
-			recRequestBody = null;
+			dSvr.setRecRequestBody(null);
+			dSvr.setResponseOK(true);
 			done();
 		});
 	});
@@ -69,16 +54,15 @@ describe('job', function() {
 			});
 			it('DCase is already delete', function(done) {
 				testdata.load(['test/job/monitor01.yaml'], (err:any) => {
-					responseFlag = true;
 					exec(cmd, function(err, stdout, stderr){
 						expect(err).to.be(null);
 						var monitor = new model_monitor.MonitorDAO(con);
 						monitor.get(604, (err:any, resultMonitor:model_monitor.MonitorNode) => {
 							expect(err).to.be(null);
 							expect(resultMonitor.deleteFlag).to.be(true);
-							expect(recRequestBody).not.to.be(null);
-							expect(recRequestBody.method).to.be('deleteMonitor');
-							expect(recRequestBody.params.nodeID).to.be(604);
+							expect(dSvr.getRecRequestBody()).not.to.be(null);
+							expect(dSvr.getRecRequestBody().method).to.be('deleteMonitor');
+							expect(dSvr.getRecRequestBody().params.nodeID).to.be(604);
 							done();
 						});
 					});
@@ -86,16 +70,15 @@ describe('job', function() {
 			});
 			it('Not Found Lastest Commit', function(done) {
 				testdata.load(['test/job/monitor02.yaml'], (err:any) => {
-					responseFlag = true;
 					exec(cmd, function(err, stdout, stderr){
 						expect(err).to.be(null);
 						var monitor = new model_monitor.MonitorDAO(con);
 						monitor.get(605, (err:any, resultMonitor:model_monitor.MonitorNode) => {
 							expect(err).to.be(null);
 							expect(resultMonitor.deleteFlag).to.be(true);
-							expect(recRequestBody).not.to.be(null);
-							expect(recRequestBody.method).to.be('deleteMonitor');
-							expect(recRequestBody.params.nodeID).to.be(605);
+							expect(dSvr.getRecRequestBody()).not.to.be(null);
+							expect(dSvr.getRecRequestBody().method).to.be('deleteMonitor');
+							expect(dSvr.getRecRequestBody().params.nodeID).to.be(605);
 							done();
 						});
 					});
@@ -103,23 +86,21 @@ describe('job', function() {
 			});
 			it('Not Found Node', function(done) {
 				testdata.load(['test/job/monitor03.yaml'], (err:any) => {
-					responseFlag = true;
 					exec(cmd, function(err, stdout, stderr){
 						expect(err).to.be(null);
 						var monitor = new model_monitor.MonitorDAO(con);
 						monitor.get(606, (err:any, resultMonitor:model_monitor.MonitorNode) => {
 							expect(err).to.be(null);
 							expect(resultMonitor.deleteFlag).to.be(true);
-							expect(recRequestBody).not.to.be(null);
-							expect(recRequestBody.method).to.be('deleteMonitor');
-							expect(recRequestBody.params.nodeID).to.be(606);
+							expect(dSvr.getRecRequestBody()).not.to.be(null);
+							expect(dSvr.getRecRequestBody().method).to.be('deleteMonitor');
+							expect(dSvr.getRecRequestBody().params.nodeID).to.be(606);
 							done();
 						});
 					});
 				});
 			});
 			it('Not Found MonitorNode', function(done) {
-				responseFlag = true;
 				testdata.clear((err:any) => {
 					exec(cmd, function(err, stdout, stderr){
 						expect(err).to.be(null);
@@ -129,7 +110,7 @@ describe('job', function() {
 			});
 			it('Rec Response Error', function(done) {
 				testdata.load(['test/job/monitor03.yaml'], (err:any) => {
-					responseFlag = false;
+					dSvr.setResponseOK(false);
 					exec(cmd, function(err, stdout, stderr){
 						expect(err).not.to.be(null);
 						done();

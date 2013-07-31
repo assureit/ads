@@ -12,40 +12,7 @@ import testdata = module('../testdata')
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
 var CONFIG = require('config')
-
-var responseOK = true;
-var redmineCall = true;
-var redmineRequestBody:any;
-
-
-var express = require('express');
-var app = express();
-app.use(express.bodyParser());
-app.post('/rec/api/1.0', function (req: any, res: any) {
-	res.header('Content-Type', 'application/json');
-	if (responseOK) {
-		res.send(JSON.stringify({ jsonrpc: "2.0", result: null, id:1}));
-	} else {
-		res.send(JSON.stringify({ jsonrpc: "2.0", id:1}), 500);
-	}
-});
-app.post('/issues.json', function (req: any, res: any) {
-	res.header('Content-Type', 'application/json');
-	if (	req.body.issue.project_id == CONFIG.redmine.projectId ) 
-	{
-		redmineRequestBody = req.body;
-		res.send(JSON.stringify({"issue":{"id":3825}}));
-	} else {
-		res.send(JSON.stringify({ jsonrpc: "2.0", id:1}), 500);
-	}
-});
-
-app.put('/issues/:itsId', function(req: any, res:any) {
-	redmineCall = true;
-	redmineRequestBody = req.body;
-	res.send(200);
-});
-
+var dSvr = require('../server')
 
 var userId = constant.SYSTEM_USER_ID;
 
@@ -63,9 +30,9 @@ describe('api', function() {
 				comment:'Unit Test Run',
 				status:'OK'
 				}
-			responseOK = true;
-			redmineCall = false;
-			redmineRequestBody = null;
+			dSvr.setResponseOK(true);
+			dSvr.setRedmineRequestBody(null);
+			dSvr.setRecRequestBody(null);
 			done();
 		});
 	});
@@ -76,7 +43,7 @@ describe('api', function() {
 		var server = null;
 		before((done) => {
 			CONFIG.redmine.port = 3030;	
-			server = app.listen(3030).on('listening', done);
+			server = dSvr.app.listen(3030).on('listening', done);
 		});
 
 		after(() => {
@@ -115,9 +82,9 @@ describe('api', function() {
 						con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = ? AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', [validParams.systemNodeId], (err, expectedResult) => {
 							expect(err).to.be(null);
 							expect(1).to.be(expectedResult.length);
-							expect(redmineRequestBody).not.to.be(null);
-							expect(redmineRequestBody.issue.subject).to.eql(constant.REBUTTAL_SUBJECT);
-							expect(redmineRequestBody.issue.description).to.eql(constant.REBUTTAL_DESCRIPTION+ '\r\n' + validParams.comment);
+							expect(dSvr.getRedmineRequestBody()).not.to.be(null);
+							expect(dSvr.getRedmineRequestBody().issue.subject).to.eql(constant.REBUTTAL_SUBJECT);
+							expect(dSvr.getRedmineRequestBody().issue.description).to.eql(constant.REBUTTAL_DESCRIPTION+ '\r\n' + validParams.comment);
 							done();
 						});
 					}, 
@@ -135,8 +102,8 @@ describe('api', function() {
 						con.query('SELECT m.dcase_id, c.id, n.this_node_id, n.node_type FROM monitor_node m, commit c, node n WHERE m.id = ? AND  m.dcase_id = c.dcase_id AND c.latest_flag = TRUE AND c.id = n.commit_id AND node_type = "Rebuttal"', [validParams.systemNodeId], (err, expectedResult) => {
 							expect(err).to.be(null);
 							expect(0).to.be(expectedResult.length);
-							expect(redmineRequestBody).not.to.be(null);
-							expect(redmineRequestBody.issue.notes).to.eql(validParams.comment);
+							expect(dSvr.getRedmineRequestBody()).not.to.be(null);
+							expect(dSvr.getRedmineRequestBody().issue.notes).to.eql(validParams.comment);
 							done();
 						});
 					}, 
@@ -309,7 +276,7 @@ describe('api', function() {
 			it('It is not connectable with rec. ', function(done) {
 				validParams.systemNodeId = 603;
 				validParams.status = 'NG';
-				responseOK = false;
+				dSvr.setResponseOK(false);
 				monitor.modifyMonitorStatus(validParams, userId, {
 					onSuccess: (result: any) => {
 						expect(result).to.be(null);
@@ -331,7 +298,7 @@ describe('api', function() {
 				monitor.modifyMonitorStatus(validParams, userId, {
 					onSuccess: (result: any) => {
 						expect(result).to.be(null);
-						expect(redmineCall).to.be(false);
+						expect(dSvr.getRedmineRequestBody()).to.be(null);
 						done();
 					}, 
 					onFailure: (err: any) => {

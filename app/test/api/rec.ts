@@ -12,54 +12,37 @@ import constant = module('../../constant')
 var userId = constant.SYSTEM_USER_ID;
 // import expect = module('expect.js')
 var expect = require('expect.js');	// TODO: import module化
-var express = require('express');
-
-var recRequestBody:any;
-
-var app = express();
-app.use(express.bodyParser());
-
-app.post('/rec/api/1.0', function (req: any, res: any) {
-        res.header('Content-Type', 'application/json');
-	var resbody:any;
-
-	recRequestBody = req.body;
-
-	if (req.body.method == 'getRawItemList') {
-		resbody = {"jsonrpc": "2.0","result": {"list": [{"watchID": "serverA_CPU","name": "サーバAのCPU負荷","datatype": "linux_cpu"}]},"id": 1};
-	} else {
-		resbody = {"jsonrpc": "2.0","result": {"items": [{"presetID": "CPU_upper_Check","name": "CPU高負荷チェック","datatype": "linux_cpu","paramName": ["between", "reference"],"normalComment": "$$0は正常に稼働しています。","errorComment": "$$0が高負荷です（$$1秒間の平均ロードアベレージが$$2以上です）"}]},"id": 1};
-	}
-	
-        res.send(resbody);
-});
-
-
+var dSvr = require('../server')
 
 describe('api', function() {
 	describe('rec', function() {
 		var server = null;
 
 		before((done) => {
-			server = app.listen(3030).on('listening', done);
+			server = dSvr.app.listen(3030).on('listening', done);
 		});
 
 		after(() => {
 			server.close();
 		});
 
+		beforeEach((done) => {
+			dSvr.setRecRequestBody(null);
+			dSvr.setResponseOK(true);
+			done();
+		});
+
 		describe('getRawItemList', function() {
 			it('call method', function(done) {
-				recRequestBody = null;
 				rec.getRawItemList(null, userId, {
 					onSuccess: (result: any) => {
 						expect(result.list).not.to.be(null);
 						expect(result.list[0].watchID).not.to.be(null);
 						expect(result.list[0].watchID).not.to.be(undefined);
 						expect(result.list[0].watchID).to.eql('serverA_CPU');
-						expect(recRequestBody).not.to.be(null);
-						expect(recRequestBody.method).to.eql('getRawItemList');
-						expect(recRequestBody.params).to.be(null);
+						expect(dSvr.getRecRequestBody()).not.to.be(null);
+						expect(dSvr.getRecRequestBody().method).to.eql('getRawItemList');
+						expect(dSvr.getRecRequestBody().params).to.be(null);
 						done();
 					},
 					onFailure: (err: any) => {
@@ -69,16 +52,15 @@ describe('api', function() {
 				});
 			});
 			it('call method with parameter', function(done) {
-				recRequestBody = null;
 				rec.getRawItemList({datatype:'test_data_type'}, userId, {
 					onSuccess: (result: any) => {
 						expect(result.list).not.to.be(null);
 						expect(result.list[0].watchID).not.to.be(null);
 						expect(result.list[0].watchID).not.to.be(undefined);
 						expect(result.list[0].watchID).to.eql('serverA_CPU');
-						expect(recRequestBody).not.to.be(null);
-						expect(recRequestBody.method).to.eql('getRawItemList');
-						expect(recRequestBody.params.datatype).to.eql('test_data_type');
+						expect(dSvr.getRecRequestBody()).not.to.be(null);
+						expect(dSvr.getRecRequestBody().method).to.eql('getRawItemList');
+						expect(dSvr.getRecRequestBody().params.datatype).to.eql('test_data_type');
 						done();
 					},
 					onFailure: (err: any) => {
@@ -118,16 +100,15 @@ describe('api', function() {
 		});
 		describe('getPresetList', function() {
 			it('call method', function(done) {
-				recRequestBody = null;
 				rec.getPresetList(null, userId, {
 					onSuccess: (result: any) => {
 						expect(result.items).not.to.be(null);
 						expect(result.items[0].presetID).not.to.be(null);
 						expect(result.items[0].presetID).not.to.be(undefined);
 						expect(result.items[0].presetID).to.eql('CPU_upper_Check');
-						expect(recRequestBody).not.to.be(null);
-						expect(recRequestBody.method).to.eql('getPresetList');
-						expect(recRequestBody.params).to.be(null);
+						expect(dSvr.getRecRequestBody()).not.to.be(null);
+						expect(dSvr.getRecRequestBody().method).to.eql('getPresetList');
+						expect(dSvr.getRecRequestBody().params).to.be(null);
 						done();
 					},
 					onFailure: (err: any) => {
