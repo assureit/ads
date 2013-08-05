@@ -340,6 +340,11 @@ var ADS = (function () {
             e.preventDefault();
         });
 
+        $("#menu-export-bash").click(function (e) {
+            _this.exportTree("sh", null);
+            e.preventDefault();
+        });
+
         $("#lang-select-english").click(function (e) {
             document.cookie = "lang=en";
             e.preventDefault();

@@ -49,6 +49,11 @@ exports.exporter = function (req, res) {
             var ex = new dscript.DScriptExporter();
             res.send(ex.export(req.body.json));
             return;
+        case "sh":
+            res.set('Content-type', 'text/plain; charset=utf-8');
+            var ex = new dscript.BashExporter();
+            res.send(ex.export(req.body.json));
+            return;
         default:
             res.send(400, "Bad Request");
             return;
