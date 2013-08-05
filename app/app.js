@@ -47,6 +47,7 @@ app.get('/', client.index);
 app.get('/page/:id', client.index);
 app.get('/tag/:t', client.index);
 app.get('/new', client.index);
+app.get('/project/new', client.index);
 app.get('/dcase/:id', client.index);
 app.post('/export.*', client.exporter);
 app.get('/javascripts/config.js', js.config);

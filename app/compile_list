@@ -13,6 +13,7 @@ api/jsonrpc.ts
 api/dcase.ts
 api/monitor.ts
 api/rec.ts
+api/project.ts
 db/db.ts
 test/server.ts
 test/db/db.ts
