@@ -367,6 +367,11 @@ class ADS {
 			e.preventDefault();
 		});
 
+		$("#menu-export-bash").click((e)=> {
+			this.exportTree("sh", null);
+			e.preventDefault();
+		});
+
 		$("#lang-select-english").click((e)=> {
 			document.cookie = "lang=en";
 			e.preventDefault();

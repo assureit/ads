@@ -103,6 +103,16 @@ export class DScriptExporter extends Exporter {
 		return ret;
 	}
 
+	emitCommentDescription(description:string, index:number, indent:string, comment?: string): void {
+		if(comment == null) {
+			comment = '//';
+		}
+		var h:string[] = description.split('\n');
+		for(var i:number = 0; i < h.length; i++) {
+			this.res.println(indent+comment+h[i], index);
+		}
+	}
+
 	GenerateStrategyCode(id: number): StrategyValue {
 		var node = this.FindById(id);
 		if(node == null) {
@@ -130,9 +140,7 @@ export class DScriptExporter extends Exporter {
 			return;
 		}
 		var indent = this.res.push();
-		this.res.println('/*', indent);
-		this.res.println(''+node.Description, indent);
-		this.res.println('*/', indent);
+		this.emitCommentDescription(node.Description, indent,'');
 		this.res.println("boolean Goal_" + id + "(Context parent) {",indent); //FIXME
 		var context = this.GetContextMetaData(node.Children);
 		this.res.println('    Context con = new Context('+JSON.stringify(context)+');',indent);
@@ -150,9 +158,7 @@ export class DScriptExporter extends Exporter {
 					run = run.slice(0,-4) + ";"
 					this.res.println(run, indent);
 				}else if(c.NodeType == 'Evidence') {
-					this.res.println('    /*', indent);
-					this.res.println('    '+c.Description, indent);
-					this.res.println('    */', indent);
+					this.emitCommentDescription(node.Description, indent,'    ');
 					this.res.println('    return true;', indent);
 				}else if(c.NodeType == 'Solution') {
 					this.res.println("    try {",indent);
@@ -183,6 +189,86 @@ export class DScriptExporter extends Exporter {
 		this.root = this.FindById(json.TopGoalId);
 
 		this.res.printlnHeader("//D-Script Generator v0.1");
+		this.res.printlnHeader('');
+		this.res.printlnHeader('');
+
+		this.GenerateGoalCode(json.TopGoalId);
+
+		this.res.printlnFooter("void main() {");
+		this.res.printlnFooter("    Goal_"+json.TopGoalId+"(null);");
+		this.res.printlnFooter("}");
+		this.res.printlnFooter("");
+		this.res.printlnFooter("main();");
+		return this.res.emit();
+	}
+}
+
+export class BashExporter extends DScriptExporter {
+	res: ResponseSource = new ResponseSource();
+	nodeList: any[];
+	root: any;
+	goalIndex: number = 0;
+
+	constructor() {
+		super();
+	}
+
+	GenerateGoalCode(id: number, b?:bool): void {
+		var node = this.FindById(id);
+		if(node == null) {
+			return;
+		}
+		var indent = this.res.push();
+		this.emitCommentDescription(node.Description, indent,'', '#');
+		this.res.println("function Goal_" + id + "() {",indent); //FIXME
+		var context = this.GetContextMetaData(node.Children);
+		this.res.println('#    Context con = new Context('+JSON.stringify(context)+');',indent);
+		this.res.println('#    con.setParent(parent);', indent);
+		for(var i: number = 0; i < node.Children.length; i++) {
+			var c = this.FindById(node.Children[i]);
+			if(c!=null) {
+				if(c.NodeType == 'Strategy') {
+					var strategy: StrategyValue = this.GenerateStrategyCode(node.Children[i]);
+					var run:string = "    return ";
+					var op: string = strategy.or? "||" : "&&"
+					for(var i:number = 0; i < strategy.subGoalIds.length; i++) { //TODO
+						run += "Goal_" + strategy.subGoalIds[i] + "(con) "+op+" ";
+					}
+					run = run.slice(0,-4) + ";"
+					this.res.println(run, indent);
+				}else if(c.NodeType == 'Evidence') {
+					this.emitCommentDescription(c.Description, indent,'    ', '#');
+					this.res.println('    return true;', indent);
+				}else if(c.NodeType == 'Solution') {
+					this.res.println("#    try {",indent);
+					var l = c.Description.split("\n");
+					for(var i:number = 0; i < l.length; i++) {
+						if(l[i].match("    ")) {
+							this.res.println('    '+ l[i], indent);
+						}else {
+							this.res.println('    #' + l[i], indent);
+						}
+					}
+					this.res.println("#    } catch(Exception e) {", indent);
+					this.res.println("#       Syslog.write(e.printStackTrace);",indent);
+					this.res.println("#        return false;",indent);
+					this.res.println("#    }",indent);
+					this.res.println("#    return true;",indent);
+				}
+			}
+		}
+
+		this.res.println("}", indent);
+		this.res.println('',indent);
+	}
+
+	export(m: any): string {
+		var json = JSON.parse(m).contents;
+		this.nodeList = json.NodeList;
+		this.root = this.FindById(json.TopGoalId);
+
+		this.res.printlnHeader("#!/bin/bash");
+		this.res.printlnHeader("#Bash Generator v0.1");
 		this.res.printlnHeader('');
 		this.res.printlnHeader('');
 
