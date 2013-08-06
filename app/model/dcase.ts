@@ -9,6 +9,7 @@ var _ = require('underscore');
 export interface InsertArg {
 	userId: number;
 	dcaseName: string;
+	projectId?: number;
 }
 export class DCase {
 	public user: model_user.User;
@@ -40,8 +41,11 @@ export class DCaseDAO extends model.DAO {
 			callback(err, dcase);
 		});
 	}
-	insert(params: InsertArg, callback: (err:any, dcaseId: number)=>void): void {
-		this.con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [params.userId, params.dcaseName], (err, result) => {
+	insert(params: InsertArg, callback: (err:any, dcaseId: number, projectId?: number)=>void): void {
+		if(params.projectId == null) {
+			params.projectId = 1; //public
+		}
+		this.con.query('INSERT INTO dcase(user_id, name, project_id) VALUES (?, ?, ?)', [params.userId, params.dcaseName, params.projectId], (err, result) => {
 			if (err) {
 				callback(err, null);
 				return;

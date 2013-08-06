@@ -54,7 +54,10 @@ var DCaseDAO = (function (_super) {
         });
     };
     DCaseDAO.prototype.insert = function (params, callback) {
-        this.con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [params.userId, params.dcaseName], function (err, result) {
+        if (params.projectId == null) {
+            params.projectId = 1;
+        }
+        this.con.query('INSERT INTO dcase(user_id, name, project_id) VALUES (?, ?, ?)', [params.userId, params.dcaseName, params.projectId], function (err, result) {
             if (err) {
                 callback(err, null);
                 return;
