@@ -10,6 +10,7 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/lib/ASNParser/peg.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/CaseModel.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/CaseViewer.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/Converter.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/Layout.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/PlugInManager.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/ServerApi.js")
@@ -22,7 +23,35 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Monitor/Monitor.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Note/Note.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/mock/Index.js")
+        //script(type="text/javascript",src="#{basepath}/assurejs/mock/Index.js")
+        script(type='text/javascript',src='#{basepath}/javascripts/config.js')
+        script(type='text/javascript')
+            $(function(){
+               var serverApi = new AssureIt.ServerAPI(Config.BASEPATH); //TODO config for Path
+               var pluginManager = new AssureIt.PlugInManager();
+               pluginManager.AddActionPlugIn("menu", new MenuBarPlugIn());
+               pluginManager.AddActionPlugIn("editor", new EditorPlugIn());
+               pluginManager.AddHTMLRenderPlugIn("annotation", new AnnotationHTMLRenderPlugIn());
+               pluginManager.AddHTMLRenderPlugIn("monitor", new MonitorHTMLRenderPlugIn());
+               pluginManager.AddHTMLRenderPlugIn("note", new NoteHTMLRenderPlugIn());
+               pluginManager.AddSVGRenderPlugIn("monitor", new MonitorSVGRenderPlugIn());
+               var oldJsonData = serverApi.GetCase("",#{caseId});
+               var converter = new AssureIt.Converter();
+               var JsonData = converter.GenNewJson(oldJsonData);
+               var Case0 = new AssureIt.Case();
+               Case0.CommitId = oldJsonData.commitId;
+               var caseDecoder = new AssureIt.CaseDecoder();
+               var root = caseDecoder.ParseJson(Case0, JsonData);
+               Case0.SetElementTop(root);
+               var Viewer = new AssureIt.CaseViewer(Case0, pluginManager, serverApi);
+               var backgroundlayer = document.getElementById("background");
+               var shapelayer = document.getElementById("layer0");
+               var contentlayer = document.getElementById("layer1");
+               var controllayer = document.getElementById("layer2");
+
+               var Screen = new AssureIt.ScreenManager(shapelayer, contentlayer, controllayer, backgroundlayer);
+               Viewer.Draw(Screen);
+            });
     body(style="overflow: hidden; margin: 0px;")
     #viewer(style="width: 100%; height: 100%;")
         svg#layer0box(xmlns="http://www.w3.org/2000/svg",version="1.1",style="width: 100%; height: 100%; position: absolute")

@@ -25,10 +25,10 @@ exports.index = function (req, res) {
 
 exports.caseView = function (req, res) {
     var page = 'case';
-    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja };
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, caseId: req.params.id };
     var auth = new util_auth.Auth(req, res);
     if (auth.isLogin()) {
-        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName(), caseId: req.params.id };
     }
 
     if (req.cookies.lang == 'en') {
