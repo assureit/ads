@@ -23,6 +23,21 @@ exports.index = function (req, res) {
     res.render(page, params);
 };
 
+exports.caseView = function (req, res) {
+    var page = 'case';
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja };
+    var auth = new util_auth.Auth(req, res);
+    if (auth.isLogin()) {
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
+    }
+
+    if (req.cookies.lang == 'en') {
+        params.lang = lang.lang.en;
+    }
+
+    res.render(page, params);
+};
+
 exports.exporter = function (req, res) {
     var exec = childProcess.exec;
 

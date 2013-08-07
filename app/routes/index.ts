@@ -25,6 +25,20 @@ export var index = function(req: any, res: any) {
 	res.render(page, params);
 };
 
+export var caseView = function(req: any, res: any) {
+	var page = 'case';
+	var params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja };
+	var auth = new util_auth.Auth(req, res);
+	if(auth.isLogin()) {
+		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
+	}
+
+	if( req.cookies.lang == 'en') {
+		params.lang = lang.lang.en;
+	}
+
+	res.render(page, params);
+};
 
 export var exporter = function(req: any, res: any) {
 	var exec = childProcess.exec;
