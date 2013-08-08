@@ -22,6 +22,7 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/src/Layout.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/PlugInManager.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/ServerApi.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/ColorTheme/ColorTheme.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/codemirror.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/Editor.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery.jqdock.min.js")
@@ -42,6 +43,7 @@ html
                pluginManager.AddHTMLRenderPlugIn("annotation", new AnnotationHTMLRenderPlugIn());
                pluginManager.AddHTMLRenderPlugIn("monitor", new MonitorHTMLRenderPlugIn());
                pluginManager.AddHTMLRenderPlugIn("note", new NoteHTMLRenderPlugIn());
+               pluginManager.AddSVGRenderPlugIn("colortheme", new TiffanyBlueThemePlugIn());
                pluginManager.AddSVGRenderPlugIn("monitor", new MonitorSVGRenderPlugIn());
                var oldJsonData = serverApi.GetCase("",#{caseId});
                var converter = new AssureIt.Converter();
