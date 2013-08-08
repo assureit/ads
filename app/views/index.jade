@@ -19,7 +19,7 @@ block bar
                     li
                         a#menu-commit(href='#')= lang.commit
             li.ads-edit-menu.ads-view-menu
-                a(href='#') Checker
+                a(href='#') Check
                 ul
                     li
                         a(href='#') Simple verifier
@@ -42,7 +42,7 @@ block bar
                         a#menu-export-xml(href="#") XML
             li.ads-edit-menu.ads-view-menu
                 a#menu-history-toggle(href="#")= lang.commitlog
-            li.ads-edit-menu.ads-view-menu
+            li
                 a(href="#")= lang.config
                 ul
                     li
@@ -85,9 +85,9 @@ block content
                             a(href='#')#alltags All
                         li.line
                     a(href='#')
-                        div(align='right') タグを全て表示
+                        div(align='right')= lang.AllTags
                 #selectDCase.span6
-                    h2 DCaseを選択
+                    h2= lang.SelectCase
                     table.table.table-striped.table-hover
                         thead
                             tr

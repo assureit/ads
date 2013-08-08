@@ -14,8 +14,8 @@ exports.lang = {
         config: "設定",
         color_theme: "カラーテーマの変更",
         locale: "言語の変更",
-        new_DCase: "新しいD-Caseを作成する",
-        DCase_name: "D-Case名",
+        new_DCase: "新しいCaseを作成する",
+        DCase_name: "Case名",
         creater: "作成者",
         topgoal: "TopGoalの説明",
         last_commit: "最終コミット日時",
@@ -27,7 +27,9 @@ exports.lang = {
         delete: "削除",
         openall: "全て開く",
         closeall: "全て折りたたむ",
-        locale: "言語設定"
+        locale: "言語設定",
+        SelectCase: "Case選択",
+        AllTags: "全てのタグを表示"
     },
     en: {
         home: "Home",
@@ -44,8 +46,8 @@ exports.lang = {
         config: "Configuration",
         color_theme: "Theme",
         locale: "Language",
-        new_DCase: "Create new D-Case",
-        DCase_name: "D-Case Name",
+        new_DCase: "Create new Case",
+        DCase_name: "Case Name",
         topgoal: "Description of the Top Goal",
         create: "Create",
         creater: "Owner",
@@ -57,7 +59,9 @@ exports.lang = {
         delete: "Delete",
         openall: "Open all",
         closeall: "Close all",
-        locale: "Language"
+        locale: "Language",
+        SelectCase: "Select Case",
+        AllTags: "Show all tags"
     }
 };
 
