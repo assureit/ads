@@ -8,6 +8,7 @@ var DCaseFile = (function () {
 
 var ImportFile = (function () {
     function ImportFile(selector) {
+        var _this = this;
         this.selector = selector;
         $(this.selector).on('dragenter', function (e) {
             e.stopPropagation();
@@ -15,11 +16,11 @@ var ImportFile = (function () {
         }).on('dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(e.target).addClass('hover');
+            $(_this.selector).addClass('hover');
         }).on('dragleave', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(e.target).removeClass('hover');
+            $(_this.selector).removeClass('hover');
         });
     }
     ImportFile.prototype.read = function (callback) {

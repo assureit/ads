@@ -15,11 +15,11 @@ class ImportFile {
 		}).on('dragover', (e) => {
 			e.stopPropagation();
 			e.preventDefault();
-			$(e.target).addClass('hover');
+			$(this.selector).addClass('hover');
 		}).on('dragleave', (e) => {
 			e.stopPropagation();
 			e.preventDefault();
-			$(e.target).removeClass('hover');
+			$(this.selector).removeClass('hover');
 		});
 	}
 
