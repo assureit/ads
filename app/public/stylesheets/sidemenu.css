@@ -9,15 +9,15 @@
 	z-index: 99999;
 }
 
-#menu-button:hover {
+/*#menu-button:hover {
 	background: #2C3E50
-}
+}*/
 
 .menu {
-	position: relative;
+	position: absolute;
 	top: 48px;
 	z-index: 99998;
-	height: 100%;
+	/*height: 100%;*/
 	-webkit-transition: all ease-in-out;
 	-webkit-transition-delay: 0.5s;
 	-moz-transition: all ease-in-out 0.5s;

@@ -40,10 +40,11 @@ html
                var pluginManager = new AssureIt.PlugInManager();
                pluginManager.AddActionPlugIn("menu", new MenuBarPlugIn());
                pluginManager.AddActionPlugIn("editor", new EditorPlugIn());
+               pluginManager.AddActionPlugIn("colortheme", new ColorThemeActionPlugIn());
                pluginManager.AddHTMLRenderPlugIn("annotation", new AnnotationHTMLRenderPlugIn());
                pluginManager.AddHTMLRenderPlugIn("monitor", new MonitorHTMLRenderPlugIn());
                pluginManager.AddHTMLRenderPlugIn("note", new NoteHTMLRenderPlugIn());
-               pluginManager.AddSVGRenderPlugIn("colortheme", new TiffanyBlueThemePlugIn());
+               pluginManager.AddSVGRenderPlugIn("colortheme", new TiffanyBlueThemeSVGRenderPlugIn());
                pluginManager.AddSVGRenderPlugIn("monitor", new MonitorSVGRenderPlugIn());
                var oldJsonData = serverApi.GetCase("",#{caseId});
                var converter = new AssureIt.Converter();
@@ -78,60 +79,5 @@ html
                     path(d="M 0 0 L 10 5 L 0 10 z",fill="white",stroke="gray")
         #editor-wrapper(style="border: 1px solid black")
             textarea#editor(placeholder="Type something...")
-        img#menu-button(src="#{basepath}/images/ait.png") Menu
-        .menu
-            ul#drop-menu
-                li
-                    a(href='#{basepath}/')= lang.home
-                li.line.ads-edit-menu
-                    a(href='#') Edit
-                    ul
-                        li
-                            a(href='#{basepath}/new') New
-                        li
-                            a(href='#{basepath}/clone') Clone
-                        li
-                            a#menu-undo(href='#')= lang.undo
-                        li
-                            a#menu-redo(href='#')= lang.redo
-                        li
-                            a#menu-commit(href='#')= lang.commit
-                li.ads-edit-menu.ads-view-menu
-                    a(href='#') Checker
-                    ul
-                        li
-                            a(href='#') Simple verifier
-                        li
-                            a(href='#') Agda
-                li.ads-edit-menu.ads-view-menu
-                    a(href='#') Export
-                    ul
-                        li
-                            a#menu-export-json(href="#") JSON
-                        li
-                            a#menu-export-png(href="#") PNG
-                        li
-                            a#menu-export-pef(href="#") PDF
-                        li
-                            a#menu-export-dscript(href="#") D-Script
-                        li
-                            a#menu-export-bash(href="#") Bash
-                        li
-                            a#menu-export-xml(href="#") XML
-                li.ads-edit-menu.ads-view-menu
-                    a#menu-history-toggle(href="#")= lang.commitlog
-                li.ads-edit-menu.ads-view-menu
-                    a(href="#")= lang.config
-                    ul
-                        li
-                            a Gesture
-                        li
-                            a(href="#")= lang.color_theme
-                            ul#menu-change-theme
-                        li
-                            a(href="#")= lang.locale
-                            ul#lang-theme
-                                li
-                                    a#lang-select-english(href="#") English
-                                li
-                                    a#lang-select-japanese(href="#") Japanese
+        a(href="#{basepath}/")
+            img#menu-button(src="#{basepath}/images/ait.png") Menu
