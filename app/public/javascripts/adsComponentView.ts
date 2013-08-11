@@ -127,8 +127,7 @@ class SelectDCaseThumbnailManager extends SelectDCaseManager{
 class TableView {
 	static toTable(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
 		var html = '<td><a href="' + Config.BASEPATH + '/case/' + id + '">' + name +
-				"</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" +
-				lastUser + "</td>";
+				"</a></td><td>" + lastUser + "</td>";
 		if(isLogin) {
 			html += "<td><a id=\"e"+ id +"\" href=\"#\">Edit</a></td>"
 				+ "<td><a id=\"d"+ id +"\" href=\"#\">Delete</a></td>";
