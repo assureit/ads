@@ -17,26 +17,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `dcase`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `dcase` (
-  `id` INT NOT NULL AUTO_INCREMENT ,
-  `project_id` INT NOT NULL ,
-  `name` VARCHAR(255) NULL ,
-  `delete_flag` TINYINT(1) NULL DEFAULT FALSE ,
-  `created` DATETIME NULL ,
-  `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_dcase_project1` (`project_id` ASC) ,
-  CONSTRAINT `fk_dcase_project1`
-    FOREIGN KEY (`project_id` )
-    REFERENCES `project` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `user`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `user` (
@@ -48,6 +28,33 @@ CREATE  TABLE IF NOT EXISTS `user` (
   `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`) ,
   UNIQUE INDEX `unq_user1` (`login_name` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `dcase`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `dcase` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `project_id` INT NOT NULL ,
+  `user_id` INT NOT NULL ,
+  `name` VARCHAR(255) NULL ,
+  `delete_flag` TINYINT(1) NULL DEFAULT FALSE ,
+  `created` DATETIME NULL ,
+  `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_dcase_project1` (`project_id` ASC) ,
+  INDEX `fk_dcase_user1` (`user_id` ASC) ,
+  CONSTRAINT `fk_dcase_project1`
+    FOREIGN KEY (`project_id` )
+    REFERENCES `project` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_dcase_user1`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `user` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
