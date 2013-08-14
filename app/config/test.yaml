@@ -14,4 +14,6 @@ test:
       - 'commit'
       - 'dcase'
       - 'file'
+      - 'project_has_user'
+      - 'project'
       - 'user'
