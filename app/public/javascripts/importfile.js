@@ -10,9 +10,14 @@ var ImportFile = (function () {
     function ImportFile(selector) {
         var _this = this;
         this.selector = selector;
+        var flag = true;
         $(this.selector).on('dragenter', function (e) {
             e.stopPropagation();
             e.preventDefault();
+            if (flag) {
+                var left = Number($(_this.selector).css('margin-left').replace("px", "")) - 10;
+                $(_this.selector).css({ 'margin-left': left + 'px' });
+            }
         }).on('dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
@@ -21,6 +26,9 @@ var ImportFile = (function () {
             e.stopPropagation();
             e.preventDefault();
             $(_this.selector).removeClass('hover');
+            flag = true;
+            var left = Number($(_this.selector).css('margin-left').replace("px", "")) + 10;
+            $(_this.selector).css({ 'margin-left': left + 'px' });
         });
     }
     ImportFile.prototype.read = function (callback) {
