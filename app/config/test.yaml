@@ -3,6 +3,12 @@ mysql:
   user: 'ads_test'
   password: 'ads_test'
   database: 'ads_test'
+redmine:
+  host: "localhost"
+  port: 3030
+  basePath: "/"
+  apiKey: "GET API KEY FROM REDMINE"
+  projectId: 1
 test:
   database:
     tables:
