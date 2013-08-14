@@ -28,7 +28,7 @@ var ADS = (function () {
             $("#newDCase").hide();
             $("#selectDCase").show();
             $("#dcase-tags").show();
-            var importFile = new ImportFile("#ase");
+            var importFile = new ImportFile(".row");
             importFile.read(function (file) {
                 var x2dc = new Xml2DCaseTree.Converter();
                 var tree = x2dc.parseXml(file.result);

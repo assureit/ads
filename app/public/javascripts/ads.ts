@@ -95,7 +95,7 @@ class ADS {
 			$("#newDCase").hide();
 			$("#selectDCase").show();
 			$("#dcase-tags").show();
-			var importFile = new ImportFile("#ase");
+			var importFile = new ImportFile(".row");
 			importFile.read((file: DCaseFile) => {
 				var x2dc : Xml2DCaseTree.Converter = new Xml2DCaseTree.Converter();
 				var tree : DCaseTree.TopGoalNode = x2dc.parseXml(file.result);
