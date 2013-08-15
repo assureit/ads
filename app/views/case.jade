@@ -25,6 +25,7 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/ColorTheme/ColorTheme.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/codemirror.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/Editor.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/FullScreenEditor/FullScreenEditor.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery.jqdock.min.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/MenuBar.js")
@@ -44,6 +45,7 @@ html
                pluginManager.SetPlugIn("annotation", new AnnotationPlugIn(pluginManager));
                pluginManager.SetPlugIn("note", new NotePlugIn(pluginManager));
                pluginManager.SetPlugIn("monitor", new MonitorPlugIn(pluginManager));
+               pluginManager.SetPlugIn("fullscreeneditor", new FullScreenEditorPlugIn(pluginManager));
                var oldJsonData = serverApi.GetCase("",#{caseId});
                var converter = new AssureIt.Converter();
                var JsonData = converter.GenNewJson(oldJsonData);
@@ -77,5 +79,7 @@ html
                     path(d="M 0 0 L 10 5 L 0 10 z",fill="white",stroke="gray")
         #editor-wrapper(style="border: 1px solid black")
             textarea#editor(placeholder="Type something...")
+        #fullscreen-editor-wrapper(style="border: 1px solid black")
+            textarea#fullscreen-editor(placeholder="Type something...")
         a(href="#{basepath}/")
             img#menu-button(src="#{basepath}/images/ait.png") Menu
