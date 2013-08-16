@@ -4,13 +4,13 @@ block bar
         img#menu-button(src="#{basepath}/images/ait.png") Menu
     .menu
         ul#drop-menu
-            li
+            //li
                 a(href='#{basepath}/')= lang.home
+            li
+                a(href='#{basepath}/new') Create Case
             li.line.ads-edit-menu
                 a(href='#') Edit
                 ul
-                    li
-                        a(href='#{basepath}/new') New
                     li
                         a(href='#{basepath}/clone') Clone
                     li
