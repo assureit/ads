@@ -27,6 +27,7 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/codemirror.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/mode/ASN/asn.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/Editor.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScript.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/FullScreenEditor/FullScreenEditor.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery.jqdock.min.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.js")
@@ -48,6 +49,7 @@ html
                pluginManager.SetPlugIn("note", new NotePlugIn(pluginManager));
                pluginManager.SetPlugIn("monitor", new MonitorPlugIn(pluginManager));
                pluginManager.SetPlugIn("fullscreeneditor", new FullScreenEditorPlugIn(pluginManager));
+               pluginManager.SetPlugIn("dscript", new DScriptPlugIn(pluginManager));
                var oldJsonData = serverApi.GetCase("",#{caseId});
                var converter = new AssureIt.Converter();
                var JsonData = converter.GenNewJson(oldJsonData);
