@@ -67,6 +67,7 @@ html
                var Viewer = new AssureIt.CaseViewer(Case0, pluginManager, serverApi, Screen);
                Viewer.Draw(Screen);
                Viewer.Draw(Screen);
+               Viewer.Screen.SetOffset(($('html').width() / 2) - ((AssureIt.CaseViewer.ElementWidth) + Viewer.ViewMap[Viewer.ElementTop.Label].AbsX),80); //Center TopGoal in the view
             });
     body(style="overflow: hidden; margin: 0px;")
         #viewer(style="width: 100%; height: 100%;")
