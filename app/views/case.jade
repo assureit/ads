@@ -35,13 +35,14 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Annotation/Annotation.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Monitor/Monitor.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Note/Note.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DragFile/DragFile.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
         //script(type="text/javascript",src="#{basepath}/assurejs/mock/Index.js")
         script(type='text/javascript',src='#{basepath}/javascripts/config.js')
         script(type='text/javascript').
             $(function(){
-               var serverApi = new AssureIt.ServerAPI(Config.BASEPATH); //TODO config for Path
-               var pluginManager = new AssureIt.PlugInManager();
+               var serverApi = new AssureIt.ServerAPI(Config.BASEPATH);
+               var pluginManager = new AssureIt.PlugInManager(Config.BASEPATH);
                pluginManager.SetPlugIn("menu", new MenuBarPlugIn(pluginManager));
                pluginManager.SetPlugIn("editor", new EditorPlugIn(pluginManager));
                pluginManager.SetPlugIn("colortheme", new TiffanyBlueThemePlugIn(pluginManager));
@@ -50,6 +51,7 @@ html
                pluginManager.SetPlugIn("monitor", new MonitorPlugIn(pluginManager));
                pluginManager.SetPlugIn("fullscreeneditor", new FullScreenEditorPlugIn(pluginManager));
                pluginManager.SetPlugIn("dscript", new DScriptPlugIn(pluginManager));
+               pluginManager.SetPlugIn("file", new DragFilePlugIn(pluginManager));
                var oldJsonData = serverApi.GetCase("",#{caseId});
                var converter = new AssureIt.Converter();
                var JsonData = converter.GenNewJson(oldJsonData);
