@@ -16,6 +16,7 @@
 .menu {
 	position: absolute;
 	top: 48px;
+	left: 0px;
 	z-index: 99998;
 	/*height: 100%;*/
 	-webkit-transition: all ease-in-out;
@@ -23,6 +24,10 @@
 	-moz-transition: all ease-in-out 0.5s;
 	-o-transition: all ease-in-out 0.5s;
 	transition: all ease-in-out 0.5s;
+}
+
+.menu-hide {
+	left: -166px;
 }
 
 #drop-menu {
@@ -82,7 +87,14 @@
 
 #drop-menu li ul {
 	display: none;
-	border: 1px solid;
+	border-top: 1px solid;
+	border-color: #000;
+}
+
+#drop-menu li ul li {
+	border-bottom: 1px solid;
+	border-left: 1px solid;
+	border-right: 1px solid;
 	border-color: #000;
 }
 
