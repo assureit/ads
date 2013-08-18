@@ -36,6 +36,8 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Monitor/Monitor.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Note/Note.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/DragFile/DragFile.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScript.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScriptGenerator.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
         //script(type="text/javascript",src="#{basepath}/assurejs/mock/Index.js")
         script(type='text/javascript',src='#{basepath}/javascripts/config.js')
@@ -90,3 +92,8 @@ html
             textarea#fullscreen-editor(placeholder="Type something...")
         a(href="#{basepath}/")
             img#menu-button(src="#{basepath}/images/ait.png") Menu
+        #dscript-editor-wrapper(style="border: 1px solid black")
+            div
+                textarea#dscript-editor-left(placeholder="")
+            div
+                textarea#dscript-editor-right(placeholder="Generated code goes here.")
