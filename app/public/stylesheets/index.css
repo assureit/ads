@@ -33,3 +33,21 @@ body {
 	color: #000;
 	font-weight: bold;
 }
+
+#assureit-status {
+	position: absolute;
+	z-index: 99997;
+	left: 10px;
+	top : 52px;
+	-webkit-transition: all ease-in-out;
+	-webkit-transition-delay: 0.5s;
+	-moz-transition: all ease-in-out 0.5s;
+	-o-transition: all ease-in-out 0.5s;
+	transition: all ease-in-out 0.5s;
+}
+
+#assureit-status ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
