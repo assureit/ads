@@ -72,6 +72,9 @@ html
                Viewer.Draw(Screen);
                Viewer.Draw(Screen);
                Viewer.Screen.SetOffset(($('html').width() / 2) - ((AssureIt.CaseViewer.ElementWidth) + Viewer.ViewMap[Viewer.ElementTop.Label].AbsX),80); //Center TopGoal in the view
+               if(Case0.IsLogin()) {
+                   $('#assureit-mode').text("Edit mode");
+               }
             });
     body(style="overflow: hidden; margin: 0px;")
         #viewer(style="width: 100%; height: 100%;")
@@ -92,6 +95,9 @@ html
             textarea#fullscreen-editor(placeholder="Type something...")
         a(href="#{basepath}/")
             img#menu-button(src="#{basepath}/images/ait.png") Menu
+        #assureit-status
+            ul
+                li#assureit-mode Viewer mode
         #dscript-editor-wrapper(style="border: 1px solid black")
             div
                 textarea#dscript-editor-left(placeholder="")
