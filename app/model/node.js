@@ -9,8 +9,8 @@ var model_dcase = require('./dcase');
 var model_pager = require('./pager');
 var model_issue = require('./issue');
 var model_tag = require('./tag');
-var model_monitor = require('./monitor');
-var error = require('../api/error');
+
+
 
 var _ = require('underscore');
 var async = require('async');
@@ -75,60 +75,6 @@ var NodeDAO = (function (_super) {
                 }
                 meta._IssueId = result.id;
                 callback(null);
-            });
-            return;
-        } else if (meta.Type == 'Monitor') {
-            var monitorDAO = new model_monitor.MonitorDAO(this.con);
-            var params = _.reduce(_.filter(_.flatten(_.map(_.filter(originalList, function (it) {
-                return _.find(node.Children, function (childId) {
-                    return it.ThisNodeId == childId && it.NodeType == 'Context';
-                });
-            }), function (it) {
-                return it.MetaData;
-            })), function (it) {
-                return it.Type == 'Parameter';
-            }), function (param, it) {
-                return _.extend(param, it);
-            }, {});
-            params = _.omit(params, ['Type', 'Visible']);
-
-            async.waterfall([
-                function (next) {
-                    monitorDAO.findByThisNodeId(dcaseId, node.ThisNodeId, function (err, monitor) {
-                        if (err instanceof error.NotFoundError) {
-                            next(null, null);
-                        } else {
-                            next(err, monitor);
-                        }
-                    });
-                },
-                function (monitor, next) {
-                    if (monitor) {
-                        if (meta.WatchId != monitor.watchId || meta.PresetId != monitor.presetId || JSON.stringify(params) != JSON.stringify(monitor.params)) {
-                            monitor.watchId = meta.WatchId;
-                            monitor.presetId = meta.PresetId;
-                            monitor.params = params;
-                            monitor.publishStatus = model_monitor.PUBLISH_STATUS_UPDATED;
-                            monitorDAO.update(monitor, function (err) {
-                                if (!err) {
-                                    meta._MonitorNodeId = monitor.id;
-                                }
-                                next(err);
-                            });
-                        } else {
-                            next(null);
-                        }
-                    } else {
-                        monitorDAO.insert(new model_monitor.MonitorNode(0, dcaseId, node.ThisNodeId, meta.WatchId, meta.PresetId, params), function (err, monitorId) {
-                            if (!err) {
-                                meta._MonitorNodeId = monitorId;
-                            }
-                            next(err);
-                        });
-                    }
-                }
-            ], function (err) {
-                callback(err);
             });
             return;
         } else {

@@ -88,65 +88,65 @@ export class NodeDAO extends model.DAO {
 				callback(null);
 			});
 			return;
-		} else if (meta.Type == 'Monitor') {
-			// TODO: 必要項目チェック
-			var monitorDAO = new model_monitor.MonitorDAO(this.con);
-			var params = 
-				_.reduce(
-					_.filter(
-						_.flatten(
-							_.map(
-								_.filter(originalList, (it:NodeData) => {
-									return _.find(node.Children, (childId:number) => {return it.ThisNodeId == childId && it.NodeType == 'Context';});
-								})
-								, (it:NodeData) => {return it.MetaData;}))
-						, (it: MetaData) => {return it.Type == 'Parameter';})
-					, (param, it:MetaData) => {return _.extend(param, it);}, {});
-			params = _.omit(params, ['Type', 'Visible']);
+		//} else if (meta.Type == 'Monitor') {
+		//	// TODO: 必要項目チェック
+		//	var monitorDAO = new model_monitor.MonitorDAO(this.con);
+		//	var params = 
+		//		_.reduce(
+		//			_.filter(
+		//				_.flatten(
+		//					_.map(
+		//						_.filter(originalList, (it:NodeData) => {
+		//							return _.find(node.Children, (childId:number) => {return it.ThisNodeId == childId && it.NodeType == 'Context';});
+		//						})
+		//						, (it:NodeData) => {return it.MetaData;}))
+		//				, (it: MetaData) => {return it.Type == 'Parameter';})
+		//			, (param, it:MetaData) => {return _.extend(param, it);}, {});
+		//	params = _.omit(params, ['Type', 'Visible']);
 
-			async.waterfall([
-				(next) => {
-					monitorDAO.findByThisNodeId(dcaseId, node.ThisNodeId, (err:any, monitor:model_monitor.MonitorNode) => {
-						if (err instanceof error.NotFoundError) {
-							next(null, null);
-						} else {
-							next(err, monitor);
-						}
-					});
-				},
-				(monitor:model_monitor.MonitorNode, next: Function) => {
-					if (monitor) {
-						if (meta.WatchId != monitor.watchId
-							|| meta.PresetId != monitor.presetId
-							|| JSON.stringify(params) != JSON.stringify(monitor.params)) {
+		//	async.waterfall([
+		//		(next) => {
+		//			monitorDAO.findByThisNodeId(dcaseId, node.ThisNodeId, (err:any, monitor:model_monitor.MonitorNode) => {
+		//				if (err instanceof error.NotFoundError) {
+		//					next(null, null);
+		//				} else {
+		//					next(err, monitor);
+		//				}
+		//			});
+		//		},
+		//		(monitor:model_monitor.MonitorNode, next: Function) => {
+		//			if (monitor) {
+		//				if (meta.WatchId != monitor.watchId
+		//					|| meta.PresetId != monitor.presetId
+		//					|| JSON.stringify(params) != JSON.stringify(monitor.params)) {
 
-							monitor.watchId = meta.WatchId;
-							monitor.presetId = meta.PresetId;
-							monitor.params = params;
-							monitor.publishStatus = model_monitor.PUBLISH_STATUS_UPDATED;
-							monitorDAO.update(monitor, (err:any) => {
-								if (!err) {
-									meta._MonitorNodeId = monitor.id;
-								}
-								next(err);
-							});
-						} else {
-							next(null);
-						}
-					} else {
-						monitorDAO.insert(new model_monitor.MonitorNode(0, dcaseId, node.ThisNodeId, meta.WatchId, meta.PresetId, params), 
-							(err:any, monitorId:number) => {
-								if (!err) {
-									meta._MonitorNodeId = monitorId;
-								}
-								next(err);
-							});
-					}
-				}
-			], (err:any) => {
-				callback(err);
-			});
-			return;
+		//					monitor.watchId = meta.WatchId;
+		//					monitor.presetId = meta.PresetId;
+		//					monitor.params = params;
+		//					monitor.publishStatus = model_monitor.PUBLISH_STATUS_UPDATED;
+		//					monitorDAO.update(monitor, (err:any) => {
+		//						if (!err) {
+		//							meta._MonitorNodeId = monitor.id;
+		//						}
+		//						next(err);
+		//					});
+		//				} else {
+		//					next(null);
+		//				}
+		//			} else {
+		//				monitorDAO.insert(new model_monitor.MonitorNode(0, dcaseId, node.ThisNodeId, meta.WatchId, meta.PresetId, params), 
+		//					(err:any, monitorId:number) => {
+		//						if (!err) {
+		//							meta._MonitorNodeId = monitorId;
+		//						}
+		//						next(err);
+		//					});
+		//			}
+		//		}
+		//	], (err:any) => {
+		//		callback(err);
+		//	});
+		//	return;
 		} else {
 			callback(null);
 			return;

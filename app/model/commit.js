@@ -8,7 +8,7 @@ var model = require('./model');
 var model_user = require('./user');
 var model_node = require('../model/node');
 var model_issue = require('../model/issue');
-var model_monitor = require('../model/monitor');
+
 var async = require('async');
 
 var Commit = (function () {
@@ -119,12 +119,6 @@ var CommitDAO = (function (_super) {
             function (com, commitId, callback) {
                 var issueDAO = new model_issue.IssueDAO(_this.con);
                 issueDAO.publish(com.dcaseId, function (err) {
-                    callback(err, com, commitId);
-                });
-            },
-            function (com, commitId, callback) {
-                var monitorDAO = new model_monitor.MonitorDAO(_this.con);
-                monitorDAO.publish(com.dcaseId, function (err) {
                     callback(err, { commitId: commitId });
                 });
             }
