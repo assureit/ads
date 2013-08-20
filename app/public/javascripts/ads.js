@@ -139,6 +139,9 @@ var ADS = (function () {
         this.hideViewer();
         this.hideEditMenu();
         this.hideViewMenu();
+        if (!this.isLogin(userId)) {
+            $("#create-case-menu").css("display", "none");
+        }
 
         $("#dcase-manager").css("display", "block");
 
