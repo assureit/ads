@@ -180,6 +180,7 @@ export function createDCase(params:any, userId: number, callback: type.Callback)
 		if (params && !params.dcaseName) checks.push('DCase name is required.');
 		if (params && params.dcaseName && params.dcaseName.length > 255) checks.push('DCase name should not exceed 255 characters.');
 		if (params && !params.contents) checks.push('Contents is required.');
+		if (params && !params.projectId) params.projectId = constant.SYSTEM_PROJECT_ID;
 		if (checks.length > 0) {
 			callback.onFailure(new error.InvalidParamsError(checks, null));
 			return false;
@@ -197,7 +198,7 @@ export function createDCase(params:any, userId: number, callback: type.Callback)
 				return;
 			}
 			var dcaseDAO = new model_dcase.DCaseDAO(con);
-			dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName}, (err:any, dcaseId:number) => {
+			dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName, projectId: params.projectId}, (err:any, dcaseId:number) => {
 				if (err) {
 					callback.onFailure(err);
 					return;

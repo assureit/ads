@@ -236,7 +236,7 @@ export class NodeDAO extends model.DAO {
 			var list = new Array<Node>();
 			result.forEach((row) => {
 				var node = new Node(row.n.id, row.n.commit_id, row.n.this_node_id, row.n.node_type, row.n.description);
-				node.dcase = new model_dcase.DCase(row.d.id, row.d.name, row.d.user_id, row.d.delete_flag);
+				node.dcase = new model_dcase.DCase(row.d.id, row.d.name, row.d.project_id, row.d.user_id, row.d.delete_flag);
 				list.push(node);
 			});
 

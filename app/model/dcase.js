@@ -9,13 +9,15 @@ var model_commit = require('./commit');
 var model_user = require('./user');
 var model_pager = require('./pager');
 var error = require('../api/error');
+var constant = require('../constant');
 var async = require('async');
 var _ = require('underscore');
 
 var DCase = (function () {
-    function DCase(id, name, userId, deleteFlag) {
+    function DCase(id, name, projectId, userId, deleteFlag) {
         this.id = id;
         this.name = name;
+        this.projectId = projectId;
         this.userId = userId;
         this.deleteFlag = deleteFlag;
         this.deleteFlag = !!this.deleteFlag;
@@ -24,7 +26,7 @@ var DCase = (function () {
         }
     }
     DCase.tableToObject = function (table) {
-        return new DCase(table.id, table.name, table.user_id, table.delete_flag);
+        return new DCase(table.id, table.name, table.project_id, table.user_id, table.delete_flag);
     };
     return DCase;
 })();
@@ -54,8 +56,8 @@ var DCaseDAO = (function (_super) {
         });
     };
     DCaseDAO.prototype.insert = function (params, callback) {
-        if (params.projectId == null) {
-            params.projectId = 1;
+        if (!params.projectId) {
+            params.projectId = constant.SYSTEM_PROJECT_ID;
         }
         this.con.query('INSERT INTO dcase(user_id, name, project_id) VALUES (?, ?, ?)', [params.userId, params.dcaseName, params.projectId], function (err, result) {
             if (err) {
@@ -87,7 +89,7 @@ var DCaseDAO = (function (_super) {
 
             var list = new Array();
             result.forEach(function (row) {
-                var d = new DCase(row.d.id, row.d.name, row.d.user_id, row.d.delete_flag);
+                var d = new DCase(row.d.id, row.d.name, row.d.project_id, row.d.user_id, row.d.delete_flag);
                 d.user = new model_user.User(row.u.id, row.u.login_name, row.u.delete_flag, row.u.system_flag);
                 d.latestCommit = new model_commit.Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
                 d.latestCommit.user = new model_user.User(row.cu.id, row.cu.login_name, row.cu.delete_flag, row.cu.system_flag);
