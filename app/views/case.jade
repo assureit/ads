@@ -32,6 +32,7 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery.jqdock.min.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/MenuBar.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DefaultStatementRender/DefaultStatementRender.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Annotation/Annotation.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Monitor/Monitor.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Note/Note.js")
@@ -49,6 +50,7 @@ html
                pluginManager.SetPlugIn("menu", new MenuBarPlugIn(pluginManager));
                pluginManager.SetPlugIn("editor", new EditorPlugIn(pluginManager));
                pluginManager.SetPlugIn("colortheme", new TiffanyBlueThemePlugIn(pluginManager));
+               pluginManager.SetPlugIn("statements", new DefaultStatementRenderPlugIn(pluginManager));
                pluginManager.SetPlugIn("annotation", new AnnotationPlugIn(pluginManager));
                pluginManager.SetPlugIn("note", new NotePlugIn(pluginManager));
                pluginManager.SetPlugIn("monitor", new MonitorPlugIn(pluginManager));
