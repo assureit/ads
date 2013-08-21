@@ -36,7 +36,6 @@ body {
 
 #assureit-status {
 	position: absolute;
-	z-index: 99997;
 	left: 10px;
 	top : 52px;
 	-webkit-transition: all ease-in-out;
@@ -50,4 +49,8 @@ body {
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
+}
+
+.CodeMirror {
+	z-index: 99999;
 }
