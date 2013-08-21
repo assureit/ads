@@ -56,15 +56,27 @@ var DCaseDAO = (function (_super) {
         });
     };
     DCaseDAO.prototype.insert = function (params, callback) {
+        var _this = this;
         if (!params.projectId) {
             params.projectId = constant.SYSTEM_PROJECT_ID;
         }
-        this.con.query('INSERT INTO dcase(user_id, name, project_id) VALUES (?, ?, ?)', [params.userId, params.dcaseName, params.projectId], function (err, result) {
-            if (err) {
-                callback(err, null);
-                return;
+        async.waterfall([
+            function (next) {
+                _this.con.query('SELECT count(id) as cnt FROM project WHERE id = ?', [params.projectId], function (err, result) {
+                    return next(err, result);
+                });
+            },
+            function (result, next) {
+                if (result[0].cnt == 0) {
+                    next(new error.NotFoundError('Project Not Found.', params));
+                    return;
+                }
+                _this.con.query('INSERT INTO dcase(user_id, name, project_id) VALUES (?, ?, ?)', [params.userId, params.dcaseName, params.projectId], function (err, result) {
+                    return next(err, result.insertId);
+                });
             }
-            callback(err, result.insertId);
+        ], function (err, dcaseId) {
+            callback(err, dcaseId, params.projectId);
         });
     };
 

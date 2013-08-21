@@ -46,13 +46,27 @@ export class DCaseDAO extends model.DAO {
 		if(!params.projectId) {
 			params.projectId = constant.SYSTEM_PROJECT_ID; //public
 		}
-		this.con.query('INSERT INTO dcase(user_id, name, project_id) VALUES (?, ?, ?)', [params.userId, params.dcaseName, params.projectId], (err, result) => {
-			if (err) {
-				callback(err, null);
-				return;
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT count(id) as cnt FROM project WHERE id = ?', [params.projectId], (err, result) => next(err, result));
+			},
+			(result:any, next) => {
+				if(result[0].cnt == 0) {
+					next(new error.NotFoundError('Project Not Found.', params));
+					return;
+				}
+				this.con.query('INSERT INTO dcase(user_id, name, project_id) VALUES (?, ?, ?)', [params.userId, params.dcaseName, params.projectId], (err, result) => next(err, result.insertId));
 			}
-			callback(err, result.insertId);
-		});
+			], (err:any, dcaseId:number) => {
+				callback(err, dcaseId, params.projectId);
+			});
+		// this.con.query('INSERT INTO dcase(user_id, name, project_id) VALUES (?, ?, ?)', [params.userId, params.dcaseName, params.projectId], (err, result) => {
+		// 	if (err) {
+		// 		callback(err, null);
+		// 		return;
+		// 	}
+		// 	callback(err, result.insertId);
+		// });
 	}
 
 	/**
