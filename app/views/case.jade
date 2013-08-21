@@ -40,6 +40,7 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/BeforeUnload/BeforeUnload.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScript.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScriptGenerator.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/LayoutPortrait/LayoutPortrait.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
         //script(type="text/javascript",src="#{basepath}/assurejs/mock/Index.js")
         script(type='text/javascript',src='#{basepath}/javascripts/config.js')
@@ -58,6 +59,8 @@ html
                pluginManager.SetPlugIn("dscript", new DScriptPlugIn(pluginManager));
                pluginManager.SetPlugIn("file", new DragFilePlugIn(pluginManager));
                pluginManager.SetPlugIn("unload", new BeforeUnloadPlugIn(pluginManager));
+               pluginManager.SetPlugIn("portraitlayout", new LayoutPortraitPlugIn(pluginManager));
+               pluginManager.SetUseLayoutEngine("portraitlayout");
                var oldJsonData = serverApi.GetCase("",#{caseId});
                var converter = new AssureIt.Converter();
                var JsonData = converter.GenNewJson(oldJsonData);
