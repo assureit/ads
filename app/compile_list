@@ -4,6 +4,7 @@ ldap-memory.ts
 constant.ts
 routes/api.ts
 routes/index.ts
+routes/gtsexport.ts
 routes/javascript.ts
 routes/lang.ts
 routes/dscript.ts

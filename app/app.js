@@ -3,6 +3,7 @@ var express = require('express');
 var api = require('./routes/api');
 var privateAPI = require('./routes/api-private');
 var client = require('./routes/index');
+var gts = require('./routes/gtsexport');
 var js = require('./routes/javascript');
 var monitor = require('./routes/monitor');
 var path = require('path');
@@ -50,6 +51,7 @@ app.get('/new', client.index);
 app.get('/dcase/:id', client.index);
 app.get('/case/:id', client.caseView);
 app.post('/export.*', client.exporter);
+app.get('/case/:id/export/:type/node/:n', gts.exporter);
 app.get('/javascripts/config.js', js.config);
 
 app.post('/login', client.login);
