@@ -74,6 +74,7 @@ export function exporter(req: any, res: any) {
 		};
 
 		var resText = generate(json.contents.NodeList, json.contents.TopGoalId);
+		res.set('Content-type','text/plain; charset=utf-8');
 		res.send(resText);
 	});
 }
