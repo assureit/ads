@@ -16,6 +16,41 @@ function getMethodName(node) {
     return node.NodeType.slice(0, 1) + node.ThisNodeId;
 }
 
+function FindById(id, nodeList) {
+    for (var i = 0; i < nodeList.length; i++) {
+        var node = nodeList[i];
+        var thisId = node.ThisNodeId;
+        if (node.ThisNodeId == id) {
+            return node;
+        }
+    }
+    return null;
+}
+
+function generate(NodeList, Id) {
+    var retText = "";
+    var node = FindById(Id, NodeList);
+    for (var i = 0; i < node.Children.length; i++) {
+        retText += generate(NodeList, node.Children[i]);
+    }
+    if (node.MetaData == null) {
+        return retText;
+    }
+    for (var j = 0; j < node.MetaData.length; j++) {
+        var data = node.MetaData[j];
+        if (data.Description == null) {
+            continue;
+        }
+        if (data.Type == "Monitor" || data.Type == "Recovery" || data.Type == "Condition") {
+            retText += '// ' + node.ThisNodeId + '\n';
+            retText += "void " + getMethodName(node) + '_' + data.Type + '() {\n';
+            retText += '    ' + data.Description.replace(/\n/g, '\n    ');
+            retText += '\n}\n\n';
+        }
+    }
+    return retText;
+}
+
 function exporter(req, res) {
     var con = new db.Database();
 
@@ -35,27 +70,7 @@ function exporter(req, res) {
             contents: JSON.parse(c.data)
         };
 
-        var resText = "";
-        console.log(json.contents.NodeList);
-        for (var i = 0; i < json.contents.NodeList.length; i++) {
-            var node = json.contents.NodeList[i];
-            if (node.MetaData == null) {
-                continue;
-            }
-            for (var j = 0; j < node.MetaData.length; j++) {
-                var data = node.MetaData[j];
-                console.log(data);
-                if (data.Description == null) {
-                    continue;
-                }
-                if (data.Type == "Monitor" || data.Type == "Recovery" || data.Type == "Condition") {
-                    resText += '// ' + node.ThisNodeId + '\n';
-                    resText += "void " + getMethodName(node) + '_' + data.Type + '() {\n';
-                    resText += '    ' + data.Description.replace(/\n/g, '\n    ');
-                    resText += '\n}\n\n';
-                }
-            }
-        }
+        var resText = generate(json.contents.NodeList, json.contents.TopGoalId);
         res.send(resText);
     });
 }
