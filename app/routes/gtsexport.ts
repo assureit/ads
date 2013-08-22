@@ -15,5 +15,22 @@ var async = require('async')
 var _ = require('underscore');
 
 export function exporter(req: any, res: any) {
-	res.send("hello");
+	//res.send("id:"+ req.params.id + ", type:"+ req.params.type + ", n:"+ req.params.n);
+	var con = new db.Database();
+
+	con.query({sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?', nestTables: true}, [req.params.id], (err, result) => {
+		if (err) {
+			con.close();
+			throw err;
+		}
+
+		con.close();
+		var c = result[0].c;
+		var d = result[0].d;
+		res.send({
+			commitId: c.id,
+			dcaseName: d.name,
+			contents: c.data
+		});
+	});
 }
