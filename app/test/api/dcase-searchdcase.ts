@@ -140,10 +140,7 @@ describe('api', function() {
 
 			var _assertHavingTags = (tagList:string[], dcaseId:number, callback: (err:any)=>void) => {
 				con.query('SELECT t.* FROM tag t, dcase_tag_rel r WHERE r.tag_id = t.id AND r.dcase_id=?', [dcaseId], (err, result) => {
-					if (err) {
-						callback(err);
-						return;
-					}
+					expect(err).to.be(null);
 					_.each(tagList, (tag:string) => {
 						var find = _.find(result, (it:any)=>{return it.label == tag});
 						expect(find).not.to.be(undefined);
@@ -163,6 +160,35 @@ describe('api', function() {
 				});
 			}
 
+			var _assertReadPermission = (dcaseId:number, userId:number, callback: (err:any) => void) => {
+				con.query('SELECT count(d.id) as cnt FROM dcase d, project_has_user pu, project p WHERE d.project_id = p.id AND p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?) AND d.id = ?', [userId, dcaseId], (err:any, result:any) => {
+					expect(err).to.be(null);
+					expect(result[0].cnt).greaterThan(0);
+					callback(err);
+				});
+			}
+			var _assertReadPermissionAll = (dcaseIdList:number[], userId:number, callback: (err:any)=>void) => {
+				if (dcaseIdList.length == 0) {
+					callback(null);
+					return;
+				}
+				_assertReadPermission(dcaseIdList[0], userId, (err:any)=> {
+					_assertReadPermissionAll(dcaseIdList.slice(1), userId, callback);
+				});
+			}
+
+			it('should return public or project relative dcase', function(done) {
+				dcase.searchDCase({}, userId, {
+					onSuccess: (result: any) => {
+						expect(result.dcaseList.length).greaterThan(0);
+						_assertReadPermissionAll(_.map(result.dcaseList, (dcase:any) => {return dcase.dcaseId;}), userId, (err:any)=> {
+							expect(err).to.be(null);
+							done();
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
+				});
+			});
 			it('should return relative dcase if tagList is not empty', function(done) {
 				var tags = ['tag1'];
 				dcase.searchDCase({tagList:tags, page:1}, userId, {
@@ -225,6 +251,9 @@ describe('api', function() {
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 				});
 			});
+			// TODO タグのプロジェクトによるフィルタリング
+			// getTagListもpublic_flagおよび所属projectでフィルタリング
+			// getCommitList、getDCase、getNodeTreeも権限チェック
 		});
 	});
 });

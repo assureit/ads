@@ -165,10 +165,7 @@ describe('api', function () {
 
             var _assertHavingTags = function (tagList, dcaseId, callback) {
                 con.query('SELECT t.* FROM tag t, dcase_tag_rel r WHERE r.tag_id = t.id AND r.dcase_id=?', [dcaseId], function (err, result) {
-                    if (err) {
-                        callback(err);
-                        return;
-                    }
+                    expect(err).to.be(null);
                     _.each(tagList, function (tag) {
                         var find = _.find(result, function (it) {
                             return it.label == tag;
@@ -190,6 +187,40 @@ describe('api', function () {
                 });
             };
 
+            var _assertReadPermission = function (dcaseId, userId, callback) {
+                con.query('SELECT count(d.id) as cnt FROM dcase d, project_has_user pu, project p WHERE d.project_id = p.id AND p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?) AND d.id = ?', [userId, dcaseId], function (err, result) {
+                    expect(err).to.be(null);
+                    expect(result[0].cnt).greaterThan(0);
+                    callback(err);
+                });
+            };
+            var _assertReadPermissionAll = function (dcaseIdList, userId, callback) {
+                if (dcaseIdList.length == 0) {
+                    callback(null);
+                    return;
+                }
+                _assertReadPermission(dcaseIdList[0], userId, function (err) {
+                    _assertReadPermissionAll(dcaseIdList.slice(1), userId, callback);
+                });
+            };
+
+            it('should return public or project relative dcase', function (done) {
+                dcase.searchDCase({}, userId, {
+                    onSuccess: function (result) {
+                        expect(result.dcaseList.length).greaterThan(0);
+                        _assertReadPermissionAll(_.map(result.dcaseList, function (dcase) {
+                            return dcase.dcaseId;
+                        }), userId, function (err) {
+                            expect(err).to.be(null);
+                            done();
+                        });
+                    },
+                    onFailure: function (error) {
+                        expect().fail(JSON.stringify(error));
+                        done();
+                    }
+                });
+            });
             it('should return relative dcase if tagList is not empty', function (done) {
                 var tags = ['tag1'];
                 dcase.searchDCase({ tagList: tags, page: 1 }, userId, {
