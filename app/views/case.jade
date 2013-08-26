@@ -66,8 +66,7 @@ html
                var oldJsonData = serverApi.GetCase("",#{caseId});
                var converter = new AssureIt.Converter();
                var JsonData = converter.GenNewJson(oldJsonData);
-               var Case0 = new AssureIt.Case();
-               Case0.CommitId = oldJsonData.commitId;
+               var Case0 = new AssureIt.Case(oldJsonData.dcaseName, oldJsonData.dcaseId, oldJsonData.commitId);
                var caseDecoder = new AssureIt.CaseDecoder();
                var root = caseDecoder.ParseJson(Case0, JsonData);
                Case0.SetElementTop(root);
