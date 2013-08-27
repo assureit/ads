@@ -74,7 +74,7 @@ export class DCaseDAO extends model.DAO {
 	 */
 	list(page: number, userId:number, projectId:number, tagList:string[], callback: (err:any, summary: model_pager.Pager, list: DCase[])=>void): void {
 		var pager = new model_pager.Pager(page);
-		var queryFrom = 'dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p ';
+		var queryFrom = 'dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND p.delete_flag = FALSE AND (p.public_flag = TRUE OR pu.user_id = ?)) p ';
 		var queryWhere = 'd.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id ';
 		var query = {sql:'' , nestTables:true};
 		// var query = {sql:'SELECT * FROM dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ? ' , nestTables:true};
@@ -127,25 +127,25 @@ export class DCaseDAO extends model.DAO {
 				list.push(d);
 			});
 
-		var countSQL = 'SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ';
-		var countParams:any[] = [];
-		if (tagList && tagList.length > 0) {
-			var tagVars:string = _.map(tagList, (it:string) => {return '?'}).join(',');
-			countSQL = 'SELECT count(d.id) as cnt ' +
-						'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' +
-						'WHERE d.id = c.dcase_id ' +
-						'AND d.user_id = u.id ' +
-						'AND c.user_id = cu.id ' +
-						'AND t.id = r.tag_id  ' +
-						'AND r.dcase_id = d.id ' +
-						'AND c.latest_flag = TRUE ' +
-						'AND d.delete_flag = FALSE ' +
-						'AND t.label IN (' + tagVars + ') ' +
-						'GROUP BY c.id ' +
-						'HAVING COUNT(t.id) = ? ';
-			var tmp:any[] = tagList;
-			countParams = tmp.concat([tagList.length]);
-		}
+		// var countSQL = 'SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ';
+		// var countParams:any[] = [];
+		// if (tagList && tagList.length > 0) {
+		// 	var tagVars:string = _.map(tagList, (it:string) => {return '?'}).join(',');
+		// 	countSQL = 'SELECT count(d.id) as cnt ' +
+		// 				'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' +
+		// 				'WHERE d.id = c.dcase_id ' +
+		// 				'AND d.user_id = u.id ' +
+		// 				'AND c.user_id = cu.id ' +
+		// 				'AND t.id = r.tag_id  ' +
+		// 				'AND r.dcase_id = d.id ' +
+		// 				'AND c.latest_flag = TRUE ' +
+		// 				'AND d.delete_flag = FALSE ' +
+		// 				'AND t.label IN (' + tagVars + ') ' +
+		// 				'GROUP BY c.id ' +
+		// 				'HAVING COUNT(t.id) = ? ';
+		// 	var tmp:any[] = tagList;
+		// 	countParams = tmp.concat([tagList.length]);
+		// }
 			// this.con.query(countSQL, countParams,(err, countResult) => {
 			this.con.query('SELECT count(d.id) as cnt FROM ' + queryFrom + 'WHERE ' + queryWhere, params,(err, countResult) => {
 				if (err) {

@@ -83,7 +83,7 @@ var DCaseDAO = (function (_super) {
     DCaseDAO.prototype.list = function (page, userId, projectId, tagList, callback) {
         var _this = this;
         var pager = new model_pager.Pager(page);
-        var queryFrom = 'dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p ';
+        var queryFrom = 'dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND p.delete_flag = FALSE AND (p.public_flag = TRUE OR pu.user_id = ?)) p ';
         var queryWhere = 'd.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id ';
         var query = { sql: '', nestTables: true };
 
@@ -118,17 +118,6 @@ var DCaseDAO = (function (_super) {
                 d.latestCommit.user = new model_user.User(row.cu.id, row.cu.login_name, row.cu.delete_flag, row.cu.system_flag);
                 list.push(d);
             });
-
-            var countSQL = 'SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ';
-            var countParams = [];
-            if (tagList && tagList.length > 0) {
-                var tagVars = _.map(tagList, function (it) {
-                    return '?';
-                }).join(',');
-                countSQL = 'SELECT count(d.id) as cnt ' + 'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' + 'WHERE d.id = c.dcase_id ' + 'AND d.user_id = u.id ' + 'AND c.user_id = cu.id ' + 'AND t.id = r.tag_id  ' + 'AND r.dcase_id = d.id ' + 'AND c.latest_flag = TRUE ' + 'AND d.delete_flag = FALSE ' + 'AND t.label IN (' + tagVars + ') ' + 'GROUP BY c.id ' + 'HAVING COUNT(t.id) = ? ';
-                var tmp = tagList;
-                countParams = tmp.concat([tagList.length]);
-            }
 
             _this.con.query('SELECT count(d.id) as cnt FROM ' + queryFrom + 'WHERE ' + queryWhere, params, function (err, countResult) {
                 if (err) {
