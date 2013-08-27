@@ -22,7 +22,7 @@ function searchDCase(params, userId, callback) {
     });
     async.waterfall([
         function (next) {
-            dcaseDAO.list(params.page, tagList, function (err, pager, result) {
+            dcaseDAO.list(params.page, userId, params.projectId, tagList, function (err, pager, result) {
                 next(err, pager, result);
             });
         },

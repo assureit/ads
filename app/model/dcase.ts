@@ -72,29 +72,43 @@ export class DCaseDAO extends model.DAO {
 	/**
 	 * @param page 検索結果の取得対象ページ（1始まり）
 	 */
-	list(page: number, tagList:string[], callback: (err:any, summary: model_pager.Pager, list: DCase[])=>void): void {
+	list(page: number, userId:number, projectId:number, tagList:string[], callback: (err:any, summary: model_pager.Pager, list: DCase[])=>void): void {
 		var pager = new model_pager.Pager(page);
-		var query = {sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ? ' , nestTables:true};
-		var params:any[] = [pager.limit, pager.getOffset()];
+		var queryFrom = 'dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p ';
+		var queryWhere = 'd.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id ';
+		var query = {sql:'' , nestTables:true};
+		// var query = {sql:'SELECT * FROM dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ? ' , nestTables:true};
+		// var params:any[] = [pager.limit, pager.getOffset()];
+		var params:any[] = [];
+		params.push(userId);
 		if (tagList && tagList.length > 0) {
 			var tagVars:string = _.map(tagList, (it:string) => {return '?'}).join(',');
-			query.sql = 'SELECT * ' +
-						'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' +
-						'WHERE d.id = c.dcase_id ' +
-						'AND d.user_id = u.id ' +
-						'AND c.user_id = cu.id ' +
+			queryFrom = queryFrom + ', tag t, dcase_tag_rel r ';
+			queryWhere = queryWhere +
 						'AND t.id = r.tag_id  ' +
 						'AND r.dcase_id = d.id ' +
-						'AND c.latest_flag = TRUE ' +
-						'AND d.delete_flag = FALSE ' +
 						'AND t.label IN (' + tagVars + ') ' +
 						'GROUP BY c.id ' +
-						'HAVING COUNT(t.id) = ? ' +
-						'ORDER BY c.modified, c.id desc LIMIT ? OFFSET ?';
+						'HAVING COUNT(t.id) = ? ';
+			// query.sql = 'SELECT * ' +
+			// 			'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p ' +
+			// 			'WHERE d.id = c.dcase_id ' +
+			// 			'AND d.user_id = u.id ' +
+			// 			'AND c.user_id = cu.id ' +
+			// 			'AND t.id = r.tag_id  ' +
+			// 			'AND r.dcase_id = d.id ' +
+			// 			'AND c.latest_flag = TRUE ' +
+			// 			'AND d.delete_flag = FALSE ' +
+			// 			'AND p.id = d.project_id ' +
+			// 			'AND t.label IN (' + tagVars + ') ' +
+			// 			'GROUP BY c.id ' +
+			// 			'HAVING COUNT(t.id) = ? ' +
+			// 			'ORDER BY c.modified, c.id desc LIMIT ? OFFSET ?';
 			var tmp:any[] = tagList;
-			params = tmp.concat([tagList.length]).concat(params);
+			params = params.concat(tmp).concat([tagList.length]);
 		}
-		this.con.query(query, params, (err, result) => {
+		query.sql = 'SELECT * FROM ' + queryFrom + 'WHERE ' + queryWhere + 'ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ?';
+		this.con.query(query, params.concat([pager.limit, pager.getOffset()]), (err, result) => {
 			if (err) {
 				callback(err, null, null);
 				return;
@@ -128,7 +142,8 @@ export class DCaseDAO extends model.DAO {
 			var tmp:any[] = tagList;
 			countParams = tmp.concat([tagList.length]);
 		}
-			this.con.query(countSQL, countParams,(err, countResult) => {
+			// this.con.query(countSQL, countParams,(err, countResult) => {
+			this.con.query('SELECT count(d.id) as cnt FROM ' + queryFrom + 'WHERE ' + queryWhere, params,(err, countResult) => {
 				if (err) {
 					callback(err, null, null);
 					return;

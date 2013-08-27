@@ -80,20 +80,27 @@ var DCaseDAO = (function (_super) {
         });
     };
 
-    DCaseDAO.prototype.list = function (page, tagList, callback) {
+    DCaseDAO.prototype.list = function (page, userId, projectId, tagList, callback) {
         var _this = this;
         var pager = new model_pager.Pager(page);
-        var query = { sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ? ', nestTables: true };
-        var params = [pager.limit, pager.getOffset()];
+        var queryFrom = 'dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p ';
+        var queryWhere = 'd.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id ';
+        var query = { sql: '', nestTables: true };
+
+        var params = [];
+        params.push(userId);
         if (tagList && tagList.length > 0) {
             var tagVars = _.map(tagList, function (it) {
                 return '?';
             }).join(',');
-            query.sql = 'SELECT * ' + 'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' + 'WHERE d.id = c.dcase_id ' + 'AND d.user_id = u.id ' + 'AND c.user_id = cu.id ' + 'AND t.id = r.tag_id  ' + 'AND r.dcase_id = d.id ' + 'AND c.latest_flag = TRUE ' + 'AND d.delete_flag = FALSE ' + 'AND t.label IN (' + tagVars + ') ' + 'GROUP BY c.id ' + 'HAVING COUNT(t.id) = ? ' + 'ORDER BY c.modified, c.id desc LIMIT ? OFFSET ?';
+            queryFrom = queryFrom + ', tag t, dcase_tag_rel r ';
+            queryWhere = queryWhere + 'AND t.id = r.tag_id  ' + 'AND r.dcase_id = d.id ' + 'AND t.label IN (' + tagVars + ') ' + 'GROUP BY c.id ' + 'HAVING COUNT(t.id) = ? ';
+
             var tmp = tagList;
-            params = tmp.concat([tagList.length]).concat(params);
+            params = params.concat(tmp).concat([tagList.length]);
         }
-        this.con.query(query, params, function (err, result) {
+        query.sql = 'SELECT * FROM ' + queryFrom + 'WHERE ' + queryWhere + 'ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ?';
+        this.con.query(query, params.concat([pager.limit, pager.getOffset()]), function (err, result) {
             if (err) {
                 callback(err, null, null);
                 return;
@@ -118,7 +125,8 @@ var DCaseDAO = (function (_super) {
                 var tmp = tagList;
                 countParams = tmp.concat([tagList.length]);
             }
-            _this.con.query(countSQL, countParams, function (err, countResult) {
+
+            _this.con.query('SELECT count(d.id) as cnt FROM ' + queryFrom + 'WHERE ' + queryWhere, params, function (err, countResult) {
                 if (err) {
                     callback(err, null, null);
                     return;

@@ -22,7 +22,7 @@ export function searchDCase(params:any, userId: number, callback: type.Callback)
 	var tagList = _.filter(params.tagList, (it:string) => {return typeof(it) == 'string';});
 	async.waterfall([
 		(next) => {
-			dcaseDAO.list(params.page, tagList, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+			dcaseDAO.list(params.page, userId, params.projectId, tagList, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
 				next(err, pager, result);
 			});
 		}, 
