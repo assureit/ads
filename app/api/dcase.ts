@@ -27,7 +27,7 @@ export function searchDCase(params:any, userId: number, callback: type.Callback)
 			});
 		}, 
 		(pager:model_pager.Pager, dcaseList:model_dcase.DCase[], next) => {
-			tagDAO.search(tagList, (err:any, tagList:model_tag.Tag[]) => {
+			tagDAO.search(userId, tagList, (err:any, tagList:model_tag.Tag[]) => {
 				next(err, pager, dcaseList, tagList);
 			});
 		}],

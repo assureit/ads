@@ -27,7 +27,7 @@ function searchDCase(params, userId, callback) {
             });
         },
         function (pager, dcaseList, next) {
-            tagDAO.search(tagList, function (err, tagList) {
+            tagDAO.search(userId, tagList, function (err, tagList) {
                 next(err, pager, dcaseList, tagList);
             });
         }
