@@ -51,7 +51,7 @@ var Xml2DCaseTree;
 
                     if (childNode.NodeType == "Context") {
                         var thisContextAddableNode = thisNode;
-                        thisContextAddableNode.Contexts = childNode;
+                        thisContextAddableNode.Contexts.push(childNode);
                     } else {
                         thisNode.Children.push(childNode);
                         this.makeTree(childNodeIdText);

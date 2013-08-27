@@ -62,7 +62,7 @@ module Xml2DCaseTree {
 
 					if(childNode.NodeType == "Context") {
 						var thisContextAddableNode : DCaseTree.ContextAddableNode = <DCaseTree.ContextAddableNode>thisNode;
-						thisContextAddableNode.Contexts = <DCaseTree.ContextNode>childNode;
+						thisContextAddableNode.Contexts.push(<DCaseTree.ContextNode>childNode);
 					}
 					else {
 						thisNode.Children.push(childNode);

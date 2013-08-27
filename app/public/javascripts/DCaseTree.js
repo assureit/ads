@@ -191,7 +191,7 @@ var DCaseTree;
         __extends(ContextAddableNode, _super);
         function ContextAddableNode(NodeType, Description, MetaData, Id) {
             _super.call(this, NodeType, Description, MetaData, Id);
-            this.Contexts = null;
+            this.Contexts = [];
         }
         ContextAddableNode.prototype.convertAllChildNodeIntoJson = function (jsonData) {
             var elem = {};
@@ -205,15 +205,17 @@ var DCaseTree;
             }
             elem["Children"] = childrenIds;
 
-            if (this.Contexts != null) {
-                elem["Contexts"] = this.Contexts.Id;
+            var contextIds = [];
+            for (var i = 0; i < this.Contexts.length; i++) {
+                contextIds.push(this.Contexts[i].Id);
             }
+            elem["Contexts"] = contextIds;
             elem["MetaData"] = this.MetaData;
 
             jsonData.push(elem);
 
-            if (this.Contexts != null) {
-                this.Contexts.convertAllChildNodeIntoJson(jsonData);
+            for (var h = 0; h < this.Contexts.length; h++) {
+                this.Contexts[h].convertAllChildNodeIntoJson(jsonData);
             }
 
             for (var j = 0; j < this.Children.length; j++) {
@@ -226,12 +228,12 @@ var DCaseTree;
         ContextAddableNode.prototype.convertAllChildNodeIntoXml = function (linkArray) {
             outputText("\t<rootBasicNode xsi:type=\"dcase:" + this.NodeType + "\" id=\"" + this.Id + "\" name=\"" + this.NodeName + "\" desc=\"" + this.Description + "\"/>");
 
-            if (this.Contexts != null) {
-                var linkContext = "\t<rootBasicLink xsi:type=\"dcase:link\" id=\"Undefined\"" + " source=\"" + this.Id + "\" target=\"#" + this.Contexts.Id + "\" name=\"Link_" + (linkArray.length + 1) + "\"/>";
+            for (var i = 0; i < this.Contexts.length; i++) {
+                var linkContext = "\t<rootBasicLink xsi:type=\"dcase:link\" id=\"Undefined\"" + " source=\"" + this.Id + "\" target=\"#" + this.Contexts[i].Id + "\" name=\"Link_" + (linkArray.length + 1) + "\"/>";
 
                 linkArray.push(linkContext);
 
-                this.Contexts.convertAllChildNodeIntoXml(linkArray);
+                this.Contexts[i].convertAllChildNodeIntoXml(linkArray);
             }
 
             for (var j = 0; j < this.Children.length; j++) {
@@ -277,8 +279,8 @@ var DCaseTree;
 
             outputText("---");
 
-            if (this.Contexts != null) {
-                this.Contexts.convertAllChildNodeIntoMarkdown(goalNum);
+            for (var h = 0; h < this.Contexts.length; h++) {
+                this.Contexts[h].convertAllChildNodeIntoMarkdown(goalNum);
             }
 
             for (var k = 0; k < this.Children.length; k++) {
@@ -291,9 +293,13 @@ var DCaseTree;
             for (var i = 0; i < depth; i++) {
                 data += "\t";
             }
-            data += this.NodeType + ":" + this.Id;
-            if (this.Contexts != null) {
-                data += " (Contexts:" + this.Contexts.Id + ")";
+            if (this.Contexts.length != 0) {
+                data += " (Contexts:" + this.Contexts[0].Id;
+                for (var i = 1; i < this.Contexts.length; i++) {
+                    data += ", ";
+                    data += this.Contexts[i].Id;
+                }
+                data += ")";
             }
             console.log(data);
 
@@ -340,16 +346,20 @@ var DCaseTree;
             }
             elem["Children"] = childrenIds;
 
-            if (this.Contexts != null) {
-                elem["Contexts"] = this.Contexts.Id;
+            if (this.Contexts.length != 0) {
+                var contextIds = [];
+                for (var m = 0; m < this.Contexts.length; m++) {
+                    contextIds.push(this.Contexts[m].Id);
+                }
+                elem["Contexts"] = contextIds;
             }
 
             elem["MetaData"] = this.MetaData;
 
             jsonData.push(elem);
 
-            if (this.Contexts != null) {
-                this.Contexts.convertAllChildNodeIntoJson(jsonData);
+            for (var k = 0; k < this.Contexts.length; k++) {
+                this.Contexts[k].convertAllChildNodeIntoJson(jsonData);
             }
 
             for (var j = 0; j < this.Children.length; j++) {
@@ -366,12 +376,12 @@ var DCaseTree;
             outputText(xmlStr);
             outputText("\t<rootBasicNode xsi:type=\"dcase:" + this.NodeType + "\" id=\"" + this.Id + "\" name=\"" + this.NodeName + "\" desc=\"" + this.Description + "\"/>");
 
-            if (this.Contexts != null) {
-                var linkContext = "\t<rootBasicLink xsi:type=\"dcase:link\" id=\"Undefined\"" + " source=\"" + this.Id + "\" target=\"#" + this.Contexts.Id + "\" name=\"Link_" + (linkArray.length + 1) + "\"/>";
+            for (var i = 0; i < this.Contexts.length; i++) {
+                var linkContext = "\t<rootBasicLink xsi:type=\"dcase:link\" id=\"Undefined\"" + " source=\"" + this.Id + "\" target=\"#" + this.Contexts[i].Id + "\" name=\"Link_" + (linkArray.length + 1) + "\"/>";
 
                 linkArray.push(linkContext);
 
-                this.Contexts.convertAllChildNodeIntoXml(linkArray);
+                this.Contexts[i].convertAllChildNodeIntoXml(linkArray);
             }
 
             for (var j = 0; j < this.Children.length; j++) {
@@ -424,8 +434,8 @@ var DCaseTree;
             }
             outputText("---");
 
-            if (this.Contexts != null) {
-                this.Contexts.convertAllChildNodeIntoMarkdown(goalNum);
+            for (var h = 0; h < this.Contexts.length; h++) {
+                this.Contexts[h].convertAllChildNodeIntoMarkdown(goalNum);
             }
 
             for (var k = 0; k < this.Children.length; k++) {

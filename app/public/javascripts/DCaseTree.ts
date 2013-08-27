@@ -194,11 +194,11 @@ module DCaseTree {
 
 	export class ContextAddableNode extends DCaseNode {
 
-		Contexts : ContextNode;
+		Contexts : ContextNode[];
 
 		constructor(NodeType : string, Description : string, MetaData : any[], Id : number) {
 			super(NodeType, Description, MetaData, Id);
-			this.Contexts = null;
+			this.Contexts = [];
 		}
 
 
@@ -214,15 +214,17 @@ module DCaseTree {
 			}
 			elem["Children"] = childrenIds;
 
-			if(this.Contexts != null) {
-				elem["Contexts"] = this.Contexts.Id;
+			var contextIds: number[] = [];
+			for(var i: number = 0; i < this.Contexts.length; i++){
+				contextIds.push(this.Contexts[i].Id);
 			}
+			elem["Contexts"] = contextIds;
 			elem["MetaData"] = this.MetaData;
 
 			jsonData.push(elem);
 
-			if(this.Contexts != null) {
-				this.Contexts.convertAllChildNodeIntoJson(jsonData);
+			for(var h : number = 0; h < this.Contexts.length ; h++){
+				this.Contexts[h].convertAllChildNodeIntoJson(jsonData);
 			}
 
 			for(var j : number = 0; j < this.Children.length ; j++){
@@ -237,14 +239,14 @@ module DCaseTree {
 			outputText("\t<rootBasicNode xsi:type=\"dcase:" + this.NodeType + "\" id=\""
 				+ this.Id + "\" name=\"" + this.NodeName + "\" desc=\"" + this.Description + "\"/>");
 
-			if(this.Contexts != null) {
+			for(var i : number = 0; i < this.Contexts.length; i++) {
 				var linkContext : string = "\t<rootBasicLink xsi:type=\"dcase:link\" id=\"Undefined\""
-					+ " source=\"" + this.Id + "\" target=\"#" + this.Contexts.Id + "\" name=\"Link_"
+					+ " source=\"" + this.Id + "\" target=\"#" + this.Contexts[i].Id + "\" name=\"Link_"
 					+ (linkArray.length + 1) + "\"/>";
 
 				linkArray.push(linkContext);
 
-				this.Contexts.convertAllChildNodeIntoXml(linkArray);
+				this.Contexts[i].convertAllChildNodeIntoXml(linkArray);
 			}
 
 			for(var j : number = 0; j < this.Children.length; j++) {
@@ -295,8 +297,8 @@ module DCaseTree {
 
 			outputText("---");
 
-			if(this.Contexts != null) {
-				this.Contexts.convertAllChildNodeIntoMarkdown(goalNum);
+			for(var h : number = 0; h < this.Contexts.length; h++) {
+				this.Contexts[h].convertAllChildNodeIntoMarkdown(goalNum);
 			}
 
 			for(var k : number = 0; k < this.Children.length; k++) {
@@ -309,9 +311,13 @@ module DCaseTree {
 			for(var i : number = 0; i < depth; i++) {
 				data += "\t";
 			}
-			data += this.NodeType + ":" + this.Id;
-			if(this.Contexts != null) {
-				data += " (Contexts:" + this.Contexts.Id+ ")";
+			if(this.Contexts.length != 0) {
+				data += " (Contexts:" + this.Contexts[0].Id;
+				for(var i = 1; i < this.Contexts.length; i++) {
+					data += ", ";
+					data += this.Contexts[i].Id;
+				}
+				data+= ")";
 			}
 			console.log(data); // dump this node
 
@@ -363,16 +369,20 @@ module DCaseTree {
 			}
 			elem["Children"] = childrenIds;
 
-			if(this.Contexts != null){
-				elem["Contexts"] = this.Contexts.Id;
+			if(this.Contexts.length != 0){
+				var contextIds: any[] = [];
+				for(var m: number = 0; m < this.Contexts.length; m++){
+					contextIds.push(this.Contexts[m].Id);
+				}
+				elem["Contexts"] = contextIds;
 			}
 
 			elem["MetaData"] = this.MetaData;
 
 			jsonData.push(elem);
 
-			if(this.Contexts != null) {
-				this.Contexts.convertAllChildNodeIntoJson(jsonData);
+			for(var k : number = 0; k < this.Contexts.length; k++){
+				this.Contexts[k].convertAllChildNodeIntoJson(jsonData);
 			}
 
 			for(var j : number = 0; j < this.Children.length; j++){
@@ -392,14 +402,14 @@ module DCaseTree {
 			outputText("\t<rootBasicNode xsi:type=\"dcase:" + this.NodeType + "\" id=\""
 				+ this.Id + "\" name=\"" + this.NodeName + "\" desc=\"" + this.Description + "\"/>");
 
-			if(this.Contexts != null) {
+			for(var i : number = 0; i < this.Contexts.length; i++) {
 				var linkContext : string = "\t<rootBasicLink xsi:type=\"dcase:link\" id=\"Undefined\""
-					+ " source=\"" + this.Id + "\" target=\"#" + this.Contexts.Id + "\" name=\"Link_"
+					+ " source=\"" + this.Id + "\" target=\"#" + this.Contexts[i].Id + "\" name=\"Link_"
 					+ (linkArray.length + 1) + "\"/>";
 
 				linkArray.push(linkContext);
 
-				this.Contexts.convertAllChildNodeIntoXml(linkArray);
+				this.Contexts[i].convertAllChildNodeIntoXml(linkArray);
 			}
 
 			for(var j : number = 0; j < this.Children.length; j++) {
@@ -455,8 +465,8 @@ module DCaseTree {
 			}
 			outputText("---");
 
-			if(this.Contexts != null) {
-				this.Contexts.convertAllChildNodeIntoMarkdown(goalNum);
+			for(var h : number = 0; h < this.Contexts.length; h++) {
+				this.Contexts[h].convertAllChildNodeIntoMarkdown(goalNum);
 			}
 
 			for(var k : number = 0; k < this.Children.length; k++) {
