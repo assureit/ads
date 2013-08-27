@@ -81,6 +81,10 @@ export class DCaseDAO extends model.DAO {
 		// var params:any[] = [pager.limit, pager.getOffset()];
 		var params:any[] = [];
 		params.push(userId);
+		if (projectId && projectId > 0) {
+			queryWhere = queryWhere + 'AND p.id=? ';
+			params.push(projectId);
+		}
 		if (tagList && tagList.length > 0) {
 			var tagVars:string = _.map(tagList, (it:string) => {return '?'}).join(',');
 			queryFrom = queryFrom + ', tag t, dcase_tag_rel r ';

@@ -204,6 +204,22 @@ describe('api', function () {
                 });
             };
 
+            var _assertProjectId = function (dcaseId, projectId, callback) {
+                con.query('SELECT count(d.id) as cnt FROM dcase d WHERE id = ? AND project_id = ?', [dcaseId, projectId], function (err, result) {
+                    expect(err).to.be(null);
+                    expect(result[0].cnt).greaterThan(0);
+                    callback(err);
+                });
+            };
+            var _assertProjectIdAll = function (dcaseIdList, projectId, callback) {
+                if (dcaseIdList.length == 0) {
+                    callback(null);
+                    return;
+                }
+                _assertProjectId(dcaseIdList[0], projectId, function (err) {
+                    _assertProjectIdAll(dcaseIdList.slice(1), projectId, callback);
+                });
+            };
             it('should return public or project relative dcase', function (done) {
                 dcase.searchDCase({}, userId, {
                     onSuccess: function (result) {
@@ -240,6 +256,24 @@ describe('api', function () {
                 });
             });
 
+            it('should return project relative dcase if projectId is not empty', function (done) {
+                var projectId = 206;
+                dcase.searchDCase({ projectId: projectId, page: 1 }, userId, {
+                    onSuccess: function (result) {
+                        expect(result.dcaseList.length).greaterThan(0);
+                        _assertProjectIdAll(_.map(result.dcaseList, function (dcase) {
+                            return dcase.dcaseId;
+                        }), projectId, function (err) {
+                            expect(err).to.be(null);
+                            done();
+                        });
+                    },
+                    onFailure: function (error) {
+                        expect().fail(JSON.stringify(error));
+                        done();
+                    }
+                });
+            });
             it('multi tagList should be AND query', function (done) {
                 var tags = ['tag1', 'tag2'];
                 dcase.searchDCase({ tagList: tags, page: 1 }, userId, {

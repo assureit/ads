@@ -177,6 +177,22 @@ describe('api', function() {
 				});
 			}
 
+			var _assertProjectId = (dcaseId:number, projectId:number, callback: (err:any) => void) => {
+				con.query('SELECT count(d.id) as cnt FROM dcase d WHERE id = ? AND project_id = ?', [dcaseId, projectId], (err:any, result:any) => {
+					expect(err).to.be(null);
+					expect(result[0].cnt).greaterThan(0);
+					callback(err);
+				});
+			}
+			var _assertProjectIdAll = (dcaseIdList:number[], projectId:number, callback: (err:any)=>void) => {
+				if (dcaseIdList.length == 0) {
+					callback(null);
+					return;
+				}
+				_assertProjectId(dcaseIdList[0], projectId, (err:any)=> {
+					_assertProjectIdAll(dcaseIdList.slice(1), projectId, callback);
+				});
+			}
 			it('should return public or project relative dcase', function(done) {
 				dcase.searchDCase({}, userId, {
 					onSuccess: (result: any) => {
@@ -203,6 +219,19 @@ describe('api', function() {
 				});
 			});
 
+			it('should return project relative dcase if projectId is not empty', function(done) {
+				var projectId:number = 206;
+				dcase.searchDCase({projectId:projectId, page:1}, userId, {
+					onSuccess: (result: any) => {
+						expect(result.dcaseList.length).greaterThan(0);
+						_assertProjectIdAll(_.map(result.dcaseList, (dcase:any) => {return dcase.dcaseId;}), projectId, (err:any)=> {
+							expect(err).to.be(null);
+							done();
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
+				});
+			});
 			it('multi tagList should be AND query', function(done) {
 				var tags = ['tag1', 'tag2'];
 				dcase.searchDCase({tagList:tags, page:1}, userId, {

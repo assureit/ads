@@ -89,6 +89,10 @@ var DCaseDAO = (function (_super) {
 
         var params = [];
         params.push(userId);
+        if (projectId && projectId > 0) {
+            queryWhere = queryWhere + 'AND p.id=? ';
+            params.push(projectId);
+        }
         if (tagList && tagList.length > 0) {
             var tagVars = _.map(tagList, function (it) {
                 return '?';
