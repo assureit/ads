@@ -45,6 +45,26 @@ export class ProjectDAO extends model.DAO {
 		});
 	}
 
+	remove(userId:number, projectId:number, callback(err:any) => void): void {
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT count(id) as cnt FROM project_has_user WHERE project_id = ? AND user_id = ?', [projectId, userId], (err:any, result:any) => next(err, result));
+			},
+			(result, next) => {
+				if (result[0].cnt == 0) {
+					next(new error.ForbiddenError('You need permission to remove the project', {userId:userId, projectId:projectId}));
+				} else {
+					next(result);
+				}
+			},
+			(next) => {
+				this.con.query('UPDATE project SET delete_flag=FALSE WHERE id=?', [projectId], (err:any, result:any) => next(err, result));
+			},
+		], (err:any, result:any) => {
+			callback(err);
+		});
+	}
+
 	addMember(projectId: number, userId: number, callback: (err:any) => void): void {
 		async.waterfall([
 			(next) => {

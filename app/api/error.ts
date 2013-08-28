@@ -60,6 +60,12 @@ export class ApplicationError implements IRPCOverHTTPError {
 	}
 }
 
+export class ForbiddenError extends ApplicationError {
+	constructor(msg:string, data?:any) {
+		super(HTTP_STATUS.OK, RPC_ERROR.FORBIDDEN, msg, data);
+	}
+}
+
 export class NotFoundError extends ApplicationError {
 	constructor(msg:string, data?:any) {
 		super(HTTP_STATUS.OK, RPC_ERROR.DATA_NOT_FOUND, msg, data);
@@ -105,10 +111,10 @@ export enum RPC_ERROR {
 	PARSE_ERROR = -32700,
 	CONFIG_ERROR = 22000,
 	AUTH_ERROR = 23000,
+	FORBIDDEN = 23001,
 	DATA_NOT_FOUND = 24001,
 	DATA_VERSION_CONFLICT = 24002,
 	DATA_DUPLICATE = 24003,
-
 	NOT_DEFINED = 19999
 }
 

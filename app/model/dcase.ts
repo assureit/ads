@@ -74,7 +74,7 @@ export class DCaseDAO extends model.DAO {
 	 */
 	list(page: number, userId:number, projectId:number, tagList:string[], callback: (err:any, summary: model_pager.Pager, list: DCase[])=>void): void {
 		var pager = new model_pager.Pager(page);
-		var queryFrom = 'dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND p.delete_flag = FALSE AND (p.public_flag = TRUE OR pu.user_id = ?)) p ';
+		var queryFrom = 'dcase d, commit c, user u, user cu, (SELECT DISTINCT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND p.delete_flag = FALSE AND (p.public_flag = TRUE OR pu.user_id = ?)) p ';
 		var queryWhere = 'd.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id ';
 		var query = {sql:'' , nestTables:true};
 		// var query = {sql:'SELECT * FROM dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ? ' , nestTables:true};
