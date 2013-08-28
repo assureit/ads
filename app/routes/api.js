@@ -11,7 +11,7 @@ jsonrpc.add('version', function (params, userId, callback) {
 jsonrpc.addModule(dcase);
 jsonrpc.addModule(project);
 jsonrpc.addModule(rec);
-jsonrpc.requireAuth(['createDCase', 'commit', 'editDCase', 'deleteDCase']);
+jsonrpc.requireAuth(['createDCase', 'commit', 'editDCase', 'deleteDCase', 'createProject', 'editProject', 'deleteProject']);
 
 exports.httpHandler = jsonrpc.httpHandler;
 
