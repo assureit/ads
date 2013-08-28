@@ -70,3 +70,17 @@ function editProject(params, userId, callback) {
 }
 exports.editProject = editProject;
 
+function deleteProject(params, userId, callback) {
+    var con = new db.Database();
+    var projectDAO = new model_project.ProjectDAO(con);
+    projectDAO.remove(userId, params.projectId, function (err) {
+        con.close();
+        if (err) {
+            callback.onFailure(err);
+            return;
+        }
+        callback.onSuccess({ ok: true });
+    });
+}
+exports.deleteProject = deleteProject;
+

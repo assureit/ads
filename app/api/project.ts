@@ -72,3 +72,17 @@ export function editProject(params:any, userId: number, callback: type.Callback)
 	});
 }
 
+export function deleteProject(params:any, userId: number, callback: type.Callback) {
+	//TODO validation
+	var con = new db.Database();
+	var projectDAO = new model_project.ProjectDAO(con);
+	projectDAO.remove(userId, params.projectId, (err:any) => {
+		con.close();
+		if (err) {
+			callback.onFailure(err);
+			return;
+		}
+		callback.onSuccess({ok: true}); //FIXME
+	});
+}
+

@@ -83,6 +83,15 @@ var ApplicationError = (function () {
 })();
 exports.ApplicationError = ApplicationError;
 
+var ForbiddenError = (function (_super) {
+    __extends(ForbiddenError, _super);
+    function ForbiddenError(msg, data) {
+        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.FORBIDDEN, msg, data);
+    }
+    return ForbiddenError;
+})(ApplicationError);
+exports.ForbiddenError = ForbiddenError;
+
 var NotFoundError = (function (_super) {
     __extends(NotFoundError, _super);
     function NotFoundError(msg, data) {
@@ -145,6 +154,7 @@ exports.ExternalParameterError = ExternalParameterError;
     RPC_ERROR[RPC_ERROR["PARSE_ERROR"] = -32700] = "PARSE_ERROR";
     RPC_ERROR[RPC_ERROR["CONFIG_ERROR"] = 22000] = "CONFIG_ERROR";
     RPC_ERROR[RPC_ERROR["AUTH_ERROR"] = 23000] = "AUTH_ERROR";
+    RPC_ERROR[RPC_ERROR["FORBIDDEN"] = 23001] = "FORBIDDEN";
     RPC_ERROR[RPC_ERROR["DATA_NOT_FOUND"] = 24001] = "DATA_NOT_FOUND";
     RPC_ERROR[RPC_ERROR["DATA_VERSION_CONFLICT"] = 24002] = "DATA_VERSION_CONFLICT";
     RPC_ERROR[RPC_ERROR["DATA_DUPLICATE"] = 24003] = "DATA_DUPLICATE";

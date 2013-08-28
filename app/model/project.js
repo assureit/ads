@@ -5,6 +5,7 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var model = require('./model');
+var error = require('../api/error');
 
 var async = require('async');
 var _ = require('underscore');
@@ -57,6 +58,31 @@ var ProjectDAO = (function (_super) {
             }
         ], function (err, result) {
             callback(err, result.insertId);
+        });
+    };
+
+    ProjectDAO.prototype.remove = function (userId, projectId, callback) {
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query('SELECT count(id) as cnt FROM project_has_user WHERE project_id = ? AND user_id = ?', [projectId, userId], function (err, result) {
+                    return next(err, result);
+                });
+            },
+            function (result, next) {
+                if (result[0].cnt == 0) {
+                    next(new error.ForbiddenError('You need permission to remove the project', { userId: userId, projectId: projectId }));
+                } else {
+                    next();
+                }
+            },
+            function (next) {
+                _this.con.query('UPDATE project SET delete_flag=TRUE WHERE id=?', [projectId], function (err, result) {
+                    return next(err, result);
+                });
+            }
+        ], function (err, result) {
+            callback(err);
         });
     };
 
