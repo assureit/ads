@@ -22,12 +22,12 @@ export function searchDCase(params:any, userId: number, callback: type.Callback)
 	var tagList = _.filter(params.tagList, (it:string) => {return typeof(it) == 'string';});
 	async.waterfall([
 		(next) => {
-			dcaseDAO.list(params.page, tagList, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+			dcaseDAO.list(params.page, userId, params.projectId, tagList, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
 				next(err, pager, result);
 			});
 		}, 
 		(pager:model_pager.Pager, dcaseList:model_dcase.DCase[], next) => {
-			tagDAO.search(tagList, (err:any, tagList:model_tag.Tag[]) => {
+			tagDAO.search(userId, tagList, (err:any, tagList:model_tag.Tag[]) => {
 				next(err, pager, dcaseList, tagList);
 			});
 		}],
@@ -180,6 +180,7 @@ export function createDCase(params:any, userId: number, callback: type.Callback)
 		if (params && !params.dcaseName) checks.push('DCase name is required.');
 		if (params && params.dcaseName && params.dcaseName.length > 255) checks.push('DCase name should not exceed 255 characters.');
 		if (params && !params.contents) checks.push('Contents is required.');
+		if (params && !params.projectId) params.projectId = constant.SYSTEM_PROJECT_ID;
 		if (checks.length > 0) {
 			callback.onFailure(new error.InvalidParamsError(checks, null));
 			return false;
@@ -197,7 +198,7 @@ export function createDCase(params:any, userId: number, callback: type.Callback)
 				return;
 			}
 			var dcaseDAO = new model_dcase.DCaseDAO(con);
-			dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName}, (err:any, dcaseId:number) => {
+			dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName, projectId: params.projectId}, (err:any, dcaseId:number) => {
 				if (err) {
 					callback.onFailure(err);
 					return;

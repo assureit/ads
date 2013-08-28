@@ -1,4 +1,5 @@
 exports.SYSTEM_USER_ID = 1;
+exports.SYSTEM_PROJECT_ID = 1;
 exports.UPLOAD_DIR = 'upload';
 exports.basepath = "";
 exports.REBUTTAL_SUBJECT = '監視項目の状態が変更されました。';

@@ -1,6 +1,6 @@
 var db = require('../db/db');
 
-
+var constant = require('../constant');
 var model_dcase = require('../model/dcase');
 var model_commit = require('../model/commit');
 var model_node = require('../model/node');
@@ -22,12 +22,12 @@ function searchDCase(params, userId, callback) {
     });
     async.waterfall([
         function (next) {
-            dcaseDAO.list(params.page, tagList, function (err, pager, result) {
+            dcaseDAO.list(params.page, userId, params.projectId, tagList, function (err, pager, result) {
                 next(err, pager, result);
             });
         },
         function (pager, dcaseList, next) {
-            tagDAO.search(tagList, function (err, tagList) {
+            tagDAO.search(userId, tagList, function (err, tagList) {
                 next(err, pager, dcaseList, tagList);
             });
         }
@@ -196,6 +196,8 @@ function createDCase(params, userId, callback) {
             checks.push('DCase name should not exceed 255 characters.');
         if (params && !params.contents)
             checks.push('Contents is required.');
+        if (params && !params.projectId)
+            params.projectId = constant.SYSTEM_PROJECT_ID;
         if (checks.length > 0) {
             callback.onFailure(new error.InvalidParamsError(checks, null));
             return false;
@@ -214,7 +216,7 @@ function createDCase(params, userId, callback) {
                 return;
             }
             var dcaseDAO = new model_dcase.DCaseDAO(con);
-            dcaseDAO.insert({ userId: userId, dcaseName: params.dcaseName }, function (err, dcaseId) {
+            dcaseDAO.insert({ userId: userId, dcaseName: params.dcaseName, projectId: params.projectId }, function (err, dcaseId) {
                 if (err) {
                     callback.onFailure(err);
                     return;

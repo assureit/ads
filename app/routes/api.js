@@ -1,6 +1,7 @@
 var jsonrpc = require('../api/jsonrpc');
 
 var dcase = require('../api/dcase');
+var project = require('../api/project');
 var rec = require('../api/rec');
 
 jsonrpc.add('version', function (params, userId, callback) {
@@ -8,6 +9,7 @@ jsonrpc.add('version', function (params, userId, callback) {
 });
 
 jsonrpc.addModule(dcase);
+jsonrpc.addModule(project);
 jsonrpc.addModule(rec);
 jsonrpc.requireAuth(['createDCase', 'commit', 'editDCase', 'deleteDCase']);
 
