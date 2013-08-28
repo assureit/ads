@@ -14,7 +14,7 @@ import model_tag = module('../../model/tag')
 var expect = require('expect.js');	// TODO: import module化
 var _ = require('underscore');
 
-var userId = constant.SYSTEM_USER_ID;
+var userId = 101;
 
 describe('api', function() {
     var con;
@@ -62,7 +62,7 @@ describe('api', function() {
 						expect(result.summary.totalItems).not.to.be(undefined);
 						expect(result.summary.itemsPerPage).not.to.be(undefined);
 
-						con.query('SELECT count(d.id) as cnt FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE', (err, expectedResult) => {
+						con.query('SELECT count(d.id) as cnt FROM dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id', [userId], (err, expectedResult) => {
 							if (err) {
 								con.close();
 								throw err;
@@ -140,10 +140,7 @@ describe('api', function() {
 
 			var _assertHavingTags = (tagList:string[], dcaseId:number, callback: (err:any)=>void) => {
 				con.query('SELECT t.* FROM tag t, dcase_tag_rel r WHERE r.tag_id = t.id AND r.dcase_id=?', [dcaseId], (err, result) => {
-					if (err) {
-						callback(err);
-						return;
-					}
+					expect(err).to.be(null);
 					_.each(tagList, (tag:string) => {
 						var find = _.find(result, (it:any)=>{return it.label == tag});
 						expect(find).not.to.be(undefined);
@@ -163,6 +160,51 @@ describe('api', function() {
 				});
 			}
 
+			var _assertReadPermission = (dcaseId:number, userId:number, callback: (err:any) => void) => {
+				con.query('SELECT count(d.id) as cnt FROM dcase d, project_has_user pu, project p WHERE d.project_id = p.id AND p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?) AND d.id = ?', [userId, dcaseId], (err:any, result:any) => {
+					expect(err).to.be(null);
+					expect(result[0].cnt).greaterThan(0);
+					callback(err);
+				});
+			}
+			var _assertReadPermissionAll = (dcaseIdList:number[], userId:number, callback: (err:any)=>void) => {
+				if (dcaseIdList.length == 0) {
+					callback(null);
+					return;
+				}
+				_assertReadPermission(dcaseIdList[0], userId, (err:any)=> {
+					_assertReadPermissionAll(dcaseIdList.slice(1), userId, callback);
+				});
+			}
+
+			var _assertProjectId = (dcaseId:number, projectId:number, callback: (err:any) => void) => {
+				con.query('SELECT count(d.id) as cnt FROM dcase d WHERE id = ? AND project_id = ?', [dcaseId, projectId], (err:any, result:any) => {
+					expect(err).to.be(null);
+					expect(result[0].cnt).greaterThan(0);
+					callback(err);
+				});
+			}
+			var _assertProjectIdAll = (dcaseIdList:number[], projectId:number, callback: (err:any)=>void) => {
+				if (dcaseIdList.length == 0) {
+					callback(null);
+					return;
+				}
+				_assertProjectId(dcaseIdList[0], projectId, (err:any)=> {
+					_assertProjectIdAll(dcaseIdList.slice(1), projectId, callback);
+				});
+			}
+			it('should return public or project relative dcase', function(done) {
+				dcase.searchDCase({}, userId, {
+					onSuccess: (result: any) => {
+						expect(result.dcaseList.length).greaterThan(0);
+						_assertReadPermissionAll(_.map(result.dcaseList, (dcase:any) => {return dcase.dcaseId;}), userId, (err:any)=> {
+							expect(err).to.be(null);
+							done();
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
+				});
+			});
 			it('should return relative dcase if tagList is not empty', function(done) {
 				var tags = ['tag1'];
 				dcase.searchDCase({tagList:tags, page:1}, userId, {
@@ -177,6 +219,19 @@ describe('api', function() {
 				});
 			});
 
+			it('should return project relative dcase if projectId is not empty', function(done) {
+				var projectId:number = 206;
+				dcase.searchDCase({projectId:projectId, page:1}, userId, {
+					onSuccess: (result: any) => {
+						expect(result.dcaseList.length).greaterThan(0);
+						_assertProjectIdAll(_.map(result.dcaseList, (dcase:any) => {return dcase.dcaseId;}), projectId, (err:any)=> {
+							expect(err).to.be(null);
+							done();
+						});
+					}, 
+					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
+				});
+			});
 			it('multi tagList should be AND query', function(done) {
 				var tags = ['tag1', 'tag2'];
 				dcase.searchDCase({tagList:tags, page:1}, userId, {
@@ -225,6 +280,9 @@ describe('api', function() {
 					onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));done();},
 				});
 			});
+			// TODO タグのプロジェクトによるフィルタリング
+			// getTagListもpublic_flagおよび所属projectでフィルタリング
+			// getCommitList、getDCase、getNodeTreeも権限チェック
 		});
 	});
 });

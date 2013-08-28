@@ -14,6 +14,7 @@ var dSvr = require('../server')
 describe('net', () => {
 	var server = null;
 	before((done) => {
+		console.log(JSON.stringify(CONFIG.redmine));
 		CONFIG.redmine.port = 3030;
 		server = dSvr.app.listen(3030).on('listening', done);
 	});

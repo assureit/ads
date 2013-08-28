@@ -1,25 +1,35 @@
+project:
+  - {id: 204, name: 'open project1', public_flag: true}
+  - {id: 205, name: 'close project1', public_flag: false}
+  - {id: 206, name: 'own project1', public_flag: false}
+project_has_user:
+  - {id: 204, project_id: 204, user_id: 102}
+  - {id: 205, project_id: 204, user_id: 103}
+  - {id: 206, project_id: 205, user_id: 102}
+  - {id: 207, project_id: 205, user_id: 103}
+  - {id: 208, project_id: 206, user_id: 101}
 dcase:
-  - {id: 204, name: 'dcase4', user_id: 101}
-  - {id: 205, name: 'dcase5', user_id: 101}
-  - {id: 206, name: 'dcase6', user_id: 101}
-  - {id: 207, name: 'dcase7', user_id: 101}
-  - {id: 208, name: 'dcase8', user_id: 101}
-  - {id: 209, name: 'dcase9', user_id: 101}
-  - {id: 210, name: 'dcase10', user_id: 101}
-  - {id: 211, name: 'dcase11', user_id: 101}
-  - {id: 212, name: 'dcase12', user_id: 101}
-  - {id: 213, name: 'dcase13', user_id: 101}
-  - {id: 214, name: 'dcase14', user_id: 101}
-  - {id: 215, name: 'dcase15', user_id: 101}
-  - {id: 216, name: 'dcase16', user_id: 101}
-  - {id: 217, name: 'dcase17', user_id: 101}
-  - {id: 218, name: 'dcase18', user_id: 101}
-  - {id: 219, name: 'dcase19', user_id: 101}
-  - {id: 220, name: 'dcase20', user_id: 101}
-  - {id: 221, name: 'dcase21', user_id: 101}
-  - {id: 222, name: 'dcase22', user_id: 101}
-  - {id: 223, name: 'dcase23', user_id: 101, delete_flag: 1}
-  - {id: 224, name: 'deleted_dcase', user_id: 101, delete_flag: true}
+  - {id: 204, name: 'dcase4', project_id: 204, user_id: 101}
+  - {id: 205, name: 'dcase5', project_id: 204, user_id: 101}
+  - {id: 206, name: 'dcase6', project_id: 204, user_id: 101}
+  - {id: 207, name: 'dcase7', project_id: 204, user_id: 101}
+  - {id: 208, name: 'dcase8', project_id: 204, user_id: 101}
+  - {id: 209, name: 'dcase9', project_id: 204, user_id: 101}
+  - {id: 210, name: 'dcase10', project_id: 206, user_id: 101}
+  - {id: 211, name: 'dcase11', project_id: 206, user_id: 101}
+  - {id: 212, name: 'dcase12', project_id: 206, user_id: 101}
+  - {id: 213, name: 'dcase13', project_id: 206, user_id: 101}
+  - {id: 214, name: 'dcase14', project_id: 206, user_id: 101}
+  - {id: 215, name: 'dcase15', project_id: 206, user_id: 101}
+  - {id: 216, name: 'dcase16', project_id: 206, user_id: 101}
+  - {id: 217, name: 'dcase17', project_id: 206, user_id: 101}
+  - {id: 218, name: 'dcase18', project_id: 206, user_id: 101}
+  - {id: 219, name: 'dcase19', project_id: 206, user_id: 101}
+  - {id: 220, name: 'dcase20', project_id: 206, user_id: 101}
+  - {id: 221, name: 'dcase21', project_id: 205, user_id: 101}
+  - {id: 222, name: 'dcase22', project_id: 206, user_id: 101}
+  - {id: 223, name: 'dcase23', project_id: 204, user_id: 101, delete_flag: 1}
+  - {id: 224, name: 'deleted_dcase', project_id: 204, user_id: 101, delete_flag: true}
 commit:
   - {id: 404, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 4', dcase_id: 204, user_id: 101}
   - {id: 405, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 5', dcase_id: 205, user_id: 101}
@@ -107,6 +117,9 @@ tag:
   - {id: 705, label: 'deleted_tag'}
   - {id: 706, label: 'unlink_tag'}
   - {id: 707, label: 'unrelational_tag'}
+  - {id: 708, label: 'open_project_tag'}
+  - {id: 709, label: 'closed_project_tag'}
+  - {id: 710, label: 'own_project_tag'}
 dcase_tag_rel:
   - {id: 801, dcase_id: 201, tag_id: 701}
   - {id: 802, dcase_id: 202, tag_id: 701}
@@ -117,3 +130,6 @@ dcase_tag_rel:
   - {id: 807, dcase_id: 203, tag_id: 704}
   - {id: 808, dcase_id: 224, tag_id: 705}
   - {id: 809, dcase_id: 222, tag_id: 707}
+  - {id: 810, dcase_id: 204, tag_id: 708}
+  - {id: 811, dcase_id: 221, tag_id: 709}
+  - {id: 812, dcase_id: 220, tag_id: 710}

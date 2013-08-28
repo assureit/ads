@@ -46,7 +46,7 @@ var TagDAO = (function (_super) {
         });
     };
 
-    TagDAO.prototype.search = function (tagList, callback) {
+    TagDAO.prototype.search = function (userId, tagList, callback) {
         var _this = this;
         if (!tagList || tagList.length == 0) {
             this.list(callback);
@@ -57,8 +57,8 @@ var TagDAO = (function (_super) {
                 var tagVars = _.map(tagList, function (tag) {
                     return '?';
                 }).join(',');
-                var sql = 'SELECT id, label, COUNT(id) as cnt FROM ( ' + 'SELECT t2.* ' + 'FROM dcase d, commit c, tag t, dcase_tag_rel r, dcase_tag_rel r2, tag t2 ' + 'WHERE d.id = c.dcase_id  ' + 'AND t.id = r.tag_id   ' + 'AND r.dcase_id = d.id ' + 'AND r2.dcase_id = d.id ' + 'AND r2.tag_id = t2.id ' + 'AND c.latest_flag = TRUE  ' + 'AND d.delete_flag = FALSE  ' + 'AND t.label IN (' + tagVars + ') ' + 'GROUP BY c.id, t2.id ' + 'HAVING COUNT(t.id) = 2 ' + ') v ' + 'GROUP BY id ' + 'ORDER BY cnt DESC, id ';
-                _this.con.query(sql, tagList, function (err, result) {
+                var sql = 'SELECT id, label, COUNT(id) as cnt FROM ( ' + 'SELECT t2.* ' + 'FROM dcase d, commit c, tag t, dcase_tag_rel r, dcase_tag_rel r2, tag t2, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND p.delete_flag = FALSE AND (p.public_flag = TRUE OR pu.user_id = ?)) p ' + 'WHERE d.id = c.dcase_id  ' + 'AND t.id = r.tag_id   ' + 'AND r.dcase_id = d.id ' + 'AND r2.dcase_id = d.id ' + 'AND r2.tag_id = t2.id ' + 'AND p.id = d.project_id ' + 'AND c.latest_flag = TRUE  ' + 'AND d.delete_flag = FALSE  ' + 'AND t.label IN (' + tagVars + ') ' + 'GROUP BY c.id, t2.id ' + 'HAVING COUNT(t.id) = 2 ' + ') v ' + 'GROUP BY id ' + 'ORDER BY cnt DESC, id ';
+                _this.con.query(sql, [userId].concat(tagList), function (err, result) {
                     next(err, result);
                 });
             },
