@@ -1,6 +1,6 @@
 dcase:
-  - {id: 901, name: 'deleted_dcase', user_id: 101, delete_flag: true}
-  - {id: 902, name: 'dcase902', user_id: 101 }
+  - {id: 901, name: 'deleted_dcase', project_id: 201, user_id: 101, delete_flag: true}
+  - {id: 902, name: 'dcase902', project_id: 201, user_id: 101 }
 tag:
   - {id: 701, label: 'tag1'}
   - {id: 702, label: 'tag2'}

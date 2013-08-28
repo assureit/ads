@@ -14,6 +14,7 @@ describe('model', function() {
 	var testDB;
 	var con: db.Database
 	var dcaseDAO: model_dcase.DCaseDAO;
+	var userId:number = 2;
 
 	beforeEach(function (done) {
 		testdata.begin(['test/model/dcase.yaml'], (err:any, c:db.Database) => {
@@ -80,7 +81,7 @@ describe('model', function() {
 		});
 		describe('list', function() {
 			it('normal end no tag', function(done) {
-				dcaseDAO.list(1, null, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+				dcaseDAO.list(1, userId, null, null, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
 					expect(err).to.be(null);
 					expect(pager).not.to.be(null);
 					expect(pager).not.to.be(undefined);
@@ -97,7 +98,7 @@ describe('model', function() {
 				}); 
 			});
 			it('normal end plus tag', function(done) {
-				dcaseDAO.list(1, ["tag1"], (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+				dcaseDAO.list(1, userId, null, ["tag1"], (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
 					expect(err).to.be(null);
 					expect(pager).not.to.be(null);
 					expect(pager).not.to.be(undefined);
@@ -114,7 +115,7 @@ describe('model', function() {
 				}); 
 			});
 			it('tag is not exists', function(done) {
-				dcaseDAO.list(1, ["QQQ"], (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+				dcaseDAO.list(1, userId, null, ["QQQ"], (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
 					expect(err).to.be(null);
 					expect(pager).not.to.be(null);
 					expect(pager).not.to.be(undefined);
