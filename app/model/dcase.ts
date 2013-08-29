@@ -11,18 +11,22 @@ export interface InsertArg {
 	userId: number;
 	dcaseName: string;
 	projectId?: number;
+	type?: number;
 }
 export class DCase {
 	public user: model_user.User;
 	public latestCommit: model_commit.Commit;
-	constructor(public id:number, public name:string, public projectId:number, public userId:number, public deleteFlag:bool) {
+	constructor(public id:number, public name:string, public projectId:number, public userId:number, public deleteFlag:bool, public type?:number) {
 		this.deleteFlag = !!this.deleteFlag;
 		if (deleteFlag === undefined) {
 			this.deleteFlag = false;
 		}
+		if (this.type === undefined) {
+			this.type = constant.CASE_TYPE_DEFAULT;
+		}
 	}
 	static tableToObject(table: any) {
-		return new DCase(table.id, table.name, table.project_id, table.user_id, table.delete_flag);
+		return new DCase(table.id, table.name, table.project_id, table.user_id, table.delete_flag, table.type);
 	}
 }
 export class DCaseDAO extends model.DAO {
@@ -46,6 +50,9 @@ export class DCaseDAO extends model.DAO {
 		if(!params.projectId) {
 			params.projectId = constant.SYSTEM_PROJECT_ID; //public
 		}
+		if (!params.type) {
+			params.type = constant.CASE_TYPE_DEFAULT;
+		}
 		async.waterfall([
 			(next) => {
 				this.con.query('SELECT count(id) as cnt FROM project WHERE id = ?', [params.projectId], (err, result) => next(err, result));
@@ -55,7 +62,7 @@ export class DCaseDAO extends model.DAO {
 					next(new error.NotFoundError('Project Not Found.', params));
 					return;
 				}
-				this.con.query('INSERT INTO dcase(user_id, name, project_id) VALUES (?, ?, ?)', [params.userId, params.dcaseName, params.projectId], (err, result) => next(err, result.insertId));
+				this.con.query('INSERT INTO dcase(user_id, name, project_id, type) VALUES (?, ?, ?, ?)', [params.userId, params.dcaseName, params.projectId, params.type], (err, result) => next(err, result.insertId));
 			}
 			], (err:any, dcaseId:number) => {
 				callback(err, dcaseId, params.projectId);
@@ -120,7 +127,7 @@ export class DCaseDAO extends model.DAO {
 
 			var list = new Array<DCase>();
 			result.forEach((row) => {
-				var d = new DCase(row.d.id, row.d.name, row.d.project_id, row.d.user_id, row.d.delete_flag);
+				var d = DCase.tableToObject(row.d);//new DCase(row.d.id, row.d.name, row.d.project_id, row.d.user_id, row.d.delete_flag, row.d.type);
 				d.user = new model_user.User(row.u.id, row.u.login_name, row.u.delete_flag, row.u.system_flag);
 				d.latestCommit = new model_commit.Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
 				d.latestCommit.user = new model_user.User(row.cu.id, row.cu.login_name, row.cu.delete_flag, row.cu.system_flag);

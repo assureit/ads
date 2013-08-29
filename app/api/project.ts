@@ -70,7 +70,7 @@ export function createProject(params:any, userId: number, callback: type.Callbac
 			projectDAO.addMember(projectId, userId, (err:any) => next(err, user, projectId));
 		},
 		(user:model_user.User, projectId:number, next) => {
-			dcaseDAO.insert({userId: userId, dcaseName: dcase.DCaseName, projectId: projectId}, (err:any, dcaseId:number) => next(err, user, projectId, dcaseId));
+			dcaseDAO.insert({userId: userId, dcaseName: dcase.DCaseName, projectId: projectId, type:constant.CASE_TYPE_STAKEHOLDER}, (err:any, dcaseId:number) => next(err, user, projectId, dcaseId));
 		},
 		(user:model_user.User, projectId:number, dcaseId:number, next) => {
 			commitDAO.insert({data: JSON.stringify(dcase.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (err:any, commitId:number) => next(err, user, projectId, dcaseId, commitId));

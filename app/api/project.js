@@ -1,6 +1,6 @@
 var db = require('../db/db');
 
-
+var constant = require('../constant');
 var model_dcase = require('../model/dcase');
 var model_commit = require('../model/commit');
 var model_project = require('../model/project');
@@ -75,7 +75,7 @@ function createProject(params, userId, callback) {
             });
         },
         function (user, projectId, next) {
-            dcaseDAO.insert({ userId: userId, dcaseName: dcase.DCaseName, projectId: projectId }, function (err, dcaseId) {
+            dcaseDAO.insert({ userId: userId, dcaseName: dcase.DCaseName, projectId: projectId, type: constant.CASE_TYPE_STAKEHOLDER }, function (err, dcaseId) {
                 return next(err, user, projectId, dcaseId);
             });
         },
