@@ -91,14 +91,6 @@ export function createProject(params:any, userId: number, callback: type.Callbac
 			callback.onSuccess({projectId: projectId});
 		}
 	);
-	// projectDAO.insert(params.name, params.isPublic, (err:any, projectId: number) => {
-	// 	con.close();
-	// 	if (err) {
-	// 		callback.onFailure(err);
-	// 		return;
-	// 	}
-	// 	callback.onSuccess({projectId: projectId});
-	// });
 }
 
 export function editProject(params:any, userId: number, callback: type.Callback) {
