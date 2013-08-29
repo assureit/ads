@@ -14,7 +14,7 @@ describe('model', function() {
 	var testDB;
 	var con: db.Database
 	var dcaseDAO: model_dcase.DCaseDAO;
-	var userId:number = 2;
+	var userId:number = 101;
 
 	beforeEach(function (done) {
 		testdata.begin(['test/model/dcase.yaml'], (err:any, c:db.Database) => {

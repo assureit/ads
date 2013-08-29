@@ -10,7 +10,7 @@ describe('model', function () {
     var testDB;
     var con;
     var dcaseDAO;
-    var userId = 2;
+    var userId = 101;
 
     beforeEach(function (done) {
         testdata.begin(['test/model/dcase.yaml'], function (err, c) {

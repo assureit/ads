@@ -62,7 +62,7 @@ export class DCaseDAO extends model.DAO {
 					next(new error.NotFoundError('Project Not Found.', params));
 					return;
 				}
-				this.con.query('INSERT INTO dcase(user_id, name, project_id, type) VALUES (?, ?, ?, ?)', [params.userId, params.dcaseName, params.projectId, params.type], (err, result) => next(err, result.insertId));
+				this.con.query('INSERT INTO dcase(user_id, name, project_id, type) VALUES (?, ?, ?, ?)', [params.userId, params.dcaseName, params.projectId, params.type], (err, result) => next(err, result ? result.insertId : null));
 			}
 			], (err:any, dcaseId:number) => {
 				callback(err, dcaseId, params.projectId);

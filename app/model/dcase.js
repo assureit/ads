@@ -79,7 +79,7 @@ var DCaseDAO = (function (_super) {
                     return;
                 }
                 _this.con.query('INSERT INTO dcase(user_id, name, project_id, type) VALUES (?, ?, ?, ?)', [params.userId, params.dcaseName, params.projectId, params.type], function (err, result) {
-                    return next(err, result.insertId);
+                    return next(err, result ? result.insertId : null);
                 });
             }
         ], function (err, dcaseId) {
