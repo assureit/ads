@@ -24,6 +24,7 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/src/PlugInManager.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/ServerApi.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/ColorTheme/ColorTheme.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/display/placeholder.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/codemirror.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/mode/ASN/asn.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/Editor.js")
@@ -68,7 +69,7 @@ html
                var oldJsonData = serverApi.GetCase("",#{caseId});
                var converter = new AssureIt.Converter();
                var JsonData = converter.GenNewJson(oldJsonData);
-               var Case0 = new AssureIt.Case(oldJsonData.dcaseName, #{caseId}, oldJsonData.commitId);
+               var Case0 = new AssureIt.Case(oldJsonData.dcaseName, #{caseId}, oldJsonData.commitId, pluginManager);
                var caseDecoder = new AssureIt.CaseDecoder();
                var root = caseDecoder.ParseJson(Case0, JsonData);
                Case0.SetElementTop(root);
