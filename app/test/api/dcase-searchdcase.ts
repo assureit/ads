@@ -62,7 +62,7 @@ describe('api', function() {
 						expect(result.summary.totalItems).not.to.be(undefined);
 						expect(result.summary.itemsPerPage).not.to.be(undefined);
 
-						con.query('SELECT count(d.id) as cnt FROM dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id', [userId], (err, expectedResult) => {
+						con.query('SELECT count(d.id) as cnt FROM dcase d, commit c, user u, user cu, (SELECT DISTINCT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id', [userId], (err, expectedResult) => {
 							if (err) {
 								con.close();
 								throw err;

@@ -119,6 +119,7 @@ export class DCaseDAO extends model.DAO {
 			params = params.concat(tmp).concat([tagList.length]);
 		}
 		query.sql = 'SELECT * FROM ' + queryFrom + 'WHERE ' + queryWhere + 'ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ?';
+		// console.log(query.sql);
 		this.con.query(query, params.concat([pager.limit, pager.getOffset()]), (err, result) => {
 			if (err) {
 				callback(err, null, null);

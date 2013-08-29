@@ -111,6 +111,7 @@ var DCaseDAO = (function (_super) {
             params = params.concat(tmp).concat([tagList.length]);
         }
         query.sql = 'SELECT * FROM ' + queryFrom + 'WHERE ' + queryWhere + 'ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ?';
+
         this.con.query(query, params.concat([pager.limit, pager.getOffset()]), function (err, result) {
             if (err) {
                 callback(err, null, null);
