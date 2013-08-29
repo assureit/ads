@@ -7,6 +7,7 @@ var model_node = require('../model/node');
 
 
 var model_user = require('../model/user');
+var model_project = require('../model/project');
 var model_tag = require('../model/tag');
 var error = require('./error');
 var async = require('async');
@@ -269,6 +270,7 @@ function commit(params, userId, callback) {
     var con = new db.Database();
     var commitDAO = new model_commit.CommitDAO(con);
     var userDAO = new model_user.UserDAO(con);
+    var projectDAO = new model_project.ProjectDAO(con);
     async.waterfall([
         function (next) {
             con.begin(function (err, result) {
@@ -291,7 +293,12 @@ function commit(params, userId, callback) {
                 return;
             }
             commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
-                return next(err, result);
+                return next(err, resultCheck.dcaseId, result);
+            });
+        },
+        function (dcaseId, commitResult, next) {
+            projectDAO.updateMember(dcaseId, function (err) {
+                return next(err, commitResult);
             });
         },
         function (commitResult, next) {

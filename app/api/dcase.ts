@@ -9,6 +9,7 @@ import model_node = module('../model/node')
 import model_pager = module('../model/pager')
 import model_issue = module('../model/issue')
 import model_user = module('../model/user')
+import model_project = module('../model/project')
 import model_tag = module('../model/tag')
 import error = module('./error')
 var async = require('async')
@@ -245,6 +246,7 @@ export function commit(params: any, userId: number, callback: type.Callback) {
 	var con = new db.Database();
 	var commitDAO = new model_commit.CommitDAO(con);
 	var userDAO = new model_user.UserDAO(con);
+	var projectDAO = new model_project.ProjectDAO(con);
 	async.waterfall([
 		(next) => {
 			con.begin((err, result) => next(err));
@@ -260,7 +262,10 @@ export function commit(params: any, userId: number, callback: type.Callback) {
 				next(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
 				return;
 			}
-			commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err:any, result:any) => next(err, result));
+			commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err:any, result:any) => next(err, resultCheck.dcaseId, result));
+		},
+		(dcaseId:number, commitResult, next) => {
+			projectDAO.updateMember(dcaseId, (err:any) => next(err, commitResult));
 		},
 		(commitResult, next) => {
 			con.commit((err, result) => next(err, commitResult));
