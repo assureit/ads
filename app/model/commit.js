@@ -23,6 +23,9 @@ var Commit = (function () {
         this.latestFlag = latestFlag;
         this.latestFlag = !!this.latestFlag;
     }
+    Commit.tableToObject = function (row) {
+        return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.message, row.data, row.date_time, row.latest_flag);
+    };
     return Commit;
 })();
 exports.Commit = Commit;

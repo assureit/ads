@@ -6,7 +6,9 @@ var __extends = this.__extends || function (d, b) {
 };
 var model = require('./model');
 var error = require('../api/error');
+var constant = require('../constant');
 
+var model_dcase = require('./dcase');
 var async = require('async');
 var _ = require('underscore');
 
@@ -108,6 +110,69 @@ var ProjectDAO = (function (_super) {
                 });
             }
         ], function (err, result) {
+            callback(err);
+        });
+    };
+
+    ProjectDAO.prototype.updateMember = function (dcaseId, callback) {
+        var _this = this;
+        var dcaseDAO = new model_dcase.DCaseDAO(this.con);
+        var dcase;
+        async.waterfall([
+            function (next) {
+                dcaseDAO.getDetail(dcaseId, function (err, dc) {
+                    return next(err, dc);
+                });
+            },
+            function (dc, next) {
+                dcase = dc;
+                if (dcase.type != constant.CASE_TYPE_STAKEHOLDER) {
+                    callback(null);
+                    return;
+                }
+                var data = JSON.parse(dcase.latestCommit.data);
+                var evidences = _.filter(data.contents.NodeList, function (it) {
+                    return it.NodeType == 'Evidence';
+                });
+                var users = _.uniq(_.flatten(_.map(evidences, function (it) {
+                    return it.Description.split('\n');
+                })));
+
+                var vars = _.map(users, function (it) {
+                    return '?';
+                }).join(',');
+                _this.con.query('SELECT * FROM user WHERE login_name in (' + vars + ')', users, function (err, result) {
+                    return next(err, users, result);
+                });
+            },
+            function (users, result, next) {
+                var userIdList = [];
+                result.forEach(function (row) {
+                    userIdList.push(row.id);
+                });
+                if (userIdList.length == 0) {
+                    next(new error.NotFoundError('Project member is not found.', users));
+                    return;
+                }
+                next(null, userIdList);
+            },
+            function (userIdList, next) {
+                var vars = _.map(userIdList, function (it) {
+                    return '?';
+                }).join(',');
+                _this.con.query('DELETE FROM PROJECT_HAS_USER WHERE project_id = ? AND user_id NOT IN (' + vars + ')', [dcase.projectId].concat(userIdList), function (err, result) {
+                    return next(err, userIdList);
+                });
+            },
+            function (userIdList, next) {
+                var vars = _.map(userIdList, function (it) {
+                    return '?';
+                }).join(',');
+                _this.con.query('INSERT INTO project_has_user(project_id, user_id) SELECT ?, u.id FROM user u WHERE u.id IN (' + vars + ') AND NOT EXISTS (SELECT id FROM project_has_user pu WHERE pu.user_id = u.id AND pu.project_id = ?)', [dcase.projectId].concat(userIdList).concat(dcase.projectId), function (err, result) {
+                    return next(err);
+                });
+            }
+        ], function (err) {
             callback(err);
         });
     };

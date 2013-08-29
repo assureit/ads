@@ -45,6 +45,7 @@ test/model/file.ts
 test/model/issue.ts
 test/model/tag.ts
 test/model/pager.ts
+test/model/project.ts
 test/net/redmine.ts
 test/net/ldap.ts
 test/net/rec.ts

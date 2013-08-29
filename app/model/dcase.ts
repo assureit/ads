@@ -46,6 +46,30 @@ export class DCaseDAO extends model.DAO {
 			callback(err, dcase);
 		});
 	}
+	getDetail(id:number, callback: (err:any, dcase:DCase)=>void) {
+		async.waterfall([
+			(next) => {
+				this.con.query({sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag=TRUE and d.id = ?', nestTables: true}, [id], (err, result) => next(err, result));
+
+			},
+			(result:any, next) => {
+				if (result.length == 0) {
+					next(new error.NotFoundError('Effective DCase does not exist.', {id: id}));
+					return;
+				}
+				var row = result[0];
+				var dcase = DCase.tableToObject(row.d);
+				dcase.user = model_user.User.tableToObject(row.u);
+				dcase.latestCommit = model_commit.Commit.tableToObject(row.c);
+				dcase.latestCommit.user = model_user.User.tableToObject(row.cu);
+				next(null, dcase);
+			}
+			],
+			(err:any, result:DCase) => {
+				callback(err, result);
+			}
+		);
+	}
 	insert(params: InsertArg, callback: (err:any, dcaseId: number, projectId?: number)=>void): void {
 		if(!params.projectId) {
 			params.projectId = constant.SYSTEM_PROJECT_ID; //public

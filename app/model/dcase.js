@@ -59,6 +59,30 @@ var DCaseDAO = (function (_super) {
             callback(err, dcase);
         });
     };
+    DCaseDAO.prototype.getDetail = function (id, callback) {
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query({ sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag=TRUE and d.id = ?', nestTables: true }, [id], function (err, result) {
+                    return next(err, result);
+                });
+            },
+            function (result, next) {
+                if (result.length == 0) {
+                    next(new error.NotFoundError('Effective DCase does not exist.', { id: id }));
+                    return;
+                }
+                var row = result[0];
+                var dcase = DCase.tableToObject(row.d);
+                dcase.user = model_user.User.tableToObject(row.u);
+                dcase.latestCommit = model_commit.Commit.tableToObject(row.c);
+                dcase.latestCommit.user = model_user.User.tableToObject(row.cu);
+                next(null, dcase);
+            }
+        ], function (err, result) {
+            callback(err, result);
+        });
+    };
     DCaseDAO.prototype.insert = function (params, callback) {
         var _this = this;
         if (!params.projectId) {

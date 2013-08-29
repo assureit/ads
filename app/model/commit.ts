@@ -19,6 +19,9 @@ export class Commit {
 	constructor(public id:number, public prevCommitId: number, public dcaseId: number, public userId: number, public message:string, public data:string, public dateTime: Date, public latestFlag: bool) {
 		this.latestFlag = !!this.latestFlag;
 	}
+	static tableToObject(row:any) {
+		return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.message, row.data, row.date_time, row.latest_flag);
+	}
 }
 export class CommitDAO extends model.DAO {
 	insert(params: InsertArg, callback: (err:any, commitId: number)=>void): void {
