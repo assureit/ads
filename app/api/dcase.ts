@@ -244,38 +244,37 @@ export function commit(params: any, userId: number, callback: type.Callback) {
 
 	var con = new db.Database();
 	var commitDAO = new model_commit.CommitDAO(con);
-	con.begin((err, result) => {
-		var userDAO = new model_user.UserDAO(con);
-		userDAO.select(userId, (err:any, user: model_user.User) => {
+	var userDAO = new model_user.UserDAO(con);
+	async.waterfall([
+		(next) => {
+			con.begin((err, result) => next(err));
+		},
+		(next) => {
+			userDAO.select(userId, (err:any, user: model_user.User) => next(err, user));
+		},
+		(user:model_user.User, next) => {
+			commitDAO.get(params.commitId, (err:any, resultCheck) => next(err, resultCheck));
+		},
+		(resultCheck, next) => {
+			if (resultCheck.latestFlag == false) {
+				next(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
+				return;
+			}
+			commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err:any, result:any) => next(err, result));
+		},
+		(commitResult, next) => {
+			con.commit((err, result) => next(err, commitResult));
+		}
+		], 
+		(err:any, result:any) => {
+			con.close();
 			if (err) {
 				callback.onFailure(err);
 				return;
 			}
-
-			commitDAO.get(params.commitId, (err, resultCheck) => {
-				if (err) {
-					callback.onFailure(err);
-					return;
-				}
-				if (resultCheck.latestFlag == false) {
-					callback.onFailure(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
-					return;
-				}
-
-				// _commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
-				commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err, result) => {
-					con.commit((err, _result) =>{
-						if (err) {
-							callback.onFailure(err);
-							return;
-						}
-						callback.onSuccess(result);
-						con.close();
-					});
-				});
-			});
-		});
-	});
+			callback.onSuccess(result);
+		}
+	);
 };
 
 export function deleteDCase(params:any, userId: number, callback: type.Callback) {

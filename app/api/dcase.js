@@ -268,36 +268,44 @@ function commit(params, userId, callback) {
 
     var con = new db.Database();
     var commitDAO = new model_commit.CommitDAO(con);
-    con.begin(function (err, result) {
-        var userDAO = new model_user.UserDAO(con);
-        userDAO.select(userId, function (err, user) {
-            if (err) {
-                callback.onFailure(err);
+    var userDAO = new model_user.UserDAO(con);
+    async.waterfall([
+        function (next) {
+            con.begin(function (err, result) {
+                return next(err);
+            });
+        },
+        function (next) {
+            userDAO.select(userId, function (err, user) {
+                return next(err, user);
+            });
+        },
+        function (user, next) {
+            commitDAO.get(params.commitId, function (err, resultCheck) {
+                return next(err, resultCheck);
+            });
+        },
+        function (resultCheck, next) {
+            if (resultCheck.latestFlag == false) {
+                next(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
                 return;
             }
-
-            commitDAO.get(params.commitId, function (err, resultCheck) {
-                if (err) {
-                    callback.onFailure(err);
-                    return;
-                }
-                if (resultCheck.latestFlag == false) {
-                    callback.onFailure(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
-                    return;
-                }
-
-                commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
-                    con.commit(function (err, _result) {
-                        if (err) {
-                            callback.onFailure(err);
-                            return;
-                        }
-                        callback.onSuccess(result);
-                        con.close();
-                    });
-                });
+            commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
+                return next(err, result);
             });
-        });
+        },
+        function (commitResult, next) {
+            con.commit(function (err, result) {
+                return next(err, commitResult);
+            });
+        }
+    ], function (err, result) {
+        con.close();
+        if (err) {
+            callback.onFailure(err);
+            return;
+        }
+        callback.onSuccess(result);
     });
 }
 exports.commit = commit;
