@@ -34,6 +34,7 @@ test/api/dcase-searchdcase.ts
 test/api/dcase-deletedcase.ts
 test/api/dcase-editdcase.ts
 test/api/monitor.ts
+test/api/project.ts
 test/api/rec.ts
 test/model/user.ts
 test/model/node.ts
