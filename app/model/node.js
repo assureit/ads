@@ -100,11 +100,6 @@ var NodeDAO = (function (_super) {
         }
         async.waterfall([
             function (next) {
-                _this.processNodeList(dcaseId, commitId, list, function (err) {
-                    return next(err);
-                });
-            },
-            function (next) {
                 _this.registerTag(dcaseId, list, function (err) {
                     return next(err);
                 });
