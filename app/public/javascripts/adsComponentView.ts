@@ -102,28 +102,6 @@ class SelectDCaseManager {
 	}
 }
 
-class ThumnailView {
-	static toThumnail(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
-		var html = '<ul class="thumbnails"><li class="span4"><a href="#" class="thumbnail">'+name+'</a></li></ul>';
-		return $('<div></div>').html(html);
-	}
-}
-
-class SelectDCaseThumbnailManager extends SelectDCaseManager{
-	constructor() {
-		super();
-	}
-
-	clear() : void {
-		$("#selectDCase *").remove();
-		$("#selectDCase").append('<div class="row-fluid"></div>');
-	}
-
-	updateContentsOrZeroView():void {
-		super._updateContentsOrZeroView($('#selectDCase .row-fluid'), "<font color=gray>DCaseがありません</font>", ThumnailView.toThumnail);
-	}
-}
-
 class TableView {
 	static toTable(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
 		var html = '<td><a href="' + Config.BASEPATH + '/case/' + id + '">' + $('<div />').text(name).html() +
@@ -158,27 +136,49 @@ class SelectDCaseView {
 	constructor() {
 		this.pageIndex = 1;
 		this.maxPageSize = 2;
-		this.manager = new SelectDCaseTableManager();
 	}
 
 	clear(): void {
-		this.manager.clear();
+		$("#ProjectList *").remove();
 	}
 
 	addElements(userId, pageIndex?: any, tags?: string[]): void {
-		if(pageIndex == null || pageIndex < 1) pageIndex = 1;
-		if(tags == null) tags = [];
-		this.pageIndex = pageIndex - 0;
-		var searchResults: any = DCaseAPI.searchDCase(this.pageIndex, tags);
-		var dcaseList : any = searchResults.dcaseList;
-		this.maxPageSize  = searchResults.summary.maxPage;
-
-		var isLogin = userId != null;
-		$.each(dcaseList, (i, dcase)=>{
-			var s:SelectDCaseContent = new SelectDCaseContent(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
-			this.manager.add(s);
-		});
-		this.manager.updateContentsOrZeroView();
+		//if(pageIndex == null || pageIndex < 1) pageIndex = 1;
+		//if(tags == null) tags = [];
+		//this.pageIndex = pageIndex - 0;
+		//var searchResults: any = DCaseAPI.searchDCase(this.pageIndex, tags);
+		//var dcaseList : any = searchResults.dcaseList;
+		//this.maxPageSize  = searchResults.summary.maxPage;
+//
+//		//var isLogin = userId != null;
+//		//$.each(dcaseList, (i, dcase)=>{
+//		//	var s:SelectDCaseContent = new SelectDCaseContent(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
+//		//	this.manager.add(s);
+//		//});
+		//this.manager.updateContentsOrZeroView();
+		var mock = [{
+			name: "Project1",
+			users: [
+				{name: "UserA"},
+				{name: "UserB"},
+				{name: "UserC"}
+			],
+			cases: [
+				{
+					name: "Case1A",
+					size: 12,
+					lastUpdateDate: "12 minutes ago",
+					lastUpdateUser: "UserC",
+				},
+				{
+					name: "Case1B",
+					size: 2,
+					lastUpdateDate: "30 minutes ago",
+					lastUpdateUser: "UserA",
+				}
+			],
+		}];
+		$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(mock) );
 	}
 
 	initEvents() {

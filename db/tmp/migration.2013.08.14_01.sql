@@ -2,15 +2,15 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-ALTER TABLE `dcase` ADD COLUMN `project_id` INT(11) AFTER `id` , CHANGE COLUMN `user_id` `user_id` INT(11) NOT NULL  AFTER `project_id` , 
+ALTER TABLE `dcase`, CHANGE COLUMN `user_id` `user_id` INT(11) NOT NULL  AFTER `project_id` , 
   ADD CONSTRAINT `fk_dcase_project1`
   FOREIGN KEY (`project_id` )
   REFERENCES `project` (`id` )
   ON DELETE NO ACTION
   ON UPDATE NO ACTION
 , ADD INDEX `fk_dcase_project1` (`project_id` ASC) 
-, ADD INDEX `fk_dcase_user1` (`user_id` ASC) 
-, DROP INDEX `fk_dcase_user1_idx` ;
+, ADD INDEX `fk_dcase_user1` (`user_id` ASC) ;
+--, DROP INDEX `fk_dcase_user1_idx` ;
 
 CREATE  TABLE IF NOT EXISTS `project` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,

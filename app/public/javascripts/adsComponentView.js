@@ -116,32 +116,6 @@ var SelectDCaseManager = (function () {
     return SelectDCaseManager;
 })();
 
-var ThumnailView = (function () {
-    function ThumnailView() {
-    }
-    ThumnailView.toThumnail = function (id, name, user, lastDate, lastUser, isLogin) {
-        var html = '<ul class="thumbnails"><li class="span4"><a href="#" class="thumbnail">' + name + '</a></li></ul>';
-        return $('<div></div>').html(html);
-    };
-    return ThumnailView;
-})();
-
-var SelectDCaseThumbnailManager = (function (_super) {
-    __extends(SelectDCaseThumbnailManager, _super);
-    function SelectDCaseThumbnailManager() {
-        _super.call(this);
-    }
-    SelectDCaseThumbnailManager.prototype.clear = function () {
-        $("#selectDCase *").remove();
-        $("#selectDCase").append('<div class="row-fluid"></div>');
-    };
-
-    SelectDCaseThumbnailManager.prototype.updateContentsOrZeroView = function () {
-        _super.prototype._updateContentsOrZeroView.call(this, $('#selectDCase .row-fluid'), "<font color=gray>DCaseがありません</font>", ThumnailView.toThumnail);
-    };
-    return SelectDCaseThumbnailManager;
-})(SelectDCaseManager);
-
 var TableView = (function () {
     function TableView() {
     }
@@ -174,29 +148,37 @@ var SelectDCaseView = (function () {
     function SelectDCaseView() {
         this.pageIndex = 1;
         this.maxPageSize = 2;
-        this.manager = new SelectDCaseTableManager();
     }
     SelectDCaseView.prototype.clear = function () {
-        this.manager.clear();
+        $("#ProjectList *").remove();
     };
 
     SelectDCaseView.prototype.addElements = function (userId, pageIndex, tags) {
-        var _this = this;
-        if (pageIndex == null || pageIndex < 1)
-            pageIndex = 1;
-        if (tags == null)
-            tags = [];
-        this.pageIndex = pageIndex - 0;
-        var searchResults = DCaseAPI.searchDCase(this.pageIndex, tags);
-        var dcaseList = searchResults.dcaseList;
-        this.maxPageSize = searchResults.summary.maxPage;
-
-        var isLogin = userId != null;
-        $.each(dcaseList, function (i, dcase) {
-            var s = new SelectDCaseContent(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
-            _this.manager.add(s);
-        });
-        this.manager.updateContentsOrZeroView();
+        var mock = [
+            {
+                name: "Project1",
+                users: [
+                    { name: "UserA" },
+                    { name: "UserB" },
+                    { name: "UserC" }
+                ],
+                cases: [
+                    {
+                        name: "Case1A",
+                        size: 12,
+                        lastUpdateDate: "12 minutes ago",
+                        lastUpdateUser: "UserC"
+                    },
+                    {
+                        name: "Case1B",
+                        size: 2,
+                        lastUpdateDate: "30 minutes ago",
+                        lastUpdateUser: "UserA"
+                    }
+                ]
+            }
+        ];
+        $("#ProjectList").append(($)("#project_tmpl").tmpl(mock));
     };
 
     SelectDCaseView.prototype.initEvents = function () {

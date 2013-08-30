@@ -1,11 +1,47 @@
 extends layout
+block append content
+    script#case_tmpl(type="text/x-jquery-tmpl")
+        li.media
+            img.media-object.pull-left(data-src="holder.js/64x64",alt="64x64",style="width: 64px; height: 64px;",src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABP0lEQVR4Xu2YQQ7DIAwEyTnfyrN5U245t6ISFUptEhNQEUxvFdTxrsxOyrLv+8tN/FkwgAngCJABE2egIwShABSAAlAACkzsABgEg2AQDILBiSHAnyEwCAbBIBgEg2BwYgeqYNB7/7Vw27YfO+O6tKZ536Km9KzHBqTiJKFXQqSmWtTUjK5qQE5MWLs7AVcTU2JqcwPiA84ipWbPArXvlpqlMVZ1AiQh67q64zg+/aXmpMZoa2G/pWaJCX8zIDSrjXouA8KaZmqXBpybkqZAOzbaBORqWk1oOgGxmSs6WI5ArqZVfNj/2IB0lLWkvxt6WkbUerdo8h5Q4npPv6kyAT0JsvaCAdwIcSPEjRA3QtbkHGk/FIACUAAKQIGRUt2qBQpAASgABaCANTlH2g8FoAAUgAJQYKRUt2qBArNT4A1sFqCQARPBMwAAAABJRU5ErkJggg==")
+            .media-body
+                h4
+                    a(href='#') ${name}
+                    a.btn.btn-danger.btn-mini.pull-right
+                        i.icon-trash　&nbsp;
+                        |Delete
+                    span.pull-right
+                        i.icon-sitemap
+                        | ${size}&nbsp;
+                p ${description}
+                small
+                    a(href='#') ${lastUpdateUser}
+                    |  updated ${lastUpdateDate}
+    script#project_tmpl(type="text/x-jquery-tmpl")
+        article
+            h3 ${name} &nbsp;
+                a.btn.btn-mini
+                    i.icon-edit &nbsp;
+                a.btn.btn-success.btn-small.pull-right
+                    i.icon-plus　&nbsp;
+                    |New case
+            ul.inline
+                li
+                    i.icon-user　&nbsp;
+                    |${users.length > 0 ? users.length : "Public"}
+                |{{each users}}
+                li
+                    a(href='#') ${this.name}
+                |{{/each}}
+            ul.media-list
+                |{{tmpl(cases) "#case_tmpl"}}
+            hr
 block bar
     a(href="#{basepath}/")
         img#menu-button(src="#{basepath}/images/ait.png") Menu
     .menu
         ul#drop-menu
             //li
-                a(href='#{basepath}/')= lang.home
+            //    a(href='#{basepath}/')= lang.home
             li#create-case-menu
                 a(href='#{basepath}/new') Create Case
             li.line.ads-edit-menu
@@ -60,88 +96,62 @@ block bar
                         a#lang-select-japanese(href="#") Japanese
             block sign
 block content
-    #ase.container
-        #viewer(style="display: none;")
-        #dcase-manager.container-fluid(style="display: none;")
-            .row
-                #newDCase.span6.offset3(style='display: none;')
-                    h2= lang.new_DCase
-                    form.form-horizontal
-                        .control-group#newdcase-name
-                            label.control-label(for="inputDCaseName")= lang.DCase_name
-                            .controls
-                                input#inputDCaseName(type="text", id="inputDCaseName")
-                        .control-group#newdcase-desc
-                            label.control-label(for="inputDesc")= lang.topgoal
-                            .controls
-                                textarea#inputDesc(rows=5)
-                        .control-group
-                            .controls
-                                button.btn#dcase-create(type="button")= lang.create
-                //#dcase-tags.span2.offset2
-                    h4 Tags
-                    hr
-                    ul#dcase-tags-ul.unstyled
+    #dcase-manager.container-fluid(style="display: none;")
+        .row
+            #newDCase.span6.offset3(style='display: none;')
+                h2= lang.new_DCase
+                form.form-horizontal
+                    .control-group#newdcase-name
+                        label.control-label(for="inputDCaseName")= lang.DCase_name
+                        .controls
+                            input#inputDCaseName(type="text", id="inputDCaseName")
+                    .control-group#newdcase-desc
+                        label.control-label(for="inputDesc")= lang.topgoal
+                        .controls
+                            textarea#inputDesc(rows=5)
+                    .control-group
+                        .controls
+                            button.btn#dcase-create(type="button")= lang.create
+            .span6.offset2
+                h2 Projects&nbsp;
+                    a.btn.btn-success.pull-right
+                        i.icon-plus　&nbsp;
+                        |New project
+                hr
+                #ProjectList
+        .dropdown#edit-menulist(style="display: none;")
+            a.dropdown-toggle(data-toggle="dropdown", href="#")
+                i.icon-list
+            ul.dropdown-menu
+                li
+                    a#ml-cut(href="#")= lang.cut
+                li
+                    a#ml-copy(href="#")= lang.copy
+                li
+                    a#ml-paste(href="#")= lang.paste
+                li
+                    a#ml-delete(href="#")= lang.delete
+                li.divider
+                li
+                    a#ml-openall(href="#")= lang.openall
+                li
+                    a#ml-closeall(href="#")= lang.closeall
+                li.divider
+                li.dropdown-submenu
+                    a(tabindex="-1", href="#")= lang.export
+                    ul.dropdown-menu
                         li
-                            a(href='#')#alltags All
-                        li.line
-                    a(href='#')
-                        div(align='right')= lang.AllTags
-                #selectDCase.span6.offset2
-                    h2= lang.SelectCase
-                    table.table.table-striped.table-hover
-                        thead
-                            tr
-                                th= lang.DCase_name
-                                //th= lang.creater
-                                //th= lang.last_commit
-                                th= lang.last_commiter
-                                th Edit
-                                th Delete
-                        tbody#dcase-select-table
-                    .pagination
-                        ul
-                            li
-                                a#prev-page(href='#') &laquo;
-                            li
-                                a#next-page(href='#') &raquo;
-            .dropdown#edit-menulist(style="display: none;")
-                a.dropdown-toggle(data-toggle="dropdown", href="#")
-                    i.icon-list
-                ul.dropdown-menu
-                    li
-                        a#ml-cut(href="#")= lang.cut
-                    li
-                        a#ml-copy(href="#")= lang.copy
-                    li
-                        a#ml-paste(href="#")= lang.paste
-                    li
-                        a#ml-delete(href="#")= lang.delete
-                    li.divider
-                    li
-                        a#ml-openall(href="#")= lang.openall
-                    li
-                        a#ml-closeall(href="#")= lang.closeall
-                    li.divider
-                    li.dropdown-submenu
-                        a(tabindex="-1", href="#")= lang.export
-                        ul.dropdown-menu
-                            li
-                                a#ml-export-json(href="#") JSON
-                            li
-                                a#ml-export-png(href="#") PNG
-                            li
-                                a#ml-export-pdf(href="#") PDF
-                            li
-                                a#ml-export-dscript(href="#") D-Script
-            table#edit-newnode(style="display: none;")
-                    tr
-                        td(width="80")
-                            ul.nav.nav-list(style="min-height: 100px;")
-                        td(width="200")
-                            textarea(style="margin: 0px; padding: 0px; width: 100%; height: 100%;")
-block svg
-    svg(width="0", height="0")
-        defs
-            marker#Triangle-black(viewBox="0 0 10 10", refX="10", refY="5", markerUnits="strokeWidth", markerWidth="15", markerHeight="9", orient="auto")
-                path(d="M 0 0 L 10 5 L 0 10 z", fill="gray", stroke="gray")
+                            a#ml-export-json(href="#") JSON
+                        li
+                            a#ml-export-png(href="#") PNG
+                        li
+                            a#ml-export-pdf(href="#") PDF
+                        li
+                            a#ml-export-dscript(href="#") D-Script
+        table#edit-newnode(style="display: none;")
+                tr
+                    td(width="80")
+                        ul.nav.nav-list(style="min-height: 100px;")
+                    td(width="200")
+                        textarea(style="margin: 0px; padding: 0px; width: 100%; height: 100%;")
+
