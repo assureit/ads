@@ -66,12 +66,17 @@ html
                pluginManager.SetPlugIn("export", new ExportPlugIn(pluginManager));
                pluginManager.SetPlugIn("timeline", new TimeLinePlugIn(pluginManager));
                pluginManager.SetUseLayoutEngine("portraitlayout");
+
+			   // Assume that oldJsonData.contents consists of "DCaseName" and "NodeList(ASN)"
+			   // Is it needed to handle both AssureNotation and JSON here?
                var oldJsonData = serverApi.GetCase("",#{caseId});
-               var converter = new AssureIt.Converter();
-               var JsonData = converter.GenNewJson(oldJsonData);
-               var Case0 = new AssureIt.Case(oldJsonData.dcaseName, #{caseId}, oldJsonData.commitId, pluginManager);
+               //var converter = new AssureIt.Converter();
+               //var JsonData = converter.GenNewJson(oldJsonData);
+			   var contents = oldJsonData.contents;
+               var Case0 = new AssureIt.Case(oldJsonData.DCaseName, #{caseId}, oldJsonData.commitId, pluginManager);
                var caseDecoder = new AssureIt.CaseDecoder();
-               var root = caseDecoder.ParseJson(Case0, JsonData);
+               //var root = caseDecoder.ParseJson(Case0, JsonData);
+			   var root = caseDecoder.ParseASN(Case0, contents.NodeList, null);
                Case0.SetElementTop(root);
                var backgroundlayer = document.getElementById("background");
                var shapelayer = document.getElementById("layer0");
