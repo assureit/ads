@@ -228,16 +228,10 @@ function createDCase(params, userId, callback) {
                         callback.onFailure(err);
                         return;
                     }
-                    var nodeDAO = new model_node.NodeDAO(con);
-                    nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, function (err) {
-                        if (err) {
-                            callback.onFailure(err);
-                            return;
-                        }
-                        con.commit(function (err, result) {
-                            callback.onSuccess({ dcaseId: dcaseId, commitId: commitId });
-                            con.close();
-                        });
+
+                    con.commit(function (err, result) {
+                        callback.onSuccess({ dcaseId: dcaseId, commitId: commitId });
+                        con.close();
                     });
                 });
             });
