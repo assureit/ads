@@ -7,6 +7,6 @@ node:
   - {id: 520, this_node_id: 1, description: 'node401_1', node_type: 'Goal', commit_id: 405}
   - {id: 521, this_node_id: 2, description: 'node401_2', node_type: 'Strategy', commit_id: 405}
   - {id: 523, this_node_id: 3, description: 'node401_3', node_type: 'Goal', commit_id: 405}
-monitor_node:
-  - {id: 605, dcase_id: 205, this_node_id: 1, watch_id: 10, preset_id: 100, params: '{"a": "val_a", "b": 2}'}
+# monitor_node:
+#   - {id: 605, dcase_id: 205, this_node_id: 1, watch_id: 10, preset_id: 100, params: '{"a": "val_a", "b": 2}'}
 

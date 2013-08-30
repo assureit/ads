@@ -1,5 +1,5 @@
-issue:
-  - {id: 2001, dcase_id: 201, subject: 'test data01'}
-  - {id: 2002, dcase_id: 201, subject: 'test data02'}
-  - {id: 2003, dcase_id: 201, 'its_id':'aaa',  subject: 'test data03'}
-  - {id: 2004, dcase_id: 202, subject: 'test data04', description: 'test description04'}
+# issue:
+#   - {id: 2001, dcase_id: 201, subject: 'test data01'}
+#   - {id: 2002, dcase_id: 201, subject: 'test data02'}
+#   - {id: 2003, dcase_id: 201, 'its_id':'aaa',  subject: 'test data03'}
+#   - {id: 2004, dcase_id: 202, subject: 'test data04', description: 'test description04'}
