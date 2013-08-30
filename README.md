@@ -21,15 +21,17 @@ npm install
 ビルド
 ------------
 ```
-tsc @compile_list
+npm run-script make
 ```
 
 
 テスト
 ------------
 ```
-npm start_ldap_mem
-npm run-script test
+# 全件
+npm test
+# 1件
+NODE_ENV=test mocha test/model/project.js
 ```
 
 テストデバッグ実行

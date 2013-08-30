@@ -258,68 +258,7 @@ describe('api', function () {
                     }
                 });
             });
-            it('rec api registMonitor parameter check', function (done) {
-                this.timeout(15000);
-                validParam.commitId = 406;
-                dcase.commit(validParam, userId, {
-                    onSuccess: function (result) {
-                        expect(result).not.to.be(null);
-                        expect(result).not.to.be(undefined);
-                        expect(result.commitId).not.to.be(null);
-                        expect(result.commitId).not.to.be(undefined);
-                        var commitDAO = new model_commit.CommitDAO(con);
-                        commitDAO.get(result.commitId, function (err, resultCommit) {
-                            expect(err).to.be(null);
-                            expect(resultCommit.latestFlag).to.equal(true);
-                            con.query('SELECT * FROM monitor_node WHERE dcase_id = ?', [resultCommit.dcaseId], function (errMonitor, resultMonitor) {
-                                expect(errMonitor).to.be(null);
-                                expect(resultMonitor).not.to.be(null);
-                                expect(resultMonitor.length).to.eql(1);
-                                expect(dSvr.getRecRequestBody()).not.to.be(null);
-                                expect(dSvr.getRecRequestBody().method).to.eql('registMonitor');
-                                expect(dSvr.getRecRequestBody().params.nodeID).to.eql(resultMonitor[0].id);
-                                expect(dSvr.getRecRequestBody().params.watchID).to.eql(resultMonitor[0].watch_id);
-                                expect(dSvr.getRecRequestBody().params.presetID).to.eql(resultMonitor[0].preset_id);
-                                done();
-                            });
-                        });
-                    },
-                    onFailure: function (error) {
-                        expect().fail(JSON.stringify(error));
-                    }
-                });
-            });
-            it('rec api updateMonitor parameter check', function (done) {
-                this.timeout(15000);
-                validParam.commitId = 407;
-                dcase.commit(validParam, userId, {
-                    onSuccess: function (result) {
-                        expect(result).not.to.be(null);
-                        expect(result).not.to.be(undefined);
-                        expect(result.commitId).not.to.be(null);
-                        expect(result.commitId).not.to.be(undefined);
-                        var commitDAO = new model_commit.CommitDAO(con);
-                        commitDAO.get(result.commitId, function (err, resultCommit) {
-                            expect(err).to.be(null);
-                            expect(resultCommit.latestFlag).to.equal(true);
-                            con.query('SELECT * FROM monitor_node WHERE dcase_id = ?', [resultCommit.dcaseId], function (errMonitor, resultMonitor) {
-                                expect(errMonitor).to.be(null);
-                                expect(resultMonitor).not.to.be(null);
-                                expect(resultMonitor.length).to.eql(1);
-                                expect(dSvr.getRecRequestBody()).not.to.be(null);
-                                expect(dSvr.getRecRequestBody().method).to.eql('updateMonitor');
-                                expect(dSvr.getRecRequestBody().params.nodeID).to.eql(resultMonitor[0].id);
-                                expect(dSvr.getRecRequestBody().params.watchID).to.eql(resultMonitor[0].watch_id);
-                                expect(dSvr.getRecRequestBody().params.presetID).to.eql(resultMonitor[0].preset_id);
-                                done();
-                            });
-                        });
-                    },
-                    onFailure: function (error) {
-                        expect().fail(JSON.stringify(error));
-                    }
-                });
-            });
+
             it('redmine parameter check', function (done) {
                 this.timeout(15000);
                 validParam.contents.NodeList[2].MetaData = [];

@@ -3,6 +3,36 @@ cookie:
 ads:
   basePath: ""
   uploadPath: "upload"
+  stakeholderCase:
+    contents:
+      NodeList:
+        - ThisNodeId: 1
+          NodeType: 'Goal'
+          Description:  "Stakeholders are identified in this project"
+          Children: [2]
+          Contexts: []
+          MetaData: []
+        - ThisNodeId: 2
+          NodeType: 'Strategy'
+          Description: 'Arguing over types of stakeholders'
+          Children: [3]
+          Contexts: []
+          MetaData: []
+        - ThisNodeId: 3
+          NodeType: 'Goal'
+          Description: 'Founders are identified'
+          Children: [4]
+          Contexts: []
+          MetaData: []
+        - ThisNodeId: 4
+          NodeType: 'Evidence'
+          Description: '%USER%'
+          Children: []
+          Contexts: []
+          MetaData: []
+      TopGoalId: 1
+      NodeCount: 4
+      DCaseName: 'Stakeholders'
 redmine:
   host: "localhost"
   port: 80

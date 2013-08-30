@@ -9,6 +9,7 @@ describe('model', function () {
     var testDB;
     var con;
     var tagDAO;
+    var userId = 101;
 
     beforeEach(function (done) {
         testdata.begin(['test/default-data.yaml', 'test/model/tag.yaml'], function (err, c) {
@@ -38,7 +39,7 @@ describe('model', function () {
         });
         describe('search', function () {
             it('normal end', function (done) {
-                tagDAO.search(['tag1', 'tag2'], function (err, list) {
+                tagDAO.search(userId, ['tag1', 'tag2'], function (err, list) {
                     expect(err).to.be(null);
                     expect(list).not.to.be(null);
                     done();

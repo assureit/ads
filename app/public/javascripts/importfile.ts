@@ -9,17 +9,25 @@ class ImportFile {
 
 	constructor(selector: string) {
 		this.selector = selector;
+		var flag = true;
 		$(this.selector).on('dragenter', (e)=> {
 			e.stopPropagation();
 			e.preventDefault();
+			if(flag) {
+				var left = Number($(this.selector).css('margin-left').replace("px","")) - 10;
+				$(this.selector).css({'margin-left': left + 'px'});
+			}
 		}).on('dragover', (e) => {
 			e.stopPropagation();
 			e.preventDefault();
-			$(e.target).addClass('hover');
+			$(this.selector).addClass('hover');
 		}).on('dragleave', (e) => {
 			e.stopPropagation();
 			e.preventDefault();
-			$(e.target).removeClass('hover');
+			$(this.selector).removeClass('hover');
+			flag = true;
+			var left = Number($(this.selector).css('margin-left').replace("px","")) + 10;
+			$(this.selector).css({'margin-left': left + 'px'});
 		});
 	}
 

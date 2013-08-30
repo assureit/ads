@@ -18,6 +18,9 @@ var User = (function () {
         this.deleteFlag = !!this.deleteFlag;
         this.systemFlag = !!this.systemFlag;
     }
+    User.tableToObject = function (row) {
+        return new User(row.id, row.login_name, row.delete_flag, row.system_flag);
+    };
     return User;
 })();
 exports.User = User;

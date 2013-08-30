@@ -1,15 +1,16 @@
 extends layout
 block bar
-    img#menu-button(src="#{basepath}/images/ait.png") Menu
+    a(href="#{basepath}/")
+        img#menu-button(src="#{basepath}/images/ait.png") Menu
     .menu
         ul#drop-menu
-            li
+            //li
                 a(href='#{basepath}/')= lang.home
+            li#create-case-menu
+                a(href='#{basepath}/new') Create Case
             li.line.ads-edit-menu
                 a(href='#') Edit
                 ul
-                    li
-                        a(href='#{basepath}/new') New
                     li
                         a(href='#{basepath}/clone') Clone
                     li
@@ -19,7 +20,7 @@ block bar
                     li
                         a#menu-commit(href='#')= lang.commit
             li.ads-edit-menu.ads-view-menu
-                a(href='#') Checker
+                a(href='#') Check
                 ul
                     li
                         a(href='#') Simple verifier
@@ -42,21 +43,21 @@ block bar
                         a#menu-export-xml(href="#") XML
             li.ads-edit-menu.ads-view-menu
                 a#menu-history-toggle(href="#")= lang.commitlog
-            li.ads-edit-menu.ads-view-menu
-                a(href="#")= lang.config
+            li
+                a(href="#")= lang.locale
                 ul
-                    li
+                    //li
                         a Gesture
-                    li
+                    //li
                         a(href="#")= lang.color_theme
                         ul#menu-change-theme
-                    li
+                    //li
                         a(href="#")= lang.locale
                         ul#lang-theme
-                            li
-                                a#lang-select-english(href="#") English
-                            li
-                                a#lang-select-japanese(href="#") Japanese
+                    li
+                        a#lang-select-english(href="#") English
+                    li
+                        a#lang-select-japanese(href="#") Japanese
             block sign
 block content
     #ase.container
@@ -77,7 +78,7 @@ block content
                         .control-group
                             .controls
                                 button.btn#dcase-create(type="button")= lang.create
-                #dcase-tags.span2.offset2
+                //#dcase-tags.span2.offset2
                     h4 Tags
                     hr
                     ul#dcase-tags-ul.unstyled
@@ -85,15 +86,15 @@ block content
                             a(href='#')#alltags All
                         li.line
                     a(href='#')
-                        div(align='right') タグを全て表示
-                #selectDCase.span6
-                    h2 DCaseを選択
+                        div(align='right')= lang.AllTags
+                #selectDCase.span6.offset2
+                    h2= lang.SelectCase
                     table.table.table-striped.table-hover
                         thead
                             tr
                                 th= lang.DCase_name
-                                th= lang.creater
-                                th= lang.last_commit
+                                //th= lang.creater
+                                //th= lang.last_commit
                                 th= lang.last_commiter
                                 th Edit
                                 th Delete

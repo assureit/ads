@@ -1,12 +1,13 @@
 var db = require('../db/db');
 
-
+var constant = require('../constant');
 var model_dcase = require('../model/dcase');
 var model_commit = require('../model/commit');
 var model_node = require('../model/node');
 
 
 var model_user = require('../model/user');
+var model_project = require('../model/project');
 var model_tag = require('../model/tag');
 var error = require('./error');
 var async = require('async');
@@ -22,12 +23,12 @@ function searchDCase(params, userId, callback) {
     });
     async.waterfall([
         function (next) {
-            dcaseDAO.list(params.page, tagList, function (err, pager, result) {
+            dcaseDAO.list(params.page, userId, params.projectId, tagList, function (err, pager, result) {
                 next(err, pager, result);
             });
         },
         function (pager, dcaseList, next) {
-            tagDAO.search(tagList, function (err, tagList) {
+            tagDAO.search(userId, tagList, function (err, tagList) {
                 next(err, pager, dcaseList, tagList);
             });
         }
@@ -196,6 +197,8 @@ function createDCase(params, userId, callback) {
             checks.push('DCase name should not exceed 255 characters.');
         if (params && !params.contents)
             checks.push('Contents is required.');
+        if (params && !params.projectId)
+            params.projectId = constant.SYSTEM_PROJECT_ID;
         if (checks.length > 0) {
             callback.onFailure(new error.InvalidParamsError(checks, null));
             return false;
@@ -214,7 +217,7 @@ function createDCase(params, userId, callback) {
                 return;
             }
             var dcaseDAO = new model_dcase.DCaseDAO(con);
-            dcaseDAO.insert({ userId: userId, dcaseName: params.dcaseName }, function (err, dcaseId) {
+            dcaseDAO.insert({ userId: userId, dcaseName: params.dcaseName, projectId: params.projectId }, function (err, dcaseId) {
                 if (err) {
                     callback.onFailure(err);
                     return;
@@ -225,16 +228,10 @@ function createDCase(params, userId, callback) {
                         callback.onFailure(err);
                         return;
                     }
-                    var nodeDAO = new model_node.NodeDAO(con);
-                    nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, function (err) {
-                        if (err) {
-                            callback.onFailure(err);
-                            return;
-                        }
-                        con.commit(function (err, result) {
-                            callback.onSuccess({ dcaseId: dcaseId, commitId: commitId });
-                            con.close();
-                        });
+
+                    con.commit(function (err, result) {
+                        callback.onSuccess({ dcaseId: dcaseId, commitId: commitId });
+                        con.close();
                     });
                 });
             });
@@ -266,36 +263,50 @@ function commit(params, userId, callback) {
 
     var con = new db.Database();
     var commitDAO = new model_commit.CommitDAO(con);
-    con.begin(function (err, result) {
-        var userDAO = new model_user.UserDAO(con);
-        userDAO.select(userId, function (err, user) {
-            if (err) {
-                callback.onFailure(err);
+    var userDAO = new model_user.UserDAO(con);
+    var projectDAO = new model_project.ProjectDAO(con);
+    async.waterfall([
+        function (next) {
+            con.begin(function (err, result) {
+                return next(err);
+            });
+        },
+        function (next) {
+            userDAO.select(userId, function (err, user) {
+                return next(err, user);
+            });
+        },
+        function (user, next) {
+            commitDAO.get(params.commitId, function (err, resultCheck) {
+                return next(err, resultCheck);
+            });
+        },
+        function (resultCheck, next) {
+            if (resultCheck.latestFlag == false) {
+                next(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
                 return;
             }
-
-            commitDAO.get(params.commitId, function (err, resultCheck) {
-                if (err) {
-                    callback.onFailure(err);
-                    return;
-                }
-                if (resultCheck.latestFlag == false) {
-                    callback.onFailure(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
-                    return;
-                }
-
-                commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
-                    con.commit(function (err, _result) {
-                        if (err) {
-                            callback.onFailure(err);
-                            return;
-                        }
-                        callback.onSuccess(result);
-                        con.close();
-                    });
-                });
+            commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
+                return next(err, resultCheck.dcaseId, result);
             });
-        });
+        },
+        function (dcaseId, commitResult, next) {
+            projectDAO.updateMember(dcaseId, function (err) {
+                return next(err, commitResult);
+            });
+        },
+        function (commitResult, next) {
+            con.commit(function (err, result) {
+                return next(err, commitResult);
+            });
+        }
+    ], function (err, result) {
+        con.close();
+        if (err) {
+            callback.onFailure(err);
+            return;
+        }
+        callback.onSuccess(result);
     });
 }
 exports.commit = commit;

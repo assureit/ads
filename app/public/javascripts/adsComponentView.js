@@ -36,7 +36,7 @@ var CreateDCaseView = (function () {
                 NodeCount: 1
             };
             var r = DCaseAPI.createDCase(name, tree);
-            location.href = "./dcase/" + r.dcaseId;
+            location.href = "./case/" + r.dcaseId;
         });
     }
     CreateDCaseView.prototype.enableSubmit = function () {
@@ -146,7 +146,7 @@ var TableView = (function () {
     function TableView() {
     }
     TableView.toTable = function (id, name, user, lastDate, lastUser, isLogin) {
-        var html = '<td><a href="' + Config.BASEPATH + '/dcase/' + id + '">' + name + "</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" + lastUser + "</td>";
+        var html = '<td><a href="' + Config.BASEPATH + '/case/' + id + '">' + $('<div />').text(name).html() + "</a></td><td>" + $('<div/>').text(lastUser).html() + "</td>";
         if (isLogin) {
             html += "<td><a id=\"e" + id + "\" href=\"#\">Edit</a></td>" + "<td><a id=\"d" + id + "\" href=\"#\">Delete</a></td>";
         }
