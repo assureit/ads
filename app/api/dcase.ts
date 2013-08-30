@@ -210,17 +210,17 @@ export function createDCase(params:any, userId: number, callback: type.Callback)
 						callback.onFailure(err);
 						return;
 					}
-					var nodeDAO = new model_node.NodeDAO(con);
-					nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, (err:any) => {
-						if (err) {
-							callback.onFailure(err);
-							return;
-						}
+					//var nodeDAO = new model_node.NodeDAO(con);
+					//nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, (err:any) => {
+					//	if (err) {
+					//		callback.onFailure(err);
+					//		return;
+					//	}
 						con.commit((err, result) =>{
 							callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
 							con.close();
 						});
-					});
+					//});
 				});
 			});
 		});
