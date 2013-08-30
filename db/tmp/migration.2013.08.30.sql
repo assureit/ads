@@ -31,10 +31,9 @@ CREATE  TABLE IF NOT EXISTS `access_log` (
     REFERENCES `user` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_general_ci;
+ENGINE = InnoDB;
 
+insert into project_has_user (project_id, user_id, role) values (1, 1, 'system');
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

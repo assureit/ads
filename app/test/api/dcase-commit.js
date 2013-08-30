@@ -258,31 +258,6 @@ describe('api', function () {
                     }
                 });
             });
-
-            it('redmine parameter check', function (done) {
-                this.timeout(15000);
-                validParam.contents.NodeList[2].MetaData = [];
-                dcase.commit(validParam, userId, {
-                    onSuccess: function (result) {
-                        expect(result).not.to.be(null);
-                        expect(result).not.to.be(undefined);
-                        expect(result.commitId).not.to.be(null);
-                        expect(result.commitId).not.to.be(undefined);
-                        expect(dSvr.getRedmineRequestBody()).not.to.be(null);
-                        expect(dSvr.getRedmineRequestBody().issue.subject).to.eql(validParam.contents.NodeList[0].MetaData[0].Subject);
-                        expect(dSvr.getRedmineRequestBody().issue.description).to.eql(validParam.contents.NodeList[0].MetaData[0].Description);
-                        var commitDAO = new model_commit.CommitDAO(con);
-                        commitDAO.get(result.commitId, function (err, resultCommit) {
-                            expect(err).to.be(null);
-                            expect(resultCommit.latestFlag).to.equal(true);
-                            done();
-                        });
-                    },
-                    onFailure: function (error) {
-                        expect().fail(JSON.stringify(error));
-                    }
-                });
-            });
         });
     });
 });

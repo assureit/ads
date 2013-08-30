@@ -99,20 +99,21 @@ export class CommitDAO extends model.DAO {
 				nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, (err:any) => {callback(err, com, commitId);});
 			}
 			, (com: Commit, commitId: number, callback) => {
-				this.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
+				// this.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
+				this.update(commitId, JSON.stringify(contents), (err:any) => callback(err, {commitId: commitId}));
 			}
-			, (com: Commit, commitId: number, callback) => {
-				var issueDAO = new model_issue.IssueDAO(this.con);
-				issueDAO.publish(com.dcaseId, (err:any) => {
-					callback(err, {commitId: commitId});
-				});
+			// , (com: Commit, commitId: number, callback) => {
+			// 	var issueDAO = new model_issue.IssueDAO(this.con);
+			// 	issueDAO.publish(com.dcaseId, (err:any) => {
+			// 		callback(err, {commitId: commitId});
+			// 	});
 //			} 
 //			, (com: Commit, commitId: number, callback) => {
 //				var monitorDAO = new model_monitor.MonitorDAO(this.con);
 //				monitorDAO.publish(com.dcaseId, (err:any) => {
 //					callback(err, {commitId: commitId});
 //				});
-			}
+			// }
 		], (err:any, result:any) => {
 			if (err) {
 				this.con.rollback();

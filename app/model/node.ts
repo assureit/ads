@@ -170,9 +170,9 @@ export class NodeDAO extends model.DAO {
 			return;
 		}
 		async.waterfall([
-			(next) => {
-				this.processNodeList(dcaseId, commitId, list, (err:any) => next(err));
-			},
+			// (next) => {
+			// 	this.processNodeList(dcaseId, commitId, list, (err:any) => next(err));
+			// },
 			(next) => {
 				this.registerTag(dcaseId, list, (err:any) => next(err));
 			}],
