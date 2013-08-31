@@ -20,17 +20,17 @@ class CreateDCaseView {
 				error = true;
 			}
 			if(error) return;
-			var id = 1;
-			var tree = {
-				NodeList: [{
-					ThisNodeId: id,
-					NodeType: "Goal",
-					Description: desc,
-					Children: [],
-				}],
-				TopGoalId: id,
-				NodeCount: 1,
-			};
+			var tree = "*Goal\n" + desc;
+			//var tree = {
+			//	NodeList: [{
+			//		ThisNodeId: id,
+			//		NodeType: "Goal",
+			//		Description: desc,
+			//		Children: [],
+			//	}],
+			//	TopGoalId: id,
+			//	NodeCount: 1,
+			//};
 			var r: any = DCaseAPI.createDCase(name, tree);
 			location.href = "./case/" + r.dcaseId;
 		});
