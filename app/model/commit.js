@@ -6,7 +6,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var model = require('./model');
 var model_user = require('./user');
-var model_node = require('../model/node');
+
 
 
 var async = require('async');
@@ -104,18 +104,12 @@ var CommitDAO = (function (_super) {
                 });
             },
             function (com, callback) {
-                _this.insert({ data: JSON.stringify(contents), prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message }, function (err, commitId) {
+                _this.insert({ data: contents, prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message }, function (err, commitId) {
                     callback(err, com, commitId);
                 });
             },
             function (com, commitId, callback) {
-                var nodeDAO = new model_node.NodeDAO(_this.con);
-                nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, function (err) {
-                    callback(err, com, commitId);
-                });
-            },
-            function (com, commitId, callback) {
-                _this.update(commitId, JSON.stringify(contents), function (err) {
+                _this.update(commitId, contents, function (err) {
                     return callback(err, { commitId: commitId });
                 });
             }
