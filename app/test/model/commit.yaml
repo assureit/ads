@@ -15,7 +15,7 @@ dcase_tag_rel:
   - {id: 801, dcase_id: 201, tag_id: 701}
   - {id: 804, dcase_id: 201, tag_id: 702}
   - {id: 806, dcase_id: 201, tag_id: 703}
-monitor_node:
-  - {id: 604, dcase_id: 205, this_node_id: 1, watch_id: 10, preset_id: 100, params: '{"a": "val_a", "b": 2}'}
-  - {id: 605, dcase_id: 206, this_node_id: 2, watch_id: 20, preset_id: 200, params: null, publish_status: 2}
+# monitor_node:
+#   - {id: 604, dcase_id: 205, this_node_id: 1, watch_id: 10, preset_id: 100, params: '{"a": "val_a", "b": 2}'}
+#   - {id: 605, dcase_id: 206, this_node_id: 2, watch_id: 20, preset_id: 200, params: null, publish_status: 2}
 

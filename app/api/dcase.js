@@ -223,21 +223,14 @@ function createDCase(params, userId, callback) {
                     return;
                 }
                 var commitDAO = new model_commit.CommitDAO(con);
-                commitDAO.insert({ data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit' }, function (err, commitId) {
+                commitDAO.insert({ data: params.contents, dcaseId: dcaseId, userId: userId, message: 'Initial Commit' }, function (err, commitId) {
                     if (err) {
                         callback.onFailure(err);
                         return;
                     }
-                    var nodeDAO = new model_node.NodeDAO(con);
-                    nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, function (err) {
-                        if (err) {
-                            callback.onFailure(err);
-                            return;
-                        }
-                        con.commit(function (err, result) {
-                            callback.onSuccess({ dcaseId: dcaseId, commitId: commitId });
-                            con.close();
-                        });
+                    con.commit(function (err, result) {
+                        callback.onSuccess({ dcaseId: dcaseId, commitId: commitId });
+                        con.close();
                     });
                 });
             });

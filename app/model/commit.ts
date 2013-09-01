@@ -92,27 +92,28 @@ export class CommitDAO extends model.DAO {
 				this.get(previousCommitId, (err:any, com: Commit) => {callback(err, com);});
 			}
 			, (com: Commit, callback) => {
-				this.insert({data: JSON.stringify(contents), prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message}, (err:any, commitId:number) => {callback(err, com, commitId);});
+				this.insert({data: contents, prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message}, (err:any, commitId:number) => {callback(err, com, commitId);});
 			}
+			//, (com: Commit, commitId: number, callback) => {
+			//	var nodeDAO = new model_node.NodeDAO(this.con);
+			//	nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, (err:any) => {callback(err, com, commitId);});
+			//}
 			, (com: Commit, commitId: number, callback) => {
-				var nodeDAO = new model_node.NodeDAO(this.con);
-				nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, (err:any) => {callback(err, com, commitId);});
+				// this.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
+				this.update(commitId, contents, (err:any) => callback(err, {commitId: commitId}));
 			}
-			, (com: Commit, commitId: number, callback) => {
-				this.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
-			}
-			, (com: Commit, commitId: number, callback) => {
-				var issueDAO = new model_issue.IssueDAO(this.con);
-				issueDAO.publish(com.dcaseId, (err:any) => {
-					callback(err, {commitId: commitId});
-				});
+			// , (com: Commit, commitId: number, callback) => {
+			// 	var issueDAO = new model_issue.IssueDAO(this.con);
+			// 	issueDAO.publish(com.dcaseId, (err:any) => {
+			// 		callback(err, {commitId: commitId});
+			// 	});
 //			} 
 //			, (com: Commit, commitId: number, callback) => {
 //				var monitorDAO = new model_monitor.MonitorDAO(this.con);
 //				monitorDAO.publish(com.dcaseId, (err:any) => {
 //					callback(err, {commitId: commitId});
 //				});
-			}
+			// }
 		], (err:any, result:any) => {
 			if (err) {
 				this.con.rollback();

@@ -246,26 +246,26 @@ describe('model', function() {
 					});
 				});
 			});
-			it('redmine parameter check ', function(done) {
-				this.timeout(15000);
-				validParam.contents.NodeList[2].MetaData = [];
-				commitDAO.commit(1, 401, 'commit test', validParam.contents, (err, result) => {
-					expect(err).to.be(null);
-					expect(result).not.to.be(null);
-					expect(result).not.to.be(undefined);
-					expect(result.commitId).not.to.be(null);
-					expect(result.commitId).not.to.be(undefined);
-					expect(dSvr.getRedmineRequestBody()).not.to.be(null);
-					expect(dSvr.getRedmineRequestBody().issue.subject).to.eql(validParam.contents.NodeList[0].MetaData[0].Subject);
-					expect(dSvr.getRedmineRequestBody().issue.description).to.eql(validParam.contents.NodeList[0].MetaData[0].Description);
-					con.query('SELECT * FROM commit WHERE id=?', [result.commitId], (err, resultCommit) => {
-						expect(err).to.be(null);
-						expect(resultCommit[0].latest_flag).to.eql(true);
-						expect
-						done();
-					});
-				});
-			});
+			// it('redmine parameter check ', function(done) {
+			// 	this.timeout(15000);
+			// 	validParam.contents.NodeList[2].MetaData = [];
+			// 	commitDAO.commit(1, 401, 'commit test', validParam.contents, (err, result) => {
+			// 		expect(err).to.be(null);
+			// 		expect(result).not.to.be(null);
+			// 		expect(result).not.to.be(undefined);
+			// 		expect(result.commitId).not.to.be(null);
+			// 		expect(result.commitId).not.to.be(undefined);
+			// 		expect(dSvr.getRedmineRequestBody()).not.to.be(null);
+			// 		expect(dSvr.getRedmineRequestBody().issue.subject).to.eql(validParam.contents.NodeList[0].MetaData[0].Subject);
+			// 		expect(dSvr.getRedmineRequestBody().issue.description).to.eql(validParam.contents.NodeList[0].MetaData[0].Description);
+			// 		con.query('SELECT * FROM commit WHERE id=?', [result.commitId], (err, resultCommit) => {
+			// 			expect(err).to.be(null);
+			// 			expect(resultCommit[0].latest_flag).to.eql(true);
+			// 			expect
+			// 			done();
+			// 		});
+			// 	});
+			// });
 			// it('rec api registMonitor parameter check', function(done) {
 			// 	this.timeout(15000);
 			// 	commitDAO.commit(1, 406, 'commit test', validParam.contents, (err, result) => {

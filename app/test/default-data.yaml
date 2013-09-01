@@ -44,7 +44,14 @@ file:
   - {id: 301, name: 'test file1.txt', path: 'test/routes/testfiles/uptest.txt', user_id: 1}
   - {id: 302, name: 'notfound', path: 'test/routes/testfiles/notfound.', user_id: 1}
 commit:
-  - {id: 401, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 1', dcase_id: 201, user_id: 101}
+  - id: 401
+    data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}'
+    date_time: null
+    prev_commit_id: null
+    latest_flag: 1
+    message: 'commit message 1'
+    dcase_id: 201
+    user_id: 101
   - {id: 402, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 2', dcase_id: 202, user_id: 102}
   - {id: 403, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 3', dcase_id: 203, user_id: 103}
   # - {id: 404, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 4', dcase_id: 204, user_id: 101}
@@ -76,65 +83,8 @@ node:
   - {id: 507, this_node_id: 1, description: 'node403_1', node_type: 'Goal', commit_id: 403}
   - {id: 508, this_node_id: 2, description: 'node403_2', node_type: 'Strategy', commit_id: 403}
   - {id: 509, this_node_id: 3, description: 'node403_3', node_type: 'Goal', commit_id: 403}
-  # - {id: 510, this_node_id: 1, description: 'node404_1', node_type: 'Goal', commit_id: 404}
-  # - {id: 511, this_node_id: 2, description: 'node404_2', node_type: 'Strategy', commit_id: 404}
-  # - {id: 512, this_node_id: 3, description: 'node404_3', node_type: 'Goal', commit_id: 404}
-  # - {id: 513, this_node_id: 1, description: 'node405_1', node_type: 'Goal', commit_id: 405}
-  # - {id: 514, this_node_id: 2, description: 'node405_2', node_type: 'Strategy', commit_id: 405}
-  # - {id: 515, this_node_id: 3, description: 'node405_3', node_type: 'Goal', commit_id: 405}
-  # - {id: 516, this_node_id: 1, description: 'node406_1', node_type: 'Goal', commit_id: 406}
-  # - {id: 517, this_node_id: 2, description: 'node406_2', node_type: 'Strategy', commit_id: 406}
-  # - {id: 518, this_node_id: 3, description: 'node406_3', node_type: 'Goal', commit_id: 406}
-  # - {id: 519, this_node_id: 1, description: 'node407_1', node_type: 'Goal', commit_id: 407}
-  # - {id: 520, this_node_id: 2, description: 'node407_2', node_type: 'Strategy', commit_id: 407}
-  # - {id: 521, this_node_id: 3, description: 'node407_3', node_type: 'Goal', commit_id: 407}
-  # - {id: 522, this_node_id: 1, description: 'node408_1', node_type: 'Goal', commit_id: 408}
-  # - {id: 523, this_node_id: 2, description: 'node408_2', node_type: 'Strategy', commit_id: 408}
-  # - {id: 524, this_node_id: 3, description: 'node408_3', node_type: 'Goal', commit_id: 408}
-  # - {id: 525, this_node_id: 1, description: 'node409_1', node_type: 'Goal', commit_id: 409}
-  # - {id: 526, this_node_id: 2, description: 'node409_2', node_type: 'Strategy', commit_id: 409}
-  # - {id: 527, this_node_id: 3, description: 'node409_3', node_type: 'Goal', commit_id: 409}
-  # - {id: 528, this_node_id: 1, description: 'node410_1', node_type: 'Goal', commit_id: 410}
-  # - {id: 529, this_node_id: 2, description: 'node410_2', node_type: 'Strategy', commit_id: 410}
-  # - {id: 530, this_node_id: 3, description: 'node410_3', node_type: 'Goal', commit_id: 410}
-  # - {id: 531, this_node_id: 1, description: 'node411_1', node_type: 'Goal', commit_id: 411}
-  # - {id: 532, this_node_id: 2, description: 'node411_2', node_type: 'Strategy', commit_id: 411}
-  # - {id: 533, this_node_id: 3, description: 'node411_3', node_type: 'Goal', commit_id: 411}
-  # - {id: 534, this_node_id: 1, description: 'node412_1', node_type: 'Goal', commit_id: 412}
-  # - {id: 535, this_node_id: 2, description: 'node412_2', node_type: 'Strategy', commit_id: 412}
-  # - {id: 536, this_node_id: 3, description: 'node412_3', node_type: 'Goal', commit_id: 412}
-  # - {id: 537, this_node_id: 1, description: 'node413_1', node_type: 'Goal', commit_id: 413}
-  # - {id: 538, this_node_id: 2, description: 'node413_2', node_type: 'Strategy', commit_id: 413}
-  # - {id: 539, this_node_id: 3, description: 'node413_3', node_type: 'Goal', commit_id: 413}
-  # - {id: 540, this_node_id: 1, description: 'node414_1', node_type: 'Goal', commit_id: 414}
-  # - {id: 541, this_node_id: 2, description: 'node414_2', node_type: 'Strategy', commit_id: 414}
-  # - {id: 542, this_node_id: 3, description: 'node414_3', node_type: 'Goal', commit_id: 414}
-  # - {id: 543, this_node_id: 1, description: 'node415_1', node_type: 'Goal', commit_id: 415}
-  # - {id: 544, this_node_id: 2, description: 'node415_2', node_type: 'Strategy', commit_id: 415}
-  # - {id: 545, this_node_id: 3, description: 'node415_3', node_type: 'Goal', commit_id: 415}
-  # - {id: 546, this_node_id: 1, description: 'node416_1', node_type: 'Goal', commit_id: 416}
-  # - {id: 547, this_node_id: 2, description: 'node416_2', node_type: 'Strategy', commit_id: 416}
-  # - {id: 548, this_node_id: 3, description: 'node416_3', node_type: 'Goal', commit_id: 416}
-  # - {id: 549, this_node_id: 1, description: 'node417_1', node_type: 'Goal', commit_id: 417}
-  # - {id: 550, this_node_id: 2, description: 'node417_2', node_type: 'Strategy', commit_id: 417}
-  # - {id: 551, this_node_id: 3, description: 'node417_3', node_type: 'Goal', commit_id: 417}
-  # - {id: 552, this_node_id: 1, description: 'node418_1', node_type: 'Goal', commit_id: 418}
-  # - {id: 553, this_node_id: 2, description: 'node418_2', node_type: 'Strategy', commit_id: 418}
-  # - {id: 554, this_node_id: 3, description: 'node418_3', node_type: 'Goal', commit_id: 418}
-  # - {id: 555, this_node_id: 1, description: 'node419_1', node_type: 'Goal', commit_id: 419}
-  # - {id: 556, this_node_id: 2, description: 'node419_2', node_type: 'Strategy', commit_id: 419}
-  # - {id: 557, this_node_id: 3, description: 'node419_3', node_type: 'Goal', commit_id: 419}
-  # - {id: 558, this_node_id: 1, description: 'node420_1', node_type: 'Goal', commit_id: 420}
-  # - {id: 559, this_node_id: 2, description: 'node420_2', node_type: 'Strategy', commit_id: 420}
-  # - {id: 560, this_node_id: 3, description: 'node420_3', node_type: 'Goal', commit_id: 420}
-  # - {id: 561, this_node_id: 1, description: 'node421_1', node_type: 'Goal', commit_id: 421}
-  # - {id: 562, this_node_id: 2, description: 'node421_2', node_type: 'Strategy', commit_id: 421}
-  # - {id: 563, this_node_id: 3, description: 'node421_3', node_type: 'Goal', commit_id: 421}
-  # - {id: 564, this_node_id: 1, description: 'node422_1', node_type: 'Goal', commit_id: 422}
-  # - {id: 565, this_node_id: 2, description: 'node422_2', node_type: 'Strategy', commit_id: 422}
-  # - {id: 566, this_node_id: 3, description: 'node422_3', node_type: 'Goal', commit_id: 422}
-monitor_node:
-  - {id: 601, dcase_id: 201, this_node_id: 1, watch_id: 10, preset_id: 100, params: '{"a": "val_a", "b": 2}'}
-  - {id: 602, dcase_id: 201, this_node_id: 2, watch_id: 20, preset_id: 200, params: null, publish_status: 2}
-  - {id: 603, dcase_id: 201, this_node_id: 3, watch_id: 30, preset_id: 300, params: null, publish_status: 1}
+# monitor_node:
+#   - {id: 601, dcase_id: 201, this_node_id: 1, watch_id: 10, preset_id: 100, params: '{"a": "val_a", "b": 2}'}
+#   - {id: 602, dcase_id: 201, this_node_id: 2, watch_id: 20, preset_id: 200, params: null, publish_status: 2}
+#   - {id: 603, dcase_id: 201, this_node_id: 3, watch_id: 30, preset_id: 300, params: null, publish_status: 1}
 
