@@ -154,6 +154,8 @@ var SelectDCaseView = (function () {
     };
 
     SelectDCaseView.prototype.addElements = function (userId, pageIndex, tags) {
+        var projects = DCaseAPI.getProjectList(userId);
+        console.log(projects);
         var mock = [
             {
                 name: "Project1",

@@ -57,6 +57,11 @@ module DCaseAPI {
 			dcaseName: name, contents: tree });
 	};
 
+	export var createProject = function(name, isPublic) {
+		return this.call("createProject", {
+			name: name, isPublic: isPublic });
+	};
+
 	export var getCommitList = function(dcaseId) {
 		return this.call("getCommitList", { dcaseId:dcaseId }).commitList;
 	};
@@ -76,6 +81,10 @@ module DCaseAPI {
 	
 	export var getDCase = function(dcaseId) {
 		return this.call("getDCase", { dcaseId: dcaseId });
+	};
+
+	export var getProjectList = function(userId) {
+		return this.call("getProjectList", { userId: userId });
 	};
 	
 	export var editDCase = function(dcaseId, name) {

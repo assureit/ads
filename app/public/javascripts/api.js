@@ -54,6 +54,13 @@ var DCaseAPI;
         });
     };
 
+    DCaseAPI.createProject = function (name, isPublic) {
+        return this.call("createProject", {
+            name: name,
+            isPublic: isPublic
+        });
+    };
+
     DCaseAPI.getCommitList = function (dcaseId) {
         return this.call("getCommitList", { dcaseId: dcaseId }).commitList;
     };
@@ -72,6 +79,10 @@ var DCaseAPI;
 
     DCaseAPI.getDCase = function (dcaseId) {
         return this.call("getDCase", { dcaseId: dcaseId });
+    };
+
+    DCaseAPI.getProjectList = function (userId) {
+        return this.call("getProjectList", { userId: userId });
     };
 
     DCaseAPI.editDCase = function (dcaseId, name) {

@@ -156,6 +156,8 @@ class SelectDCaseView {
 //		//	this.manager.add(s);
 //		//});
 		//this.manager.updateContentsOrZeroView();
+		var projects: any = DCaseAPI.getProjectList(userId);
+		console.log(projects);
 		var mock = [{
 			name: "Project1",
 			users: [
