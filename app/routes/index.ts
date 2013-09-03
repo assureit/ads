@@ -10,11 +10,10 @@ var CONFIG = require('config')
 //import ex = module('./exporter')
 
 export var index = function(req: any, res: any) {
-	var page = 'signin';
+	var page = 'index';
 	var params: any = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: null};
 	var auth = new util_auth.Auth(req, res);
 	if(auth.isLogin()) {
-		page = 'signout';
 		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
 	}
 

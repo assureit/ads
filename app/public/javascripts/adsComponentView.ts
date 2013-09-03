@@ -184,7 +184,7 @@ class SelectDCaseView {
 				dcase.dateTime = this.formatDate(dcase.latestCommit.dateTime);
 			}
 		}
-		console.log(project);
+		//console.log(projects);
 		$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(projects) );
 
 		$(".DeleteCaseButton").click(function(){
