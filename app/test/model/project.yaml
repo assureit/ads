@@ -11,4 +11,37 @@ project_has_user:
 dcase:
   - {id: 1001, name: 'stakeholder case', project_id: 1001, user_id: 101, type: 1}
 commit:
-  - {id: 1001, data: '{"contents":{"NodeList":[{"ThisNodeId":1,"NodeType":"Goal","Description":"Stakeholders are identified in this project","Children":[2,3],"Contexts":[],"MetaData":[]},{"ThisNodeId":2,"NodeType":"Context","Description":"","Children":[],"Contexts":[],"MetaData":[{"ProjectName":"Development of Assure S","Stakeholders":"LDAPName","Visible":true,"Description":""}]},{"ThisNodeId":3,"NodeType":"Strategy","Description":"Arguing over types of stakeholders","Children":[7,8,9],"Contexts":[],"MetaData":[]},{"ThisNodeId":7,"NodeType":"Goal","Description":"Founders are identified","Children":[10],"Contexts":[],"MetaData":[]},{"ThisNodeId":10,"NodeType":"Evidence","Description":"user1","Children":[],"Contexts":[],"MetaData":[]},{"ThisNodeId":8,"NodeType":"Goal","Description":"Developers are identified","Children":[11],"Contexts":[],"MetaData":[]},{"ThisNodeId":11,"NodeType":"Evidence","Description":"user2\nuser2\nproject_member1","Children":[],"Contexts":[],"MetaData":[]},{"ThisNodeId":9,"NodeType":"Goal","Description":"Operators are identified","Children":[12],"Contexts":[],"MetaData":[]},{"ThisNodeId":12,"NodeType":"Evidence","Description":"not_project_member","Children":[],"Contexts":[],"MetaData":[]}],"TopGoalId":1,"NodeCount":12,"DCaseName":"Stakeholders"}}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 4', dcase_id: 1001, user_id: 101}
+  - id: 1001
+    data: |
+      *1
+      dcase1
+      Note0::
+        Type: Issue
+        Subject: このゴールを満たす必要がある
+        Visible: true
+        _IssueId: 232
+          詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+      *2
+      s1
+      **3
+      g1
+      Note0::
+        Type: Issue
+        Subject: 2つ目のイシュー
+        Visible: true
+        _IssueId: 233
+          あああ詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+    date_time: null
+    prev_commit_id: null
+    latest_flag: 1
+    message: 'commit message 4'
+    dcase_id: 1001
+    user_id: 101

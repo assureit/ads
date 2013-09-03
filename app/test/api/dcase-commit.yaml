@@ -3,10 +3,142 @@ dcase:
   - {id: 205, name: 'dcase5', project_id: 201, user_id: 101}
   - {id: 206, name: 'dcase5', project_id: 201, user_id: 101}
 commit:
-  - {id: 404, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: false, message: 'commit message 4', dcase_id: 204, user_id: 101}
-  - {id: 405, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: true, message: 'commit message 4', dcase_id: 204, user_id: 101}
-  - {id: 406, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 1', dcase_id: 205, user_id: 101}
-  - {id: 407, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 1', dcase_id: 206, user_id: 101}
+  - id: 404
+    data: |
+      *1
+      dcase1
+      Note0::
+        Type: Issue
+        Subject: このゴールを満たす必要がある
+        Visible: true
+        _IssueId: 232
+          詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+      *2
+      s1
+      **3
+      g1
+      Note0::
+        Type: Issue
+        Subject: 2つ目のイシュー
+        Visible: true
+        _IssueId: 233
+          あああ詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+    date_time: null
+    prev_commit_id: null
+    latest_flag: false
+    message: 'commit message 4'
+    dcase_id: 204
+    user_id: 101
+  - id: 405
+    data: |
+      *1
+      dcase1
+      Note0::
+        Type: Issue
+        Subject: このゴールを満たす必要がある
+        Visible: true
+        _IssueId: 232
+          詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+      *2
+      s1
+      **3
+      g1
+      Note0::
+        Type: Issue
+        Subject: 2つ目のイシュー
+        Visible: true
+        _IssueId: 233
+          あああ詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+    date_time: null
+    prev_commit_id: null
+    latest_flag: true
+    message: 'commit message 4'
+    dcase_id: 204
+    user_id: 101
+  - id: 406
+    data: |
+      *1
+      dcase1
+      Note0::
+        Type: Issue
+        Subject: このゴールを満たす必要がある
+        Visible: true
+        _IssueId: 232
+          詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+      *2
+      s1
+      **3
+      g1
+      Note0::
+        Type: Issue
+        Subject: 2つ目のイシュー
+        Visible: true
+        _IssueId: 233
+          あああ詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+    date_time: null
+    prev_commit_id: null
+    latest_flag: 1
+    message: 'commit message 1'
+    dcase_id: 205
+    user_id: 101
+  - id: 407
+    data: |
+      *1
+      dcase1
+      Note0::
+        Type: Issue
+        Subject: このゴールを満たす必要がある
+        Visible: true
+        _IssueId: 232
+          詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+      *2
+      s1
+      **3
+      g1
+      Note0::
+        Type: Issue
+        Subject: 2つ目のイシュー
+        Visible: true
+        _IssueId: 233
+          あああ詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+    date_time: null
+    prev_commit_id: null
+    latest_flag: 1
+    message: 'commit message 1'
+    dcase_id: 206
+    user_id: 101
 tag:
   - {id: 701, label: 'tag1'}
   - {id: 702, label: 'tag2'}
