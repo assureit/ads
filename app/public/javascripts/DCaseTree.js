@@ -201,15 +201,14 @@ var DCaseTree;
 
             var childrenIds = [];
             for (var i = 0; i < this.Children.length; i++) {
-                childrenIds[i] = this.Children[i].Id;
+                childrenIds.push(this.Children[i].Id);
             }
-            elem["Children"] = childrenIds;
 
-            var contextIds = [];
             for (var i = 0; i < this.Contexts.length; i++) {
-                contextIds.push(this.Contexts[i].Id);
+                childrenIds.push(this.Contexts[i].Id);
             }
-            elem["Contexts"] = contextIds;
+
+            elem["Children"] = childrenIds;
             elem["MetaData"] = this.MetaData;
 
             jsonData.push(elem);

@@ -210,15 +210,14 @@ module DCaseTree {
 
 			var childrenIds : number[] = [];
 			for(var i : number = 0; i < this.Children.length ; i++) {
-				childrenIds[i] = this.Children[i].Id;
+				childrenIds.push(this.Children[i].Id);
 			}
-			elem["Children"] = childrenIds;
 
-			var contextIds: number[] = [];
 			for(var i: number = 0; i < this.Contexts.length; i++){
-				contextIds.push(this.Contexts[i].Id);
+				childrenIds.push(this.Contexts[i].Id);
 			}
-			elem["Contexts"] = contextIds;
+			//elem["Contexts"] = contextIds;
+			elem["Children"] = childrenIds;
 			elem["MetaData"] = this.MetaData;
 
 			jsonData.push(elem);
