@@ -3,11 +3,16 @@ body {
 	margin: 0px;
 }
 
-.hover {
+article * {
+	border: none;
+	overflow: hidden;
+}
+
+article.hover {
 	background-color: #eee;
-	border: 10px dashed;
+/*	border: 10px dashed;
 	border-color: #000;
-	margin: -10px;
+	margin: -10px;*/
 }
 
 #viewer {
