@@ -16,7 +16,6 @@ class ADS {
 	selectDCaseView: SelectDCaseView;
 	tagListManager : TagListManager;
 	createDCaseView: CreateDCaseView;
-	createProjectView: CreateProjectView;
 	timelineView   : TimeLineView;
 
 	getLoginUserorNull() {
@@ -97,23 +96,12 @@ class ADS {
 		router.route("project/new", "project", () => {
 			$("#project-create").click(function() {
 				var name = $("#inputProjectName").attr("value");
+				var isPublic = $("#inputIsPublic").attr("checked") != null;
+				var language = ($("#inputIsEnglish").attr("checked") != null) ? "en" : "ja";
 				console.log(name);
-				//var desc = $("#inputDesc").attr("value");
-				//var error = false;
-				//if(name == "") {
-				//	$("#newdcase-name").addClass("error");
-				//	error = true;
-				//} else {
-				//	$("#newdcase-name").removeClass("error");
-				//}
-				//if(desc == "") {
-				//	$("#newdcase-desc").addClass("error");
-				//	error = true;
-				//}
-				//if(error) return;
-				//var tree = "*Goal\n" + desc;
-				//var r: any = DCaseAPI.createDCase(name, tree, this.projectid);
-				//location.href = "../case/" + r.dcaseId;
+				console.log(isPublic);
+				console.log(language);
+				var r = DCaseAPI.createProject(name, isPublic);
 			});
 		});
 

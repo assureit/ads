@@ -4,34 +4,9 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var CreateProjectView = (function () {
-    function CreateProjectView() {
-        $("#dcase-create").click(function () {
-            var name = $("#inputDCaseName").attr("value");
-            var desc = $("#inputDesc").attr("value");
-            var error = false;
-            if (name == "") {
-                $("#newdcase-name").addClass("error");
-                error = true;
-            } else {
-                $("#newdcase-name").removeClass("error");
-            }
-            if (desc == "") {
-                $("#newdcase-desc").addClass("error");
-                error = true;
-            }
-            if (error)
-                return;
-            var tree = "*Goal\n" + desc;
-            var r = DCaseAPI.createDCase(name, tree, this.projectid);
-            location.href = "../case/" + r.dcaseId;
-        });
-    }
-    return CreateProjectView;
-})();
-
 var CreateDCaseView = (function () {
     function CreateDCaseView() {
+        var self = this;
         this.projectid = -1;
         $("#dcase-create").click(function () {
             var name = $("#inputDCaseName").attr("value");
@@ -51,7 +26,7 @@ var CreateDCaseView = (function () {
                 return;
             var tree = "*Goal\n" + desc;
 
-            var r = DCaseAPI.createDCase(name, tree, this.projectid);
+            var r = DCaseAPI.createDCase(name, tree, self.projectid);
             location.href = "../case/" + r.dcaseId;
         });
     }

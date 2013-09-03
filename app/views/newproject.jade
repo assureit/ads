@@ -22,10 +22,10 @@ block content
                         label(for="inputProjectName")= lang.Project_name
                         input#inputProjectName(type="text", id="inputProjectName")
                         label.checkbox
-                            input(type="checkbox",checked="checked")
+                            input#inputIsPublic(type="checkbox",checked="checked")
                             |Public Project
                         label.radio.inline
-                            input(type="radio",name="optionsRadios",id="en",value="en",checked="checked")
+                            input#inputIsEnglish(type="radio",name="optionsRadios",id="en",value="en",checked="checked")
                             |English
                         label.radio.inline
                             input(type="radio",name="optionsRadios",id="ja",value="ja")
