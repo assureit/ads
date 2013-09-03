@@ -32,6 +32,7 @@ var ADS = (function () {
                 console.log(isPublic);
                 console.log(language);
                 var r = DCaseAPI.createProject(name, isPublic);
+                location.href = "../";
             });
         });
 
