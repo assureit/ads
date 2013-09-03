@@ -189,44 +189,9 @@ class SelectDCaseView {
 		for(var i = 0; i < projects.length; i++){
 			var project = projects[i];
 			project.users = [];
-			project.cases = [];
+			project.cases = DCaseAPI.getProjectDCase(1, project.projectId).dcaseList;
 		}
-		console.log(projects.projectList);
-		var mock = [{
-			name: "Project1",
-			users: [
-				{name: "UserA"},
-				{name: "UserB"},
-				{name: "UserC"}
-			],
-			cases: [
-				{
-					name: "Case1A",
-					size: 12,
-					lastUpdateDate: "12 minutes ago",
-					lastUpdateUser: "UserC",
-				},
-				{
-					name: "Case1B",
-					size: 2,
-					lastUpdateDate: "30 minutes ago",
-					lastUpdateUser: "UserA",
-				}
-			],
-		},
-		{
-			name: "Project2",
-			users: [
-			],
-			cases: [
-				{
-					name: "Case2A",
-					size: 12,
-					lastUpdateDate: "12 minutes ago",
-					lastUpdateUser: "UserC",
-				},
-			],
-		}];
+		console.log(project);
 		$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(projects) );
 
 		//$(".NewCaseButton").click(function(){

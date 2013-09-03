@@ -5,20 +5,20 @@ block append content
             img.media-object.pull-left(data-src="holder.js/64x64",alt="64x64",style="width: 64px; height: 64px;",src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABP0lEQVR4Xu2YQQ7DIAwEyTnfyrN5U245t6ISFUptEhNQEUxvFdTxrsxOyrLv+8tN/FkwgAngCJABE2egIwShABSAAlAACkzsABgEg2AQDILBiSHAnyEwCAbBIBgEg2BwYgeqYNB7/7Vw27YfO+O6tKZ536Km9KzHBqTiJKFXQqSmWtTUjK5qQE5MWLs7AVcTU2JqcwPiA84ipWbPArXvlpqlMVZ1AiQh67q64zg+/aXmpMZoa2G/pWaJCX8zIDSrjXouA8KaZmqXBpybkqZAOzbaBORqWk1oOgGxmSs6WI5ArqZVfNj/2IB0lLWkvxt6WkbUerdo8h5Q4npPv6kyAT0JsvaCAdwIcSPEjRA3QtbkHGk/FIACUAAKQIGRUt2qBQpAASgABaCANTlH2g8FoAAUgAJQYKRUt2qBArNT4A1sFqCQARPBMwAAAABJRU5ErkJggg==")
             .media-body
                 h4
-                    a(href='#') ${name}
+                    a(href='#') ${dcaseName}
                     a.btn.btn-danger.btn-mini.pull-right.DeleteCaseButton
                         i.icon-trash　&nbsp;
                         |Delete
                     span.pull-right
                         i.icon-sitemap
-                        | ${size}&nbsp;
+                        | 0&nbsp;
                 p ${description}
                 small
-                    a(href='#') ${lastUpdateUser}
-                    |  updated ${lastUpdateDate}
+                    a(href='#') ${latestCommit.userName}
+                    |  updated at ${latestCommit.dateTime}
     script#project_tmpl(type="text/x-jquery-tmpl")
         article(id="project${projectId}")
-            h3 #${projectId} ${projectName} &nbsp;
+            h3 ${projectName} &nbsp;
                 a.btn.btn-mini
                     i.icon-edit &nbsp;
                 a.btn.btn-success.btn-small.pull-right.NewCaseButton(href='./new/${projectId}')
@@ -56,7 +56,7 @@ block content
             #selectDCase.span6.offset2
                 h2 Projects&nbsp;
                     a.btn.btn-success.pull-right.NewProjectButton(href="./project/new")
-                        i.icon-plus.pull-right　&nbsp;
+                        i.icon-plus &nbsp;
                         |New project
                 hr
                 #ProjectList
