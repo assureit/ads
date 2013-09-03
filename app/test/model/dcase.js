@@ -10,6 +10,7 @@ describe('model', function () {
     var testDB;
     var con;
     var dcaseDAO;
+    var userId = 101;
 
     beforeEach(function (done) {
         testdata.begin(['test/model/dcase.yaml'], function (err, c) {
@@ -76,7 +77,7 @@ describe('model', function () {
         });
         describe('list', function () {
             it('normal end no tag', function (done) {
-                dcaseDAO.list(1, null, function (err, pager, result) {
+                dcaseDAO.list(1, userId, null, null, function (err, pager, result) {
                     expect(err).to.be(null);
                     expect(pager).not.to.be(null);
                     expect(pager).not.to.be(undefined);
@@ -93,7 +94,7 @@ describe('model', function () {
                 });
             });
             it('normal end plus tag', function (done) {
-                dcaseDAO.list(1, ["tag1"], function (err, pager, result) {
+                dcaseDAO.list(1, userId, null, ["tag1"], function (err, pager, result) {
                     expect(err).to.be(null);
                     expect(pager).not.to.be(null);
                     expect(pager).not.to.be(undefined);
@@ -110,7 +111,7 @@ describe('model', function () {
                 });
             });
             it('tag is not exists', function (done) {
-                dcaseDAO.list(1, ["QQQ"], function (err, pager, result) {
+                dcaseDAO.list(1, userId, null, ["QQQ"], function (err, pager, result) {
                     expect(err).to.be(null);
                     expect(pager).not.to.be(null);
                     expect(pager).not.to.be(undefined);

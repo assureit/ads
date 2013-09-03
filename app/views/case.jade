@@ -1,0 +1,121 @@
+html
+    head
+        title Assure-It
+        link(rel='stylesheet', href='#{basepath}/stylesheets/sidemenu.css')
+        link(rel='stylesheet', href='#{basepath}/stylesheets/index.css')
+        link(rel='stylesheet', href='#{basepath}/lib/bootstrap.min.css')
+        link(rel='stylesheet', href='#{basepath}/lib/bootstrap.icons.css')
+        link(rel='stylesheet', href='#{basepath}/lib/bootstrap-responsive.min.css')
+        link(rel='stylesheet', href='#{basepath}/stylesheets/dcase-node.css')
+        link(rel='stylesheet',href='#{basepath}/assurejs/plugins/Editor/lib/codemirror/codemirror.css')
+        link(rel='stylesheet',href="#{basepath}/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.css")
+        link(rel='stylesheet',href="#{basepath}/assurejs/lib/animate-custom.css")
+        script(type='text/javascript', src='#{basepath}/javascripts/sidemenu.js')
+        script(type="text/javascript",src="#{basepath}/assurejs/lib/jquery.min.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/lib/pointer.min.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/lib/ASNParser/peg.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseModel.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseViewer.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/Converter.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseEncoder.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/EditorUtil.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/RecApi.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/Layout.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/PlugInManager.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/ServerApi.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/ColorTheme/ColorTheme.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/display/placeholder.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/codemirror.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/mode/ASN/asn.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/Editor.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScript.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/FullScreenEditor/FullScreenEditor.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery.jqdock.min.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/MenuBar.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DefaultStatementRender/DefaultStatementRender.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Annotation/Annotation.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Monitor/Monitor.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Note/Note.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DragFile/DragFile.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/BeforeUnload/BeforeUnload.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScript.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScriptGenerator.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/LayoutPortrait/LayoutPortrait.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Export/Export.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/TimeLine/TimeLine.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
+        //script(type="text/javascript",src="#{basepath}/assurejs/mock/Index.js")
+        script(type='text/javascript',src='#{basepath}/javascripts/config.js')
+        script(type='text/javascript').
+            $(function(){
+               var serverApi = new AssureIt.ServerAPI(Config.BASEPATH);
+               var pluginManager = new AssureIt.PlugInManager(Config.BASEPATH);
+               pluginManager.SetPlugIn("menu", new MenuBarPlugIn(pluginManager));
+               pluginManager.SetPlugIn("editor", new EditorPlugIn(pluginManager));
+               pluginManager.SetPlugIn("colortheme", new TiffanyBlueThemePlugIn(pluginManager));
+               pluginManager.SetPlugIn("statements", new DefaultStatementRenderPlugIn(pluginManager));
+               pluginManager.SetPlugIn("annotation", new AnnotationPlugIn(pluginManager));
+               pluginManager.SetPlugIn("note", new NotePlugIn(pluginManager));
+               pluginManager.SetPlugIn("monitor", new MonitorPlugIn(pluginManager));
+               pluginManager.SetPlugIn("fullscreeneditor", new FullScreenEditorPlugIn(pluginManager));
+               pluginManager.SetPlugIn("dscript", new DScriptPlugIn(pluginManager));
+               pluginManager.SetPlugIn("file", new DragFilePlugIn(pluginManager));
+               pluginManager.SetPlugIn("unload", new BeforeUnloadPlugIn(pluginManager));
+               pluginManager.SetPlugIn("portraitlayout", new LayoutPortraitPlugIn(pluginManager));
+               pluginManager.SetPlugIn("export", new ExportPlugIn(pluginManager));
+               pluginManager.SetPlugIn("timeline", new TimeLinePlugIn(pluginManager));
+               pluginManager.SetUseLayoutEngine("portraitlayout");
+
+               // Assume that oldJsonData.contents consists of "DCaseName" and "NodeList(ASN)"
+               // Is it needed to handle both AssureNotation and JSON here?
+               var oldJsonData = serverApi.GetCase("",#{caseId});
+               var contents = oldJsonData.contents;
+               var Case0 = new AssureIt.Case(oldJsonData.DCaseName, #{caseId}, oldJsonData.commitId, pluginManager);
+               var caseDecoder = new AssureIt.CaseDecoder();
+               var root = caseDecoder.ParseASN(Case0, contents, null);
+               Case0.SetElementTop(root);
+               var backgroundlayer = document.getElementById("background");
+               var shapelayer = document.getElementById("layer0");
+               var contentlayer = document.getElementById("layer1");
+               var controllayer = document.getElementById("layer2");
+
+               var Screen = new AssureIt.ScreenManager(shapelayer, contentlayer, controllayer, backgroundlayer);
+               var Viewer = new AssureIt.CaseViewer(Case0, pluginManager, serverApi, Screen);
+               Viewer.Draw();
+               Viewer.Screen.SetOffset(($('html').width() / 2) - ((AssureIt.CaseViewer.ElementWidth) + Viewer.ViewMap[Viewer.ElementTop.Label].AbsX),80); //Center TopGoal in the view
+               Case0.SetEditable();
+               if(Case0.IsEditable()) {
+                   $('#assureit-mode').text("Edit mode");
+                   Case0.SetModified(false);
+               }
+            });
+    body(style="overflow: hidden; margin: 0px;")
+        a(href="#{basepath}/")
+            img#menu-button(src="#{basepath}/images/ait.png") Menu
+        #assureit-status
+            ul
+                li#assureit-mode Viewer mode
+        #viewer(style="width: 100%; height: 100%;")
+            svg#layer0box(xmlns="http://www.w3.org/2000/svg",version="1.1",style="width: 100%; height: 100%; position: absolute")
+                g#layer0(transform="translate(0,0)")
+            #background(style="width: 100%; height: 100%; position: absolute;")
+            #layer1(style="width: 0px; height: 0px; position: absolute;")
+            #layer2(style="width: 0px; height: 0px; position: absolute;")
+        svg(width="0",height="0")
+            defs
+                marker#Triangle-black(viewBox="0 0 10 10",refX="10",refY="5",markerUnits="strokeWidth",markerWidth="15",markerHeight="9",orient="auto")
+                    path(d="M 0 0 L 10 5 L 0 10 z",fill="gray",stroke="gray")
+                marker#Triangle-white(viewBox="0 0 10 10",refX="10",refY="5",markerUnits="strokeWidth",markerWidth="15",markerHeight="9",orient="auto")
+                    path(d="M 0 0 L 10 5 L 0 10 z",fill="white",stroke="gray")
+                polygon#UndevelopdSymbol(fill="none",stroke="#333",stroke-width="1.5",points="0 -20 -20 0 0 20 20 0")
+        #editor-wrapper(style="border: 1px solid black")
+            textarea#editor(placeholder="Type something...")
+        #fullscreen-editor-wrapper(style="border: 1px solid black")
+            textarea#fullscreen-editor(placeholder="Type something...")
+        #dscript-editor-wrapper(style="border: 1px solid black")
+            div
+                textarea#dscript-editor-left(placeholder="")
+            div
+                textarea#dscript-editor-right(placeholder="Generated code goes here.")

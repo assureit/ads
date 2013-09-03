@@ -1,0 +1,47 @@
+user:
+  - {id: 1001, login_name: 'not_project_member', system_flag: 1}
+  - {id: 1002, login_name: 'project_member1', system_flag: 1}
+  - {id: 1003, login_name: 'project_member2', system_flag: 1}
+project:
+  - {id: 1001, name: 'project1'}
+project_has_user:
+  - {id: 1001, project_id: 1001, user_id: 101}
+  - {id: 1002, project_id: 1001, user_id: 1002}
+  - {id: 1003, project_id: 1001, user_id: 1003}
+dcase:
+  - {id: 1001, name: 'stakeholder case', project_id: 1001, user_id: 101, type: 1}
+commit:
+  - id: 1001
+    data: |
+      *goal
+      dcase1
+      Note0::
+        Type: Issue
+        Subject: このゴールを満たす必要がある
+        Visible: true
+        _IssueId: 232
+          詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+      *strategy
+      s1
+      **goal
+      g1
+      Note0::
+        Type: Issue
+        Subject: 2つ目のイシュー
+        Visible: true
+        _IssueId: 233
+          あああ詳細な情報をここに記述する
+      Note1::
+        Type: LastUpdated
+        User: Shida
+        Visible: false
+    date_time: null
+    prev_commit_id: null
+    latest_flag: 1
+    message: 'commit message 4'
+    dcase_id: 1001
+    user_id: 101

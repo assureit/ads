@@ -47,10 +47,22 @@ var DCaseAPI;
         }
     };
 
-    DCaseAPI.createDCase = function (name, tree) {
+    DCaseAPI.getProjectDCase = function (pageIndex, projectId) {
+        return this.call("searchDCase", { page: pageIndex, projectId: projectId });
+    };
+
+    DCaseAPI.createDCase = function (name, tree, projectId) {
         return this.call("createDCase", {
             dcaseName: name,
-            contents: tree
+            contents: tree,
+            projectId: projectId
+        });
+    };
+
+    DCaseAPI.createProject = function (name, isPublic) {
+        return this.call("createProject", {
+            name: name,
+            isPublic: isPublic
         });
     };
 
@@ -72,6 +84,14 @@ var DCaseAPI;
 
     DCaseAPI.getDCase = function (dcaseId) {
         return this.call("getDCase", { dcaseId: dcaseId });
+    };
+
+    DCaseAPI.getProjectList = function (userId) {
+        return this.call("getProjectList", { userId: userId });
+    };
+
+    DCaseAPI.getPublicProjectList = function () {
+        return this.call("getPublicProjectList", {});
     };
 
     DCaseAPI.editDCase = function (dcaseId, name) {

@@ -4,11 +4,27 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 
 -- -----------------------------------------------------
+-- Table `project`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `project` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(1024) NOT NULL ,
+  `public_flag` TINYINT(1) NOT NULL DEFAULT FALSE ,
+  `delete_flag` TINYINT(1) NOT NULL DEFAULT FALSE ,
+  `last_modified` DATETIME NULL COMMENT 'プロジェクト内のDCaseが最終的に更新された日時' ,
+  `created` DATETIME NULL ,
+  `modified` TIMESTAMP NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `user`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `user` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `login_name` VARCHAR(45) NOT NULL ,
+  `mail_address` VARCHAR(256) NULL ,
   `delete_flag` TINYINT(1) NOT NULL DEFAULT FALSE ,
   `system_flag` TINYINT(1) NOT NULL DEFAULT FALSE ,
   `created` DATETIME NULL ,
@@ -23,13 +39,21 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `dcase` (
   `id` INT NOT NULL AUTO_INCREMENT ,
+  `project_id` INT NOT NULL ,
+  `user_id` INT NOT NULL ,
+  `type` INT NOT NULL DEFAULT 0 COMMENT '種別\n0: 通常\n1: Stakeholderケース' ,
   `name` VARCHAR(255) NULL ,
   `delete_flag` TINYINT(1) NULL DEFAULT FALSE ,
-  `user_id` INT NOT NULL ,
   `created` DATETIME NULL ,
   `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_dcase_user1_idx` (`user_id` ASC) ,
+  INDEX `fk_dcase_project1` (`project_id` ASC) ,
+  INDEX `fk_dcase_user1` (`user_id` ASC) ,
+  CONSTRAINT `fk_dcase_project1`
+    FOREIGN KEY (`project_id` )
+    REFERENCES `project` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   CONSTRAINT `fk_dcase_user1`
     FOREIGN KEY (`user_id` )
     REFERENCES `user` (`id` )
@@ -48,8 +72,10 @@ CREATE  TABLE IF NOT EXISTS `commit` (
   `prev_commit_id` INT NULL COMMENT '前回コミットID' ,
   `latest_flag` TINYINT(1) NULL DEFAULT TRUE COMMENT '最新コミットフラグ 0:最新でない 1:最新' ,
   `message` TEXT NULL COMMENT 'コミットメッセージ' ,
+  `meta_data` TEXT NULL ,
   `dcase_id` INT NOT NULL ,
   `user_id` INT NOT NULL ,
+  `role` VARCHAR(80) NULL ,
   `created` DATETIME NULL ,
   `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`) ,
@@ -142,12 +168,12 @@ CREATE  TABLE IF NOT EXISTS `monitor_node` (
   `params` TEXT NULL ,
   `rebuttal_this_node_id` INT NULL ,
   `publish_status` INT NOT NULL DEFAULT 0 COMMENT 'REC登録状態\n0: 未\n1: 済\n2: 要更新' ,
-  `delete_flag` TINYINT(1) NOT NULL DEFAULT 0 ,
+  `delete_flag` TINYINT(1) NOT NULL DEFAULT FALSE ,
   `created` DATETIME NULL ,
   `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_monitor_node_dcase1_idx` (`dcase_id` ASC) ,
   UNIQUE INDEX `unq_monitor_node1` (`dcase_id` ASC, `this_node_id` ASC) ,
+  INDEX `fk_monitor_node_dcase1_idx` (`dcase_id` ASC) ,
   CONSTRAINT `fk_monitor_node_dcase1`
     FOREIGN KEY (`dcase_id` )
     REFERENCES `dcase` (`id` )
@@ -165,7 +191,7 @@ CREATE  TABLE IF NOT EXISTS `tag` (
   `created` DATETIME NULL ,
   `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`) ,
-  INDEX `idx_tag1` (`label` ASC) )
+  INDEX `idx_tag1` (`label`(255) ASC) )
 ENGINE = InnoDB;
 
 
@@ -179,9 +205,9 @@ CREATE  TABLE IF NOT EXISTS `dcase_tag_rel` (
   `created` DATETIME NULL ,
   `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `unq_dcase_tag_rel1` (`dcase_id` ASC, `tag_id` ASC) ,
   INDEX `fk_dcase_tag_rel_dcase1_idx` (`dcase_id` ASC) ,
   INDEX `fk_dcase_tag_rel_tag1_idx` (`tag_id` ASC) ,
-  UNIQUE INDEX `unq_dcase_tag_rel1` (`dcase_id` ASC, `tag_id` ASC) ,
   CONSTRAINT `fk_dcase_tag_rel_dcase1`
     FOREIGN KEY (`dcase_id` )
     REFERENCES `dcase` (`id` )
@@ -190,6 +216,59 @@ CREATE  TABLE IF NOT EXISTS `dcase_tag_rel` (
   CONSTRAINT `fk_dcase_tag_rel_tag1`
     FOREIGN KEY (`tag_id` )
     REFERENCES `tag` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `project_has_user`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `project_has_user` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `project_id` INT NOT NULL ,
+  `user_id` INT NOT NULL ,
+  `role` VARCHAR(80) NULL ,
+  `created` DATETIME NULL ,
+  `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_project_has_user_project1` (`project_id` ASC) ,
+  INDEX `fk_project_has_user_user1` (`user_id` ASC) ,
+  CONSTRAINT `fk_project_has_user_project1`
+    FOREIGN KEY (`project_id` )
+    REFERENCES `project` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_project_has_user_user1`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `user` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `access_log`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `access_log` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `commit_id` INT NOT NULL ,
+  `user_id` INT NOT NULL ,
+  `access_type` VARCHAR(45) NULL ,
+  `accessed` DATETIME NULL ,
+  `created` DATETIME NULL ,
+  `modified` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_access_log_commit1` (`commit_id` ASC) ,
+  INDEX `fk_access_log_user1` (`user_id` ASC) ,
+  CONSTRAINT `fk_access_log_commit1`
+    FOREIGN KEY (`commit_id` )
+    REFERENCES `commit` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_access_log_user1`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `user` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

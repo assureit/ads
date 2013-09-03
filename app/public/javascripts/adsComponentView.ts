@@ -4,7 +4,10 @@
 ///<reference path='dcaseviewer.ts'/>
 
 class CreateDCaseView {
+	projectid: number;
 	constructor() {
+		var self = this;
+		this.projectid = -1;
 		$("#dcase-create").click(function() {
 			var name = $("#inputDCaseName").attr("value");
 			var desc = $("#inputDesc").attr("value");
@@ -20,23 +23,14 @@ class CreateDCaseView {
 				error = true;
 			}
 			if(error) return;
-			var id = 1;
-			var tree = {
-				NodeList: [{
-					ThisNodeId: id,
-					NodeType: "Goal",
-					Description: desc,
-					Children: [],
-				}],
-				TopGoalId: id,
-				NodeCount: 1,
-			};
-			var r: any = DCaseAPI.createDCase(name, tree);
-			location.href = "./dcase/" + r.dcaseId;
+			var tree = "*Goal\n" + desc;
+			var r: any = DCaseAPI.createDCase(name, tree, self.projectid);
+			location.href = "../case/" + r.dcaseId;
 		});
 	}
 
-	enableSubmit(): void{
+	enableSubmit(projectid: number): void{
+		this.projectid = projectid;
 		$("#dcase-create").removeClass("disabled");
 		$("#inputDCaseName").removeAttr("disabled");
 		$("#inputDesc").removeAttr("disabled");
@@ -102,33 +96,10 @@ class SelectDCaseManager {
 	}
 }
 
-class ThumnailView {
-	static toThumnail(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
-		var html = '<ul class="thumbnails"><li class="span4"><a href="#" class="thumbnail">'+name+'</a></li></ul>';
-		return $('<div></div>').html(html);
-	}
-}
-
-class SelectDCaseThumbnailManager extends SelectDCaseManager{
-	constructor() {
-		super();
-	}
-
-	clear() : void {
-		$("#selectDCase *").remove();
-		$("#selectDCase").append('<div class="row-fluid"></div>');
-	}
-
-	updateContentsOrZeroView():void {
-		super._updateContentsOrZeroView($('#selectDCase .row-fluid'), "<font color=gray>DCaseがありません</font>", ThumnailView.toThumnail);
-	}
-}
-
 class TableView {
 	static toTable(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
-		var html = '<td><a href="' + Config.BASEPATH + '/dcase/' + id + '">' + name +
-				"</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" +
-				lastUser + "</td>";
+		var html = '<td><a href="' + Config.BASEPATH + '/case/' + id + '">' + $('<div />').text(name).html() +
+				"</a></td><td>" + $('<div/>').text(lastUser).html() + "</td>";
 		if(isLogin) {
 			html += "<td><a id=\"e"+ id +"\" href=\"#\">Edit</a></td>"
 				+ "<td><a id=\"d"+ id +"\" href=\"#\">Delete</a></td>";
@@ -159,27 +130,72 @@ class SelectDCaseView {
 	constructor() {
 		this.pageIndex = 1;
 		this.maxPageSize = 2;
-		this.manager = new SelectDCaseTableManager();
 	}
 
 	clear(): void {
-		this.manager.clear();
+		$("#ProjectList *").remove();
+	}
+
+	formatDate(time: string){
+		var deltaTime = new Date().getTime() - new Date(time).getTime();
+		var minute = 60 * 1000;
+		var hour   = minute * 60;
+		var day    = hour * 24;
+		var month  = day * 30;
+		var year   = month * 365;
+
+		if(deltaTime < minute) {
+			return "just now";
+		}else if(deltaTime >= minute && deltaTime < 2 * minute) {
+			return "a minute ago";
+		}else if(deltaTime >= 2 * minute && deltaTime < hour) {
+			return "" + Math.floor(deltaTime / minute) + " minutes ago";
+		}else if(deltaTime >= hour && deltaTime < 2 * hour) {
+			return "an hour ago";
+		}else if(deltaTime >= 2*hour && deltaTime < day) {
+			return "" + Math.floor(deltaTime / hour) + " hours ago";
+		}else if(deltaTime >= day && deltaTime < 2 * day) {
+			return "a day ago";
+		}else if(deltaTime >= 2*day && deltaTime < month) {
+			return "" + Math.floor(deltaTime / day) + " days ago";
+		}else if(deltaTime >= month && deltaTime < 2 * month) {
+			return "a month ago";
+		}else if(deltaTime >= 2*month && deltaTime < year) {
+			return "" + Math.floor(deltaTime / month) + " months ago";
+		}else if(deltaTime >= year && deltaTime < 2 * year) {
+			return "an year ago";
+		}else if(deltaTime >= 2*year) {
+			return "" + Math.floor(deltaTime / year) + " years ago";
+		}
+		return "error";
 	}
 
 	addElements(userId, pageIndex?: any, tags?: string[]): void {
-		if(pageIndex == null || pageIndex < 1) pageIndex = 1;
-		if(tags == null) tags = [];
-		this.pageIndex = pageIndex - 0;
-		var searchResults: any = DCaseAPI.searchDCase(this.pageIndex, tags);
-		var dcaseList : any = searchResults.dcaseList;
-		this.maxPageSize  = searchResults.summary.maxPage;
+		var isLoggedin = userId != null;
+		var privateProjects: any = isLoggedin ? DCaseAPI.getProjectList(userId) : { projectList: [] };
+		var publicProjects: any = DCaseAPI.getPublicProjectList();
+		var projects = privateProjects.projectList.concat(publicProjects.projectList);
+		for(var i = 0; i < projects.length; i++){
+			var project = projects[i];
+			project.users = [];
+			project.cases = DCaseAPI.getProjectDCase(1, project.projectId).dcaseList;
+			for(var j = 0; j < project.cases.length; j++){
+				var dcase = project.cases[j];
+				dcase.dateTime = this.formatDate(dcase.latestCommit.dateTime);
+			}
+		}
+		console.log(projects);
+		$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(projects) );
 
-		var isLogin = userId != null;
-		$.each(dcaseList, (i, dcase)=>{
-			var s:SelectDCaseContent = new SelectDCaseContent(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
-			this.manager.add(s);
+		$(".DeleteCaseButton").click(function(){
+			var dcaseId = (<any>($(this))).tmplItem().data.dcaseId;
+			if(window.confirm('dcaseを削除しますか?')) {
+				if(DCaseAPI.deleteDCase(dcaseId) != null) {
+					alert("削除しました");
+					location.reload();
+				}
+			}
 		});
-		this.manager.updateContentsOrZeroView();
 	}
 
 	initEvents() {
@@ -200,6 +216,7 @@ class SelectDCaseView {
 			}
 			e.preventDefault();
 		});
+
 	}
 
 }

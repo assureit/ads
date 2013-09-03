@@ -9,25 +9,29 @@ var DCaseFile = (function () {
 var ImportFile = (function () {
     function ImportFile(selector) {
         this.selector = selector;
+        var flag = true;
         $(this.selector).on('dragenter', function (e) {
             e.stopPropagation();
             e.preventDefault();
+            if (flag) {
+            }
         }).on('dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(e.target).addClass('hover');
+            $(e.currentTarget).addClass('hover');
         }).on('dragleave', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $(e.target).removeClass('hover');
+            $(e.currentTarget).removeClass('hover');
+            flag = true;
         });
     }
     ImportFile.prototype.read = function (callback) {
-        $(this.selector).on('drop', function (e) {
-            e.stopPropagation();
-            e.preventDefault();
-            $(e.target).removeClass('hover');
-            var file = (e.originalEvent.dataTransfer).files[0];
+        $(this.selector).on('drop', function (ev) {
+            ev.stopPropagation();
+            ev.preventDefault();
+            $(ev.currentTarget).removeClass('hover');
+            var file = (ev.originalEvent.dataTransfer).files[0];
             if (file) {
                 var reader = new FileReader();
                 reader.onerror = function (e) {
@@ -35,7 +39,7 @@ var ImportFile = (function () {
                 };
                 reader.onload = function (e) {
                     var dcaseFile = new DCaseFile((e.target).result, file.name);
-                    callback(dcaseFile);
+                    callback(dcaseFile, ev.currentTarget);
                 };
                 reader.readAsText(file, 'utf-8');
             }

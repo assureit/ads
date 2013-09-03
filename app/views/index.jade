@@ -1,146 +1,75 @@
 extends layout
+block append content
+    script#case_tmpl(type="text/x-jquery-tmpl")
+        li.media
+            img.media-object.pull-left(data-src="holder.js/64x64",alt="64x64",style="width: 64px; height: 64px;",src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABP0lEQVR4Xu2YQQ7DIAwEyTnfyrN5U245t6ISFUptEhNQEUxvFdTxrsxOyrLv+8tN/FkwgAngCJABE2egIwShABSAAlAACkzsABgEg2AQDILBiSHAnyEwCAbBIBgEg2BwYgeqYNB7/7Vw27YfO+O6tKZ536Km9KzHBqTiJKFXQqSmWtTUjK5qQE5MWLs7AVcTU2JqcwPiA84ipWbPArXvlpqlMVZ1AiQh67q64zg+/aXmpMZoa2G/pWaJCX8zIDSrjXouA8KaZmqXBpybkqZAOzbaBORqWk1oOgGxmSs6WI5ArqZVfNj/2IB0lLWkvxt6WkbUerdo8h5Q4npPv6kyAT0JsvaCAdwIcSPEjRA3QtbkHGk/FIACUAAKQIGRUt2qBQpAASgABaCANTlH2g8FoAAUgAJQYKRUt2qBArNT4A1sFqCQARPBMwAAAABJRU5ErkJggg==")
+            .media-body
+                h4
+                    |@${dcaseId} 
+                    a(href='./case/${dcaseId}') ${dcaseName}
+                    a.btn.btn-danger.btn-mini.pull-right.DeleteCaseButton
+                        i.icon-trash　&nbsp;
+                        |Delete
+                    span.pull-right
+                        i.icon-sitemap
+                        | 0&nbsp;
+                p ${description}
+                small
+                    |${userName} updated 
+                    abbr(title="${latestCommit.dateTime}") ${dateTime}
+    script#project_tmpl(type="text/x-jquery-tmpl")
+        article(id="project${projectId}")
+            h3 #${projectId} ${projectName} &nbsp;
+                a.btn.btn-success.btn-small.pull-right.NewCaseButton(href='./new/${projectId}')
+                    i.icon-plus　&nbsp;
+                    |New case
+            ul.inline
+                li
+                    i.icon-user　&nbsp;
+                    |${users && users.length > 0 ? users.length : "Public"}
+                |{{if users}}
+                |{{each users}}
+                li
+                    |${this.name}
+                |{{/each}}
+                |{{/if}}
+            ul.media-list
+                |{{tmpl(cases) "#case_tmpl"}}
+            hr
 block bar
-    img#menu-button(src="#{basepath}/images/ait.png") Menu
+    a(href="#{basepath}/")
+        img#menu-button(src="#{basepath}/images/ait.png") Menu
     .menu
         ul#drop-menu
-            li
-                a(href='#{basepath}/')= lang.home
-            li.line.ads-edit-menu
-                a(href='#') Edit
-                ul
-                    li
-                        a(href='#{basepath}/new') New
-                    li
-                        a(href='#{basepath}/clone') Clone
-                    li
-                        a#menu-undo(href='#')= lang.undo
-                    li
-                        a#menu-redo(href='#')= lang.redo
-                    li
-                        a#menu-commit(href='#')= lang.commit
-            li.ads-edit-menu.ads-view-menu
-                a(href='#') Checker
-                ul
-                    li
-                        a(href='#') Simple verifier
-                    li
-                        a(href='#') Agda
-            li.ads-edit-menu.ads-view-menu
-                a(href='#') Export
-                ul
-                    li
-                        a#menu-export-json(href="#") JSON
-                    li
-                        a#menu-export-png(href="#") PNG
-                    li
-                        a#menu-export-pef(href="#") PDF
-                    li
-                        a#menu-export-dscript(href="#") D-Script
-                    li
-                        a#menu-export-bash(href="#") Bash
-                    li
-                        a#menu-export-xml(href="#") XML
-            li.ads-edit-menu.ads-view-menu
-                a#menu-history-toggle(href="#")= lang.commitlog
-            li.ads-edit-menu.ads-view-menu
-                a(href="#")= lang.config
-                ul
-                    li
-                        a Gesture
-                    li
-                        a(href="#")= lang.color_theme
-                        ul#menu-change-theme
-                    li
-                        a(href="#")= lang.locale
-                        ul#lang-theme
-                            li
-                                a#lang-select-english(href="#") English
-                            li
-                                a#lang-select-japanese(href="#") Japanese
-            block sign
+            if userName
+                li#monitors-menu
+                    a(href='#') Monitors
+                li#settings-menu
+                    a(href='#') Settings
+                include signout
+            else
+                include signin
 block content
-    #ase.container
-        #viewer(style="display: none;")
-        #dcase-manager.container-fluid(style="display: none;")
-            .row
-                #newDCase.span6.offset3(style='display: none;')
-                    h2= lang.new_DCase
-                    form.form-horizontal
-                        .control-group#newdcase-name
-                            label.control-label(for="inputDCaseName")= lang.DCase_name
-                            .controls
-                                input#inputDCaseName(type="text", id="inputDCaseName")
-                        .control-group#newdcase-desc
-                            label.control-label(for="inputDesc")= lang.topgoal
-                            .controls
-                                textarea#inputDesc(rows=5)
-                        .control-group
-                            .controls
-                                button.btn#dcase-create(type="button")= lang.create
-                #dcase-tags.span2.offset2
-                    h4 Tags
-                    hr
-                    ul#dcase-tags-ul.unstyled
-                        li
-                            a(href='#')#alltags All
-                        li.line
-                    a(href='#')
-                        div(align='right') タグを全て表示
-                #selectDCase.span6
-                    h2 DCaseを選択
-                    table.table.table-striped.table-hover
-                        thead
-                            tr
-                                th= lang.DCase_name
-                                th= lang.creater
-                                th= lang.last_commit
-                                th= lang.last_commiter
-                                th Edit
-                                th Delete
-                        tbody#dcase-select-table
-                    .pagination
-                        ul
-                            li
-                                a#prev-page(href='#') &laquo;
-                            li
-                                a#next-page(href='#') &raquo;
-            .dropdown#edit-menulist(style="display: none;")
-                a.dropdown-toggle(data-toggle="dropdown", href="#")
-                    i.icon-list
-                ul.dropdown-menu
-                    li
-                        a#ml-cut(href="#")= lang.cut
-                    li
-                        a#ml-copy(href="#")= lang.copy
-                    li
-                        a#ml-paste(href="#")= lang.paste
-                    li
-                        a#ml-delete(href="#")= lang.delete
-                    li.divider
-                    li
-                        a#ml-openall(href="#")= lang.openall
-                    li
-                        a#ml-closeall(href="#")= lang.closeall
-                    li.divider
-                    li.dropdown-submenu
-                        a(tabindex="-1", href="#")= lang.export
-                        ul.dropdown-menu
-                            li
-                                a#ml-export-json(href="#") JSON
-                            li
-                                a#ml-export-png(href="#") PNG
-                            li
-                                a#ml-export-pdf(href="#") PDF
-                            li
-                                a#ml-export-dscript(href="#") D-Script
-            table#edit-newnode(style="display: none;")
-                    tr
-                        td(width="80")
-                            ul.nav.nav-list(style="min-height: 100px;")
-                        td(width="200")
-                            textarea(style="margin: 0px; padding: 0px; width: 100%; height: 100%;")
-block svg
-    svg(width="0", height="0")
-        defs
-            marker#Triangle-black(viewBox="0 0 10 10", refX="10", refY="5", markerUnits="strokeWidth", markerWidth="15", markerHeight="9", orient="auto")
-                path(d="M 0 0 L 10 5 L 0 10 z", fill="gray", stroke="gray")
+    #dcase-manager.container-fluid(style="display: none;")
+        .row
+            #newDCase.span6.offset3(style='display: none;')
+                h2= lang.new_DCase
+                form.form-horizontal
+                    .control-group#newdcase-name
+                        label.control-label(for="inputDCaseName")= lang.DCase_name
+                        .controls
+                            input#inputDCaseName(type="text", id="inputDCaseName")
+                    .control-group#newdcase-desc
+                        label.control-label(for="inputDesc")= lang.topgoal
+                        .controls
+                            textarea#inputDesc(rows=5)
+                    .control-group
+                        .controls
+                            button.btn#dcase-create(type="button")= lang.create
+            #selectDCase.span6.offset2
+                h2 Projects&nbsp;
+                    a.btn.btn-success.pull-right.NewProjectButton(href="./project/new")
+                        i.icon-plus &nbsp;
+                        |New project
+                hr
+                #ProjectList

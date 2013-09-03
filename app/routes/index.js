@@ -8,12 +8,41 @@ var util_auth = require('../util/auth');
 var CONFIG = require('config');
 
 exports.index = function (req, res) {
-    var page = 'signin';
-    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja };
+    var page = 'index';
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: null };
     var auth = new util_auth.Auth(req, res);
     if (auth.isLogin()) {
-        page = 'signout';
         params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
+    }
+
+    if (req.cookies.lang == 'en') {
+        params.lang = lang.lang.en;
+    }
+
+    res.render(page, params);
+};
+
+exports.newprojectView = function (req, res) {
+    var page = 'newproject';
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: null };
+    var auth = new util_auth.Auth(req, res);
+    if (auth.isLogin()) {
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
+    }
+
+    if (req.cookies.lang == 'en') {
+        params.lang = lang.lang.en;
+    }
+
+    res.render(page, params);
+};
+
+exports.caseView = function (req, res) {
+    var page = 'case';
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, caseId: req.params.id };
+    var auth = new util_auth.Auth(req, res);
+    if (auth.isLogin()) {
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName(), caseId: req.params.id };
     }
 
     if (req.cookies.lang == 'en') {

@@ -52,9 +52,18 @@ module DCaseAPI {
 		}
 	};
 
-	export var createDCase = function(name, tree) {
+	export var getProjectDCase = function(pageIndex: number, projectId: number) {
+		return this.call("searchDCase", {page: pageIndex, projectId: projectId});
+	};
+
+	export var createDCase = function(name, tree, projectId) {
 		return this.call("createDCase", {
-			dcaseName: name, contents: tree });
+			dcaseName: name, contents: tree , projectId: projectId });
+	};
+
+	export var createProject = function(name, isPublic) {
+		return this.call("createProject", {
+			name: name, isPublic: isPublic });
 	};
 
 	export var getCommitList = function(dcaseId) {
@@ -76,6 +85,14 @@ module DCaseAPI {
 	
 	export var getDCase = function(dcaseId) {
 		return this.call("getDCase", { dcaseId: dcaseId });
+	};
+
+	export var getProjectList = function(userId) {
+		return this.call("getProjectList", { userId: userId });
+	};
+
+	export var getPublicProjectList = function() {
+		return this.call("getPublicProjectList", {});
 	};
 	
 	export var editDCase = function(dcaseId, name) {

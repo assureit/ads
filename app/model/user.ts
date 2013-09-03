@@ -8,6 +8,9 @@ export class User {
 		this.deleteFlag = !!this.deleteFlag;
 		this.systemFlag = !!this.systemFlag;
 	}
+	static tableToObject(row:any) {
+		return new User(row.id, row.login_name, row.delete_flag, row.system_flag);
+	}
 }
 
 export class UserDAO extends model.DAO {

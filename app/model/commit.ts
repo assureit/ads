@@ -4,7 +4,8 @@ import model = module('./model')
 import model_user = module('./user')
 import model_node = module('../model/node')
 import model_issue = module('../model/issue')
-import model_monitor = module('../model/monitor')
+import asn_parser = module('../util/asn-parser')
+//import model_monitor = module('../model/monitor')
 var async = require('async')
 
 export interface InsertArg {
@@ -18,6 +19,9 @@ export class Commit {
 	public user: model_user.User;
 	constructor(public id:number, public prevCommitId: number, public dcaseId: number, public userId: number, public message:string, public data:string, public dateTime: Date, public latestFlag: bool) {
 		this.latestFlag = !!this.latestFlag;
+	}
+	static tableToObject(row:any) {
+		return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.message, row.data, row.date_time, row.latest_flag);
 	}
 }
 export class CommitDAO extends model.DAO {
@@ -83,33 +87,36 @@ export class CommitDAO extends model.DAO {
 	}
 
 
-	commit(userId:number, previousCommitId:number, message: string, contents:any, commitCallback: (err:any, result:any)=>void) {
+	commit(userId:number, previousCommitId:number, message: string, contents:string, commitCallback: (err:any, result:any)=>void) {
 		async.waterfall([
 			(callback) => {
 				this.get(previousCommitId, (err:any, com: Commit) => {callback(err, com);});
 			}
 			, (com: Commit, callback) => {
-				this.insert({data: JSON.stringify(contents), prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message}, (err:any, commitId:number) => {callback(err, com, commitId);});
+				this.insert({data: contents, prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message}, (err:any, commitId:number) => {callback(err, com, commitId);});
 			}
 			, (com: Commit, commitId: number, callback) => {
+				var parser = new asn_parser.ASNParser();
+				var nodes = parser.parseNodeList(contents);
 				var nodeDAO = new model_node.NodeDAO(this.con);
-				nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, (err:any) => {callback(err, com, commitId);});
+				nodeDAO.insertList(com.dcaseId, commitId, nodes, (err:any) => {callback(err, com, commitId);});
 			}
 			, (com: Commit, commitId: number, callback) => {
-				this.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
-			} 
-			, (com: Commit, commitId: number, callback) => {
-				var issueDAO = new model_issue.IssueDAO(this.con);
-				issueDAO.publish(com.dcaseId, (err:any) => {
-					callback(err, com, commitId);
-				});
-			} 
-			, (com: Commit, commitId: number, callback) => {
-				var monitorDAO = new model_monitor.MonitorDAO(this.con);
-				monitorDAO.publish(com.dcaseId, (err:any) => {
-					callback(err, {commitId: commitId});
-				});
-			} 
+				// this.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
+				this.update(commitId, contents, (err:any) => callback(err, {commitId: commitId}));
+			}
+			// , (com: Commit, commitId: number, callback) => {
+			// 	var issueDAO = new model_issue.IssueDAO(this.con);
+			// 	issueDAO.publish(com.dcaseId, (err:any) => {
+			// 		callback(err, {commitId: commitId});
+			// 	});
+//			} 
+//			, (com: Commit, commitId: number, callback) => {
+//				var monitorDAO = new model_monitor.MonitorDAO(this.con);
+//				monitorDAO.publish(com.dcaseId, (err:any) => {
+//					callback(err, {commitId: commitId});
+//				});
+			// }
 		], (err:any, result:any) => {
 			if (err) {
 				this.con.rollback();

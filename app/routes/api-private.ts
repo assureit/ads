@@ -6,6 +6,6 @@ jsonrpc.add('version', function(params: any, userId: number, callback: type.Call
 	callback.onSuccess('version 1.0');
 });
 
-jsonrpc.addModule(monitor);
+// jsonrpc.addModule(monitor);
 
 export var httpHandler = jsonrpc.httpHandler;

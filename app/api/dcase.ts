@@ -9,6 +9,7 @@ import model_node = module('../model/node')
 import model_pager = module('../model/pager')
 import model_issue = module('../model/issue')
 import model_user = module('../model/user')
+import model_project = module('../model/project')
 import model_tag = module('../model/tag')
 import error = module('./error')
 var async = require('async')
@@ -22,12 +23,12 @@ export function searchDCase(params:any, userId: number, callback: type.Callback)
 	var tagList = _.filter(params.tagList, (it:string) => {return typeof(it) == 'string';});
 	async.waterfall([
 		(next) => {
-			dcaseDAO.list(params.page, tagList, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
+			dcaseDAO.list(params.page, userId, params.projectId, tagList, (err:any, pager: model_pager.Pager, result: model_dcase.DCase[]) => {
 				next(err, pager, result);
 			});
 		}, 
 		(pager:model_pager.Pager, dcaseList:model_dcase.DCase[], next) => {
-			tagDAO.search(tagList, (err:any, tagList:model_tag.Tag[]) => {
+			tagDAO.search(userId, tagList, (err:any, tagList:model_tag.Tag[]) => {
 				next(err, pager, dcaseList, tagList);
 			});
 		}],
@@ -180,6 +181,7 @@ export function createDCase(params:any, userId: number, callback: type.Callback)
 		if (params && !params.dcaseName) checks.push('DCase name is required.');
 		if (params && params.dcaseName && params.dcaseName.length > 255) checks.push('DCase name should not exceed 255 characters.');
 		if (params && !params.contents) checks.push('Contents is required.');
+		if (params && !params.projectId) params.projectId = constant.SYSTEM_PROJECT_ID;
 		if (checks.length > 0) {
 			callback.onFailure(new error.InvalidParamsError(checks, null));
 			return false;
@@ -197,27 +199,20 @@ export function createDCase(params:any, userId: number, callback: type.Callback)
 				return;
 			}
 			var dcaseDAO = new model_dcase.DCaseDAO(con);
-			dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName}, (err:any, dcaseId:number) => {
+			dcaseDAO.insert({userId: userId, dcaseName: params.dcaseName, projectId: params.projectId}, (err:any, dcaseId:number) => {
 				if (err) {
 					callback.onFailure(err);
 					return;
 				}
 				var commitDAO = new model_commit.CommitDAO(con);
-				commitDAO.insert({data: JSON.stringify(params.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (err:any, commitId:number) => {
+				commitDAO.insert({data: params.contents, dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (err:any, commitId:number) => {
 					if (err) {
 						callback.onFailure(err);
 						return;
 					}
-					var nodeDAO = new model_node.NodeDAO(con);
-					nodeDAO.insertList(dcaseId, commitId, params.contents.NodeList, (err:any) => {
-						if (err) {
-							callback.onFailure(err);
-							return;
-						}
-						con.commit((err, result) =>{
-							callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
-							con.close();
-						});
+					con.commit((err, result) =>{
+						callback.onSuccess({dcaseId: dcaseId, commitId: commitId});
+						con.close();
 					});
 				});
 			});
@@ -243,38 +238,42 @@ export function commit(params: any, userId: number, callback: type.Callback) {
 
 	var con = new db.Database();
 	var commitDAO = new model_commit.CommitDAO(con);
-	con.begin((err, result) => {
-		var userDAO = new model_user.UserDAO(con);
-		userDAO.select(userId, (err:any, user: model_user.User) => {
+	var userDAO = new model_user.UserDAO(con);
+	var projectDAO = new model_project.ProjectDAO(con);
+	async.waterfall([
+		(next) => {
+			con.begin((err, result) => next(err));
+		},
+		(next) => {
+			userDAO.select(userId, (err:any, user: model_user.User) => next(err, user));
+		},
+		(user:model_user.User, next) => {
+			commitDAO.get(params.commitId, (err:any, resultCheck) => next(err, resultCheck));
+		},
+		(resultCheck, next) => {
+			if (resultCheck.latestFlag == false) {
+				next(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
+				return;
+			}
+			// commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err:any, result:any) => next(err, resultCheck.dcaseId, result));
+			commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err:any, result:any) => next(err, result));
+		},
+		// (dcaseId:number, commitResult, next) => {
+		// 	projectDAO.updateMember(dcaseId, (err:any) => next(err, commitResult));
+		// },
+		(commitResult, next) => {
+			con.commit((err, result) => next(err, commitResult));
+		}
+		], 
+		(err:any, result:any) => {
+			con.close();
 			if (err) {
 				callback.onFailure(err);
 				return;
 			}
-
-			commitDAO.get(params.commitId, (err, resultCheck) => {
-				if (err) {
-					callback.onFailure(err);
-					return;
-				}
-				if (resultCheck.latestFlag == false) {
-					callback.onFailure(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
-					return;
-				}
-
-				// _commit(con, params.commitId, params.commitMessage, params.contents, (err, result) => {
-				commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err, result) => {
-					con.commit((err, _result) =>{
-						if (err) {
-							callback.onFailure(err);
-							return;
-						}
-						callback.onSuccess(result);
-						con.close();
-					});
-				});
-			});
-		});
-	});
+			callback.onSuccess(result);
+		}
+	);
 };
 
 export function deleteDCase(params:any, userId: number, callback: type.Callback) {

@@ -35,7 +35,7 @@ export class TagDAO extends model.DAO {
 	 * 検索結果のDCaseとひもづくタグの配列を取得する.
 	 * 参照: model.dcase.DCaseDAO#list
 	 */
-	search(tagList:string[], callback:(err:any, list: Tag[])=>void) {
+	search(userId:number, tagList:string[], callback:(err:any, list: Tag[])=>void) {
 		if (!tagList || tagList.length == 0) {
 			this.list(callback);
 			return;
@@ -45,12 +45,13 @@ export class TagDAO extends model.DAO {
 				var tagVars = _.map(tagList, (tag:string)=>{return '?';}).join(',');
 				var sql = 'SELECT id, label, COUNT(id) as cnt FROM ( ' +
 							'SELECT t2.* ' +
-							'FROM dcase d, commit c, tag t, dcase_tag_rel r, dcase_tag_rel r2, tag t2 ' +
+							'FROM dcase d, commit c, tag t, dcase_tag_rel r, dcase_tag_rel r2, tag t2, (SELECT DISTINCT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND p.delete_flag = FALSE AND (p.public_flag = TRUE OR pu.user_id = ?)) p ' +
 							'WHERE d.id = c.dcase_id  ' +
 							'AND t.id = r.tag_id   ' +
 							'AND r.dcase_id = d.id ' +
 							'AND r2.dcase_id = d.id ' +
 							'AND r2.tag_id = t2.id ' +
+							'AND p.id = d.project_id ' +
 							'AND c.latest_flag = TRUE  ' +
 							'AND d.delete_flag = FALSE  ' +
 							'AND t.label IN (' + tagVars + ') ' +
@@ -59,7 +60,7 @@ export class TagDAO extends model.DAO {
 							') v ' +
 							'GROUP BY id ' +
 							'ORDER BY cnt DESC, id ';
-				this.con.query(sql, tagList, (err:any, result:any) => {
+				this.con.query(sql, [userId].concat(tagList), (err:any, result:any) => {
 						// console.log(sql);
 						// console.log(tagList);
 						// console.log(result);

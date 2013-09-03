@@ -3,8 +3,16 @@ body {
 	margin: 0px;
 }
 
-.hover {
-	background-color: #0ff;
+article * {
+	border: none;
+	overflow: hidden;
+}
+
+article.hover {
+	background-color: #eee;
+/*	border: 10px dashed;
+	border-color: #000;
+	margin: -10px;*/
 }
 
 #viewer {
@@ -29,4 +37,25 @@ body {
 #alltags {
 	color: #000;
 	font-weight: bold;
+}
+
+#assureit-status {
+	position: absolute;
+	left: 10px;
+	top : 52px;
+	-webkit-transition: all ease-in-out;
+	-webkit-transition-delay: 0.5s;
+	-moz-transition: all ease-in-out 0.5s;
+	-o-transition: all ease-in-out 0.5s;
+	transition: all ease-in-out 0.5s;
+}
+
+#assureit-status ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.CodeMirror {
+	z-index: 99999;
 }

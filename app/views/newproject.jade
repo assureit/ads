@@ -1,0 +1,34 @@
+extends layout
+block bar
+    a(href="#{basepath}/")
+        img#menu-button(src="#{basepath}/images/ait.png") Menu
+    .menu
+        ul#drop-menu
+            if userName
+                li#monitors-menu
+                    a(href='#') Monitors
+                li#settings-menu
+                    a(href='#') Settings
+                block sign
+            else
+                block sign
+block content
+    #dcase-manager.container-fluid
+        .row
+            #newProject.span6.offset3
+                h2= lang.new_Project
+                form.form-horizontal
+                    fieldset
+                        label(for="inputProjectName")= lang.Project_name
+                        input#inputProjectName(type="text", id="inputProjectName")
+                        label.checkbox
+                            input#inputIsPublic(type="checkbox",checked="checked")
+                            |Public Project
+                        label.radio.inline
+                            input#inputIsEnglish(type="radio",name="optionsRadios",id="en",value="en",checked="checked")
+                            |English
+                        label.radio.inline
+                            input(type="radio",name="optionsRadios",id="ja",value="ja")
+                            |Japanese
+                        label= lang.Public_project
+                            button.btn#project-create(type="button")= lang.create

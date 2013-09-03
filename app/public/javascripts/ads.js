@@ -1,7 +1,7 @@
 var ADS = (function () {
     function ADS(body) {
         var _this = this;
-        this.TITLE_SUFFIX = " - Assurance DS";
+        this.TITLE_SUFFIX = " - Assure-It";
         this.URL_EXPORT = Config.BASEPATH + "/export";
         this.selectDCaseView = new SelectDCaseView();
         this.selectDCaseView.initEvents();
@@ -9,7 +9,7 @@ var ADS = (function () {
         this.createDCaseView = new CreateDCaseView();
 
         var router = new Router();
-        router.route("new", "new", function () {
+        router.route("new/:project", "new", function (project) {
             var userId = _this.getLoginUserorNull();
             _this.initDefaultScreen(userId, 1, null);
             $("#newDCase").show();
@@ -17,10 +17,27 @@ var ADS = (function () {
             $("#dcase-tags").hide();
 
             if (_this.isLogin(userId)) {
-                _this.createDCaseView.enableSubmit();
+                _this.createDCaseView.enableSubmit(Number(project));
             } else {
                 _this.createDCaseView.disableSubmit();
             }
+        });
+
+        router.route("project/new", "project", function () {
+            var create_pressed = false;
+            $("#project-create").click(function () {
+                if (create_pressed)
+                    return;
+                create_pressed = true;
+                var name = $("#inputProjectName").attr("value");
+                var isPublic = $("#inputIsPublic").attr("checked") != null;
+                var language = ($("#inputIsEnglish").attr("checked") != null) ? "en" : "ja";
+                console.log(name);
+                console.log(isPublic);
+                console.log(language);
+                var r = DCaseAPI.createProject(name, isPublic);
+                location.href = "../";
+            });
         });
 
         var defaultRouter = function (pageIndex, tag) {
@@ -28,15 +45,20 @@ var ADS = (function () {
             $("#newDCase").hide();
             $("#selectDCase").show();
             $("#dcase-tags").show();
-            var importFile = new ImportFile("#ase");
-            importFile.read(function (file) {
-                var tree = JSON.parse(file.result);
-                if ("contents" in tree) {
-                    var r = DCaseAPI.createDCase(tree.contents.DCaseName, tree.contents);
-                    location.href = "./dcase/" + r.dcaseId;
-                } else {
-                    alert("Invalid File");
-                }
+            var importFile = new ImportFile("article");
+            importFile.read(function (file, target) {
+                var x2dc = new Xml2DCaseTree.Converter();
+                var tree = x2dc.parseXml(file.result);
+                var j = tree.convertAllChildNodeIntoJson([]);
+                var contents = {
+                    DCaseName: file.name,
+                    NodeCount: tree.NodeCount,
+                    TopGoalId: tree.TopGoalId,
+                    NodeList: j
+                };
+                var projectId = parseInt($(target).attr("id").replace(/[a-zA-Z]*/, ""));
+                var r = DCaseAPI.createDCase(file.name, contents, projectId);
+                location.href = "./case/" + r.dcaseId;
             });
         };
 
@@ -134,6 +156,9 @@ var ADS = (function () {
         this.hideViewer();
         this.hideEditMenu();
         this.hideViewMenu();
+        if (!this.isLogin(userId)) {
+            $("#create-case-menu").css("display", "none");
+        }
 
         $("#dcase-manager").css("display", "block");
 
