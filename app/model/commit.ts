@@ -4,6 +4,7 @@ import model = module('./model')
 import model_user = module('./user')
 import model_node = module('../model/node')
 import model_issue = module('../model/issue')
+import asn_parser = module('../util/asn-parser')
 //import model_monitor = module('../model/monitor')
 var async = require('async')
 
@@ -86,7 +87,7 @@ export class CommitDAO extends model.DAO {
 	}
 
 
-	commit(userId:number, previousCommitId:number, message: string, contents:any, commitCallback: (err:any, result:any)=>void) {
+	commit(userId:number, previousCommitId:number, message: string, contents:string, commitCallback: (err:any, result:any)=>void) {
 		async.waterfall([
 			(callback) => {
 				this.get(previousCommitId, (err:any, com: Commit) => {callback(err, com);});
@@ -94,10 +95,12 @@ export class CommitDAO extends model.DAO {
 			, (com: Commit, callback) => {
 				this.insert({data: contents, prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message}, (err:any, commitId:number) => {callback(err, com, commitId);});
 			}
-			//, (com: Commit, commitId: number, callback) => {
-			//	var nodeDAO = new model_node.NodeDAO(this.con);
-			//	nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, (err:any) => {callback(err, com, commitId);});
-			//}
+			, (com: Commit, commitId: number, callback) => {
+				var parser = new asn_parser.ASNParser();
+				var nodes = parser.parseNodeList(contents);
+				var nodeDAO = new model_node.NodeDAO(this.con);
+				nodeDAO.insertList(com.dcaseId, commitId, nodes, (err:any) => {callback(err, com, commitId);});
+			}
 			, (com: Commit, commitId: number, callback) => {
 				// this.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
 				this.update(commitId, contents, (err:any) => callback(err, {commitId: commitId}));

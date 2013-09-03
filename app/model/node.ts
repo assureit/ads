@@ -11,27 +11,17 @@ import error = module('../api/error')
 var _ = require('underscore');
 var async = require('async');
 
-export interface MetaData {
-	Type: string;
-	Subject?: string;
-	Description?: string;
-	Visible?:string;
-	// for Issue
-	_IssueId?: number;
-	// for monitor
-	_MonitorNodeId?: number;
-	WatchId?: string;
-	PresetId?: string;
-	Tag?: string;
-	User?: string;
+export interface NodeNote {
+	Name: string;
+	Body: any;
 }
 export interface NodeData {
-	ThisNodeId: number;
-	Description: string;
-	NodeType: string;
-	Children?: number[];
-	Contexts?: number[];
-	MetaData?: MetaData[];
+	Type: string;
+	Label: string;
+	Statement: string;
+	Annotations:any;
+	Children?: any[];
+	Notes?: NodeNote[];
 }
 export class Node {
 	public dcase: model_dcase.DCase;
@@ -44,50 +34,50 @@ export class NodeDAO extends model.DAO {
 	 *   イシュー発行
 	 *   モニタ作成
 	 */
-	processNodeList(dcaseId:number, commitId:number, list: NodeData[], callback: (err:any)=>void): void {
-		this._processNodeList(dcaseId, commitId, list, list, callback);
-	}
+	// processNodeList(dcaseId:number, commitId:number, list: NodeData[], callback: (err:any)=>void): void {
+	// 	this._processNodeList(dcaseId, commitId, list, list, callback);
+	// }
 
-	_processNodeList(dcaseId:number, commitId:number, list: NodeData[], originalList:NodeData[], callback: (err:any)=>void): void {
-		if (list.length == 0) {
-			callback(null);
-			return;
-		}
-		this.processMetaDataList(dcaseId, commitId, list[0], list[0].MetaData, originalList, (err:any) => {
-			if (err) {
-				callback(err);
-				return;
-			}
-			this._processNodeList(dcaseId, commitId, list.slice(1), originalList, callback);
-		});
-	}
+	// _processNodeList(dcaseId:number, commitId:number, list: NodeData[], originalList:NodeData[], callback: (err:any)=>void): void {
+	// 	if (list.length == 0) {
+	// 		callback(null);
+	// 		return;
+	// 	}
+	// 	this.processMetaDataList(dcaseId, commitId, list[0], list[0].MetaData, originalList, (err:any) => {
+	// 		if (err) {
+	// 			callback(err);
+	// 			return;
+	// 		}
+	// 		this._processNodeList(dcaseId, commitId, list.slice(1), originalList, callback);
+	// 	});
+	// }
 
-	processMetaDataList(dcaseId:number, commitId:number, node:NodeData, list:MetaData[], originalList:NodeData[], callback: (err:any)=>void): void {
-		if (!list || list.length == 0) {
-			callback(null);
-			return;
-		}
-		this.processMetaData(dcaseId, commitId, node, list[0], originalList, (err:any) => {
-			if (err) {
-				callback(err);
-				return;
-			}
-			this.processMetaDataList(dcaseId, commitId, node, list.slice(1), originalList, callback);
-		});
-	}
-	processMetaData(dcaseId:number, commitId:number, node:NodeData, meta:MetaData, originalList:NodeData[], callback: (err:any)=>void): void {
-		if (meta.Type == 'Issue' && !meta._IssueId) {
-			var issueDAO = new model_issue.IssueDAO(this.con);
-			// TODO: 必要項目チェック
-			issueDAO.insert(new model_issue.Issue(0, dcaseId, null, meta.Subject, meta.Description), (err:any, result:model_issue.Issue) => {
-				if(err) {
-					callback(err);
-					return;					
-				}
-				meta._IssueId = result.id;
-				callback(null);
-			});
-			return;
+	// processMetaDataList(dcaseId:number, commitId:number, node:NodeData, list:MetaData[], originalList:NodeData[], callback: (err:any)=>void): void {
+	// 	if (!list || list.length == 0) {
+	// 		callback(null);
+	// 		return;
+	// 	}
+	// 	this.processMetaData(dcaseId, commitId, node, list[0], originalList, (err:any) => {
+	// 		if (err) {
+	// 			callback(err);
+	// 			return;
+	// 		}
+	// 		this.processMetaDataList(dcaseId, commitId, node, list.slice(1), originalList, callback);
+	// 	});
+	// }
+	// processMetaData(dcaseId:number, commitId:number, node:NodeData, meta:MetaData, originalList:NodeData[], callback: (err:any)=>void): void {
+		// if (meta.Type == 'Issue' && !meta._IssueId) {
+		// 	var issueDAO = new model_issue.IssueDAO(this.con);
+		// 	// TODO: 必要項目チェック
+		// 	issueDAO.insert(new model_issue.Issue(0, dcaseId, null, meta.Subject, meta.Description), (err:any, result:model_issue.Issue) => {
+		// 		if(err) {
+		// 			callback(err);
+		// 			return;					
+		// 		}
+		// 		meta._IssueId = result.id;
+		// 		callback(null);
+		// 	});
+		// 	return;
 		//} else if (meta.Type == 'Monitor') {
 		//	// TODO: 必要項目チェック
 		//	var monitorDAO = new model_monitor.MonitorDAO(this.con);
@@ -147,15 +137,15 @@ export class NodeDAO extends model.DAO {
 		//		callback(err);
 		//	});
 		//	return;
-		} else {
-			callback(null);
-			return;
-		}
-	}
+	// 	} else {
+	// 		callback(null);
+	// 		return;
+	// 	}
+	// }
 	insert(commitId: number, data: NodeData, callback: (err:any, nodeId: number)=>void): void {
 		// TODO: node propertyをどうするべきか？TicketやMonitorに変更するべきか、meta.ticket1.id、meta.ticket1.nameなどとして並列にするか
-		this.con.query('INSERT INTO node(this_node_id, description, node_type, commit_id) VALUES(?,?,?,?)', 
-			[data.ThisNodeId, data.Description, data.NodeType, commitId], (err, result) => {
+		this.con.query('INSERT INTO node(description, node_type, commit_id) VALUES(?,?,?)', 
+			[JSON.stringify(data), data.Type, commitId], (err, result) => {
 			if (err) {
 				callback(err, null);
 				return;
@@ -207,10 +197,10 @@ export class NodeDAO extends model.DAO {
 
 	registerTag(dcaseId:number, list: NodeData[], callback: (err:any) => void) {
 		var tagDAO = new model_tag.TagDAO(this.con);
-		var metaDataList: MetaData[] = _.flatten(_.map(list, (node: NodeData) => {return node.MetaData;}));
-		metaDataList = _.filter(metaDataList, (meta: MetaData) => {return meta && meta.Type == 'Tag'});
+		var noteList: NodeNote[] = _.flatten(_.map(list, (node: NodeData) => {return node.Notes;}));
+		noteList = _.filter(noteList, (note: NodeNote) => {return note && note.Body.Type == 'Tag'});
 		var tagList = _.uniq(_.filter(
-			(_.map(metaDataList, (meta: MetaData) => {return meta.Tag})),
+			(_.map(noteList, (note: NodeNote) => {return note.Body.Tag})),
 			(tag:string) => {
 				return typeof(tag) == 'string' && tag.length > 0;
 			}));
