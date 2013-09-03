@@ -18,14 +18,17 @@ block content
             #newProject.span6.offset3
                 h2= lang.new_Project
                 form.form-horizontal
-                    .control-group#newproject-name
-                        label.control-label(for="inputProjectName")= lang.Project_name
-                        .controls
-                            input#inputProjectName(type="text", id="inputProjectName")
-                    .control-group#newproject-desc
-                        label.control-label(for="inputDesc")= lang.topgoal
-                        .controls
-                            textarea#inputDesc(rows=5)
-                    .control-group
-                        .controls
+                    fieldset
+                        label(for="inputProjectName")= lang.Project_name
+                        input#inputProjectName(type="text", id="inputProjectName")
+                        label.checkbox
+                            input(type="checkbox",checked="checked")
+                            |Public Project
+                        label.radio.inline
+                            input(type="radio",name="optionsRadios",id="en",value="en",checked="checked")
+                            |English
+                        label.radio.inline
+                            input(type="radio",name="optionsRadios",id="ja",value="ja")
+                            |Japanese
+                        label= lang.Public_project
                             button.btn#project-create(type="button")= lang.create
