@@ -34,7 +34,7 @@ class CreateDCaseView {
 			//	NodeCount: 1,
 			//};
 			var r: any = DCaseAPI.createDCase(name, tree, this.projectid);
-			location.href = "./case/" + r.dcaseId;
+			location.href = "../case/" + r.dcaseId;
 		});
 	}
 
