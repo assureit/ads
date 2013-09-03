@@ -19,7 +19,7 @@ describe('api.dcase', function () {
         validParam = {
             dcaseName: 'test dcase',
             projectId: 201,
-            contents: '*1\n' + 'dcase1\n' + '*2\n' + 's1\n' + '**3\n' + 'g1\n'
+            contents: '*goal\n' + 'dcase1\n' + '*strategy\n' + 's1\n' + '**goal\n' + 'g1\n'
         };
         testdata.load([], function (err) {
             con = new db.Database();
