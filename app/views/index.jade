@@ -45,9 +45,9 @@ block bar
                     a(href='#') Monitors
                 li#settings-menu
                     a(href='#') Settings
-                block sign
+                include signout
             else
-                block sign
+                include signin
 block content
     #dcase-manager.container-fluid(style="display: none;")
         .row
