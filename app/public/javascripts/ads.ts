@@ -9,6 +9,7 @@
 ///<reference path='DCaseTree.ts'/>
 ///<reference path='Xml2DCaseTree.ts'/>
 
+declare var AssureIt: any;
 class ADS {
 	TITLE_SUFFIX   : string = " - Assure-It";
 	URL_EXPORT     : string = Config.BASEPATH + "/export";
@@ -119,14 +120,28 @@ class ADS {
 				var x2dc : Xml2DCaseTree.Converter = new Xml2DCaseTree.Converter();
 				var tree : DCaseTree.TopGoalNode = x2dc.parseXml(file.result);
 				var j = tree.convertAllChildNodeIntoJson([]);
-				var contents = {
+
+				//FIXME convert from XML to ASN directly.
+				var converter: any = new AssureIt.Converter();
+				var encoder  : any = new AssureIt.CaseEncoder();
+				var decoder  : any = new AssureIt.CaseDecoder();
+
+				var s:any = {};
+				s.contents = JSON.stringify({
 					DCaseName: file.name,
 					NodeCount: tree.NodeCount,
 					TopGoalId: tree.TopGoalId,
 					NodeList: j
-				};
+				});
+
+				var JsonData: any = converter.GenNewJson(s);
+				var Case0: any = new AssureIt.Case(file.name, 0/*FIXME*/, 0/*FIXME*/, new AssureIt.PlugInManager("FIXME"));
+				var root: any = decoder.ParseJson(Case0, JsonData);
+				Case0.SetElementTop(root);
+				var encoded: any = encoder.ConvertToASN(Case0.ElementTop, false);
+
 				var projectId = parseInt($(target).attr("id").replace(/[a-zA-Z]*/,""));
-				var r = DCaseAPI.createDCase(file.name, contents, projectId);
+				var r = DCaseAPI.createDCase(file.name, encoded, projectId);
 				location.href = "./case/" + r.dcaseId;
 			});
 		}
