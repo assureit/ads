@@ -232,10 +232,15 @@ class SelectDCaseView {
 		console.log(project);
 		$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(projects) );
 
-		//$(".NewCaseButton").click(function(){
-		//	var projectId = (<any>($(this))).tmplItem().data.projectId;
-		//	location.href = "./new/" + projectId;
-		//});
+		$(".DeleteCaseButton").click(function(){
+			var dcaseId = (<any>($(this))).tmplItem().data.dcaseId;
+			if(window.confirm('dcaseを削除しますか?')) {
+				if(DCaseAPI.deleteDCase(dcaseId) != null) {
+					alert("削除しました");
+					location.reload();
+				}
+			}
+		});
 	}
 
 	initEvents() {

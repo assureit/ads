@@ -221,6 +221,16 @@ var SelectDCaseView = (function () {
         }
         console.log(project);
         $("#ProjectList").append(($)("#project_tmpl").tmpl(projects));
+
+        $(".DeleteCaseButton").click(function () {
+            var dcaseId = (($(this))).tmplItem().data.dcaseId;
+            if (window.confirm('dcaseを削除しますか?')) {
+                if (DCaseAPI.deleteDCase(dcaseId) != null) {
+                    alert("削除しました");
+                    location.reload();
+                }
+            }
+        });
     };
 
     SelectDCaseView.prototype.initEvents = function () {
