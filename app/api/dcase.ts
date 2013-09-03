@@ -255,11 +255,12 @@ export function commit(params: any, userId: number, callback: type.Callback) {
 				next(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
 				return;
 			}
-			commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err:any, result:any) => next(err, resultCheck.dcaseId, result));
+			// commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err:any, result:any) => next(err, resultCheck.dcaseId, result));
+			commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err:any, result:any) => next(err, result));
 		},
-		(dcaseId:number, commitResult, next) => {
-			projectDAO.updateMember(dcaseId, (err:any) => next(err, commitResult));
-		},
+		// (dcaseId:number, commitResult, next) => {
+		// 	projectDAO.updateMember(dcaseId, (err:any) => next(err, commitResult));
+		// },
 		(commitResult, next) => {
 			con.commit((err, result) => next(err, commitResult));
 		}
