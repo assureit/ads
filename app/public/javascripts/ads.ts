@@ -102,6 +102,7 @@ class ADS {
 				console.log(isPublic);
 				console.log(language);
 				var r = DCaseAPI.createProject(name, isPublic);
+				location.href = "../";
 			});
 		});
 

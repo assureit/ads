@@ -25,7 +25,6 @@ var CreateDCaseView = (function () {
             if (error)
                 return;
             var tree = "*Goal\n" + desc;
-
             var r = DCaseAPI.createDCase(name, tree, self.projectid);
             location.href = "../case/" + r.dcaseId;
         });
