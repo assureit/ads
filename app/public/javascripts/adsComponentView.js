@@ -192,7 +192,7 @@ var SelectDCaseView = (function () {
                 dcase.dateTime = this.formatDate(dcase.latestCommit.dateTime);
             }
         }
-
+        console.log(projects);
         $("#ProjectList").append(($)("#project_tmpl").tmpl(projects));
 
         $(".DeleteCaseButton").click(function () {

@@ -18,7 +18,7 @@ block append content
                     abbr(title="${latestCommit.dateTime}") ${dateTime}
     script#project_tmpl(type="text/x-jquery-tmpl")
         article(id="project${projectId}")
-            h3 ${projectName} &nbsp;
+            h3 #${projectId} ${projectName} &nbsp;
                 a.btn.btn-success.btn-small.pull-right.NewCaseButton(href='./new/${projectId}')
                     i.icon-plus　&nbsp;
                     |New case
