@@ -145,11 +145,11 @@ var SelectDCaseView = (function () {
     SelectDCaseView.prototype.addElements = function (userId, pageIndex, tags) {
         var isLoggedin = userId != null;
 
-        var projects = isLoggedin ? DCaseAPI.getProjectList(userId) : { projectList: [] };
+        var privateProjects = isLoggedin ? DCaseAPI.getProjectList(userId) : { projectList: [] };
         var publicProjects = DCaseAPI.getPublicProjectList();
-        projects.projectList = projects.projectList.concat(publicProjects.projectList);
-        for (var i = 0; i < projects.projectList.length; i++) {
-            var project = projects.projectList[i];
+        var projects = privateProjects.projectList.concat(publicProjects.projectList);
+        for (var i = 0; i < projects.length; i++) {
+            var project = projects[i];
             project.users = [];
             project.cases = [];
         }
@@ -190,7 +190,7 @@ var SelectDCaseView = (function () {
                 ]
             }
         ];
-        $("#ProjectList").append(($)("#project_tmpl").tmpl(projects.projectList));
+        $("#ProjectList").append(($)("#project_tmpl").tmpl(projects));
 
         $(".NewCaseButton").click(function () {
             var projectId = (($(this))).tmplItem().data.projectId;

@@ -11,7 +11,7 @@ var CONFIG = require('config')
 
 export var index = function(req: any, res: any) {
 	var page = 'signin';
-	var params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja };
+	var params: any = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: null};
 	var auth = new util_auth.Auth(req, res);
 	if(auth.isLogin()) {
 		page = 'signout';
