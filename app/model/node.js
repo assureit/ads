@@ -7,7 +7,7 @@ var __extends = this.__extends || function (d, b) {
 var model = require('./model');
 var model_dcase = require('./dcase');
 var model_pager = require('./pager');
-var model_issue = require('./issue');
+
 var model_tag = require('./tag');
 
 
@@ -31,59 +31,8 @@ var NodeDAO = (function (_super) {
     function NodeDAO() {
         _super.apply(this, arguments);
     }
-    NodeDAO.prototype.processNodeList = function (dcaseId, commitId, list, callback) {
-        this._processNodeList(dcaseId, commitId, list, list, callback);
-    };
-
-    NodeDAO.prototype._processNodeList = function (dcaseId, commitId, list, originalList, callback) {
-        var _this = this;
-        if (list.length == 0) {
-            callback(null);
-            return;
-        }
-        this.processMetaDataList(dcaseId, commitId, list[0], list[0].MetaData, originalList, function (err) {
-            if (err) {
-                callback(err);
-                return;
-            }
-            _this._processNodeList(dcaseId, commitId, list.slice(1), originalList, callback);
-        });
-    };
-
-    NodeDAO.prototype.processMetaDataList = function (dcaseId, commitId, node, list, originalList, callback) {
-        var _this = this;
-        if (!list || list.length == 0) {
-            callback(null);
-            return;
-        }
-        this.processMetaData(dcaseId, commitId, node, list[0], originalList, function (err) {
-            if (err) {
-                callback(err);
-                return;
-            }
-            _this.processMetaDataList(dcaseId, commitId, node, list.slice(1), originalList, callback);
-        });
-    };
-    NodeDAO.prototype.processMetaData = function (dcaseId, commitId, node, meta, originalList, callback) {
-        if (meta.Type == 'Issue' && !meta._IssueId) {
-            var issueDAO = new model_issue.IssueDAO(this.con);
-
-            issueDAO.insert(new model_issue.Issue(0, dcaseId, null, meta.Subject, meta.Description), function (err, result) {
-                if (err) {
-                    callback(err);
-                    return;
-                }
-                meta._IssueId = result.id;
-                callback(null);
-            });
-            return;
-        } else {
-            callback(null);
-            return;
-        }
-    };
     NodeDAO.prototype.insert = function (commitId, data, callback) {
-        this.con.query('INSERT INTO node(this_node_id, description, node_type, commit_id) VALUES(?,?,?,?)', [data.ThisNodeId, data.Description, data.NodeType, commitId], function (err, result) {
+        this.con.query('INSERT INTO node(description, node_type, commit_id) VALUES(?,?,?)', [JSON.stringify(data), data.Type, commitId], function (err, result) {
             if (err) {
                 callback(err, null);
                 return;
@@ -136,14 +85,14 @@ var NodeDAO = (function (_super) {
 
     NodeDAO.prototype.registerTag = function (dcaseId, list, callback) {
         var tagDAO = new model_tag.TagDAO(this.con);
-        var metaDataList = _.flatten(_.map(list, function (node) {
-            return node.MetaData;
+        var noteList = _.flatten(_.map(list, function (node) {
+            return node.Notes;
         }));
-        metaDataList = _.filter(metaDataList, function (meta) {
-            return meta && meta.Type == 'Tag';
+        noteList = _.filter(noteList, function (note) {
+            return note && note.Body.Type == 'Tag';
         });
-        var tagList = _.uniq(_.filter((_.map(metaDataList, function (meta) {
-            return meta.Tag;
+        var tagList = _.uniq(_.filter((_.map(noteList, function (note) {
+            return note.Body.Tag;
         })), function (tag) {
             return typeof (tag) == 'string' && tag.length > 0;
         }));

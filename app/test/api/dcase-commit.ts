@@ -17,7 +17,7 @@ var dSvr = require('../server')
 
 var userId = constant.SYSTEM_USER_ID;
 
-describe('api', function() {
+describe('api.dcase', function() {
 	var con:db.Database;
 	var validParam:any;
 
@@ -25,77 +25,46 @@ describe('api', function() {
 		validParam = {
 			commitId: 401,
 			commitMessage: 'test',
-			contents: {
-				NodeCount:3,
-				TopGoalId:1,
-				NodeList:[
-					{
-						ThisNodeId:1,
-						Description:"dcase1",
-						Children:[2],
-						NodeType:"Goal",
-						MetaData: [
-							{
-								Type: "Issue",
-								Subject: "このゴールを満たす必要がある",
-								Description: "詳細な情報をここに記述する",
-								Visible: "true",
-							},
-							{
-								Type: "LastUpdated",
-								User: "Shida",
-								Visible: "false",
-							},
-							{
-								Type: "Tag",
-								Tag: "tag1",
-								Visible: "true",
-							},
-						]
-					},
-					{
-						ThisNodeId:2,
-						Description:"s1",
-						Children:[3],
-						NodeType:"Strategy",
-						MetaData:[]
-					},
-					{
-						ThisNodeId:3,
-						Description:"g1",
-						Children:[],
-						NodeType:"Goal",
-						MetaData: [
-							{
-								Type: "Issue",
-								Subject: "2つ目のイシュー",
-								Description: "あああ詳細な情報をここに記述する",
-								Visible: "true"
-							},
-							{
-								Type: "LastUpdated",
-								User: "Shida",
-								Visible: "false",
-							},
-							{
-								Type: "Tag",
-								Tag: "tag1",
-								Visible: "true",
-							},
-							{
-								Type: "Tag",
-								Tag: "tag2",
-								Visible: "true",
-							},
-							{
-								Type: "Tag",
-								Tag: "newTag",
-								Visible: "true",
-							},
-						]
-					}
-				]
-			}
+			contents: '*goal\n' +
+						'dcase1\n' +
+						'Note0::\n' +
+						'	Type: Issue\n' +
+						'	Subject: このゴールを満たす必要がある\n' +
+						'	Visible: true\n' +
+						'	詳細な情報をここに記述する\n' +
+						'Note1::\n' +
+						'	Type: LastUpdated\n' +
+						'	User: Shida\n' +
+						'	Visible: false\n' +
+						'Note2::\n' +
+						'	Type: Tag\n' +
+						'	Tag: tag1\n' +
+						'	Visible: true\n\n' +
+						'*strategy\n' +
+						's1\n\n' +
+						'**goal\n' +
+						'g1\n' +
+						'Note0::\n' +
+						'	Type: Issue\n' +
+						'	Subject: 2つ目のイシュー\n' +
+						'	Visible: true\n' +
+						'	あああ詳細な情報をここに記述する\n' +
+						'Note1::\n' +
+						'	Type: LastUpdated\n' +
+						'	User: Shida\n' +
+						'	Visible: false\n' +
+						'Note2::\n' +
+						'	Type: Tag\n' +
+						'	Tag: tag1\n' +
+						'	Visible: true\n' +
+						'Note3::\n' +
+						'	Type: Tag\n' +
+						'	Tag: tag2\n' +
+						'	Visible: true\n' +
+						'Note4::\n' +
+						'	Type: Tag\n' +
+						'	Tag: newTag\n' +
+						'	Visible: true'
 		}
 		testdata.load(['test/api/dcase-commit.yaml'], (err:any) => {
 		        con = new db.Database();
@@ -120,7 +89,6 @@ describe('api', function() {
 		CONFIG.resetRuntime((err, written, buffer) => {});
 	});
 
-	describe('dcase', function() {
 		///////////////////////////////////////////////
 		describe('commit', function() {
 			it('should return result', function(done) {
@@ -383,5 +351,4 @@ describe('api', function() {
 			// 	);
 			// });
 		});
-	});
 });

@@ -33,7 +33,7 @@ CREATE  TABLE IF NOT EXISTS `access_log` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-insert into project_has_user (project_id, user_id, role) values (1, 1, 'system');
+insert into project_has_user (id, project_id, user_id, role) values (1, 1, 1, 'system');
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
