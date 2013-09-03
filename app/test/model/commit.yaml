@@ -3,10 +3,142 @@ dcase:
   - {id: 205, name: 'dcase5', project_id: 201, user_id: 101}
   - {id: 206, name: 'dcase5', project_id: 201, user_id: 101}
 commit:
-  - {id: 404, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: false, message: 'commit message 4', dcase_id: 204, user_id: 101}
-  - {id: 405, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: true, message: 'commit message 4', dcase_id: 204, user_id: 101}
-  - {id: 406, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 1', dcase_id: 205, user_id: 101}
-  - {id: 407, data: '{"NodeCount":3,"TopGoalId":1,"NodeList":[{"ThisNodeId":1,"Description":"dcase1","Children":[2],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"このゴールを満たす必要がある","Description":"詳細な情報をここに記述する","Visible":"true","_IssueId":232},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]},{"ThisNodeId":2,"Description":"s1","Children":[3],"NodeType":"Strategy","MetaData":[]},{"ThisNodeId":3,"Description":"g1","Children":[],"NodeType":"Goal","MetaData":[{"Type":"Issue","Subject":"2つ目のイシュー","Description":"あああ詳細な情報をここに記述する","Visible":"true","_IssueId":233},{"Type":"LastUpdated","User":"Shida","Visible":"false"}]}]}', date_time: null, prev_commit_id: null, latest_flag: 1, message: 'commit message 1', dcase_id: 206, user_id: 101}
+  - id: 404
+    data: |
+      *goal
+      dcase1
+      Note0::
+      	Type: Issue
+      	Subject: このゴールを満たす必要がある
+      	Visible: true
+      	_IssueId: 232
+          詳細な情報をここに記述する
+      Note1::
+      	Type: LastUpdated
+      	User: Shida
+      	Visible: false
+      *strategy
+      s1
+      **goal
+      g1
+      Note0::
+      	Type: Issue
+      	Subject: 2つ目のイシュー
+      	Visible: true
+      	_IssueId: 233
+          あああ詳細な情報をここに記述する
+      Note1::
+      	Type: LastUpdated
+      	User: Shida
+      	Visible: false
+    date_time: null
+    prev_commit_id: null
+    latest_flag: false
+    message: 'commit message 4'
+    dcase_id: 204
+    user_id: 101
+  - id: 405
+    data: |
+      *goal
+      dcase1
+      Note0::
+      	Type: Issue
+      	Subject: このゴールを満たす必要がある
+      	Visible: true
+      	_IssueId: 232
+          詳細な情報をここに記述する
+      Note1::
+      	Type: LastUpdated
+      	User: Shida
+      	Visible: false
+      *strategy
+      s1
+      **goal
+      g1
+      Note0::
+      	Type: Issue
+      	Subject: 2つ目のイシュー
+      	Visible: true
+      	_IssueId: 233
+          あああ詳細な情報をここに記述する
+      Note1::
+      	Type: LastUpdated
+      	User: Shida
+      	Visible: false
+    date_time: null
+    prev_commit_id: null
+    latest_flag: true
+    message: 'commit message 4'
+    dcase_id: 204
+    user_id: 101
+  - id: 406
+    data: |
+      *goal
+      dcase1
+      Note0::
+      	Type: Issue
+      	Subject: このゴールを満たす必要がある
+      	Visible: true
+      	_IssueId: 232
+          詳細な情報をここに記述する
+      Note1::
+      	Type: LastUpdated
+      	User: Shida
+      	Visible: false
+      *strategy
+      s1
+      **goal
+      g1
+      Note0::
+      	Type: Issue
+      	Subject: 2つ目のイシュー
+      	Visible: true
+      	_IssueId: 233
+          あああ詳細な情報をここに記述する
+      Note1::
+      	Type: LastUpdated
+      	User: Shida
+      	Visible: false
+    date_time: null
+    prev_commit_id: null
+    latest_flag: 1
+    message: 'commit message 1'
+    dcase_id: 205
+    user_id: 101
+  - id: 407
+    data: |
+      *goal
+      dcase1
+      Note0::
+      	Type: Issue
+      	Subject: このゴールを満たす必要がある
+      	Visible: true
+      	_IssueId: 232
+          詳細な情報をここに記述する
+      Note1::
+      	Type: LastUpdated
+      	User: Shida
+      	Visible: false
+      *strategy
+      s1
+      **goal
+      g1
+      Note0::
+      	Type: Issue
+      	Subject: 2つ目のイシュー
+      	Visible: true
+      	_IssueId: 233
+          あああ詳細な情報をここに記述する
+      Note1::
+      	Type: LastUpdated
+      	User: Shida
+      	Visible: false
+    date_time: null
+    prev_commit_id: null
+    latest_flag: 1
+    message: 'commit message 1'
+    dcase_id: 206
+    user_id: 101
 tag:
   - {id: 701, label: 'tag1'}
   - {id: 702, label: 'tag2'}
@@ -18,4 +150,5 @@ dcase_tag_rel:
 # monitor_node:
 #   - {id: 604, dcase_id: 205, this_node_id: 1, watch_id: 10, preset_id: 100, params: '{"a": "val_a", "b": 2}'}
 #   - {id: 605, dcase_id: 206, this_node_id: 2, watch_id: 20, preset_id: 200, params: null, publish_status: 2}
+
 

@@ -16,7 +16,7 @@ var _ = require('underscore');
 
 var userId = 101;
 
-describe('api', function() {
+describe('api.dcase', function() {
     var con;
 	beforeEach(function (done) {
 		testdata.load(['test/api/dcase-searchdcase.yaml'], (err:any) => {
@@ -27,7 +27,6 @@ describe('api', function() {
 	afterEach(function (done) {
 		testdata.clear((err:any) => done());
 	});
-	describe('dcase', function() {
 		describe('searchDCase', function() {
 
 			it('should return result', function(done) {
@@ -284,5 +283,4 @@ describe('api', function() {
 			// getTagListもpublic_flagおよび所属projectでフィルタリング
 			// getCommitList、getDCase、getNodeTreeも権限チェック
 		});
-	});
 });

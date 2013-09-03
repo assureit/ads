@@ -17,37 +17,19 @@ var expect = require('expect.js');	// TODO: import module化
 
 var userId = constant.SYSTEM_USER_ID;
 
-describe('api', function() {
+describe('api.dcase', function() {
     var con:db.Database;
     var validParam:any;
 	beforeEach(function (done) {
 		validParam = {
 						dcaseName: 'test dcase', 
 						projectId: 201,
-						contents: {
-							NodeCount:3,
-							TopGoalId:1,
-							NodeList:[
-								{
-									ThisNodeId:1,
-									Description:"dcase1",
-									Children:[2],
-									NodeType:"Goal"
-								},
-								{
-									ThisNodeId:2,
-									Description:"s1",
-									Children:[3],
-									NodeType:"Strategy"
-								},
-								{
-									ThisNodeId:3,
-									Description:"g1",
-									Children:[],
-									NodeType:"Goal"
-								}
-							]
-						}
+						contents: '*goal\n' +
+									'dcase1\n' +
+									'*strategy\n' +
+									's1\n' +
+									'**goal\n' +
+									'g1\n'
 					};
 		testdata.load([], (err:any) => {
 	        con = new db.Database();
@@ -57,7 +39,6 @@ describe('api', function() {
 	afterEach(function (done) {
 		testdata.clear((err:any) => done());
 	});
-	describe('dcase', function() {
 
 		describe('createDCase', function() {
 			it('should return result', function(done) {
@@ -305,5 +286,4 @@ describe('api', function() {
 				);
 			});
 		});
-	});
 });
