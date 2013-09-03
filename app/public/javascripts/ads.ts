@@ -78,14 +78,12 @@ class ADS {
 		this.selectDCaseView.initEvents();
 		this.tagListManager  = new TagListManager();
 		this.createDCaseView = new CreateDCaseView();
-		this.createProjectView = new CreateProjectView();
 
 		var router = new Router();
 		router.route("new/:project", "new", (project) => {
 			var userId: number  = this.getLoginUserorNull();
 			this.initDefaultScreen(userId, 1, null);
 			$("#newDCase").show();
-			$("#newProject").hide();
 			$("#selectDCase").hide();
 			$("#dcase-tags").hide();
 
@@ -97,13 +95,31 @@ class ADS {
 		});
 
 		router.route("project/new", "project", () => {
-				/* TODO */
+			$("#project-create").click(function() {
+				var name = $("#inputProjectName").attr("value");
+				console.log(name);
+				//var desc = $("#inputDesc").attr("value");
+				//var error = false;
+				//if(name == "") {
+				//	$("#newdcase-name").addClass("error");
+				//	error = true;
+				//} else {
+				//	$("#newdcase-name").removeClass("error");
+				//}
+				//if(desc == "") {
+				//	$("#newdcase-desc").addClass("error");
+				//	error = true;
+				//}
+				//if(error) return;
+				//var tree = "*Goal\n" + desc;
+				//var r: any = DCaseAPI.createDCase(name, tree, this.projectid);
+				//location.href = "../case/" + r.dcaseId;
+			});
 		});
 
 		var defaultRouter = (pageIndex: any, tag?: string) => {
 			this.initDefaultScreen(this.getLoginUserorNull(), pageIndex, this.selectDCaseView, tag);
 			$("#newDCase").hide();
-			$("#newProject").hide();
 			$("#selectDCase").show();
 			$("#dcase-tags").show();
 			var importFile = new ImportFile(".row");
@@ -146,7 +162,6 @@ class ADS {
 			this.hideViewer();
 			this.clearTimeLine();
 			$("#newDCase").hide();
-			$("#newProject").hide();
 			$("#selectDCase").hide();
 			$("#dcase-tags").hide();
 			var userId = this.getLoginUserorNull();
