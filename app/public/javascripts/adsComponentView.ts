@@ -229,10 +229,10 @@ class SelectDCaseView {
 		}];
 		$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(projects) );
 
-		$(".NewCaseButton").click(function(){
-			var projectId = (<any>($(this))).tmplItem().data.projectId;
-			location.href = "./new/" + projectId;
-		});
+		//$(".NewCaseButton").click(function(){
+		//	var projectId = (<any>($(this))).tmplItem().data.projectId;
+		//	location.href = "./new/" + projectId;
+		//});
 	}
 
 	initEvents() {

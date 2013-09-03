@@ -52,12 +52,8 @@ module DCaseAPI {
 		}
 	};
 
-	export var getProjectDCase = function(pageIndex: any, projectId: number) {
-		try{
-			return this.call("searchDCase", {page: pageIndex, projectId: projectId});
-		}catch(e){
-			return [];
-		}
+	export var getProjectDCase = function(pageIndex: number, projectId: number) {
+		return this.call("searchDCase", {page: pageIndex, projectId: projectId});
 	};
 
 	export var createDCase = function(name, tree, projectId) {
