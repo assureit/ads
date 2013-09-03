@@ -10,9 +10,11 @@ var ASNParser = (function () {
             var children = n.Children;
             n.Children = [];
             node.push(n);
-            children.forEach(function (c) {
-                traverse(c);
-            });
+            if (children) {
+                children.forEach(function (c) {
+                    traverse(c);
+                });
+            }
         };
         traverse(obj);
         return node;

@@ -8,9 +8,11 @@ export class ASNParser {
 			var children = n.Children;
 			n.Children = [];
 			node.push(n);
-			children.forEach((c:any) => {
-				traverse(c);
-			});
+			if (children) {
+				children.forEach((c:any) => {
+					traverse(c);
+				});
+			}
 		}
 		traverse(obj);
 		return node;
