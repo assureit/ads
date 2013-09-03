@@ -31,7 +31,7 @@ class CreateDCaseView {
 			//	TopGoalId: id,
 			//	NodeCount: 1,
 			//};
-			var r: any = DCaseAPI.createDCase(name, tree);
+			var r: any = DCaseAPI.createDCase(name, tree, 1);
 			location.href = "./case/" + r.dcaseId;
 		});
 	}
@@ -201,6 +201,11 @@ class SelectDCaseView {
 			],
 		}];
 		$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(projects.projectList) );
+
+		$(".NewCaseButton").click(function(){
+			var projectId = (<any>($(this))).tmplItem().data.projectId;
+			location.href = "./new/" + projectId;
+		});
 	}
 
 	initEvents() {
@@ -221,6 +226,7 @@ class SelectDCaseView {
 			}
 			e.preventDefault();
 		});
+
 	}
 
 }

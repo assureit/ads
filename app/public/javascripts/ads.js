@@ -40,7 +40,7 @@ var ADS = (function () {
                     TopGoalId: tree.TopGoalId,
                     NodeList: j
                 };
-                var r = DCaseAPI.createDCase(file.name, contents);
+                var r = DCaseAPI.createDCase(file.name, contents, 1);
                 location.href = "./case/" + r.dcaseId;
             });
         };

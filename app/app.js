@@ -47,7 +47,7 @@ app.post('/api/1.0/private', privateAPI.httpHandler);
 app.get('/', client.index);
 app.get('/page/:id', client.index);
 app.get('/tag/:t', client.index);
-app.get('/new', client.index);
+app.get('/new/:projectId', client.index);
 app.get('/project/new', client.index);
 app.get('/dcase/:id', client.index);
 app.get('/case/:id', client.caseView);

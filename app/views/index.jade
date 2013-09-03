@@ -6,7 +6,7 @@ block append content
             .media-body
                 h4
                     a(href='#') ${name}
-                    a.btn.btn-danger.btn-mini.pull-right
+                    a.btn.btn-danger.btn-mini.pull-right.DeleteCaseButton
                         i.icon-trash　&nbsp;
                         |Delete
                     span.pull-right
@@ -17,11 +17,11 @@ block append content
                     a(href='#') ${lastUpdateUser}
                     |  updated ${lastUpdateDate}
     script#project_tmpl(type="text/x-jquery-tmpl")
-        article
+        article(id="project${projectId}")
             h3 #${projectId} ${projectName} &nbsp;
                 a.btn.btn-mini
                     i.icon-edit &nbsp;
-                a.btn.btn-success.btn-small.pull-right
+                a.btn.btn-success.btn-small.pull-right.NewCaseButton
                     i.icon-plus　&nbsp;
                     |New case
             ul.inline

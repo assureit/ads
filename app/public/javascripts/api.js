@@ -47,10 +47,19 @@ var DCaseAPI;
         }
     };
 
-    DCaseAPI.createDCase = function (name, tree) {
+    DCaseAPI.getProjectDCase = function (pageIndex, projectId) {
+        try  {
+            return this.call("searchDCase", { page: pageIndex, projectId: projectId });
+        } catch (e) {
+            return [];
+        }
+    };
+
+    DCaseAPI.createDCase = function (name, tree, projectId) {
         return this.call("createDCase", {
             dcaseName: name,
-            contents: tree
+            contents: tree,
+            projectId: projectId
         });
     };
 

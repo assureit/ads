@@ -52,9 +52,17 @@ module DCaseAPI {
 		}
 	};
 
-	export var createDCase = function(name, tree) {
+	export var getProjectDCase = function(pageIndex: any, projectId: number) {
+		try{
+			return this.call("searchDCase", {page: pageIndex, projectId: projectId});
+		}catch(e){
+			return [];
+		}
+	};
+
+	export var createDCase = function(name, tree, projectId) {
 		return this.call("createDCase", {
-			dcaseName: name, contents: tree });
+			dcaseName: name, contents: tree , projectId: projectId });
 	};
 
 	export var createProject = function(name, isPublic) {

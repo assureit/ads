@@ -110,7 +110,7 @@ class ADS {
 					TopGoalId: tree.TopGoalId,
 					NodeList: j
 				};
-				var r = DCaseAPI.createDCase(file.name, contents);
+				var r = DCaseAPI.createDCase(file.name, contents, 1/*FIXME*/);
 				location.href = "./case/" + r.dcaseId;
 				//if("contents" in tree) {
 				//	var r = DCaseAPI.createDCase(tree.contents.DCaseName, tree.contents);

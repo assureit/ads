@@ -24,7 +24,7 @@ var CreateDCaseView = (function () {
                 return;
             var tree = "*Goal\n" + desc;
 
-            var r = DCaseAPI.createDCase(name, tree);
+            var r = DCaseAPI.createDCase(name, tree, 1);
             location.href = "./case/" + r.dcaseId;
         });
     }
@@ -191,6 +191,11 @@ var SelectDCaseView = (function () {
             }
         ];
         $("#ProjectList").append(($)("#project_tmpl").tmpl(projects.projectList));
+
+        $(".NewCaseButton").click(function () {
+            var projectId = (($(this))).tmplItem().data.projectId;
+            location.href = "./new/" + projectId;
+        });
     };
 
     SelectDCaseView.prototype.initEvents = function () {
