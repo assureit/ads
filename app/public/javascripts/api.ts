@@ -56,6 +56,10 @@ module DCaseAPI {
 		return this.call("searchDCase", {page: pageIndex, projectId: projectId});
 	};
 
+	export var getProjectUser = function(projectId: number) {
+		return this.call("getProjectUser", {projectId: projectId});
+	};
+
 	export var createDCase = function(name, tree, projectId) {
 		return this.call("createDCase", {
 			dcaseName: name, contents: tree , projectId: projectId });

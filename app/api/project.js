@@ -72,6 +72,37 @@ function getPublicProjectList(params, userId, callback) {
 }
 exports.getPublicProjectList = getPublicProjectList;
 
+function getProjectUser(params, userId, callback) {
+    var con = new db.Database();
+    var projectDAO = new model_project.ProjectDAO(con);
+    var userDAO = new model_user.UserDAO(con);
+    params = params || {};
+    params.projectId = params.projectId ? params.projectId : 1;
+    async.waterfall([
+        function (next) {
+            userDAO.projectUserList(params.projectId, function (err, result) {
+                next(err, result);
+            });
+        }
+    ], function (err, result) {
+        con.close();
+        if (err) {
+            callback.onFailure(err);
+            return;
+        }
+        var resultUserlist = _.map(result, function (val) {
+            return {
+                userId: val.id,
+                loginName: val.loginName
+            };
+        });
+        callback.onSuccess({
+            userList: resultUserlist
+        });
+    });
+}
+exports.getProjectUser = getProjectUser;
+
 function createProject(params, userId, callback) {
     var con = new db.Database();
     var userDAO = new model_user.UserDAO(con);

@@ -152,6 +152,20 @@ var UserDAO = (function (_super) {
         });
     };
 
+    UserDAO.prototype.projectUserList = function (projectId, callback) {
+        this.con.query({ sql: 'SELECT u.* FROM user u INNER JOIN project_has_user AS pu ON pu.user_id=u.id WHERE project_id=?', nestTables: true }, [projectId], function (err, result) {
+            if (err) {
+                callback(err, null);
+                return;
+            }
+            var list = [];
+            result.forEach(function (row) {
+                list.push(User.tableToObject(row.u));
+            });
+            callback(null, list);
+        });
+    };
+
     UserDAO.prototype.insert = function (loginName, callback) {
         var _this = this;
         this.con.query('INSERT INTO user(login_name) VALUES(?) ', [loginName], function (err, result) {

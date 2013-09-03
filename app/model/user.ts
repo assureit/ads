@@ -132,6 +132,19 @@ export class UserDAO extends model.DAO {
 
 	}
 
+	projectUserList(projectId: number, callback: (err:any, result: User[])=>void): void {
+		this.con.query({sql:'SELECT u.* FROM user u INNER JOIN project_has_user AS pu ON pu.user_id=u.id WHERE project_id=?', nestTables: true}, [projectId], (err:any, result:any) => {
+			if (err) {
+				callback(err, null);
+				return;
+			}
+			var list:User[] = [];
+			result.forEach((row) => {
+				list.push(User.tableToObject(row.u));
+			});
+			callback(null, list);
+		});
+	}
 
 	insert(loginName: string, callback: (err:any, user:User) => void) {
 		// this.con.on('error', (err) => {
