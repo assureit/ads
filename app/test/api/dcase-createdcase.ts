@@ -17,36 +17,19 @@ var expect = require('expect.js');	// TODO: import module化
 
 var userId = constant.SYSTEM_USER_ID;
 
-describe('api', function() {
+describe('api.dcase', function() {
     var con:db.Database;
     var validParam:any;
 	beforeEach(function (done) {
 		validParam = {
 						dcaseName: 'test dcase', 
-						contents: {
-							NodeCount:3,
-							TopGoalId:1,
-							NodeList:[
-								{
-									ThisNodeId:1,
-									Description:"dcase1",
-									Children:[2],
-									NodeType:"Goal"
-								},
-								{
-									ThisNodeId:2,
-									Description:"s1",
-									Children:[3],
-									NodeType:"Strategy"
-								},
-								{
-									ThisNodeId:3,
-									Description:"g1",
-									Children:[],
-									NodeType:"Goal"
-								}
-							]
-						}
+						projectId: 201,
+						contents: '*goal\n' +
+									'dcase1\n' +
+									'*strategy\n' +
+									's1\n' +
+									'**goal\n' +
+									'g1\n'
 					};
 		testdata.load([], (err:any) => {
 	        con = new db.Database();
@@ -56,7 +39,6 @@ describe('api', function() {
 	afterEach(function (done) {
 		testdata.clear((err:any) => done());
 	});
-	describe('dcase', function() {
 
 		describe('createDCase', function() {
 			it('should return result', function(done) {
@@ -74,6 +56,7 @@ describe('api', function() {
 							dcaseDAO.get(result.dcaseId, (err:any, resultDCase:model_dcase.DCase) => {
 								expect(err).to.be(null);
 								expect(resultDCase.name).to.equal(validParam.dcaseName);
+								expect(resultDCase.projectId).to.equal(validParam.projectId);
 								commitDAO.get(result.commitId, (err:any, resultCommit:model_commit.Commit) => {
 									expect(err).to.be(null);
 									expect(resultCommit.latestFlag).to.equal(true);
@@ -82,6 +65,107 @@ describe('api', function() {
 							});
 						}, 
 						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					}
+				);
+			});
+			it('projectId not found should be projectId=1', function(done) {
+				validParam.projectId = null;
+				dcase.createDCase(validParam, userId, 
+					{
+						onSuccess: (result: any) => {
+							expect(result).not.to.be(null);
+							expect(result).not.to.be(undefined);
+							expect(result.dcaseId).not.to.be(null);
+							expect(result.dcaseId).not.to.be(undefined);
+							expect(result.commitId).not.to.be(null);
+							expect(result.commitId).not.to.be(undefined);
+							var dcaseDAO = new model_dcase.DCaseDAO(con);
+							var commitDAO = new model_commit.CommitDAO(con);
+							dcaseDAO.get(result.dcaseId, (err:any, resultDCase:model_dcase.DCase) => {
+								expect(err).to.be(null);
+								expect(resultDCase.name).to.equal(validParam.dcaseName);
+								expect(resultDCase.projectId).to.equal(constant.SYSTEM_PROJECT_ID);
+								commitDAO.get(result.commitId, (err:any, resultCommit:model_commit.Commit) => {
+									expect(err).to.be(null);
+									expect(resultCommit.latestFlag).to.equal(true);
+									done();
+								});
+							});
+						}, 
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					}
+				);
+			});
+			it('projectId 0 should be projectId=1', function(done) {
+				validParam.projectId = 0;
+				dcase.createDCase(validParam, userId, 
+					{
+						onSuccess: (result: any) => {
+							expect(result).not.to.be(null);
+							expect(result).not.to.be(undefined);
+							expect(result.dcaseId).not.to.be(null);
+							expect(result.dcaseId).not.to.be(undefined);
+							expect(result.commitId).not.to.be(null);
+							expect(result.commitId).not.to.be(undefined);
+							var dcaseDAO = new model_dcase.DCaseDAO(con);
+							var commitDAO = new model_commit.CommitDAO(con);
+							dcaseDAO.get(result.dcaseId, (err:any, resultDCase:model_dcase.DCase) => {
+								expect(err).to.be(null);
+								expect(resultDCase.name).to.equal(validParam.dcaseName);
+								expect(resultDCase.projectId).to.equal(constant.SYSTEM_PROJECT_ID);
+								commitDAO.get(result.commitId, (err:any, resultCommit:model_commit.Commit) => {
+									expect(err).to.be(null);
+									expect(resultCommit.latestFlag).to.equal(true);
+									done();
+								});
+							});
+						}, 
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					}
+				);
+			});
+			it('projectId not set should be projectId=1', function(done) {
+				delete validParam['projectId'];
+				dcase.createDCase(validParam, userId, 
+					{
+						onSuccess: (result: any) => {
+							expect(result).not.to.be(null);
+							expect(result).not.to.be(undefined);
+							expect(result.dcaseId).not.to.be(null);
+							expect(result.dcaseId).not.to.be(undefined);
+							expect(result.commitId).not.to.be(null);
+							expect(result.commitId).not.to.be(undefined);
+							var dcaseDAO = new model_dcase.DCaseDAO(con);
+							var commitDAO = new model_commit.CommitDAO(con);
+							dcaseDAO.get(result.dcaseId, (err:any, resultDCase:model_dcase.DCase) => {
+								expect(err).to.be(null);
+								expect(resultDCase.name).to.equal(validParam.dcaseName);
+								expect(resultDCase.projectId).to.equal(constant.SYSTEM_PROJECT_ID);
+								commitDAO.get(result.commitId, (err:any, resultCommit:model_commit.Commit) => {
+									expect(err).to.be(null);
+									expect(resultCommit.latestFlag).to.equal(true);
+									done();
+								});
+							});
+						}, 
+						onFailure: (error: error.RPCError) => {expect().fail(JSON.stringify(error));},
+					}
+				);
+			});
+			it('project not found', function(done) {
+				validParam.projectId = 2;
+				dcase.createDCase(validParam, userId, 
+					{
+						onSuccess: (result: any) => {
+							expect(result).to.be(null);	
+							done();
+						}, 
+						onFailure: (err: error.RPCError) => {
+							expect(err.rpcHttpStatus).to.be(200);
+							expect(err.code).to.be(error.RPC_ERROR.DATA_NOT_FOUND);
+							expect(err.message).to.be('Project Not Found.');
+							done();
+						},
 					}
 				);
 			});
@@ -202,5 +286,4 @@ describe('api', function() {
 				);
 			});
 		});
-	});
 });

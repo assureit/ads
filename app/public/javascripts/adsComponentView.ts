@@ -20,19 +20,19 @@ class CreateDCaseView {
 				error = true;
 			}
 			if(error) return;
-			var id = 1;
-			var tree = {
-				NodeList: [{
-					ThisNodeId: id,
-					NodeType: "Goal",
-					Description: desc,
-					Children: [],
-				}],
-				TopGoalId: id,
-				NodeCount: 1,
-			};
+			var tree = "*Goal\n" + desc;
+			//var tree = {
+			//	NodeList: [{
+			//		ThisNodeId: id,
+			//		NodeType: "Goal",
+			//		Description: desc,
+			//		Children: [],
+			//	}],
+			//	TopGoalId: id,
+			//	NodeCount: 1,
+			//};
 			var r: any = DCaseAPI.createDCase(name, tree);
-			location.href = "./dcase/" + r.dcaseId;
+			location.href = "./case/" + r.dcaseId;
 		});
 	}
 
@@ -126,9 +126,8 @@ class SelectDCaseThumbnailManager extends SelectDCaseManager{
 
 class TableView {
 	static toTable(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
-		var html = '<td><a href="' + Config.BASEPATH + '/dcase/' + id + '">' + name +
-				"</a></td><td>" + user + "</td><td>" + lastDate + "</td><td>" +
-				lastUser + "</td>";
+		var html = '<td><a href="' + Config.BASEPATH + '/case/' + id + '">' + $('<div />').text(name).html() +
+				"</a></td><td>" + $('<div/>').text(lastUser).html() + "</td>";
 		if(isLogin) {
 			html += "<td><a id=\"e"+ id +"\" href=\"#\">Edit</a></td>"
 				+ "<td><a id=\"d"+ id +"\" href=\"#\">Delete</a></td>";

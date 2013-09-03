@@ -6,6 +6,7 @@ import express = module('express')
 import api = module('./routes/api')
 import privateAPI = module('./routes/api-private')
 import client = module('./routes/index')
+import gts = module('./routes/gtsexport')
 import js = module('./routes/javascript')
 import monitor = module('./routes/monitor')
 import path = module('path')
@@ -65,8 +66,11 @@ app.get('/', client.index);
 app.get('/page/:id', client.index);
 app.get('/tag/:t', client.index);
 app.get('/new', client.index);
+app.get('/project/new', client.index);
 app.get('/dcase/:id', client.index);
+app.get('/case/:id', client.caseView);
 app.post('/export.*', client.exporter);
+app.get('/case/:id/export/:type/node/:n', gts.exporter);
 app.get('/javascripts/config.js', js.config);
 
 app.post('/login', client.login);

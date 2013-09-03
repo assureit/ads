@@ -7,8 +7,9 @@ var __extends = this.__extends || function (d, b) {
 var model = require('./model');
 var model_user = require('./user');
 var model_node = require('../model/node');
-var model_issue = require('../model/issue');
-var model_monitor = require('../model/monitor');
+
+var asn_parser = require('../util/asn-parser');
+
 var async = require('async');
 
 var Commit = (function () {
@@ -23,6 +24,9 @@ var Commit = (function () {
         this.latestFlag = latestFlag;
         this.latestFlag = !!this.latestFlag;
     }
+    Commit.tableToObject = function (row) {
+        return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.message, row.data, row.date_time, row.latest_flag);
+    };
     return Commit;
 })();
 exports.Commit = Commit;
@@ -101,31 +105,21 @@ var CommitDAO = (function (_super) {
                 });
             },
             function (com, callback) {
-                _this.insert({ data: JSON.stringify(contents), prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message }, function (err, commitId) {
+                _this.insert({ data: contents, prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message }, function (err, commitId) {
                     callback(err, com, commitId);
                 });
             },
             function (com, commitId, callback) {
+                var parser = new asn_parser.ASNParser();
+                var nodes = parser.parseNodeList(contents);
                 var nodeDAO = new model_node.NodeDAO(_this.con);
-                nodeDAO.insertList(com.dcaseId, commitId, contents.NodeList, function (err) {
+                nodeDAO.insertList(com.dcaseId, commitId, nodes, function (err) {
                     callback(err, com, commitId);
                 });
             },
             function (com, commitId, callback) {
-                _this.update(commitId, JSON.stringify(contents), function (err) {
-                    callback(err, com, commitId);
-                });
-            },
-            function (com, commitId, callback) {
-                var issueDAO = new model_issue.IssueDAO(_this.con);
-                issueDAO.publish(com.dcaseId, function (err) {
-                    callback(err, com, commitId);
-                });
-            },
-            function (com, commitId, callback) {
-                var monitorDAO = new model_monitor.MonitorDAO(_this.con);
-                monitorDAO.publish(com.dcaseId, function (err) {
-                    callback(err, { commitId: commitId });
+                _this.update(commitId, contents, function (err) {
+                    return callback(err, { commitId: commitId });
                 });
             }
         ], function (err, result) {

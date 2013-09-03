@@ -15,7 +15,7 @@ var expect = require('expect.js');	// TODO: import module化
 
 var userId = constant.SYSTEM_USER_ID;
 
-describe('api', function() {
+describe('api.dcase', function() {
     var con;
 	beforeEach(function (done) {
 		testdata.load(['test/api/dcase.yaml'], (err:any) => {
@@ -26,7 +26,6 @@ describe('api', function() {
 	afterEach(function (done) {
 		testdata.clear((err:any) => done());
 	});
-	describe('dcase', function() {
 		describe('deleteDCase', function() {
 			it('should return result', function(done) {
 				dcase.deleteDCase(
@@ -139,5 +138,4 @@ describe('api', function() {
 				});
 			});
 		});
-	});
 });

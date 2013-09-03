@@ -1,5 +1,5 @@
 dcase:
-  - {id: 901, name: 'deleted_dcase', user_id: 101, delete_flag: true}
+  - {id: 901, name: 'deleted_dcase', project_id: 201, user_id: 101, delete_flag: true}
 tag:
   - {id: 701, label: 'tag1'}
   - {id: 702, label: 'tag2'}

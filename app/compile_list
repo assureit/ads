@@ -4,6 +4,7 @@ ldap-memory.ts
 constant.ts
 routes/api.ts
 routes/index.ts
+routes/gtsexport.ts
 routes/javascript.ts
 routes/lang.ts
 routes/dscript.ts
@@ -13,6 +14,7 @@ api/jsonrpc.ts
 api/dcase.ts
 api/monitor.ts
 api/rec.ts
+api/project.ts
 db/db.ts
 test/server.ts
 test/db/db.ts
@@ -32,6 +34,7 @@ test/api/dcase-searchdcase.ts
 test/api/dcase-deletedcase.ts
 test/api/dcase-editdcase.ts
 test/api/monitor.ts
+test/api/project.ts
 test/api/rec.ts
 test/model/user.ts
 test/model/node.ts
@@ -42,6 +45,7 @@ test/model/file.ts
 test/model/issue.ts
 test/model/tag.ts
 test/model/pager.ts
+test/model/project.ts
 test/net/redmine.ts
 test/net/ldap.ts
 test/net/rec.ts

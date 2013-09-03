@@ -3,24 +3,30 @@ import model_commit = module('./commit')
 import model_user = module('./user')
 import model_pager = module('./pager');
 import error = module('../api/error')
+import constant = module('../constant')
 var async = require('async');
 var _ = require('underscore');
 
 export interface InsertArg {
 	userId: number;
 	dcaseName: string;
+	projectId?: number;
+	type?: number;
 }
 export class DCase {
 	public user: model_user.User;
 	public latestCommit: model_commit.Commit;
-	constructor(public id:number, public name:string, public userId:number, public deleteFlag:bool) {
+	constructor(public id:number, public name:string, public projectId:number, public userId:number, public deleteFlag:bool, public type?:number) {
 		this.deleteFlag = !!this.deleteFlag;
 		if (deleteFlag === undefined) {
 			this.deleteFlag = false;
 		}
+		if (this.type === undefined) {
+			this.type = constant.CASE_TYPE_DEFAULT;
+		}
 	}
 	static tableToObject(table: any) {
-		return new DCase(table.id, table.name, table.user_id, table.delete_flag);
+		return new DCase(table.id, table.name, table.project_id, table.user_id, table.delete_flag, table.type);
 	}
 }
 export class DCaseDAO extends model.DAO {
@@ -40,42 +46,105 @@ export class DCaseDAO extends model.DAO {
 			callback(err, dcase);
 		});
 	}
-	insert(params: InsertArg, callback: (err:any, dcaseId: number)=>void): void {
-		this.con.query('INSERT INTO dcase(user_id, name) VALUES (?, ?)', [params.userId, params.dcaseName], (err, result) => {
-			if (err) {
-				callback(err, null);
-				return;
+	getDetail(id:number, callback: (err:any, dcase:DCase)=>void) {
+		async.waterfall([
+			(next) => {
+				this.con.query({sql: 'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag=TRUE and d.id = ?', nestTables: true}, [id], (err, result) => next(err, result));
+
+			},
+			(result:any, next) => {
+				if (result.length == 0) {
+					next(new error.NotFoundError('Effective DCase does not exist.', {id: id}));
+					return;
+				}
+				var row = result[0];
+				var dcase = DCase.tableToObject(row.d);
+				dcase.user = model_user.User.tableToObject(row.u);
+				dcase.latestCommit = model_commit.Commit.tableToObject(row.c);
+				dcase.latestCommit.user = model_user.User.tableToObject(row.cu);
+				next(null, dcase);
 			}
-			callback(err, result.insertId);
-		});
+			],
+			(err:any, result:DCase) => {
+				callback(err, result);
+			}
+		);
+	}
+	insert(params: InsertArg, callback: (err:any, dcaseId: number, projectId?: number)=>void): void {
+		if(!params.projectId) {
+			params.projectId = constant.SYSTEM_PROJECT_ID; //public
+		}
+		if (!params.type) {
+			params.type = constant.CASE_TYPE_DEFAULT;
+		}
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT count(id) as cnt FROM project WHERE id = ?', [params.projectId], (err, result) => next(err, result));
+			},
+			(result:any, next) => {
+				if(result[0].cnt == 0) {
+					next(new error.NotFoundError('Project Not Found.', params));
+					return;
+				}
+				this.con.query('INSERT INTO dcase(user_id, name, project_id, type) VALUES (?, ?, ?, ?)', [params.userId, params.dcaseName, params.projectId, params.type], (err, result) => next(err, result ? result.insertId : null));
+			}
+			], (err:any, dcaseId:number) => {
+				callback(err, dcaseId, params.projectId);
+			});
+		// this.con.query('INSERT INTO dcase(user_id, name, project_id) VALUES (?, ?, ?)', [params.userId, params.dcaseName, params.projectId], (err, result) => {
+		// 	if (err) {
+		// 		callback(err, null);
+		// 		return;
+		// 	}
+		// 	callback(err, result.insertId);
+		// });
 	}
 
 	/**
 	 * @param page 検索結果の取得対象ページ（1始まり）
 	 */
-	list(page: number, tagList:string[], callback: (err:any, summary: model_pager.Pager, list: DCase[])=>void): void {
+	list(page: number, userId:number, projectId:number, tagList:string[], callback: (err:any, summary: model_pager.Pager, list: DCase[])=>void): void {
 		var pager = new model_pager.Pager(page);
-		var query = {sql:'SELECT * FROM dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ? ' , nestTables:true};
-		var params:any[] = [pager.limit, pager.getOffset()];
+		var queryFrom = 'dcase d, commit c, user u, user cu, (SELECT DISTINCT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND p.delete_flag = FALSE AND (p.public_flag = TRUE OR pu.user_id = ?)) p ';
+		var queryWhere = 'd.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id ';
+		var query = {sql:'' , nestTables:true};
+		// var query = {sql:'SELECT * FROM dcase d, commit c, user u, user cu, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE AND p.id = d.project_id ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ? ' , nestTables:true};
+		// var params:any[] = [pager.limit, pager.getOffset()];
+		var params:any[] = [];
+		params.push(userId);
+		if (projectId && projectId > 0) {
+			queryWhere = queryWhere + 'AND p.id=? ';
+			params.push(projectId);
+		}
 		if (tagList && tagList.length > 0) {
 			var tagVars:string = _.map(tagList, (it:string) => {return '?'}).join(',');
-			query.sql = 'SELECT * ' +
-						'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' +
-						'WHERE d.id = c.dcase_id ' +
-						'AND d.user_id = u.id ' +
-						'AND c.user_id = cu.id ' +
+			queryFrom = queryFrom + ', tag t, dcase_tag_rel r ';
+			queryWhere = queryWhere +
 						'AND t.id = r.tag_id  ' +
 						'AND r.dcase_id = d.id ' +
-						'AND c.latest_flag = TRUE ' +
-						'AND d.delete_flag = FALSE ' +
 						'AND t.label IN (' + tagVars + ') ' +
 						'GROUP BY c.id ' +
-						'HAVING COUNT(t.id) = ? ' +
-						'ORDER BY c.modified, c.id desc LIMIT ? OFFSET ?';
+						'HAVING COUNT(t.id) = ? ';
+			// query.sql = 'SELECT * ' +
+			// 			'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r, (SELECT p.* FROM project p, project_has_user pu WHERE p.id = pu.project_id AND (p.public_flag = TRUE OR pu.user_id = ?)) p ' +
+			// 			'WHERE d.id = c.dcase_id ' +
+			// 			'AND d.user_id = u.id ' +
+			// 			'AND c.user_id = cu.id ' +
+			// 			'AND t.id = r.tag_id  ' +
+			// 			'AND r.dcase_id = d.id ' +
+			// 			'AND c.latest_flag = TRUE ' +
+			// 			'AND d.delete_flag = FALSE ' +
+			// 			'AND p.id = d.project_id ' +
+			// 			'AND t.label IN (' + tagVars + ') ' +
+			// 			'GROUP BY c.id ' +
+			// 			'HAVING COUNT(t.id) = ? ' +
+			// 			'ORDER BY c.modified, c.id desc LIMIT ? OFFSET ?';
 			var tmp:any[] = tagList;
-			params = tmp.concat([tagList.length]).concat(params);
+			params = params.concat(tmp).concat([tagList.length]);
 		}
-		this.con.query(query, params, (err, result) => {
+		query.sql = 'SELECT * FROM ' + queryFrom + 'WHERE ' + queryWhere + 'ORDER BY c.modified DESC, c.id desc LIMIT ? OFFSET ?';
+		// console.log(query.sql);
+		this.con.query(query, params.concat([pager.limit, pager.getOffset()]), (err, result) => {
 			if (err) {
 				callback(err, null, null);
 				return;
@@ -83,33 +152,34 @@ export class DCaseDAO extends model.DAO {
 
 			var list = new Array<DCase>();
 			result.forEach((row) => {
-				var d = new DCase(row.d.id, row.d.name, row.d.user_id, row.d.delete_flag);
+				var d = DCase.tableToObject(row.d);//new DCase(row.d.id, row.d.name, row.d.project_id, row.d.user_id, row.d.delete_flag, row.d.type);
 				d.user = new model_user.User(row.u.id, row.u.login_name, row.u.delete_flag, row.u.system_flag);
 				d.latestCommit = new model_commit.Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
 				d.latestCommit.user = new model_user.User(row.cu.id, row.cu.login_name, row.cu.delete_flag, row.cu.system_flag);
 				list.push(d);
 			});
 
-		var countSQL = 'SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ';
-		var countParams:any[] = [];
-		if (tagList && tagList.length > 0) {
-			var tagVars:string = _.map(tagList, (it:string) => {return '?'}).join(',');
-			countSQL = 'SELECT count(d.id) as cnt ' +
-						'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' +
-						'WHERE d.id = c.dcase_id ' +
-						'AND d.user_id = u.id ' +
-						'AND c.user_id = cu.id ' +
-						'AND t.id = r.tag_id  ' +
-						'AND r.dcase_id = d.id ' +
-						'AND c.latest_flag = TRUE ' +
-						'AND d.delete_flag = FALSE ' +
-						'AND t.label IN (' + tagVars + ') ' +
-						'GROUP BY c.id ' +
-						'HAVING COUNT(t.id) = ? ';
-			var tmp:any[] = tagList;
-			countParams = tmp.concat([tagList.length]);
-		}
-			this.con.query(countSQL, countParams,(err, countResult) => {
+		// var countSQL = 'SELECT count(d.id) as cnt from dcase d, commit c, user u, user cu WHERE d.id = c.dcase_id AND d.user_id = u.id AND c.user_id = cu.id AND c.latest_flag = TRUE AND d.delete_flag = FALSE ';
+		// var countParams:any[] = [];
+		// if (tagList && tagList.length > 0) {
+		// 	var tagVars:string = _.map(tagList, (it:string) => {return '?'}).join(',');
+		// 	countSQL = 'SELECT count(d.id) as cnt ' +
+		// 				'FROM dcase d, commit c, user u, user cu, tag t, dcase_tag_rel r ' +
+		// 				'WHERE d.id = c.dcase_id ' +
+		// 				'AND d.user_id = u.id ' +
+		// 				'AND c.user_id = cu.id ' +
+		// 				'AND t.id = r.tag_id  ' +
+		// 				'AND r.dcase_id = d.id ' +
+		// 				'AND c.latest_flag = TRUE ' +
+		// 				'AND d.delete_flag = FALSE ' +
+		// 				'AND t.label IN (' + tagVars + ') ' +
+		// 				'GROUP BY c.id ' +
+		// 				'HAVING COUNT(t.id) = ? ';
+		// 	var tmp:any[] = tagList;
+		// 	countParams = tmp.concat([tagList.length]);
+		// }
+			// this.con.query(countSQL, countParams,(err, countResult) => {
+			this.con.query('SELECT count(d.id) as cnt FROM ' + queryFrom + 'WHERE ' + queryWhere, params,(err, countResult) => {
 				if (err) {
 					callback(err, null, null);
 					return;

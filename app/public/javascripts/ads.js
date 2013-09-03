@@ -1,7 +1,7 @@
 var ADS = (function () {
     function ADS(body) {
         var _this = this;
-        this.TITLE_SUFFIX = " - Assurance DS";
+        this.TITLE_SUFFIX = " - Assure-It";
         this.URL_EXPORT = Config.BASEPATH + "/export";
         this.selectDCaseView = new SelectDCaseView();
         this.selectDCaseView.initEvents();
@@ -28,15 +28,20 @@ var ADS = (function () {
             $("#newDCase").hide();
             $("#selectDCase").show();
             $("#dcase-tags").show();
-            var importFile = new ImportFile("#ase");
+            var importFile = new ImportFile(".row");
             importFile.read(function (file) {
-                var tree = JSON.parse(file.result);
-                if ("contents" in tree) {
-                    var r = DCaseAPI.createDCase(tree.contents.DCaseName, tree.contents);
-                    location.href = "./dcase/" + r.dcaseId;
-                } else {
-                    alert("Invalid File");
-                }
+                var x2dc = new Xml2DCaseTree.Converter();
+                var tree = x2dc.parseXml(file.result);
+                var j = tree.convertAllChildNodeIntoJson([]);
+                console.log(j);
+                var contents = {
+                    DCaseName: file.name,
+                    NodeCount: tree.NodeCount,
+                    TopGoalId: tree.TopGoalId,
+                    NodeList: j
+                };
+                var r = DCaseAPI.createDCase(file.name, contents);
+                location.href = "./case/" + r.dcaseId;
             });
         };
 
@@ -134,6 +139,9 @@ var ADS = (function () {
         this.hideViewer();
         this.hideEditMenu();
         this.hideViewMenu();
+        if (!this.isLogin(userId)) {
+            $("#create-case-menu").css("display", "none");
+        }
 
         $("#dcase-manager").css("display", "block");
 
