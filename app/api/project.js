@@ -1,10 +1,10 @@
 var db = require('../db/db');
 
-var constant = require('../constant');
-var model_dcase = require('../model/dcase');
-var model_commit = require('../model/commit');
+
+
+
 var model_project = require('../model/project');
-var model_node = require('../model/node');
+
 
 
 var model_user = require('../model/user');
@@ -47,11 +47,7 @@ function createProject(params, userId, callback) {
     var con = new db.Database();
     var userDAO = new model_user.UserDAO(con);
     var projectDAO = new model_project.ProjectDAO(con);
-    var dcaseDAO = new model_dcase.DCaseDAO(con);
-    var commitDAO = new model_commit.CommitDAO(con);
-    var nodeDAO = new model_node.NodeDAO(con);
-    var dcaseStr = JSON.stringify(CONFIG.ads.stakeholderCase);
-    var dcase = null;
+
     async.waterfall([
         function (next) {
             con.begin(function (err, result) {
@@ -64,7 +60,6 @@ function createProject(params, userId, callback) {
             });
         },
         function (user, next) {
-            dcase = JSON.parse(dcaseStr.replace('%USER%', user.loginName));
             projectDAO.insert(params.name, params.isPublic, function (err, projectId) {
                 return next(err, user, projectId);
             });
@@ -75,26 +70,11 @@ function createProject(params, userId, callback) {
             });
         },
         function (user, projectId, next) {
-            dcaseDAO.insert({ userId: userId, dcaseName: dcase.DCaseName, projectId: projectId, type: constant.CASE_TYPE_STAKEHOLDER }, function (err, dcaseId) {
-                return next(err, user, projectId, dcaseId);
-            });
-        },
-        function (user, projectId, dcaseId, next) {
-            commitDAO.insert({ data: JSON.stringify(dcase.contents), dcaseId: dcaseId, userId: userId, message: 'Initial Commit' }, function (err, commitId) {
-                return next(err, user, projectId, dcaseId, commitId);
-            });
-        },
-        function (user, projectId, dcaseId, commitId, next) {
-            nodeDAO.insertList(dcaseId, commitId, dcase.contents.NodeList, function (err) {
-                return next(err, user, projectId, dcaseId, commitId);
-            });
-        },
-        function (user, projectId, dcaseId, commitId, next) {
             con.commit(function (err, result) {
-                return next(err, user, projectId, dcaseId, commitId);
+                return next(err, user, projectId);
             });
         }
-    ], function (err, user, projectId, dcaseId, commitId) {
+    ], function (err, user, projectId) {
         con.close();
         if (err) {
             callback.onFailure(err);
