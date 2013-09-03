@@ -18,7 +18,7 @@ export class ProjectDAO extends model.DAO {
 	list(userId: number, callback: (err:any, result: Project[])=>void): void {
 		async.waterfall([
 			(next) => {
-				this.con.query({sql:'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE pu.user_id=?', nestTables:true}, [userId],
+				this.con.query({sql:'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.public_flag=0 AND pu.user_id=?', nestTables:true}, [userId],
 					(err:any, result:any) => {
 						next(err, result);
 				});

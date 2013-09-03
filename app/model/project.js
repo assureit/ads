@@ -34,7 +34,7 @@ var ProjectDAO = (function (_super) {
         var _this = this;
         async.waterfall([
             function (next) {
-                _this.con.query({ sql: 'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE pu.user_id=?', nestTables: true }, [userId], function (err, result) {
+                _this.con.query({ sql: 'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.public_flag=0 AND pu.user_id=?', nestTables: true }, [userId], function (err, result) {
                     next(err, result);
                 });
             },

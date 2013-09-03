@@ -1,4 +1,4 @@
-var peg = require('../public/AssureJS/lib/ASNParser/peg');
+var peg = require('./../public/assurejs/lib/ASNParser/peg')
 
 export class ASNParser {
 	parseNodeList(asn:string): any[] {
