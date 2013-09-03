@@ -24,30 +24,12 @@ describe('api', function() {
 		validParam = {
 						dcaseName: 'test dcase', 
 						projectId: 201,
-						contents: {
-							NodeCount:3,
-							TopGoalId:1,
-							NodeList:[
-								{
-									ThisNodeId:1,
-									Description:"dcase1",
-									Children:[2],
-									NodeType:"Goal"
-								},
-								{
-									ThisNodeId:2,
-									Description:"s1",
-									Children:[3],
-									NodeType:"Strategy"
-								},
-								{
-									ThisNodeId:3,
-									Description:"g1",
-									Children:[],
-									NodeType:"Goal"
-								}
-							]
-						}
+						contents: '*1\n' +
+									'dcase1\n' +
+									'*2\n' +
+									's1\n' +
+									'**3\n' +
+									'g1\n'
 					};
 		testdata.load([], (err:any) => {
 	        con = new db.Database();

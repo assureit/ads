@@ -11,7 +11,9 @@ describe('test-db', function () {
         con = new db.Database();
         con.begin(function (err, result) {
             testDB = new testdb.TestDB(con);
-            done();
+            testDB.clearAll(function (err) {
+                done();
+            });
         });
     });
     afterEach(function (done) {
