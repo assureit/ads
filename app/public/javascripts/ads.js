@@ -26,7 +26,13 @@ var ADS = (function () {
         router.route("project/new", "project", function () {
             $("#project-create").click(function () {
                 var name = $("#inputProjectName").attr("value");
+                var isPublic = $("#inputIsPublic").attr("checked") != null;
+                var language = ($("#inputIsEnglish").attr("checked") != null) ? "en" : "ja";
                 console.log(name);
+                console.log(isPublic);
+                console.log(language);
+                var r = DCaseAPI.createProject(name, isPublic);
+                location.href = "../";
             });
         });
 
