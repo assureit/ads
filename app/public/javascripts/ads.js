@@ -25,6 +25,10 @@ var ADS = (function () {
             }
         });
 
+        router.route("project/new", "project", function () {
+            console.log("hihihihi");
+        });
+
         var defaultRouter = function (pageIndex, tag) {
             _this.initDefaultScreen(_this.getLoginUserorNull(), pageIndex, _this.selectDCaseView, tag);
             $("#newDCase").hide();

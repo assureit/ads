@@ -53,6 +53,20 @@ block bar
 block content
     #dcase-manager.container-fluid(style="display: none;")
         .row
+            #newDCase.span6.offset3(style='display: none;')
+                h2= lang.new_DCase
+                form.form-horizontal
+                    .control-group#newdcase-name
+                        label.control-label(for="inputDCaseName")= lang.DCase_name
+                        .controls
+                            input#inputDCaseName(type="text", id="inputDCaseName")
+                    .control-group#newdcase-desc
+                        label.control-label(for="inputDesc")= lang.topgoal
+                        .controls
+                            textarea#inputDesc(rows=5)
+                    .control-group
+                        .controls
+                            button.btn#dcase-create(type="button")= lang.create
             #selectDCase.span6.offset2
                 h2 Projects&nbsp;
                     a.btn.btn-success.pull-right.NewProjectButton(href="./project/new")

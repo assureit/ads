@@ -96,6 +96,10 @@ class ADS {
 			}
 		});
 
+		router.route("project/new", "project", () => {
+				/* TODO */
+		});
+
 		var defaultRouter = (pageIndex: any, tag?: string) => {
 			this.initDefaultScreen(this.getLoginUserorNull(), pageIndex, this.selectDCaseView, tag);
 			$("#newDCase").hide();
