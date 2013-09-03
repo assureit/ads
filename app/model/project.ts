@@ -10,7 +10,7 @@ export class Project {
 	constructor(public id:number, public name:string, public isPublic:number) {
 	}
 	static tableToObject(table: any): Project {
-		return new Project(table.project_id, table.name, table.isPublic);
+		return new Project(table.id, table.name, table.isPublic);
 	}
 }
 
@@ -18,7 +18,7 @@ export class ProjectDAO extends model.DAO {
 	list(userId: number, callback: (err:any, result: Project[])=>void): void {
 		async.waterfall([
 			(next) => {
-				this.con.query('SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE pu.user_id=?', [userId],
+				this.con.query({sql:'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE pu.user_id=?', nestTables:true}, [userId],
 					(err:any, result:any) => {
 						next(err, result);
 				});
@@ -26,7 +26,7 @@ export class ProjectDAO extends model.DAO {
 			(result:any, next) => {
 				var list:Project[] = [];
 				result.forEach((row) => {
-					list.push(Project.tableToObject(row));
+					list.push(Project.tableToObject(row.p));
 				});
 				next(null, list);
 			}

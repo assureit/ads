@@ -19,7 +19,7 @@ var Project = (function () {
         this.isPublic = isPublic;
     }
     Project.tableToObject = function (table) {
-        return new Project(table.project_id, table.name, table.isPublic);
+        return new Project(table.id, table.name, table.isPublic);
     };
     return Project;
 })();
@@ -34,14 +34,14 @@ var ProjectDAO = (function (_super) {
         var _this = this;
         async.waterfall([
             function (next) {
-                _this.con.query('SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE pu.user_id=?', [userId], function (err, result) {
+                _this.con.query({ sql: 'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE pu.user_id=?', nestTables: true }, [userId], function (err, result) {
                     next(err, result);
                 });
             },
             function (result, next) {
                 var list = [];
                 result.forEach(function (row) {
-                    list.push(Project.tableToObject(row));
+                    list.push(Project.tableToObject(row.p));
                 });
                 next(null, list);
             }
