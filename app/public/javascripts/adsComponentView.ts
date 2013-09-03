@@ -4,7 +4,9 @@
 ///<reference path='dcaseviewer.ts'/>
 
 class CreateDCaseView {
+	projectid: number;
 	constructor() {
+		this.projectid = -1;
 		$("#dcase-create").click(function() {
 			var name = $("#inputDCaseName").attr("value");
 			var desc = $("#inputDesc").attr("value");
@@ -31,12 +33,13 @@ class CreateDCaseView {
 			//	TopGoalId: id,
 			//	NodeCount: 1,
 			//};
-			var r: any = DCaseAPI.createDCase(name, tree, 1);
-			location.href = "./case/" + r.dcaseId;
+			var r: any = DCaseAPI.createDCase(name, tree, this.projectid);
+			location.href = "../case/" + r.dcaseId;
 		});
 	}
 
-	enableSubmit(): void{
+	enableSubmit(projectid: number): void{
+		this.projectid = projectid;
 		$("#dcase-create").removeClass("disabled");
 		$("#inputDCaseName").removeAttr("disabled");
 		$("#inputDesc").removeAttr("disabled");

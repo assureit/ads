@@ -285,13 +285,9 @@ function commit(params, userId, callback) {
                 next(new error.VersionConflictError('CommitID is not the effective newest commitment.'));
                 return;
             }
+
             commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
-                return next(err, resultCheck.dcaseId, result);
-            });
-        },
-        function (dcaseId, commitResult, next) {
-            projectDAO.updateMember(dcaseId, function (err) {
-                return next(err, commitResult);
+                return next(err, result);
             });
         },
         function (commitResult, next) {

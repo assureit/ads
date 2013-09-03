@@ -79,7 +79,7 @@ class ADS {
 		this.createDCaseView = new CreateDCaseView();
 
 		var router = new Router();
-		router.route("new", "new", () => {
+		router.route("new/:project", "new", (project) => {
 			var userId: number  = this.getLoginUserorNull();
 			this.initDefaultScreen(userId, 1, null);
 			$("#newDCase").show();
@@ -87,7 +87,7 @@ class ADS {
 			$("#dcase-tags").hide();
 
 			if(this.isLogin(userId)) {
-				this.createDCaseView.enableSubmit();
+				this.createDCaseView.enableSubmit(Number(project));
 			} else {
 				this.createDCaseView.disableSubmit();
 			}
