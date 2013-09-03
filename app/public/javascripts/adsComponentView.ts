@@ -204,19 +204,7 @@ class SelectDCaseView {
 	}
 
 	addElements(userId, pageIndex?: any, tags?: string[]): void {
-		//if(pageIndex == null || pageIndex < 1) pageIndex = 1;
-		//if(tags == null) tags = [];
-		//this.pageIndex = pageIndex - 0;
-		//var searchResults: any = DCaseAPI.searchDCase(this.pageIndex, tags);
-		//var dcaseList : any = searchResults.dcaseList;
-		//this.maxPageSize  = searchResults.summary.maxPage;
-//
 		var isLoggedin = userId != null;
-//		//$.each(dcaseList, (i, dcase)=>{
-//		//	var s:SelectDCaseContent = new SelectDCaseContent(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
-//		//	this.manager.add(s);
-//		//});
-		//this.manager.updateContentsOrZeroView();
 		var privateProjects: any = isLoggedin ? DCaseAPI.getProjectList(userId) : { projectList: [] };
 		var publicProjects: any = DCaseAPI.getPublicProjectList();
 		var projects = privateProjects.projectList.concat(publicProjects.projectList);

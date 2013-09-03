@@ -206,7 +206,6 @@ var SelectDCaseView = (function () {
 
     SelectDCaseView.prototype.addElements = function (userId, pageIndex, tags) {
         var isLoggedin = userId != null;
-
         var privateProjects = isLoggedin ? DCaseAPI.getProjectList(userId) : { projectList: [] };
         var publicProjects = DCaseAPI.getPublicProjectList();
         var projects = privateProjects.projectList.concat(publicProjects.projectList);
