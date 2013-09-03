@@ -28,7 +28,6 @@ exports.newprojectView = function (req, res) {
     var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: null };
     var auth = new util_auth.Auth(req, res);
     if (auth.isLogin()) {
-        page = 'signout';
         params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
     }
 
