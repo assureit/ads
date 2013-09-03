@@ -48,11 +48,7 @@ var DCaseAPI;
     };
 
     DCaseAPI.getProjectDCase = function (pageIndex, projectId) {
-        try  {
-            return this.call("searchDCase", { page: pageIndex, projectId: projectId });
-        } catch (e) {
-            return [];
-        }
+        return this.call("searchDCase", { page: pageIndex, projectId: projectId });
     };
 
     DCaseAPI.createDCase = function (name, tree, projectId) {
