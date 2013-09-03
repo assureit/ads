@@ -180,12 +180,15 @@ var SelectDCaseView = (function () {
 
     SelectDCaseView.prototype.addElements = function (userId, pageIndex, tags) {
         var isLoggedin = userId != null;
-        var privateProjects = isLoggedin ? DCaseAPI.getProjectList(userId) : { projectList: [] };
-        var publicProjects = DCaseAPI.getPublicProjectList();
-        var projects = privateProjects.projectList.concat(publicProjects.projectList);
+        var privateProjects = isLoggedin ? DCaseAPI.getProjectList(userId).projectList : [];
+        var publicProjects = DCaseAPI.getPublicProjectList().projectList;
+        var projects = privateProjects.concat(publicProjects);
+        for (var i = 0; i < privateProjects.length; i++) {
+            privateProjects[i].isPrivate = true;
+        }
         for (var i = 0; i < projects.length; i++) {
             var project = projects[i];
-            project.users = [];
+            project.users = project.isPrivate ? DCaseAPI.getProjectUser(project.projectId).userList : [];
             project.cases = DCaseAPI.getProjectDCase(1, project.projectId).dcaseList;
             for (var j = 0; j < project.cases.length; j++) {
                 var dcase = project.cases[j];
