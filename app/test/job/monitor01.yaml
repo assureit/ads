@@ -4,7 +4,7 @@ dcase:
 commit:
   - id: 404
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -16,7 +16,7 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
       **3
       g1

@@ -24,11 +24,11 @@ describe('api.dcase', function() {
 		validParam = {
 						dcaseName: 'test dcase', 
 						projectId: 201,
-						contents: '*1\n' +
+						contents: '*goal\n' +
 									'dcase1\n' +
-									'*2\n' +
+									'*strategy\n' +
 									's1\n' +
-									'**3\n' +
+									'**goal\n' +
 									'g1\n'
 					};
 		testdata.load([], (err:any) => {

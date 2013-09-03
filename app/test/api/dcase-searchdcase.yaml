@@ -38,7 +38,7 @@ dcase:
 commit:
   - id: 404
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -50,9 +50,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -72,7 +72,7 @@ commit:
     user_id: 101
   - id: 405
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -84,9 +84,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -106,7 +106,7 @@ commit:
     user_id: 101
   - id: 406
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -118,9 +118,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -140,7 +140,7 @@ commit:
     user_id: 101
   - id: 407
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -152,9 +152,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -174,7 +174,7 @@ commit:
     user_id: 101
   - id: 408
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -186,9 +186,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -208,7 +208,7 @@ commit:
     user_id: 101
   - id: 409
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -220,9 +220,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -242,7 +242,7 @@ commit:
     user_id: 101
   - id: 410
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -254,9 +254,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -276,7 +276,7 @@ commit:
     user_id: 101
   - id: 411
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -288,9 +288,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -310,7 +310,7 @@ commit:
     user_id: 101
   - id: 412
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -322,9 +322,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -344,7 +344,7 @@ commit:
     user_id: 101
   - id: 413
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -356,9 +356,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -378,7 +378,7 @@ commit:
     user_id: 101
   - id: 414
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -390,9 +390,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -412,7 +412,7 @@ commit:
     user_id: 101
   - id: 415
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -424,9 +424,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -446,7 +446,7 @@ commit:
     user_id: 101
   - id: 416
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -458,9 +458,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -480,7 +480,7 @@ commit:
     user_id: 101
   - id: 417
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -492,9 +492,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -514,7 +514,7 @@ commit:
     user_id: 101
   - id: 418
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -526,9 +526,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -548,7 +548,7 @@ commit:
     user_id: 101
   - id: 419
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -560,9 +560,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -582,7 +582,7 @@ commit:
     user_id: 101
   - id: 420
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -594,9 +594,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -616,7 +616,7 @@ commit:
     user_id: 101
   - id: 421
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -628,9 +628,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -650,7 +650,7 @@ commit:
     user_id: 101
   - id: 422
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -662,9 +662,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue
@@ -684,7 +684,7 @@ commit:
     user_id: 101
   - id: 423
     data: |
-      *1
+      *goal
       dcase1
       Note0::
         Type: Issue
@@ -696,9 +696,9 @@ commit:
         Type: LastUpdated
         User: Shida
         Visible: false
-      *2
+      *strategy
       s1
-      **3
+      **goal
       g1
       Note0::
         Type: Issue

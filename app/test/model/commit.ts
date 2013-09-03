@@ -35,7 +35,7 @@ describe('model', function() {
 		validParam = {
 			commitId: 401,
 			commitMessage: 'test',
-			contents: '*1\n' +
+			contents: '*goal\n' +
 						'dcase1\n' +
 						'Note0::\n' +
 						'	Type: Issue\n' +
@@ -50,9 +50,9 @@ describe('model', function() {
 						'	Type: Tag\n' +
 						'	Tag: tag1\n' +
 						'	Visible: true\n' +
-						'*2\n' +
+						'*strategy\n' +
 						's1\n' +
-						'**3\n' +
+						'**goal\n' +
 						'g1\n' +
 						'Note0::\n' +
 						'	Type: Issue\n' +
