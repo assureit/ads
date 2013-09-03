@@ -85,6 +85,10 @@ var DCaseAPI;
         return this.call("getProjectList", { userId: userId });
     };
 
+    DCaseAPI.getPublicProjectList = function () {
+        return this.call("getPublicProjectList", {});
+    };
+
     DCaseAPI.editDCase = function (dcaseId, name) {
         return this.call("editDCase", {
             dcaseId: dcaseId,

@@ -45,6 +45,35 @@ export function getProjectList(params:any, userId: number, callback: type.Callba
 	);
 }
 
+export function getPublicProjectList(params:any, userId: number, callback: type.Callback) {
+	var con = new db.Database();
+	var projectDAO = new model_project.ProjectDAO(con);
+	params = params || {};
+	async.waterfall([
+		(next) => {
+			projectDAO.publiclist(userId, (err:any, result: model_project.Project[]) => {
+				next(err, result);
+			});
+		}],
+		(err:any, result:model_project.Project[]) => {
+			con.close();
+			if (err) {
+				callback.onFailure(err);
+				return;
+			}
+			var resultProjectlist = _.map(result, (val: model_project.Project) => {
+				return {
+					projectId: val.id, 
+					projectName: val.name
+				};
+			});
+			callback.onSuccess({
+				projectList:resultProjectlist
+			});
+		}
+	);
+}
+
 export function createProject(params:any, userId: number, callback: type.Callback) {
 	//TODO validation
 	var con = new db.Database();

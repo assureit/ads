@@ -143,8 +143,17 @@ var SelectDCaseView = (function () {
     };
 
     SelectDCaseView.prototype.addElements = function (userId, pageIndex, tags) {
-        var projects = DCaseAPI.getProjectList(userId);
-        console.log(projects);
+        var isLoggedin = userId != null;
+
+        var projects = isLoggedin ? DCaseAPI.getProjectList(userId) : { projectList: [] };
+        var publicProjects = DCaseAPI.getPublicProjectList();
+        projects.projectList = projects.projectList.concat(publicProjects.projectList);
+        for (var i = 0; i < projects.projectList.length; i++) {
+            var project = projects.projectList[i];
+            project.users = [];
+            project.cases = [];
+        }
+        console.log(projects.projectList);
         var mock = [
             {
                 name: "Project1",
@@ -167,9 +176,21 @@ var SelectDCaseView = (function () {
                         lastUpdateUser: "UserA"
                     }
                 ]
+            },
+            {
+                name: "Project2",
+                users: [],
+                cases: [
+                    {
+                        name: "Case2A",
+                        size: 12,
+                        lastUpdateDate: "12 minutes ago",
+                        lastUpdateUser: "UserC"
+                    }
+                ]
             }
         ];
-        $("#ProjectList").append(($)("#project_tmpl").tmpl(mock));
+        $("#ProjectList").append(($)("#project_tmpl").tmpl(projects.projectList));
     };
 
     SelectDCaseView.prototype.initEvents = function () {

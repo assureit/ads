@@ -50,6 +50,26 @@ var ProjectDAO = (function (_super) {
         });
     };
 
+    ProjectDAO.prototype.publiclist = function (userId, callback) {
+        var _this = this;
+        async.waterfall([
+            function (next) {
+                _this.con.query('SELECT * FROM project AS p WHERE p.public_flag=1', function (err, result) {
+                    next(err, result);
+                });
+            },
+            function (result, next) {
+                var list = [];
+                result.forEach(function (row) {
+                    list.push(Project.tableToObject(row));
+                });
+                next(null, list);
+            }
+        ], function (err, list) {
+            callback(err, list);
+        });
+    };
+
     ProjectDAO.prototype.insert = function (name, public_flag, callback) {
         var _this = this;
         async.waterfall([

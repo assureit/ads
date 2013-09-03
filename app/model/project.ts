@@ -35,6 +35,26 @@ export class ProjectDAO extends model.DAO {
 		});
 	}
 
+	publiclist(userId: number, callback: (err:any, result: Project[])=>void): void {
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT * FROM project AS p WHERE p.public_flag=1',
+					(err:any, result:any) => {
+						next(err, result);
+				});
+			},
+			(result:any, next) => {
+				var list:Project[] = [];
+				result.forEach((row) => {
+					list.push(Project.tableToObject(row));
+				});
+				next(null, list);
+			}
+		], (err:any, list: Project[]) => {
+			callback(err, list);
+		});
+	}
+
 	insert(name: string, public_flag: boolean, callback: (err:any, projectId:number)=>void): void {
 		async.waterfall([
 			(next) => {

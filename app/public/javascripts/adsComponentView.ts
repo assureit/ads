@@ -150,14 +150,21 @@ class SelectDCaseView {
 		//var dcaseList : any = searchResults.dcaseList;
 		//this.maxPageSize  = searchResults.summary.maxPage;
 //
-//		//var isLogin = userId != null;
+		var isLoggedin = userId != null;
 //		//$.each(dcaseList, (i, dcase)=>{
 //		//	var s:SelectDCaseContent = new SelectDCaseContent(dcase.dcaseId, dcase.dcaseName, dcase.userName, dcase.latestCommit.dateTime, dcase.latestCommit.userName, isLogin);
 //		//	this.manager.add(s);
 //		//});
 		//this.manager.updateContentsOrZeroView();
-		var projects: any = DCaseAPI.getProjectList(userId);
-		console.log(projects);
+		var projects: any = isLoggedin ? DCaseAPI.getProjectList(userId) : { projectList: [] };
+		var publicProjects: any = DCaseAPI.getPublicProjectList();
+		projects.projectList = projects.projectList.concat(publicProjects.projectList);
+		for(var i = 0; i < projects.projectList.length; i++){
+			var project = projects.projectList[i];
+			project.users = [];
+			project.cases = [];
+		}
+		console.log(projects.projectList);
 		var mock = [{
 			name: "Project1",
 			users: [
@@ -179,8 +186,21 @@ class SelectDCaseView {
 					lastUpdateUser: "UserA",
 				}
 			],
+		},
+		{
+			name: "Project2",
+			users: [
+			],
+			cases: [
+				{
+					name: "Case2A",
+					size: 12,
+					lastUpdateDate: "12 minutes ago",
+					lastUpdateUser: "UserC",
+				},
+			],
 		}];
-		$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(mock) );
+		$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(projects.projectList) );
 	}
 
 	initEvents() {

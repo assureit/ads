@@ -18,7 +18,7 @@ block append content
                     |  updated ${lastUpdateDate}
     script#project_tmpl(type="text/x-jquery-tmpl")
         article
-            h3 ${name} &nbsp;
+            h3 #${projectId} ${projectName} &nbsp;
                 a.btn.btn-mini
                     i.icon-edit &nbsp;
                 a.btn.btn-success.btn-small.pull-right
@@ -27,11 +27,13 @@ block append content
             ul.inline
                 li
                     i.icon-user　&nbsp;
-                    |${users.length > 0 ? users.length : "Public"}
+                    |${users && users.length > 0 ? users.length : "Public"}
+                |{{if users}}
                 |{{each users}}
                 li
                     a(href='#') ${this.name}
                 |{{/each}}
+                |{{/if}}
             ul.media-list
                 |{{tmpl(cases) "#case_tmpl"}}
             hr
