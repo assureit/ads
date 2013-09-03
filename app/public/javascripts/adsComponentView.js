@@ -219,11 +219,6 @@ var SelectDCaseView = (function () {
             }
         ];
         $("#ProjectList").append(($)("#project_tmpl").tmpl(projects));
-
-        $(".NewCaseButton").click(function () {
-            var projectId = (($(this))).tmplItem().data.projectId;
-            location.href = "./new/" + projectId;
-        });
     };
 
     SelectDCaseView.prototype.initEvents = function () {
