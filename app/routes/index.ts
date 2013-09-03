@@ -25,6 +25,22 @@ export var index = function(req: any, res: any) {
 	res.render(page, params);
 };
 
+export var newprojectView = function(req: any, res: any) {
+	var page = 'newproject';
+	var params: any = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: null};
+	var auth = new util_auth.Auth(req, res);
+	if(auth.isLogin()) {
+		page = 'signout';
+		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
+	}
+
+	if( req.cookies.lang == 'en') {
+		params.lang = lang.lang.en;
+	}
+
+	res.render(page, params);
+}
+
 export var caseView = function(req: any, res: any) {
 	var page = 'case';
 	var params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, caseId: req.params.id};

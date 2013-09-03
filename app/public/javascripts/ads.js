@@ -7,12 +7,14 @@ var ADS = (function () {
         this.selectDCaseView.initEvents();
         this.tagListManager = new TagListManager();
         this.createDCaseView = new CreateDCaseView();
+        this.createProjectView = new CreateProjectView();
 
         var router = new Router();
         router.route("new/:project", "new", function (project) {
             var userId = _this.getLoginUserorNull();
             _this.initDefaultScreen(userId, 1, null);
             $("#newDCase").show();
+            $("#newProject").hide();
             $("#selectDCase").hide();
             $("#dcase-tags").hide();
 
@@ -26,6 +28,7 @@ var ADS = (function () {
         var defaultRouter = function (pageIndex, tag) {
             _this.initDefaultScreen(_this.getLoginUserorNull(), pageIndex, _this.selectDCaseView, tag);
             $("#newDCase").hide();
+            $("#newProject").hide();
             $("#selectDCase").show();
             $("#dcase-tags").show();
             var importFile = new ImportFile(".row");
@@ -62,6 +65,7 @@ var ADS = (function () {
             _this.hideViewer();
             _this.clearTimeLine();
             $("#newDCase").hide();
+            $("#newProject").hide();
             $("#selectDCase").hide();
             $("#dcase-tags").hide();
             var userId = _this.getLoginUserorNull();

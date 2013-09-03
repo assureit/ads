@@ -16,6 +16,7 @@ class ADS {
 	selectDCaseView: SelectDCaseView;
 	tagListManager : TagListManager;
 	createDCaseView: CreateDCaseView;
+	createProjectView: CreateProjectView;
 	timelineView   : TimeLineView;
 
 	getLoginUserorNull() {
@@ -77,12 +78,14 @@ class ADS {
 		this.selectDCaseView.initEvents();
 		this.tagListManager  = new TagListManager();
 		this.createDCaseView = new CreateDCaseView();
+		this.createProjectView = new CreateProjectView();
 
 		var router = new Router();
 		router.route("new/:project", "new", (project) => {
 			var userId: number  = this.getLoginUserorNull();
 			this.initDefaultScreen(userId, 1, null);
 			$("#newDCase").show();
+			$("#newProject").hide();
 			$("#selectDCase").hide();
 			$("#dcase-tags").hide();
 
@@ -96,6 +99,7 @@ class ADS {
 		var defaultRouter = (pageIndex: any, tag?: string) => {
 			this.initDefaultScreen(this.getLoginUserorNull(), pageIndex, this.selectDCaseView, tag);
 			$("#newDCase").hide();
+			$("#newProject").hide();
 			$("#selectDCase").show();
 			$("#dcase-tags").show();
 			var importFile = new ImportFile(".row");
@@ -138,6 +142,7 @@ class ADS {
 			this.hideViewer();
 			this.clearTimeLine();
 			$("#newDCase").hide();
+			$("#newProject").hide();
 			$("#selectDCase").hide();
 			$("#dcase-tags").hide();
 			var userId = this.getLoginUserorNull();

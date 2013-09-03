@@ -3,6 +3,30 @@
 ///<reference path='api.ts'/>
 ///<reference path='dcaseviewer.ts'/>
 
+class CreateProjectView {
+	constructor() {
+		$("#dcase-create").click(function() {
+			var name = $("#inputDCaseName").attr("value");
+			var desc = $("#inputDesc").attr("value");
+			var error = false;
+			if(name == "") {
+				$("#newdcase-name").addClass("error");
+				error = true;
+			} else {
+				$("#newdcase-name").removeClass("error");
+			}
+			if(desc == "") {
+				$("#newdcase-desc").addClass("error");
+				error = true;
+			}
+			if(error) return;
+			var tree = "*Goal\n" + desc;
+			var r: any = DCaseAPI.createDCase(name, tree, this.projectid);
+			location.href = "../case/" + r.dcaseId;
+		});
+	}
+}
+
 class CreateDCaseView {
 	projectid: number;
 	constructor() {
