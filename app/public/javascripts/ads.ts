@@ -122,26 +122,20 @@ class ADS {
 			$("#newDCase").hide();
 			$("#selectDCase").show();
 			$("#dcase-tags").show();
-			var importFile = new ImportFile(".row");
-			importFile.read((file: DCaseFile) => {
+			var importFile = new ImportFile("article");
+			importFile.read(function(file: DCaseFile, target: any) {
 				var x2dc : Xml2DCaseTree.Converter = new Xml2DCaseTree.Converter();
 				var tree : DCaseTree.TopGoalNode = x2dc.parseXml(file.result);
 				var j = tree.convertAllChildNodeIntoJson([]);
-				console.log(j);
 				var contents = {
 					DCaseName: file.name,
 					NodeCount: tree.NodeCount,
 					TopGoalId: tree.TopGoalId,
 					NodeList: j
 				};
-				var r = DCaseAPI.createDCase(file.name, contents, 1/*FIXME*/);
+				var projectId = parseInt($(target).attr("id").replace(/[a-zA-Z]*/,""));
+				var r = DCaseAPI.createDCase(file.name, contents, projectId);
 				location.href = "./case/" + r.dcaseId;
-				//if("contents" in tree) {
-				//	var r = DCaseAPI.createDCase(tree.contents.DCaseName, tree.contents);
-				//	location.href = "./case/" + r.dcaseId;
-				//} else {
-				//	alert("Invalid File");
-				//}
 			});
 		}
 

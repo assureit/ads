@@ -35,19 +35,19 @@ var ADS = (function () {
             $("#newDCase").hide();
             $("#selectDCase").show();
             $("#dcase-tags").show();
-            var importFile = new ImportFile(".row");
-            importFile.read(function (file) {
+            var importFile = new ImportFile("article");
+            importFile.read(function (file, target) {
                 var x2dc = new Xml2DCaseTree.Converter();
                 var tree = x2dc.parseXml(file.result);
                 var j = tree.convertAllChildNodeIntoJson([]);
-                console.log(j);
                 var contents = {
                     DCaseName: file.name,
                     NodeCount: tree.NodeCount,
                     TopGoalId: tree.TopGoalId,
                     NodeList: j
                 };
-                var r = DCaseAPI.createDCase(file.name, contents, 1);
+                var projectId = parseInt($(target).attr("id").replace(/[a-zA-Z]*/, ""));
+                var r = DCaseAPI.createDCase(file.name, contents, projectId);
                 location.href = "./case/" + r.dcaseId;
             });
         };
