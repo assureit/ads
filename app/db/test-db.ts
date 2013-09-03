@@ -35,6 +35,7 @@ export class TestDB {
 		var fd = fs.readFileSync(filePath, 'utf8');
 		try {
 			yaml.loadAll(fd, (doc) => {
+				console.log(doc.commit[0].data);
 				var tables = _.keys(doc);
 				var loadFuncs = _.map(tables, (table)=> {return this._buildLoadTableFunc(table, doc[table])});
 				async.waterfall(loadFuncs, (err:any) => {callback(err);});

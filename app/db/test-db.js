@@ -31,6 +31,7 @@ var TestDB = (function () {
         var fd = fs.readFileSync(filePath, 'utf8');
         try  {
             yaml.loadAll(fd, function (doc) {
+                console.log(doc.commit[0].data);
                 var tables = _.keys(doc);
                 var loadFuncs = _.map(tables, function (table) {
                     return _this._buildLoadTableFunc(table, doc[table]);
