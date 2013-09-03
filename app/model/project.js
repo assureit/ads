@@ -19,7 +19,7 @@ var Project = (function () {
         this.isPublic = isPublic;
     }
     Project.tableToObject = function (table) {
-        return new Project(table.id, table.name, table.isPublic);
+        return new Project(table.project_id, table.name, table.isPublic);
     };
     return Project;
 })();

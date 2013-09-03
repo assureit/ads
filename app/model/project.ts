@@ -10,7 +10,7 @@ export class Project {
 	constructor(public id:number, public name:string, public isPublic:number) {
 	}
 	static tableToObject(table: any): Project {
-		return new Project(table.id, table.name, table.isPublic);
+		return new Project(table.project_id, table.name, table.isPublic);
 	}
 }
 
