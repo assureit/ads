@@ -17,7 +17,7 @@ var dSvr = require('../server')
 
 var userId = constant.SYSTEM_USER_ID;
 
-describe('api', function() {
+describe('api.dcase', function() {
 	var con:db.Database;
 	var validParam:any;
 
@@ -89,7 +89,6 @@ describe('api', function() {
 		CONFIG.resetRuntime((err, written, buffer) => {});
 	});
 
-	describe('dcase', function() {
 		///////////////////////////////////////////////
 		describe('commit', function() {
 			it('should return result', function(done) {
@@ -352,5 +351,4 @@ describe('api', function() {
 			// 	);
 			// });
 		});
-	});
 });

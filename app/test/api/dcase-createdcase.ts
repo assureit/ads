@@ -17,7 +17,7 @@ var expect = require('expect.js');	// TODO: import module化
 
 var userId = constant.SYSTEM_USER_ID;
 
-describe('api', function() {
+describe('api.dcase', function() {
     var con:db.Database;
     var validParam:any;
 	beforeEach(function (done) {
@@ -39,7 +39,6 @@ describe('api', function() {
 	afterEach(function (done) {
 		testdata.clear((err:any) => done());
 	});
-	describe('dcase', function() {
 
 		describe('createDCase', function() {
 			it('should return result', function(done) {
@@ -287,5 +286,4 @@ describe('api', function() {
 				);
 			});
 		});
-	});
 });
