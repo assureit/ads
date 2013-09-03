@@ -94,7 +94,10 @@ class ADS {
 		});
 
 		router.route("project/new", "project", () => {
+			var create_pressed = false;
 			$("#project-create").click(function() {
+				if(create_pressed) return;
+				create_pressed = true;
 				var name = $("#inputProjectName").attr("value");
 				var isPublic = $("#inputIsPublic").attr("checked") != null;
 				var language = ($("#inputIsEnglish").attr("checked") != null) ? "en" : "ja";
