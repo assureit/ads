@@ -6,6 +6,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var CreateDCaseView = (function () {
     function CreateDCaseView() {
+        this.projectid = -1;
         $("#dcase-create").click(function () {
             var name = $("#inputDCaseName").attr("value");
             var desc = $("#inputDesc").attr("value");
@@ -24,11 +25,12 @@ var CreateDCaseView = (function () {
                 return;
             var tree = "*Goal\n" + desc;
 
-            var r = DCaseAPI.createDCase(name, tree, 1);
+            var r = DCaseAPI.createDCase(name, tree, this.projectid);
             location.href = "./case/" + r.dcaseId;
         });
     }
-    CreateDCaseView.prototype.enableSubmit = function () {
+    CreateDCaseView.prototype.enableSubmit = function (projectid) {
+        this.projectid = projectid;
         $("#dcase-create").removeClass("disabled");
         $("#inputDCaseName").removeAttr("disabled");
         $("#inputDesc").removeAttr("disabled");
