@@ -31,7 +31,8 @@ exports.lang = {
         closeall: "全て折りたたむ",
         locale: "言語設定",
         SelectCase: "Case選択",
-        AllTags: "全てのタグを表示"
+        AllTags: "全てのタグを表示",
+        public: "公開"
     },
     en: {
         home: "Home",
@@ -65,7 +66,8 @@ exports.lang = {
         closeall: "Close all",
         locale: "Language",
         SelectCase: "Select Case",
-        AllTags: "Show all tags"
+        AllTags: "Show all tags",
+        public: "Public"
     }
 };
 

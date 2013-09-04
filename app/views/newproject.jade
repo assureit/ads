@@ -9,9 +9,9 @@ block bar
                     a(href='#') Monitors
                 li#settings-menu
                     a(href='#') Settings
-                block sign
+                include signout
             else
-                block sign
+                include signin
 block content
     #dcase-manager.container-fluid
         .row
@@ -19,16 +19,21 @@ block content
                 h2= lang.new_Project
                 form.form-horizontal
                     fieldset
-                        label(for="inputProjectName")= lang.Project_name
-                        input#inputProjectName(type="text", id="inputProjectName")
-                        label.checkbox
-                            input#inputIsPublic(type="checkbox",checked="checked")
-                            |Public Project
-                        label.radio.inline
-                            input#inputIsEnglish(type="radio",name="optionsRadios",id="en",value="en",checked="checked")
-                            |English
-                        label.radio.inline
-                            input(type="radio",name="optionsRadios",id="ja",value="ja")
-                            |Japanese
-                        label= lang.Public_project
-                            button.btn#project-create(type="button")= lang.create
+                        .control-group
+                            label.control-label(for="inputProjectName")= lang.Project_name
+                            .controls
+                                input#inputProjectName(type="text")
+                        .control-group
+                            label.control-label(for="inputLanguage")= lang.locale
+                            .controls
+                                select#inputLanguage
+                                    option(value="en") English
+                                    option(value="ja") Japanese
+                        .control-group
+                            .controls
+                                label.checkbox= lang.public
+                                    input#inputIsPublic(type="checkbox",checked="checked")
+                        .control-group
+                            .controls
+                                button.btn#project-create(type="button")= lang.create
+
