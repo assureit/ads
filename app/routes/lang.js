@@ -32,7 +32,9 @@ exports.lang = {
         closeall: "全て折りたたむ",
         locale: "言語設定",
         SelectCase: "Case選択",
-        AllTags: "全てのタグを表示"
+        AllTags: "全てのタグを表示",
+        member: "メンバー",
+        public: "公開プロジェクト"
     },
     en: {
         home: "Home",
@@ -67,7 +69,9 @@ exports.lang = {
         closeall: "Close all",
         locale: "Language",
         SelectCase: "Select Case",
-        AllTags: "Show all tags"
+        AllTags: "Show all tags",
+        member: "Member",
+        public: "Public project"
     }
 };
 

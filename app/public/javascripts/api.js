@@ -70,6 +70,21 @@ var DCaseAPI;
         });
     };
 
+    DCaseAPI.editProject = function (projectId, name, isPublic) {
+        return this.call("editProject", {
+            projectId: projectId,
+            name: name,
+            isPublic: isPublic
+        });
+    };
+
+    DCaseAPI.addProjectUser = function (projectId, users) {
+        return this.call("addProjectUser", {
+            projectId: projectId,
+            users: users
+        });
+    };
+
     DCaseAPI.getCommitList = function (dcaseId) {
         return this.call("getCommitList", { dcaseId: dcaseId }).commitList;
     };

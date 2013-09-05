@@ -32,7 +32,9 @@ export var lang = {
 		closeall:      "全て折りたたむ",
 		locale:        "言語設定",
 		SelectCase:    "Case選択",
-		AllTags:       "全てのタグを表示"
+		AllTags:       "全てのタグを表示",
+		member:        "メンバー",
+		public:        "公開プロジェクト",
 	},
 	en: {
 		home:         "Home",
@@ -52,7 +54,6 @@ export var lang = {
 		new_DCase:    "Create a new Case",
 		new_Project:  "Create a new Project",
 		DCase_name:   "Case Name",
-		public:       "Public",
 		Project_name: "Project Name",
 		topgoal:      "Description of the Top Goal",
 		create:       "Create",
@@ -67,6 +68,8 @@ export var lang = {
 		closeall:     "Close all",
 		locale:       "Language",
 		SelectCase:   "Select Case",
-		AllTags:      "Show all tags"
+		AllTags:      "Show all tags",
+		member:       "Member",
+		public:       "Public project",
 	}
 };
