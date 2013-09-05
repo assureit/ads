@@ -101,13 +101,28 @@ class ADS {
 				create_pressed = true;
 				var name = $("#inputProjectName").attr("value");
 				var isPublic = $("#inputIsPublic").attr("checked") != null;
-				var language = ($("#inputIsEnglish").attr("checked") != null) ? "en" : "ja";
+				var language = $("#inputLanguage").attr("value");
 				console.log(name);
 				console.log(isPublic);
 				console.log(language);
 				var r = DCaseAPI.createProject(name, isPublic);
 				location.href = "../";
 			});
+
+			var addNewMember = function(){
+				var newMemberForm = (<any>$)("#member_tmpl").tmpl({name: "", role: ""});
+				newMemberForm.find(".DeleteMemberButton").click(function(e){
+					e.preventDefault();
+					$((<any>($(this))).tmplItem().nodes).remove();
+				});
+				$("#AddMemberButton").before(newMemberForm);
+			}
+
+			$("#AddMemberButton").click((e)=>{
+				e.preventDefault();
+				addNewMember();
+			});
+			//$("#AddMemberButton").before( (<any>$)("#member_tmpl").tmpl({name: "", role: ""}) );
 		});
 
 		var defaultRouter = (pageIndex: any, tag?: string) => {

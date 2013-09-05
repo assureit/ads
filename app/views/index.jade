@@ -21,7 +21,7 @@ block append content
         article(id="project${projectId}")
             h3
                 //|#${projectId} 
-                |${projectName} &nbsp;
+                a(href='./project/${projectId}/edit') ${projectName} &nbsp;
                 a.btn.btn-success.btn-small.pull-right.NewCaseButton(href='./new/${projectId}')
                     i.icon-plus　&nbsp;
                     |New case
@@ -45,8 +45,7 @@ block append content
                 |{{/if}}
         hr
 block bar
-    a(href="#{basepath}/")
-        img#menu-button(src="#{basepath}/images/ait.png") Menu
+    include logo
     .menu
         ul#drop-menu
             if userName
@@ -58,7 +57,7 @@ block bar
             else
                 include signin
 block content
-    #dcase-manager.container-fluid(style="display: none;")
+    #dcase-manager.container
         .row
             #newDCase.span6.offset3(style='display: none;')
                 h2= lang.new_DCase
@@ -73,7 +72,7 @@ block content
                             textarea#inputDesc(rows=5)
                     .control-group
                         .controls
-                            button.btn#dcase-create(type="button")= lang.create
+                            button.btn.btn-primary#dcase-create(type="button")= lang.create
             #selectDCase.span6.offset2
                 h2 Projects&nbsp;
                     a.btn.btn-success.pull-right.NewProjectButton(href="./project/new")

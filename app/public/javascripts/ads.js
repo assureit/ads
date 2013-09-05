@@ -31,12 +31,26 @@ var ADS = (function () {
                 create_pressed = true;
                 var name = $("#inputProjectName").attr("value");
                 var isPublic = $("#inputIsPublic").attr("checked") != null;
-                var language = ($("#inputIsEnglish").attr("checked") != null) ? "en" : "ja";
+                var language = $("#inputLanguage").attr("value");
                 console.log(name);
                 console.log(isPublic);
                 console.log(language);
                 var r = DCaseAPI.createProject(name, isPublic);
                 location.href = "../";
+            });
+
+            var addNewMember = function () {
+                var newMemberForm = ($)("#member_tmpl").tmpl({ name: "", role: "" });
+                newMemberForm.find(".DeleteMemberButton").click(function (e) {
+                    e.preventDefault();
+                    $((($(this))).tmplItem().nodes).remove();
+                });
+                $("#AddMemberButton").before(newMemberForm);
+            };
+
+            $("#AddMemberButton").click(function (e) {
+                e.preventDefault();
+                addNewMember();
             });
         });
 

@@ -1,7 +1,6 @@
 extends layout
 block bar
-    a(href="#{basepath}/")
-        img#menu-button(src="#{basepath}/images/ait.png") Menu
+    include logo
     .menu
         ul#drop-menu
             if userName
@@ -12,28 +11,33 @@ block bar
                 include signout
             else
                 include signin
+block append content
+    script#member_tmpl(type="text/x-jquery-tmpl")
+        form.form-inline
+            input.input-large(type="text", placeholder="username" value="${name}")
+            |&nbsp;
+            input.input-medium(type="password", placeholder="role" value="${role}")
+            |&nbsp;
+            button.btn.btn-danger.DeleteMemberButton
+                i.icon-minus &nbsp;
 block content
-    #dcase-manager.container-fluid
+    #dcase-manager.container
         .row
             #newProject.span6.offset3
                 h2= lang.new_Project
-                form.form-horizontal
-                    fieldset
-                        .control-group
-                            label.control-label(for="inputProjectName")= lang.Project_name
-                            .controls
-                                input#inputProjectName(type="text")
-                        .control-group
-                            label.control-label(for="inputLanguage")= lang.locale
-                            .controls
-                                select#inputLanguage
-                                    option(value="en") English
-                                    option(value="ja") Japanese
-                        .control-group
-                            .controls
-                                label.checkbox= lang.public
-                                    input#inputIsPublic(type="checkbox",checked="checked")
-                        .control-group
-                            .controls
-                                button.btn#project-create(type="button")= lang.create
-
+                form
+                    label(for="inputProjectName")= lang.Project_name
+                    input#inputProjectName(type="text")
+                    label(for="inputLanguage")= lang.locale
+                    select#inputLanguage
+                        option(value="en") English
+                        option(value="ja") Japanese
+                    label.checkbox= lang.public
+                        input#inputIsPublic(type="checkbox",checked="checked")
+                #MemberList
+                    h3= lang.member
+                    form.form-inline#AddMemberButton
+                        button.btn.btn-success
+                            i.icon-plus &nbsp;
+                form
+                    button.btn.btn-primary#project-create(type="button")= lang.create
