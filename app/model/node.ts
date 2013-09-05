@@ -198,21 +198,21 @@ export class NodeDAO extends model.DAO {
 	}
 
 	registerTag(dcaseId:number, list: NodeData[], callback: (err:any) => void) {
-		var tagDAO = new model_tag.TagDAO(this.con);
-		var noteList: NodeNote[] = _.flatten(_.map(list, (node: NodeData) => {return node.Notes;}));
-		noteList = _.filter(noteList, (note: NodeNote) => {return note && note.Body.Type == 'Tag'});
-		var tagList = _.uniq(_.filter(
-			(_.map(noteList, (note: NodeNote) => {return note.Body.Tag})),
-			(tag:string) => {
-				return typeof(tag) == 'string' && tag.length > 0;
-			}));
-		async.waterfall([
-			(next) => {
-				tagDAO.replaceDCaseTag(dcaseId, tagList, (err:any)=> next(err));
-			},
-			], (err:any) => {
-				callback(err);
-			});
+	//	var tagDAO = new model_tag.TagDAO(this.con);
+	//	var noteList: NodeNote[] = _.flatten(_.map(list, (node: NodeData) => {return node.Notes;}));
+	//	noteList = _.filter(noteList, (note: NodeNote) => {return note && note.Body.Type == 'Tag'});
+	//	var tagList = _.uniq(_.filter(
+	//		(_.map(noteList, (note: NodeNote) => {return note.Body.Tag})),
+	//		(tag:string) => {
+	//			return typeof(tag) == 'string' && tag.length > 0;
+	//		}));
+	//	async.waterfall([
+	//		(next) => {
+	//			tagDAO.replaceDCaseTag(dcaseId, tagList, (err:any)=> next(err));
+	//		},
+	//		], (err:any) => {
+	//			callback(err);
+	//		});
 	}
 
 	search(page: number, query: string, callback: (err:any, pager: model_pager.Pager, list: Node[]) => void) {

@@ -8,7 +8,7 @@ var model = require('./model');
 var model_dcase = require('./dcase');
 var model_pager = require('./pager');
 
-var model_tag = require('./tag');
+
 
 
 
@@ -84,27 +84,6 @@ var NodeDAO = (function (_super) {
     };
 
     NodeDAO.prototype.registerTag = function (dcaseId, list, callback) {
-        var tagDAO = new model_tag.TagDAO(this.con);
-        var noteList = _.flatten(_.map(list, function (node) {
-            return node.Notes;
-        }));
-        noteList = _.filter(noteList, function (note) {
-            return note && note.Body.Type == 'Tag';
-        });
-        var tagList = _.uniq(_.filter((_.map(noteList, function (note) {
-            return note.Body.Tag;
-        })), function (tag) {
-            return typeof (tag) == 'string' && tag.length > 0;
-        }));
-        async.waterfall([
-            function (next) {
-                tagDAO.replaceDCaseTag(dcaseId, tagList, function (err) {
-                    return next(err);
-                });
-            }
-        ], function (err) {
-            callback(err);
-        });
     };
 
     NodeDAO.prototype.search = function (page, query, callback) {
