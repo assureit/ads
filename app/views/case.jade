@@ -72,7 +72,7 @@ html
                // Is it needed to handle both AssureNotation and JSON here?
                var contents;
                var history = Number("#{commitHistory}".length == 0 ? "NaN" : "#{commitHistory}"); // N th oldest commit.
-               if (isNaN(history)) {
+               if (!isNaN(history)) {
                    /* TODO */
                    console.log(history);
                } else {
