@@ -88,6 +88,46 @@ export class ProjectDAO extends model.DAO {
 		});
 	}
 
+	//users: [[name, role], [name, role], ...]
+	addProjectUser(projectId: number, users:string[][], callback: (err:any) => void): void {
+		var dcaseDAO = new model_dcase.DCaseDAO(this.con);
+		var roles = {};
+		for(var i = 0; i < users.length; i++){
+			roles[users[i][0]] = users[i][1];
+		}
+		var userList = [];
+		var vars:string;
+		async.waterfall([
+			(next) => {
+				var names: string[] = _.map(users, (it:string) => {return it[0]});
+				var vars:string = _.map(users, (it:string) => {return '?'}).join(',');
+				this.con.query('SELECT * FROM user WHERE login_name in (' + vars + ')', names, (err:any, result:any) => next(err, result));
+			},
+			(result:any[], next) => {
+				var userIdList = [];
+				result.forEach((row:any) => {
+					userIdList.push(row.id);
+					userList.push({ id: row.id, name: row.login_name, role:(roles[row.login_name] || null) })
+				});
+				vars = _.map(userIdList, (it:string) => {return '?'}).join(',');
+				if (userIdList.length == 0) {
+					next(new error.NotFoundError('Project member is not found.', users));
+					return;
+				}
+				next(null, userIdList);
+			},
+			(userIdList:number[], next) => {
+				this.con.query('DELETE FROM project_has_user WHERE project_id = ? AND user_id NOT IN (' + vars + ')', [projectId].concat(userIdList), (err:any, result:any) => next(err, userIdList));
+			},
+			(userIdList:number[], next) => {
+				// TODO insert role.
+				this.con.query('INSERT INTO project_has_user(project_id, user_id) SELECT ?, u.id FROM user u WHERE u.id IN (' + vars + ') AND NOT EXISTS (SELECT id FROM project_has_user pu WHERE pu.user_id = u.id AND pu.project_id = ?)', [projectId].concat(userIdList).concat(projectId), (err:any, result:any) => next(err));
+			},
+		], (err:any) => {
+			callback(err);
+		});
+	}
+
 	addMember(projectId: number, userId: number, callback: (err:any) => void): void {
 		async.waterfall([
 			(next) => {
@@ -102,11 +142,11 @@ export class ProjectDAO extends model.DAO {
 		});
 	}
 
-	edit(projectId: number, name: string, callback: (err:any)=>void): void {
+	edit(projectId: number, name: string, public_flag: boolean, callback: (err:any)=>void): void {
 		async.waterfall([
 			(next) => {
-				this.con.query('UPDATE project SET name=? WHERE id=?',
-					[name, projectId],
+				this.con.query('UPDATE project SET name=?, public_flag=? WHERE id=?',
+					[name, public_flag, projectId],
 					(err:any, result:any) => {
 						next(err, result);
 				});

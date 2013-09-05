@@ -60,17 +60,27 @@ module DCaseAPI {
 		return this.call("getProjectUser", {projectId: projectId});
 	};
 
-	export var createDCase = function(name, tree, projectId) {
+	export var createDCase = function(name: string, tree, projectId: number) {
 		return this.call("createDCase", {
 			dcaseName: name, contents: tree , projectId: projectId });
 	};
 
-	export var createProject = function(name, isPublic) {
+	export var createProject = function(name: string, isPublic: boolean) {
 		return this.call("createProject", {
 			name: name, isPublic: isPublic });
 	};
 
-	export var getCommitList = function(dcaseId) {
+	export var editProject = function(projectId: number, name: string, isPublic: boolean) {
+		return this.call("editProject", {
+			projectId: projectId, name: name, isPublic: isPublic });
+	};
+
+	export var addProjectUser = function(projectId: number, users: string[][]) {
+		return this.call("addProjectUser", {
+			projectId: projectId, users: users });
+	};
+
+	export var getCommitList = function(dcaseId: number) {
 		return this.call("getCommitList", { dcaseId:dcaseId }).commitList;
 	};
 
@@ -78,7 +88,7 @@ module DCaseAPI {
 		return this.call("getTagList", {});
 	};
 
-	export var commit = function(tree, msg, commitId) {
+	export var commit = function(tree, msg: string, commitId: number) {
 		return this.call("commit", {
 			contents: tree,
 			commitMessage: msg,
@@ -87,11 +97,11 @@ module DCaseAPI {
 		}).commitId;
 	};
 	
-	export var getDCase = function(dcaseId) {
+	export var getDCase = function(dcaseId: number) {
 		return this.call("getDCase", { dcaseId: dcaseId });
 	};
 
-	export var getProjectList = function(userId) {
+	export var getProjectList = function(userId: number) {
 		return this.call("getProjectList", { userId: userId });
 	};
 
@@ -99,18 +109,18 @@ module DCaseAPI {
 		return this.call("getPublicProjectList", {});
 	};
 	
-	export var editDCase = function(dcaseId, name) {
+	export var editDCase = function(dcaseId: number, name: string) {
 		return this.call("editDCase", {
 			dcaseId: dcaseId,
 			dcaseName: name
 		});
 	};
 	
-	export var deleteDCase = function(dcaseId) {
+	export var deleteDCase = function(dcaseId: number) {
 		return this.call("deleteDCase", { dcaseId: dcaseId });
 	};
 	
-	export var getNodeTree = function(commitId) {
+	export var getNodeTree = function(commitId: number) {
 		return JSON.parse(this.call("getNodeTree", { commitId: commitId }).contents);
 	};
 	
@@ -118,11 +128,11 @@ module DCaseAPI {
 		return this.call("searchNode", { text: text }).searchResultList;
 	};
 	
-	export var searchDCaseHistory = function(dcaseId, text) {
+	export var searchDCaseHistory = function(dcaseId: number, text: string) {
 		return this.call("searchDCaseHistory", {dcaseId: dcaseId, text: text});
 	};
 	
-	export var createTicket = function(nodeId, subject, description, userName) {
+	export var createTicket = function(nodeId: number, subject, description, userName) {
 	    return this.call("createTicket", {
 	        nodeId: nodeId,
 	        subject: subject,

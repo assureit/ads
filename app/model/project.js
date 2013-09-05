@@ -108,6 +108,57 @@ var ProjectDAO = (function (_super) {
         });
     };
 
+    ProjectDAO.prototype.addProjectUser = function (projectId, users, callback) {
+        var _this = this;
+        var dcaseDAO = new model_dcase.DCaseDAO(this.con);
+        var roles = {};
+        for (var i = 0; i < users.length; i++) {
+            roles[users[i][0]] = users[i][1];
+        }
+        var userList = [];
+        var vars;
+        async.waterfall([
+            function (next) {
+                var names = _.map(users, function (it) {
+                    return it[0];
+                });
+                var vars = _.map(users, function (it) {
+                    return '?';
+                }).join(',');
+                _this.con.query('SELECT * FROM user WHERE login_name in (' + vars + ')', names, function (err, result) {
+                    return next(err, result);
+                });
+            },
+            function (result, next) {
+                var userIdList = [];
+                result.forEach(function (row) {
+                    userIdList.push(row.id);
+                    userList.push({ id: row.id, name: row.login_name, role: (roles[row.login_name] || null) });
+                });
+                vars = _.map(userIdList, function (it) {
+                    return '?';
+                }).join(',');
+                if (userIdList.length == 0) {
+                    next(new error.NotFoundError('Project member is not found.', users));
+                    return;
+                }
+                next(null, userIdList);
+            },
+            function (userIdList, next) {
+                _this.con.query('DELETE FROM project_has_user WHERE project_id = ? AND user_id NOT IN (' + vars + ')', [projectId].concat(userIdList), function (err, result) {
+                    return next(err, userIdList);
+                });
+            },
+            function (userIdList, next) {
+                _this.con.query('INSERT INTO project_has_user(project_id, user_id) SELECT ?, u.id FROM user u WHERE u.id IN (' + vars + ') AND NOT EXISTS (SELECT id FROM project_has_user pu WHERE pu.user_id = u.id AND pu.project_id = ?)', [projectId].concat(userIdList).concat(projectId), function (err, result) {
+                    return next(err);
+                });
+            }
+        ], function (err) {
+            callback(err);
+        });
+    };
+
     ProjectDAO.prototype.addMember = function (projectId, userId, callback) {
         var _this = this;
         async.waterfall([
@@ -121,11 +172,11 @@ var ProjectDAO = (function (_super) {
         });
     };
 
-    ProjectDAO.prototype.edit = function (projectId, name, callback) {
+    ProjectDAO.prototype.edit = function (projectId, name, public_flag, callback) {
         var _this = this;
         async.waterfall([
             function (next) {
-                _this.con.query('UPDATE project SET name=? WHERE id=?', [name, projectId], function (err, result) {
+                _this.con.query('UPDATE project SET name=?, public_flag=? WHERE id=?', [name, public_flag, projectId], function (err, result) {
                     next(err, result);
                 });
             }

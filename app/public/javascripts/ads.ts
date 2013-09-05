@@ -96,15 +96,13 @@ class ADS {
 
 		router.route("project/new", "project", () => {
 			var create_pressed = false;
-			$("#project-create").click(function() {
+			$("#project-create").click(function(e) {
+				e.preventDefault();
 				if(create_pressed) return;
 				create_pressed = true;
 				var name = $("#inputProjectName").attr("value");
 				var isPublic = $("#inputIsPublic").attr("checked") != null;
 				var language = $("#inputLanguage").attr("value");
-				console.log(name);
-				console.log(isPublic);
-				console.log(language);
 				var r = DCaseAPI.createProject(name, isPublic);
 				location.href = "../";
 			});

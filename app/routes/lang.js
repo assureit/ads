@@ -33,7 +33,7 @@ exports.lang = {
         SelectCase: "Case選択",
         AllTags: "全てのタグを表示",
         member: "メンバー",
-        public: "公開プロジェクト",
+        public: "公開プロジェクト"
     },
     en: {
         home: "Home",
@@ -69,7 +69,7 @@ exports.lang = {
         SelectCase: "Select Case",
         AllTags: "Show all tags",
         member: "Member",
-        public: "Public project",
+        public: "Public project"
     }
 };
 

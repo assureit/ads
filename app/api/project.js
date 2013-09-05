@@ -145,10 +145,24 @@ function createProject(params, userId, callback) {
 }
 exports.createProject = createProject;
 
+function addProjectUser(params, userId, callback) {
+    var con = new db.Database();
+    var projectDAO = new model_project.ProjectDAO(con);
+    projectDAO.addProjectUser(params.projectId, params.users, function (err) {
+        con.close();
+        if (err) {
+            callback.onFailure(err);
+            return;
+        }
+        callback.onSuccess({ ok: true });
+    });
+}
+exports.addProjectUser = addProjectUser;
+
 function editProject(params, userId, callback) {
     var con = new db.Database();
     var projectDAO = new model_project.ProjectDAO(con);
-    projectDAO.edit(params.projectId, params.name, function (err) {
+    projectDAO.edit(params.projectId, params.name, params.isPublic, function (err) {
         con.close();
         if (err) {
             callback.onFailure(err);

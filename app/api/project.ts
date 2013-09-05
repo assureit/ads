@@ -154,11 +154,24 @@ export function createProject(params:any, userId: number, callback: type.Callbac
 	);
 }
 
+export function addProjectUser(params:any, userId: number, callback: type.Callback) {
+	var con = new db.Database();
+	var projectDAO = new model_project.ProjectDAO(con);
+	projectDAO.addProjectUser(params.projectId, params.users, (err:any) => {
+		con.close();
+		if (err) {
+			callback.onFailure(err);
+			return;
+		}
+		callback.onSuccess({ok: true}); //FIXME
+	});
+}
+
 export function editProject(params:any, userId: number, callback: type.Callback) {
 	//TODO validation
 	var con = new db.Database();
 	var projectDAO = new model_project.ProjectDAO(con);
-	projectDAO.edit(params.projectId, params.name, (err:any) => {
+	projectDAO.edit(params.projectId, params.name, params.isPublic, (err:any) => {
 		con.close();
 		if (err) {
 			callback.onFailure(err);
