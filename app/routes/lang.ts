@@ -17,6 +17,7 @@ export var lang = {
 		new_DCase:     "新しいCaseを作成する",
 		new_Project:   "新しいProjectを作成する",
 		DCase_name:    "Case名",
+		public:        "Public",
 		Project_name:  "Project名",
 		creater:       "作成者",
 		topgoal:       "TopGoalの説明",
