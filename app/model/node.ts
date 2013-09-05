@@ -11,17 +11,19 @@ import error = module('../api/error')
 var _ = require('underscore');
 var async = require('async');
 
-export interface NodeNote {
-	Name: string;
-	Body: any;
-}
+/* obsolete */
+//export interface NodeNote {
+//	Name: string;
+//	Body: any;
+//}
+
 export interface NodeData {
 	Type: string;
 	Label: string;
 	Statement: string;
 	Annotations:any;
 	Children?: any[];
-	Notes?: NodeNote[];
+	Notes?: { [index: string]: string }; // change here !! ( NodeNote[] => { [index: string]: string } )
 }
 export class Node {
 	public dcase: model_dcase.DCase;
