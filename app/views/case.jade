@@ -68,16 +68,17 @@ html
                pluginManager.SetPlugIn("timeline", new TimeLinePlugIn(pluginManager));
                pluginManager.SetUseLayoutEngine("portraitlayout");
 
-               // Assume that oldJsonData.contents consists of "DCaseName" and "NodeList(ASN)"
-               // Is it needed to handle both AssureNotation and JSON here?
                var contents;
-               var history = Number("#{commitHistory}".length == 0 ? "NaN" : "#{commitHistory}"); // N th oldest commit.
+               /* N th oldest commit starting with zero.*/
+               var history = Number("#{commitHistory}".length == 0 ? "NaN" : "#{commitHistory}");
+               var oldJsonData = serverApi.GetCase("",#{caseId});
+               var contents = oldJsonData.contents;
                if (!isNaN(history)) {
-                   /* TODO */
-                   console.log(history);
-               } else {
-                   oldJsonData = serverApi.GetCase("",#{caseId});
-                   contents = oldJsonData.contents;
+                   var commits = serverApi.GetCommitList(#{caseId});
+                   if (commits.CommitModels.length > history) {
+                       var commitId = commits.CommitModels[history].CommitId;
+                       contents = serverApi.GetNodeTree(commitId);
+                   }
                }
                var Case0 = new AssureIt.Case(oldJsonData.DCaseName, #{caseId}, oldJsonData.commitId, pluginManager);
                var caseDecoder = new AssureIt.CaseDecoder();
@@ -92,7 +93,7 @@ html
                var Viewer = new AssureIt.CaseViewer(Case0, pluginManager, serverApi, Screen);
                Viewer.Draw();
                Viewer.Screen.SetOffset(($('html').width() / 2) - ((AssureIt.CaseViewer.ElementWidth) + Viewer.ViewMap[Viewer.ElementTop.Label].AbsX),80); //Center TopGoal in the view
-               if (isNaN(history)) {
+               if (!isNaN(history)) {
                    Case0.SetEditable(false);
                } else {
                    Case0.SetEditable();
