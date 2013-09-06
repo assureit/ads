@@ -1,4 +1,13 @@
 extends layout
+block script
+    script(type='text/javascript', src='#{basepath}/javascripts/index.js')
+    //for XML import
+    script(type="text/javascript",src="#{basepath}/assurejs/src/CaseEncoder.js")
+    script(type="text/javascript",src="#{basepath}/assurejs/src/Converter.js")
+    script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
+    script(type="text/javascript",src="#{basepath}/assurejs/src/CaseModel.js")
+    script(type="text/javascript",src="#{basepath}/assurejs/src/PlugInManager.js")
+
 block append content
     script#case_tmpl(type="text/x-jquery-tmpl")
         li.media
