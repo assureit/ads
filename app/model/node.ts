@@ -11,17 +11,19 @@ import error = module('../api/error')
 var _ = require('underscore');
 var async = require('async');
 
+/* obsolete */
 export interface NodeNote {
 	Name: string;
 	Body: any;
 }
+
 export interface NodeData {
 	Type: string;
 	Label: string;
 	Statement: string;
 	Annotations:any;
 	Children?: any[];
-	Notes?: NodeNote[];
+	Notes?: { [index: string]: string }; // change here !! ( NodeNote[] => { [index: string]: string } )
 }
 export class Node {
 	public dcase: model_dcase.DCase;
@@ -164,7 +166,8 @@ export class NodeDAO extends model.DAO {
 			// 	this.processNodeList(dcaseId, commitId, list, (err:any) => next(err));
 			// },
 			(next) => {
-				this.registerTag(dcaseId, list, (err:any) => next(err));
+				//this.registerTag(dcaseId, list, (err:any) => next(err));
+				next(null); // FIXME
 			}],
 			(err:any) => {
 				if (err) {
@@ -195,6 +198,7 @@ export class NodeDAO extends model.DAO {
 		);
 	}
 
+	/* obsolete */
 	registerTag(dcaseId:number, list: NodeData[], callback: (err:any) => void) {
 		var tagDAO = new model_tag.TagDAO(this.con);
 		var noteList: NodeNote[] = _.flatten(_.map(list, (node: NodeData) => {return node.Notes;}));
