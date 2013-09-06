@@ -9,6 +9,7 @@ var model_user = require('./user');
 var model_node = require('../model/node');
 
 var asn_parser = require('../util/asn-parser');
+var error = require('../api/error');
 
 var async = require('async');
 
@@ -72,6 +73,10 @@ var CommitDAO = (function (_super) {
         this.con.query('SELECT * FROM commit WHERE id=?', [commitId], function (err, result) {
             if (err) {
                 callback(err, null);
+                return;
+            }
+            if (result.length == 0) {
+                callback(new error.NotFoundError('Effective Commit does not exist.', { commitId: commitId }), null);
                 return;
             }
             result = result[0];

@@ -14,7 +14,7 @@ export class AccessLog {
 	}
 }
 export class AccessLogDAO extends model.DAO {
-	insert(commitId: number, userId: number, accessType:string, callback: (err:any, commitId: number)=>void): void {
+	insert(commitId: number, userId: number, accessType:string, callback: (err:any)=>void): void {
 		async.waterfall([
 			(next) => {
 				this.con.query('INSERT INTO access_log(commit_id, user_id, access_type, accessed) VALUES(?,?,?,now())', 

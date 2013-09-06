@@ -2,6 +2,7 @@ var db = require('../db/db');
 
 var constant = require('../constant');
 var model_dcase = require('../model/dcase');
+var model_access_log = require('../model/access-log');
 var model_commit = require('../model/commit');
 var model_node = require('../model/node');
 
@@ -89,25 +90,29 @@ function getDCase(params, userId, callback) {
         return;
 
     var con = new db.Database();
-
-    con.query({ sql: 'SELECT * FROM dcase d, commit c WHERE d.id = c.dcase_id AND c.latest_flag=TRUE and d.id = ?', nestTables: true }, [params.dcaseId], function (err, result) {
-        if (err) {
-            con.close();
-            throw err;
+    var dcaseDAO = new model_dcase.DCaseDAO(con);
+    var accessLogDAO = new model_access_log.AccessLogDAO(con);
+    async.waterfall([
+        function (next) {
+            dcaseDAO.getDetail(params.dcaseId, function (err, dcase) {
+                return next(err, dcase);
+            });
+        },
+        function (dcase, next) {
+            accessLogDAO.insert(dcase.latestCommit.id, userId, model_access_log.TYPE_GET_DCASE, function (err) {
+                return next(err, dcase);
+            });
         }
-        if (result.length == 0) {
-            con.close();
-            callback.onFailure(new error.NotFoundError('Effective DCase does not exist.'));
+    ], function (err, dcase) {
+        con.close();
+        if (err) {
+            callback.onFailure(err);
             return;
         }
-
-        con.close();
-        var c = result[0].c;
-        var d = result[0].d;
         callback.onSuccess({
-            commitId: c.id,
-            dcaseName: d.name,
-            contents: c.data
+            commitId: dcase.latestCommit.id,
+            dcaseName: dcase.name,
+            contents: dcase.latestCommit.data
         });
     });
 }
@@ -132,21 +137,27 @@ function getNodeTree(params, userId, callback) {
     if (!validate(params))
         return;
     var con = new db.Database();
-    con.query({ sql: 'SELECT * FROM commit WHERE id = ?', nestTables: true }, [params.commitId], function (err, result) {
-        if (err) {
-            con.close();
-            throw err;
+    var commitDAO = new model_commit.CommitDAO(con);
+    var accessLogDAO = new model_access_log.AccessLogDAO(con);
+    async.waterfall([
+        function (next) {
+            commitDAO.get(params.commitId, function (err, commit) {
+                return next(err, commit);
+            });
+        },
+        function (commit, next) {
+            accessLogDAO.insert(commit.id, userId, model_access_log.TYPE_GET_NODE_TREE, function (err) {
+                return next(err, commit);
+            });
         }
-
-        if (result.length == 0) {
-            callback.onFailure(new error.NotFoundError('Effective Commit does not exist.'));
+    ], function (err, commit) {
+        con.close();
+        if (err) {
+            callback.onFailure(err);
             return;
         }
-
-        con.close();
-        var c = result[0].commit;
         callback.onSuccess({
-            contents: c.data
+            contents: commit.data
         });
     });
 }

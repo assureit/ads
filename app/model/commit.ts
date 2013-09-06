@@ -5,6 +5,7 @@ import model_user = module('./user')
 import model_node = module('../model/node')
 import model_issue = module('../model/issue')
 import asn_parser = module('../util/asn-parser')
+import error = module('../api/error')
 //import model_monitor = module('../model/monitor')
 var async = require('async')
 
@@ -62,6 +63,10 @@ export class CommitDAO extends model.DAO {
 		this.con.query('SELECT * FROM commit WHERE id=?', [commitId], (err, result) => {
 			if (err) {
 				callback(err, null);
+				return;
+			}
+			if (result.length == 0) {
+				callback(new error.NotFoundError('Effective Commit does not exist.', {commitId: commitId}), null);
 				return;
 			}
 			result = result[0];
