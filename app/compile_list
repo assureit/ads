@@ -68,4 +68,5 @@ public/javascripts/router.ts
 public/javascripts/sidemenu.ts
 public/javascripts/timeline.ts
 public/javascripts/timeutil.ts
+public/javascripts/history.ts
 job/monitor.ts

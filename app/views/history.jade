@@ -1,49 +1,23 @@
 extends layout
+block script
+    script(type='text/javascript').
+        $(function(){
+            var list = new HistoryView();
+            list.addElements(#{caseId});
+        });
 block append content
-    script#case_tmpl(type="text/x-jquery-tmpl")
-        li.media
+    script#history_tmpl(type="text/x-jquery-tmpl")
+        li.media(style='list-style: none')
             img.media-object.pull-left(data-src="holder.js/64x64",alt="64x64",style="width: 64px; height: 64px;",src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABP0lEQVR4Xu2YQQ7DIAwEyTnfyrN5U245t6ISFUptEhNQEUxvFdTxrsxOyrLv+8tN/FkwgAngCJABE2egIwShABSAAlAACkzsABgEg2AQDILBiSHAnyEwCAbBIBgEg2BwYgeqYNB7/7Vw27YfO+O6tKZ536Km9KzHBqTiJKFXQqSmWtTUjK5qQE5MWLs7AVcTU2JqcwPiA84ipWbPArXvlpqlMVZ1AiQh67q64zg+/aXmpMZoa2G/pWaJCX8zIDSrjXouA8KaZmqXBpybkqZAOzbaBORqWk1oOgGxmSs6WI5ArqZVfNj/2IB0lLWkvxt6WkbUerdo8h5Q4npPv6kyAT0JsvaCAdwIcSPEjRA3QtbkHGk/FIACUAAKQIGRUt2qBQpAASgABaCANTlH2g8FoAAUgAJQYKRUt2qBArNT4A1sFqCQARPBMwAAAABJRU5ErkJggg==")
             .media-body
-                h4
-                    //|@${dcaseId} 
-                    a(href='#{basepath}/case/${dcaseId}') ${dcaseName}
-                    a.btn.btn-danger.btn-mini.pull-right.DeleteCaseButton
-                        i.icon-trash　&nbsp;
-                        |Delete
+                p
+                    a(href='#{basepath}/case/${caseId}/history/${revisionId}') ${Message}
                     span.pull-right
                         i.icon-sitemap
                         | 0&nbsp;
-                p ${description}
                 small
                     |${userName} updated 
-                    abbr(title="${latestCommit.dateTime}") ${dateTime}
-    script#project_tmpl(type="text/x-jquery-tmpl")
-        article(id="project${projectId}")
-            h3
-                //|#${projectId} 
-                |${projectName} &nbsp;
-                a.btn.btn-success.btn-small.pull-right.NewCaseButton(href='./new/${projectId}')
-                    i.icon-plus　&nbsp;
-                    |New case
-            ul.inline
-                li
-                    i.icon-user　&nbsp;
-                    |${users && users.length > 0 ? users.length : "Public"}
-                |{{if users}}
-                |{{each users}}
-                li
-                    |${this.loginName}
-                |{{/each}}
-                |{{/if}}
-            ul.media-list
-                |{{if cases.length > 0}}
-                |{{tmpl(cases) "#case_tmpl"}}
-                |{{else}}
-                li.media
-                    .media-body
-                        p.text-center (no case)
-                |{{/if}}
-        hr
+                    span ${dateTime}
 block bar
     a(href="#{basepath}/")
         img#menu-button(src="#{basepath}/images/ait.png") Menu
@@ -58,26 +32,9 @@ block bar
             else
                 include signin
 block content
-    #dcase-manager.container-fluid(style="display: none;")
+    #dcase-manager.container-fluid
         .row
-            #newDCase.span6.offset3(style='display: none;')
-                h2= lang.new_DCase
-                form.form-horizontal
-                    .control-group#newdcase-name
-                        label.control-label(for="inputDCaseName")= lang.DCase_name
-                        .controls
-                            input#inputDCaseName(type="text", id="inputDCaseName")
-                    .control-group#newdcase-desc
-                        label.control-label(for="inputDesc")= lang.topgoal
-                        .controls
-                            textarea#inputDesc(rows=5)
-                    .control-group
-                        .controls
-                            button.btn#dcase-create(type="button")= lang.create
-            #selectDCase.span6.offset2
-                h2 Projects&nbsp;
-                    a.btn.btn-success.pull-right.NewProjectButton(href="./project/new")
-                        i.icon-plus &nbsp;
-                        |New project
+            #select-history.span6.offset2
+                h2 History&nbsp;
                 hr
-                #ProjectList
+                #history-list

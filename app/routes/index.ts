@@ -56,10 +56,10 @@ export var caseView = function(req: any, res: any) {
 
 export var historyListView = function(req: any, res: any) {
 	var page = 'history';
-	var params: any = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: null};
 	var auth = new util_auth.Auth(req, res);
+	var params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, caseId: req.params.id};
 	if(auth.isLogin()) {
-		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
+		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName(), caseId: req.params.id };
 	}
 
 	if( req.cookies.lang == 'en') {
