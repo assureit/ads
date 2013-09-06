@@ -111,7 +111,13 @@ var CommitDAO = (function (_super) {
             },
             function (com, commitId, callback) {
                 var parser = new asn_parser.ASNParser();
-                var nodes = parser.parseNodeList(contents);
+                var nodes = null;
+                try  {
+                    nodes = parser.parseNodeList(contents);
+                } catch (e) {
+                    callback(e);
+                    return;
+                }
                 var nodeDAO = new model_node.NodeDAO(_this.con);
                 nodeDAO.insertList(com.dcaseId, commitId, nodes, function (err) {
                     callback(err, com, commitId);

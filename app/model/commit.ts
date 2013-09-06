@@ -97,7 +97,13 @@ export class CommitDAO extends model.DAO {
 			}
 			, (com: Commit, commitId: number, callback) => {
 				var parser = new asn_parser.ASNParser();
-				var nodes = parser.parseNodeList(contents);
+				var nodes = null;
+				try {
+					nodes = parser.parseNodeList(contents);
+				} catch (e) {
+					callback(e);
+					return;
+				}
 				var nodeDAO = new model_node.NodeDAO(this.con);
 				nodeDAO.insertList(com.dcaseId, commitId, nodes, (err:any) => {callback(err, com, commitId);});
 			}
