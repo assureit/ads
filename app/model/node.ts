@@ -12,10 +12,10 @@ var _ = require('underscore');
 var async = require('async');
 
 /* obsolete */
-//export interface NodeNote {
-//	Name: string;
-//	Body: any;
-//}
+export interface NodeNote {
+	Name: string;
+	Body: any;
+}
 
 export interface NodeData {
 	Type: string;
@@ -166,7 +166,7 @@ export class NodeDAO extends model.DAO {
 			// 	this.processNodeList(dcaseId, commitId, list, (err:any) => next(err));
 			// },
 			(next) => {
-				this.registerTag(dcaseId, list, (err:any) => next(err));
+				//this.registerTag(dcaseId, list, (err:any) => next(err));
 			}],
 			(err:any) => {
 				if (err) {
@@ -197,22 +197,23 @@ export class NodeDAO extends model.DAO {
 		);
 	}
 
+	/* obsolete */
 	registerTag(dcaseId:number, list: NodeData[], callback: (err:any) => void) {
-	//	var tagDAO = new model_tag.TagDAO(this.con);
-	//	var noteList: NodeNote[] = _.flatten(_.map(list, (node: NodeData) => {return node.Notes;}));
-	//	noteList = _.filter(noteList, (note: NodeNote) => {return note && note.Body.Type == 'Tag'});
-	//	var tagList = _.uniq(_.filter(
-	//		(_.map(noteList, (note: NodeNote) => {return note.Body.Tag})),
-	//		(tag:string) => {
-	//			return typeof(tag) == 'string' && tag.length > 0;
-	//		}));
-	//	async.waterfall([
-	//		(next) => {
-	//			tagDAO.replaceDCaseTag(dcaseId, tagList, (err:any)=> next(err));
-	//		},
-	//		], (err:any) => {
-	//			callback(err);
-	//		});
+		var tagDAO = new model_tag.TagDAO(this.con);
+		var noteList: NodeNote[] = _.flatten(_.map(list, (node: NodeData) => {return node.Notes;}));
+		noteList = _.filter(noteList, (note: NodeNote) => {return note && note.Body.Type == 'Tag'});
+		var tagList = _.uniq(_.filter(
+			(_.map(noteList, (note: NodeNote) => {return note.Body.Tag})),
+			(tag:string) => {
+				return typeof(tag) == 'string' && tag.length > 0;
+			}));
+		async.waterfall([
+			(next) => {
+				tagDAO.replaceDCaseTag(dcaseId, tagList, (err:any)=> next(err));
+			},
+			], (err:any) => {
+				callback(err);
+			});
 	}
 
 	search(page: number, query: string, callback: (err:any, pager: model_pager.Pager, list: Node[]) => void) {
