@@ -55,6 +55,11 @@ var DCaseAPI;
         return this.call("getProjectUser", { projectId: projectId });
     };
 
+    DCaseAPI.getProjectUserAndRole = function (projectId) {
+        var users = this.call("getProjectUserAndRole", { projectId: projectId });
+        return users ? users.userList : [];
+    };
+
     DCaseAPI.createDCase = function (name, tree, projectId) {
         return this.call("createDCase", {
             dcaseName: name,
@@ -78,8 +83,8 @@ var DCaseAPI;
         });
     };
 
-    DCaseAPI.addProjectUser = function (projectId, users) {
-        return this.call("addProjectUser", {
+    DCaseAPI.updateProjectUser = function (projectId, users) {
+        return this.call("updateProjectUser", {
             projectId: projectId,
             users: users
         });

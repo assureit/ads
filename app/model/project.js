@@ -34,7 +34,10 @@ var ProjectDAO = (function (_super) {
         var _this = this;
         async.waterfall([
             function (next) {
-                _this.con.query({ sql: 'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.public_flag=0 AND pu.user_id=?', nestTables: true }, [userId], function (err, result) {
+                _this.con.query({
+                    sql: 'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.public_flag=0 AND pu.user_id=?',
+                    nestTables: true
+                }, [userId], function (err, result) {
                     next(err, result);
                 });
             },
@@ -108,9 +111,28 @@ var ProjectDAO = (function (_super) {
         });
     };
 
-    ProjectDAO.prototype.addProjectUser = function (projectId, users, callback) {
+    ProjectDAO.prototype.getProjectUserAndRole = function (projectId, callback) {
         var _this = this;
-        var dcaseDAO = new model_dcase.DCaseDAO(this.con);
+        async.waterfall([
+            function (next) {
+                _this.con.query('SELECT u.login_name, pu.role FROM user AS u INNER JOIN project_has_user AS pu ON u.id=pu.user_id WHERE pu.project_id=?', [projectId], function (err, result) {
+                    return next(err, result);
+                });
+            },
+            function (result, next) {
+                var list = [];
+                result.forEach(function (row) {
+                    list.push([row.login_name, row.role]);
+                });
+                next(null, list);
+            }
+        ], function (err, list) {
+            callback(err, list);
+        });
+    };
+
+    ProjectDAO.prototype.updateProjectUser = function (projectId, users, callback) {
+        var _this = this;
         var roles = {};
         for (var i = 0; i < users.length; i++) {
             roles[users[i][0]] = users[i][1];
@@ -150,7 +172,18 @@ var ProjectDAO = (function (_super) {
                 });
             },
             function (userIdList, next) {
-                _this.con.query('INSERT INTO project_has_user(project_id, user_id) SELECT ?, u.id FROM user u WHERE u.id IN (' + vars + ') AND NOT EXISTS (SELECT id FROM project_has_user pu WHERE pu.user_id = u.id AND pu.project_id = ?)', [projectId].concat(userIdList).concat(projectId), function (err, result) {
+                _this.con.query('INSERT INTO project_has_user(project_id, user_id) SELECT ?, u.id FROM user u ' + 'WHERE u.id IN (' + vars + ') AND NOT EXISTS (SELECT id FROM project_has_user pu WHERE pu.user_id = u.id AND pu.project_id = ?)', [projectId].concat(userIdList).concat(projectId), function (err, result) {
+                    return next(err);
+                });
+            },
+            function (next) {
+                async.waterfall(_.map(userList, function (user) {
+                    return function (nxt) {
+                        return _this.con.query('UPDATE project_has_user SET role=? WHERE user_id=?', [user.role, user.id], function (err, result) {
+                            return nxt(err);
+                        });
+                    };
+                }), function (err) {
                     return next(err);
                 });
             }

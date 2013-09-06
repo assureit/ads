@@ -18,8 +18,8 @@ export class ProjectDAO extends model.DAO {
 	list(userId: number, callback: (err:any, result: Project[])=>void): void {
 		async.waterfall([
 			(next) => {
-				this.con.query({sql:'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.public_flag=0 AND pu.user_id=?', nestTables:true}, [userId],
-					(err:any, result:any) => {
+				this.con.query({sql:'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.public_flag=0 AND pu.user_id=?',
+					nestTables:true}, [userId], (err:any, result:any) => {
 						next(err, result);
 				});
 			},
@@ -38,9 +38,8 @@ export class ProjectDAO extends model.DAO {
 	publiclist(userId: number, callback: (err:any, result: Project[])=>void): void {
 		async.waterfall([
 			(next) => {
-				this.con.query('SELECT * FROM project AS p WHERE p.public_flag=1',
-					(err:any, result:any) => {
-						next(err, result);
+				this.con.query('SELECT * FROM project AS p WHERE p.public_flag=1', (err:any, result:any) => {
+					next(err, result);
 				});
 			},
 			(result:any, next) => {
@@ -71,7 +70,8 @@ export class ProjectDAO extends model.DAO {
 	remove(userId:number, projectId:number, callback: (err:any) => void): void {
 		async.waterfall([
 			(next) => {
-				this.con.query('SELECT count(id) as cnt FROM project_has_user WHERE project_id = ? AND user_id = ?', [projectId, userId], (err:any, result:any) => next(err, result));
+				this.con.query('SELECT count(id) as cnt FROM project_has_user WHERE project_id = ? AND user_id = ?',
+					[projectId, userId], (err:any, result:any) => next(err, result));
 			},
 			(result, next) => {
 				if (result[0].cnt == 0) {
@@ -88,9 +88,25 @@ export class ProjectDAO extends model.DAO {
 		});
 	}
 
+	getProjectUserAndRole(projectId: number, callback: (err:any, result:any) => void): void {
+		async.waterfall([
+			(next) => {
+				this.con.query('SELECT u.login_name, pu.role FROM user AS u INNER JOIN project_has_user AS pu ON u.id=pu.user_id WHERE pu.project_id=?', [projectId], (err:any, result:any) => next(err, result));
+			},
+			(result:any, next) => {
+				var list = [];
+				result.forEach((row) => {
+					list.push([row.login_name, row.role]);
+				});
+				next(null, list);
+			}
+		], (err:any, list:any) => {
+			callback(err, list);
+		});
+	}
+
 	//users: [[name, role], [name, role], ...]
-	addProjectUser(projectId: number, users:string[][], callback: (err:any) => void): void {
-		var dcaseDAO = new model_dcase.DCaseDAO(this.con);
+	updateProjectUser(projectId: number, users:string[][], callback: (err:any) => void): void {
 		var roles = {};
 		for(var i = 0; i < users.length; i++){
 			roles[users[i][0]] = users[i][1];
@@ -117,11 +133,18 @@ export class ProjectDAO extends model.DAO {
 				next(null, userIdList);
 			},
 			(userIdList:number[], next) => {
-				this.con.query('DELETE FROM project_has_user WHERE project_id = ? AND user_id NOT IN (' + vars + ')', [projectId].concat(userIdList), (err:any, result:any) => next(err, userIdList));
+				this.con.query('DELETE FROM project_has_user WHERE project_id = ? AND user_id NOT IN (' + vars + ')',
+					[projectId].concat(userIdList), (err:any, result:any) => next(err, userIdList));
 			},
 			(userIdList:number[], next) => {
-				// TODO insert role.
-				this.con.query('INSERT INTO project_has_user(project_id, user_id) SELECT ?, u.id FROM user u WHERE u.id IN (' + vars + ') AND NOT EXISTS (SELECT id FROM project_has_user pu WHERE pu.user_id = u.id AND pu.project_id = ?)', [projectId].concat(userIdList).concat(projectId), (err:any, result:any) => next(err));
+				this.con.query('INSERT INTO project_has_user(project_id, user_id) SELECT ?, u.id FROM user u ' +
+					'WHERE u.id IN (' + vars + ') AND NOT EXISTS (SELECT id FROM project_has_user pu WHERE pu.user_id = u.id AND pu.project_id = ?)',
+					[projectId].concat(userIdList).concat(projectId), (err:any, result:any) => next(err));
+			},
+			(next) => {
+				async.waterfall(_.map(userList, (user) => {
+					return (nxt) => this.con.query('UPDATE project_has_user SET role=? WHERE user_id=?', [user.role, user.id], (err:any, result:any) => nxt(err));
+				}), (err:any) => next(err));
 			},
 		], (err:any) => {
 			callback(err);
@@ -156,6 +179,7 @@ export class ProjectDAO extends model.DAO {
 		});
 	}
 
+	//deprecated
 	updateMember(dcaseId:number, callback: (err:any) => void): void {
 		var dcaseDAO = new model_dcase.DCaseDAO(this.con);
 		var dcase:model_dcase.DCase;

@@ -54,7 +54,6 @@ exports.lang = {
         new_DCase: "Create a new Case",
         new_Project: "Create a new Project",
         DCase_name: "Case Name",
-        public: "Public",
         Project_name: "Project Name",
         topgoal: "Description of the Top Goal",
         create: "Create",

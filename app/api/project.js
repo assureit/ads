@@ -103,6 +103,29 @@ function getProjectUser(params, userId, callback) {
 }
 exports.getProjectUser = getProjectUser;
 
+function getProjectUserAndRole(params, userId, callback) {
+    var con = new db.Database();
+    var projectDAO = new model_project.ProjectDAO(con);
+    params = params || {};
+    async.waterfall([
+        function (next) {
+            projectDAO.getProjectUserAndRole(params.projectId, function (err, result) {
+                next(err, result);
+            });
+        }
+    ], function (err, result) {
+        con.close();
+        if (err) {
+            callback.onFailure(err);
+            return;
+        }
+        callback.onSuccess({
+            userList: result
+        });
+    });
+}
+exports.getProjectUserAndRole = getProjectUserAndRole;
+
 function createProject(params, userId, callback) {
     var con = new db.Database();
     var userDAO = new model_user.UserDAO(con);
@@ -145,10 +168,10 @@ function createProject(params, userId, callback) {
 }
 exports.createProject = createProject;
 
-function addProjectUser(params, userId, callback) {
+function updateProjectUser(params, userId, callback) {
     var con = new db.Database();
     var projectDAO = new model_project.ProjectDAO(con);
-    projectDAO.addProjectUser(params.projectId, params.users, function (err) {
+    projectDAO.updateProjectUser(params.projectId, params.users, function (err) {
         con.close();
         if (err) {
             callback.onFailure(err);
@@ -157,7 +180,7 @@ function addProjectUser(params, userId, callback) {
         callback.onSuccess({ ok: true });
     });
 }
-exports.addProjectUser = addProjectUser;
+exports.updateProjectUser = updateProjectUser;
 
 function editProject(params, userId, callback) {
     var con = new db.Database();

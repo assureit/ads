@@ -126,7 +126,7 @@ export class UserDAO extends model.DAO {
 			var resultUser : User = null;
 			if (result.length > 0) {
 				resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
-			}	
+			}
 			callback(err, resultUser);
 		});
 

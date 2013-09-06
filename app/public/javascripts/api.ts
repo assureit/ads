@@ -60,6 +60,11 @@ module DCaseAPI {
 		return this.call("getProjectUser", {projectId: projectId});
 	};
 
+	export var getProjectUserAndRole = function(projectId: number) {
+		var users = this.call("getProjectUserAndRole", {projectId: projectId});
+		return users ? users.userList : [];
+	};
+
 	export var createDCase = function(name: string, tree, projectId: number) {
 		return this.call("createDCase", {
 			dcaseName: name, contents: tree , projectId: projectId });
@@ -75,8 +80,8 @@ module DCaseAPI {
 			projectId: projectId, name: name, isPublic: isPublic });
 	};
 
-	export var addProjectUser = function(projectId: number, users: string[][]) {
-		return this.call("addProjectUser", {
+	export var updateProjectUser = function(projectId: number, users: string[][]) {
+		return this.call("updateProjectUser", {
 			projectId: projectId, users: users });
 	};
 
