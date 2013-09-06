@@ -143,7 +143,8 @@ export class ProjectDAO extends model.DAO {
 			},
 			(next) => {
 				async.waterfall(_.map(userList, (user) => {
-					return (nxt) => this.con.query('UPDATE project_has_user SET role=? WHERE user_id=?', [user.role, user.id], (err:any, result:any) => nxt(err));
+					return (nxt) => this.con.query('UPDATE project_has_user SET role=? WHERE user_id=? AND project_id=?',
+						[user.role, user.id, projectId], (err:any, result:any) => nxt(err));
 				}), (err:any) => next(err));
 			},
 		], (err:any) => {

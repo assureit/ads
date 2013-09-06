@@ -96,16 +96,6 @@ class ADS {
 
 		router.route("project/new", "project", () => {
 			var create_pressed = false;
-			$("#project-create").click(function(e) {
-				e.preventDefault();
-				if(create_pressed) return;
-				create_pressed = true;
-				var name = $("#inputProjectName").attr("value");
-				var isPublic = $("#inputIsPublic").attr("checked") != null;
-				var language = $("#inputLanguage").attr("value");
-				var r = DCaseAPI.createProject(name, isPublic);
-				location.href = "../";
-			});
 
 			var addNewMember = function(){
 				var newMemberForm = (<any>$)("#member_tmpl").tmpl({name: "", role: ""});
@@ -116,11 +106,28 @@ class ADS {
 				$("#AddMemberButton").before(newMemberForm);
 			}
 
+			var getMemberList = function(){
+				var members = [];
+				$(".memberForm").each(function(i,v){ members.push([$(v).find(".userName").attr("value"), $(v).find(".role").attr("value")]); });
+				return members;
+			}
+
 			$("#AddMemberButton").click((e)=>{
 				e.preventDefault();
 				addNewMember();
 			});
-			//$("#AddMemberButton").before( (<any>$)("#member_tmpl").tmpl({name: "", role: ""}) );
+
+			$("#project-create").click(function(e) {
+				e.preventDefault();
+				if(create_pressed) return;
+				create_pressed = true;
+				var name = $("#inputProjectName").attr("value");
+				var isPublic = $("#inputIsPublic").attr("checked") != null;
+				var language = $("#inputLanguage").attr("value");
+				var r = DCaseAPI.createProject(name, isPublic).projectId;
+				DCaseAPI.updateProjectUser(r, getMemberList());
+				location.href = "../";
+			});
 		});
 
 		var defaultRouter = (pageIndex: any, tag?: string) => {

@@ -179,7 +179,7 @@ var ProjectDAO = (function (_super) {
             function (next) {
                 async.waterfall(_.map(userList, function (user) {
                     return function (nxt) {
-                        return _this.con.query('UPDATE project_has_user SET role=? WHERE user_id=?', [user.role, user.id], function (err, result) {
+                        return _this.con.query('UPDATE project_has_user SET role=? WHERE user_id=? AND project_id=?', [user.role, user.id, projectId], function (err, result) {
                             return nxt(err);
                         });
                     };
