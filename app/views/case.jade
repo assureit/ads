@@ -68,10 +68,18 @@ html
                pluginManager.SetPlugIn("timeline", new TimeLinePlugIn(pluginManager));
                pluginManager.SetUseLayoutEngine("portraitlayout");
 
-               // Assume that oldJsonData.contents consists of "DCaseName" and "NodeList(ASN)"
-               // Is it needed to handle both AssureNotation and JSON here?
+               var contents;
+               /* N th oldest commit starting with zero.*/
+               var history = Number("#{commitHistory}".length == 0 ? "NaN" : "#{commitHistory}");
                var oldJsonData = serverApi.GetCase("",#{caseId});
                var contents = oldJsonData.contents;
+               if (!isNaN(history)) {
+                   var commits = serverApi.GetCommitList(#{caseId});
+                   if (commits.CommitModels.length > history) {
+                       var commitId = commits.CommitModels[history].CommitId;
+                       contents = serverApi.GetNodeTree(commitId);
+                   }
+               }
                var Case0 = new AssureIt.Case(oldJsonData.DCaseName, #{caseId}, oldJsonData.commitId, pluginManager);
                var caseDecoder = new AssureIt.CaseDecoder();
                var root = caseDecoder.ParseASN(Case0, contents, null);
@@ -85,7 +93,11 @@ html
                var Viewer = new AssureIt.CaseViewer(Case0, pluginManager, serverApi, Screen);
                Viewer.Draw();
                Viewer.Screen.SetOffset(($('html').width() / 2) - ((AssureIt.CaseViewer.ElementWidth) + Viewer.ViewMap[Viewer.ElementTop.Label].AbsX),80); //Center TopGoal in the view
-               Case0.SetEditable();
+               if (!isNaN(history)) {
+                   Case0.SetEditable(false);
+               } else {
+                   Case0.SetEditable();
+               }
                if(Case0.IsEditable()) {
                    $('#assureit-mode').text("Edit mode");
                    Case0.SetModified(false);
