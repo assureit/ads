@@ -137,14 +137,12 @@ var SelectDCaseTableManager = (function (_super) {
 
 var SelectDCaseView = (function () {
     function SelectDCaseView() {
-        this.pageIndex = 1;
-        this.maxPageSize = 2;
     }
     SelectDCaseView.prototype.clear = function () {
         $("#ProjectList *").remove();
     };
 
-    SelectDCaseView.prototype.addElements = function (userId, pageIndex, tags) {
+    SelectDCaseView.prototype.addElements = function (userId) {
         var isLoggedin = userId != null;
         var privateProjects = isLoggedin ? DCaseAPI.getProjectList(userId).projectList : [];
         var publicProjects = DCaseAPI.getPublicProjectList().projectList;
@@ -172,27 +170,6 @@ var SelectDCaseView = (function () {
                     location.reload();
                 }
             }
-        });
-    };
-
-    SelectDCaseView.prototype.initEvents = function () {
-        var _this = this;
-        $("#prev-page").click(function (e) {
-            var i = _this.pageIndex - 0;
-            if (i > 1) {
-                _this.pageIndex = i - 1;
-                location.href = Config.BASEPATH + "/page/" + _this.pageIndex;
-            }
-            e.preventDefault();
-        });
-
-        $("#next-page").click(function (e) {
-            var i = _this.pageIndex - 0;
-            if (_this.maxPageSize >= i + 1) {
-                _this.pageIndex = i + 1;
-                location.href = Config.BASEPATH + "/page/" + _this.pageIndex;
-            }
-            e.preventDefault();
         });
     };
     return SelectDCaseView;

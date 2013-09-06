@@ -123,20 +123,15 @@ class SelectDCaseTableManager extends SelectDCaseManager{
 }
 
 class SelectDCaseView {
-	pageIndex: number;
-	maxPageSize: number;
-	manager: SelectDCaseManager;
 
 	constructor() {
-		this.pageIndex = 1;
-		this.maxPageSize = 2;
 	}
 
 	clear(): void {
 		$("#ProjectList *").remove();
 	}
 
-	addElements(userId, pageIndex?: any, tags?: string[]): void {
+	addElements(userId): void {
 		var isLoggedin = userId != null;
 		var privateProjects: any = isLoggedin ? DCaseAPI.getProjectList(userId).projectList : [];
 		var publicProjects: any = DCaseAPI.getPublicProjectList().projectList;
@@ -166,28 +161,6 @@ class SelectDCaseView {
 			}
 		});
 	}
-
-	initEvents() {
-		$("#prev-page").click((e) => {
-			var i = this.pageIndex - 0;
-			if(i > 1) {
-				this.pageIndex = i - 1;
-				location.href = Config.BASEPATH + "/page/" + this.pageIndex;
-			}
-			e.preventDefault();
-		});
-
-		$("#next-page").click((e) => {
-			var i = this.pageIndex - 0;
-			if(this.maxPageSize >= i + 1) {
-				this.pageIndex = i + 1;
-				location.href = Config.BASEPATH + "/page/" + this.pageIndex;
-			}
-			e.preventDefault();
-		});
-
-	}
-
 }
 
 class SearchView {
