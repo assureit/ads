@@ -167,6 +167,7 @@ export class NodeDAO extends model.DAO {
 			// },
 			(next) => {
 				//this.registerTag(dcaseId, list, (err:any) => next(err));
+				next(null); // FIXME
 			}],
 			(err:any) => {
 				if (err) {

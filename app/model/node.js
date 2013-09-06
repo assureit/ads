@@ -49,6 +49,7 @@ var NodeDAO = (function (_super) {
         }
         async.waterfall([
             function (next) {
+                next(null);
             }
         ], function (err) {
             if (err) {
