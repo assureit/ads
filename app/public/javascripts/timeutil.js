@@ -1,12 +1,13 @@
 var TimeUtil;
 (function (TimeUtil) {
+    var minute = 60 * 1000;
+    var hour = minute * 60;
+    var day = hour * 24;
+    var month = day * 30;
+    var year = month * 365;
+
     function formatDate(time) {
         var deltaTime = new Date().getTime() - new Date(time).getTime();
-        var minute = 60 * 1000;
-        var hour = minute * 60;
-        var day = hour * 24;
-        var month = day * 30;
-        var year = month * 365;
 
         if (deltaTime < minute) {
             return "just now";

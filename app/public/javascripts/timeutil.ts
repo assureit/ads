@@ -1,12 +1,12 @@
 module TimeUtil {
+	var minute: number = 60 * 1000;
+	var hour  : number = minute * 60;
+	var day   : number = hour * 24;
+	var month : number = day * 30;
+	var year  : number = month * 365;
 
 	export function formatDate(time: string) {
 		var deltaTime = new Date().getTime() - new Date(time).getTime();
-		var minute = 60 * 1000;
-		var hour   = minute * 60;
-		var day    = hour * 24;
-		var month  = day * 30;
-		var year   = month * 365;
 
 		if(deltaTime < minute) {
 			return "just now";
