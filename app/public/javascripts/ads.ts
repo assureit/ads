@@ -69,13 +69,12 @@ class ADS {
 
 		if(selectDCaseView != null) {
 			selectDCaseView.clear();
-			selectDCaseView.addElements(userId, pageIndex, tags);
+			selectDCaseView.addElements(userId);
 		}
 	}
 
 	constructor(body: HTMLElement) {
 		this.selectDCaseView = new SelectDCaseView();
-		this.selectDCaseView.initEvents();
 		this.tagListManager  = new TagListManager();
 		this.createDCaseView = new CreateDCaseView();
 

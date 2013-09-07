@@ -43,134 +43,16 @@ class CreateDCaseView {
 	}
 }
 
-class SelectDCaseContent {
-	constructor(public id: number, public name: string, public user: string, public lastDate: any, public lastUser: any, public isLogin: bool) {
-	}
-
-	toHtml(callback: (id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool) => JQuery) : JQuery {
-		return callback(this.id, this.name, this.user, this.lastDate, this.lastUser, this.isLogin);
-	}
-
-	setEvent() : void {
-		if(this.isLogin) {
-			$("a#e"+this.id).click((e)=>{
-				var msg = prompt("dcase名を入力して下さい");
-				if(msg != null) {
-					if(DCaseAPI.editDCase(this.id, msg) != null) {
-						alert("変更しました");
-						location.reload();
-					}
-				}
-			});
-			$("a#d"+this.id).click((e)=>{
-				if(window.confirm('dcaseを削除しますか?')) {
-					if(DCaseAPI.deleteDCase(this.id) != null) {
-						alert("削除しました");
-						location.reload();
-					}
-				}
-			});
-		}
-	}
-}
-
-class SelectDCaseManager {
-	contents: SelectDCaseContent[] = [];
-	
-	constructor() {}
-	clear() : void {}
-	updateContentsOrZeroView():void {}
-
-	add(s: SelectDCaseContent): void {
-		this.contents.push(s);
-	}
-
-	_updateContentsOrZeroView($tbody: JQuery, zeroStr: string, callback: (id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool) => JQuery):void {
-		if(this.contents.length == 0) {
-			$(zeroStr).appendTo($tbody);
-		}
-		$.each(this.contents, (i, s) => {
-			s.toHtml(callback).appendTo($tbody);
-			s.setEvent();
-		});
-	}
-}
-
-class TableView {
-	static toTable(id: number, name: string, user: string, lastDate: any, lastUser: any, isLogin: bool): JQuery {
-		var html = '<td><a href="' + Config.BASEPATH + '/case/' + id + '">' + $('<div />').text(name).html() +
-				"</a></td><td>" + $('<div/>').text(lastUser).html() + "</td>";
-		if(isLogin) {
-			html += "<td><a id=\"e"+ id +"\" href=\"#\">Edit</a></td>"
-				+ "<td><a id=\"d"+ id +"\" href=\"#\">Delete</a></td>";
-		}
-		return $("<tr></tr>").html(html);
-	}
-}
-
-class SelectDCaseTableManager extends SelectDCaseManager{
-	constructor() {
-		super();
-	}
-
-	clear() : void {
-		$("tbody#dcase-select-table *").remove();
-	}
-
-	updateContentsOrZeroView():void {
-		super._updateContentsOrZeroView($('#dcase-select-table'), "<tr><td><font color=gray>DCaseがありません</font></td><td></td><td></td><td></td></tr>", TableView.toTable);
-	}
-}
-
 class SelectDCaseView {
-	pageIndex: number;
-	maxPageSize: number;
-	manager: SelectDCaseManager;
 
 	constructor() {
-		this.pageIndex = 1;
-		this.maxPageSize = 2;
 	}
 
 	clear(): void {
 		$("#ProjectList *").remove();
 	}
 
-	formatDate(time: string){
-		var deltaTime = new Date().getTime() - new Date(time).getTime();
-		var minute = 60 * 1000;
-		var hour   = minute * 60;
-		var day    = hour * 24;
-		var month  = day * 30;
-		var year   = month * 365;
-
-		if(deltaTime < minute) {
-			return "just now";
-		}else if(deltaTime >= minute && deltaTime < 2 * minute) {
-			return "a minute ago";
-		}else if(deltaTime >= 2 * minute && deltaTime < hour) {
-			return "" + Math.floor(deltaTime / minute) + " minutes ago";
-		}else if(deltaTime >= hour && deltaTime < 2 * hour) {
-			return "an hour ago";
-		}else if(deltaTime >= 2*hour && deltaTime < day) {
-			return "" + Math.floor(deltaTime / hour) + " hours ago";
-		}else if(deltaTime >= day && deltaTime < 2 * day) {
-			return "a day ago";
-		}else if(deltaTime >= 2*day && deltaTime < month) {
-			return "" + Math.floor(deltaTime / day) + " days ago";
-		}else if(deltaTime >= month && deltaTime < 2 * month) {
-			return "a month ago";
-		}else if(deltaTime >= 2*month && deltaTime < year) {
-			return "" + Math.floor(deltaTime / month) + " months ago";
-		}else if(deltaTime >= year && deltaTime < 2 * year) {
-			return "an year ago";
-		}else if(deltaTime >= 2*year) {
-			return "" + Math.floor(deltaTime / year) + " years ago";
-		}
-		return "error";
-	}
-
-	addElements(userId, pageIndex?: any, tags?: string[]): void {
+	addElements(userId): void {
 		var isLoggedin = userId != null;
 		var privateProjects: any = isLoggedin ? DCaseAPI.getProjectList(userId).projectList : [];
 		var publicProjects: any = DCaseAPI.getPublicProjectList().projectList;
@@ -184,7 +66,7 @@ class SelectDCaseView {
 			project.cases = DCaseAPI.getProjectDCase(1, project.projectId).dcaseList;
 			for(var j = 0; j < project.cases.length; j++){
 				var dcase = project.cases[j];
-				dcase.dateTime = this.formatDate(dcase.latestCommit.dateTime);
+				dcase.dateTime = TimeUtil.formatDate(dcase.latestCommit.dateTime);
 			}
 		}
 		console.log(projects);
@@ -200,28 +82,6 @@ class SelectDCaseView {
 			}
 		});
 	}
-
-	initEvents() {
-		$("#prev-page").click((e) => {
-			var i = this.pageIndex - 0;
-			if(i > 1) {
-				this.pageIndex = i - 1;
-				location.href = Config.BASEPATH + "/page/" + this.pageIndex;
-			}
-			e.preventDefault();
-		});
-
-		$("#next-page").click((e) => {
-			var i = this.pageIndex - 0;
-			if(this.maxPageSize >= i + 1) {
-				this.pageIndex = i + 1;
-				location.href = Config.BASEPATH + "/page/" + this.pageIndex;
-			}
-			e.preventDefault();
-		});
-
-	}
-
 }
 
 class SearchView {

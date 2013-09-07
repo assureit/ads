@@ -1,4 +1,13 @@
 extends layout
+block script
+    script(type='text/javascript', src='#{basepath}/javascripts/index.js')
+    //for XML import
+    script(type="text/javascript",src="#{basepath}/assurejs/src/CaseEncoder.js")
+    script(type="text/javascript",src="#{basepath}/assurejs/src/Converter.js")
+    script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
+    script(type="text/javascript",src="#{basepath}/assurejs/src/CaseModel.js")
+    script(type="text/javascript",src="#{basepath}/assurejs/src/PlugInManager.js")
+
 block append content
     script#case_tmpl(type="text/x-jquery-tmpl")
         li.media
@@ -6,7 +15,7 @@ block append content
             .media-body
                 h4
                     //|@${dcaseId} 
-                    a(href='./case/${dcaseId}') ${dcaseName}
+                    a(href='#{basepath}/case/${dcaseId}') ${dcaseName}
                     a.btn.btn-danger.btn-mini.pull-right.DeleteCaseButton
                         i.icon-trash　&nbsp;
                         |Delete
@@ -21,8 +30,8 @@ block append content
         article(id="project${projectId}")
             h3
                 //|#${projectId} 
-                a(href='./project/${projectId}/edit') ${projectName}
-                a.btn.btn-success.btn-small.pull-right.NewCaseButton(href='./new/${projectId}')
+                a(href='#{basepath}/project/${projectId}/edit') ${projectName}
+                a.btn.btn-success.btn-small.pull-right.NewCaseButton(href='#{basepath}/new/${projectId}')
                     i.icon-plus　&nbsp;
                     |New case
             ul.inline
