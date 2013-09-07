@@ -4,7 +4,6 @@ var ADS = (function () {
         this.TITLE_SUFFIX = " - Assure-It";
         this.URL_EXPORT = Config.BASEPATH + "/export";
         this.selectDCaseView = new SelectDCaseView();
-        this.selectDCaseView.initEvents();
         this.tagListManager = new TagListManager();
         this.createDCaseView = new CreateDCaseView();
 
@@ -199,7 +198,7 @@ var ADS = (function () {
 
         if (selectDCaseView != null) {
             selectDCaseView.clear();
-            selectDCaseView.addElements(userId, pageIndex, tags);
+            selectDCaseView.addElements(userId);
         }
     };
 

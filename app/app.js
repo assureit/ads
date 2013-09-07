@@ -51,6 +51,7 @@ app.get('/new/:projectId', client.index);
 app.get('/project/new', client.newprojectView);
 app.get('/dcase/:id', client.index);
 app.get('/case/:id', client.caseView);
+app.get('/case/:id/history', client.historyListView);
 app.get('/case/:id/history/:history', client.historyView);
 app.post('/export.*', client.exporter);
 app.get('/case/:id/export/:type/node/:n', gts.exporter);

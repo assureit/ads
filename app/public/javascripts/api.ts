@@ -85,7 +85,7 @@ module DCaseAPI {
 			projectId: projectId, users: users });
 	};
 
-	export var getCommitList = function(dcaseId: number) {
+	export var getCommitList = function(dcaseId: number): any[] {
 		return this.call("getCommitList", { dcaseId:dcaseId }).commitList;
 	};
 
