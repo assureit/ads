@@ -153,9 +153,9 @@ export class DCaseDAO extends model.DAO {
 			var list = new Array<DCase>();
 			result.forEach((row) => {
 				var d = DCase.tableToObject(row.d);//new DCase(row.d.id, row.d.name, row.d.project_id, row.d.user_id, row.d.delete_flag, row.d.type);
-				d.user = new model_user.User(row.u.id, row.u.login_name, row.u.delete_flag, row.u.system_flag);
+				d.user = model_user.User.tableToObject(row.u);
 				d.latestCommit = new model_commit.Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
-				d.latestCommit.user = new model_user.User(row.cu.id, row.cu.login_name, row.cu.delete_flag, row.cu.system_flag);
+				d.latestCommit.user = model_user.User.tableToObject(row.cu);
 				list.push(d);
 			});
 

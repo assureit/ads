@@ -95,13 +95,13 @@ html
 
                var Screen = new AssureIt.ScreenManager(shapelayer, contentlayer, controllayer, backgroundlayer);
                var Viewer = new AssureIt.CaseViewer(Case0, pluginManager, serverApi, Screen);
-               Viewer.Draw();
-               Viewer.Screen.SetOffset(($('html').width() / 2) - ((AssureIt.CaseViewer.ElementWidth) + Viewer.ViewMap[Viewer.ElementTop.Label].AbsX),80); //Center TopGoal in the view
                if (!isNaN(history)) {
                    Case0.SetEditable(false);
                } else {
                    Case0.SetEditable();
                }
+               Viewer.Draw();
+               Viewer.Screen.SetOffset(($('html').width() / 2) - ((AssureIt.CaseViewer.ElementWidth) + Viewer.ViewMap[Viewer.ElementTop.Label].AbsX),80); //Center TopGoal in the view
                if(Case0.IsEditable()) {
                    $('#assureit-mode').text("Edit mode");
                    Case0.SetModified(false);

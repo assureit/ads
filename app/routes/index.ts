@@ -168,7 +168,7 @@ export var register = function(req: any, res: any) {
 	var con = new db.Database();
 	var userDAO = new model_user.UserDAO(con);
 
-	userDAO.register(req.body.username, req.body.password, (err:any, result: model_user.User) => {
+	userDAO.register(req.body.username, req.body.password, req.body.mailAddress, (err:any, result: model_user.User) => {
 		if (err) {
 			// TODO: display error information
 			res.redirect(CONFIG.ads.basePath+'/');

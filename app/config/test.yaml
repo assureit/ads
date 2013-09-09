@@ -12,6 +12,7 @@ redmine:
 test:
   database:
     tables:
+      - 'access_log'
       - 'dcase_tag_rel'
       - 'tag'
       # - 'monitor_node'

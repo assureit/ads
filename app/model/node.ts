@@ -166,8 +166,7 @@ export class NodeDAO extends model.DAO {
 			// 	this.processNodeList(dcaseId, commitId, list, (err:any) => next(err));
 			// },
 			(next) => {
-				//this.registerTag(dcaseId, list, (err:any) => next(err));
-				next(null); // FIXME
+				this.registerTag(dcaseId, list, (err:any) => next(err));
 			}],
 			(err:any) => {
 				if (err) {
@@ -201,13 +200,8 @@ export class NodeDAO extends model.DAO {
 	/* obsolete */
 	registerTag(dcaseId:number, list: NodeData[], callback: (err:any) => void) {
 		var tagDAO = new model_tag.TagDAO(this.con);
-		var noteList: NodeNote[] = _.flatten(_.map(list, (node: NodeData) => {return node.Notes;}));
-		noteList = _.filter(noteList, (note: NodeNote) => {return note && note.Body.Type == 'Tag'});
-		var tagList = _.uniq(_.filter(
-			(_.map(noteList, (note: NodeNote) => {return note.Body.Tag})),
-			(tag:string) => {
-				return typeof(tag) == 'string' && tag.length > 0;
-			}));
+		var tagList:string[] = _.map(_.filter(list, (node: NodeData) => {return node.Notes && node.Notes['Tag'];}), (node: NodeData) => {return node.Notes['Tag'];});
+		tagList = _.uniq(_.flatten(_.map(tagList, (tag:string) => {return tag.split(',');})));
 		async.waterfall([
 			(next) => {
 				tagDAO.replaceDCaseTag(dcaseId, tagList, (err:any)=> next(err));
