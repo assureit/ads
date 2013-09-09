@@ -114,7 +114,7 @@ export class ProjectDAO extends model.DAO {
 	getProjectUserAndRole(projectId: number, callback: (err:any, result:any) => void): void {
 		async.waterfall([
 			(next) => {
-				this.con.query('SELECT u.login_name, pu.role FROM user AS u INNER JOIN project_has_user AS pu ON u.id=pu.user_id WHERE p.delete_flag=0 AND pu.project_id=?', [projectId], (err:any, result:any) => next(err, result));
+				this.con.query('SELECT u.login_name, pu.role FROM user AS u INNER JOIN project_has_user AS pu ON u.id=pu.user_id WHERE pu.project_id=?', [projectId], (err:any, result:any) => next(err, result));
 			},
 			(result:any, next) => {
 				var list = [];
