@@ -162,7 +162,7 @@ describe('model', function () {
         describe('commit', function () {
             it('normal end', function (done) {
                 this.timeout(15000);
-                commitDAO.commit(1, 401, 'commit test', validParam.contents, function (err, result) {
+                commitDAO.commit(1, 401, 'commit test', 'summary', validParam.contents, function (err, result) {
                     expect(err).to.be(null);
                     expect(result).not.to.be(null);
                     expect(result).not.to.be(undefined);

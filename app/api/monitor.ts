@@ -162,7 +162,7 @@ export function modifyMonitorStatus(params:any, userId:number, callback: type.Ca
 						}
 	
 						var commitDAO = new model_commit.CommitDAO(con);
-						commitDAO.commit(userId, latestCommit.id, commitMessage, data, (err, result) => {
+						commitDAO.commit(userId, latestCommit.id, commitMessage, null, data, (err, result) => {
 							if (err) {
 								callback.onFailure(err);
 								return;

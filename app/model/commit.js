@@ -14,20 +14,20 @@ var error = require('../api/error');
 var async = require('async');
 
 var Commit = (function () {
-    function Commit(id, prevCommitId, dcaseId, userId, metaData, message, data, dateTime, latestFlag) {
+    function Commit(id, prevCommitId, dcaseId, userId, message, metaData, data, dateTime, latestFlag) {
         this.id = id;
         this.prevCommitId = prevCommitId;
         this.dcaseId = dcaseId;
         this.userId = userId;
-        this.metaData = metaData;
         this.message = message;
+        this.metaData = metaData;
         this.data = data;
         this.dateTime = dateTime;
         this.latestFlag = latestFlag;
         this.latestFlag = !!this.latestFlag;
     }
     Commit.tableToObject = function (row) {
-        return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.meta_data, row.message, row.data, row.date_time, row.latest_flag);
+        return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.message, row.meta_data, row.data, row.date_time, row.latest_flag);
     };
     return Commit;
 })();
@@ -40,6 +40,8 @@ var CommitDAO = (function (_super) {
     CommitDAO.prototype.insert = function (params, callback) {
         var _this = this;
         params.prevId = params.prevId || 0;
+        if (params.metaData === null || params.metaData === undefined)
+            params.metaData = '';
         this.con.query('INSERT INTO commit(data, date_time, prev_commit_id, latest_flag,  dcase_id, user_id, meta_data, message) VALUES(?,now(),?,TRUE,?,?,?,?)', [params.data, params.prevId, params.dcaseId, params.userId, params.metaData, params.message], function (err, result) {
             if (err) {
                 callback(err, null);
@@ -102,8 +104,10 @@ var CommitDAO = (function (_super) {
         });
     };
 
-    CommitDAO.prototype.commit = function (userId, previousCommitId, message, contents, commitCallback) {
+    CommitDAO.prototype.commit = function (userId, previousCommitId, message, metaData, contents, commitCallback) {
         var _this = this;
+        if (metaData === null || metaData === undefined)
+            metaData = '';
         async.waterfall([
             function (callback) {
                 _this.get(previousCommitId, function (err, com) {
@@ -111,7 +115,7 @@ var CommitDAO = (function (_super) {
                 });
             },
             function (com, callback) {
-                _this.insert({ data: contents, prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message }, function (err, commitId) {
+                _this.insert({ data: contents, metaData: metaData, prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message }, function (err, commitId) {
                     callback(err, com, commitId);
                 });
             },

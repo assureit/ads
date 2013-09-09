@@ -235,7 +235,7 @@ function createDCase(params, userId, callback) {
                     return;
                 }
                 var commitDAO = new model_commit.CommitDAO(con);
-                commitDAO.insert({ data: params.contents, dcaseId: dcaseId, userId: userId, message: 'Initial Commit' }, function (err, commitId) {
+                commitDAO.insert({ data: params.contents, metaData: params.summary, dcaseId: dcaseId, userId: userId, message: 'Initial Commit' }, function (err, commitId) {
                     if (err) {
                         callback.onFailure(err);
                         return;
@@ -298,7 +298,7 @@ function commit(params, userId, callback) {
                 return;
             }
 
-            commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
+            commitDAO.commit(userId, params.commitId, params.commitMessage, params.summary, params.contents, function (err, result) {
                 return next(err, result);
             });
         },

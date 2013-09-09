@@ -11,24 +11,25 @@ var async = require('async')
 
 export interface InsertArg {
 	data: string;
+	metaData?: string;
 	prevId?: number;
 	dcaseId: number;
 	userId: number;
-	metaData?: string;
 	message?: string;
 }
 export class Commit {
 	public user: model_user.User;
-	constructor(public id:number, public prevCommitId: number, public dcaseId: number, public userId: number, public metaData:string, public message:string, public data:string, public dateTime: Date, public latestFlag: bool) {
+	constructor(public id:number, public prevCommitId: number, public dcaseId: number, public userId: number, public message:string, public metaData:string, public data:string, public dateTime: Date, public latestFlag: bool) {
 		this.latestFlag = !!this.latestFlag;
 	}
 	static tableToObject(row:any) {
-		return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.meta_data, row.message, row.data, row.date_time, row.latest_flag);
+		return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.message, row.meta_data, row.data, row.date_time, row.latest_flag);
 	}
 }
 export class CommitDAO extends model.DAO {
 	insert(params: InsertArg, callback: (err:any, commitId: number)=>void): void {
 		params.prevId = params.prevId || 0;
+		if (params.metaData === null || params.metaData === undefined) params.metaData = '';
 		this.con.query('INSERT INTO commit(data, date_time, prev_commit_id, latest_flag,  dcase_id, user_id, meta_data, message) VALUES(?,now(),?,TRUE,?,?,?,?)', 
 			[params.data, params.prevId, params.dcaseId, params.userId, params.metaData, params.message], (err, result) => {
 			if (err) {
@@ -93,13 +94,14 @@ export class CommitDAO extends model.DAO {
 	}
 
 
-	commit(userId:number, previousCommitId:number, message: string, contents:string, commitCallback: (err:any, result:any)=>void) {
+	commit(userId:number, previousCommitId:number, message: string, metaData:string, contents:string, commitCallback: (err:any, result:any)=>void) {
+		if (metaData === null || metaData === undefined) metaData = '';
 		async.waterfall([
 			(callback) => {
 				this.get(previousCommitId, (err:any, com: Commit) => {callback(err, com);});
 			}
 			, (com: Commit, callback) => {
-				this.insert({data: contents, prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message}, (err:any, commitId:number) => {callback(err, com, commitId);});
+				this.insert({data: contents, metaData: metaData, prevId: previousCommitId, dcaseId: com.dcaseId, userId: userId, message: message}, (err:any, commitId:number) => {callback(err, com, commitId);});
 			}
 			, (com: Commit, commitId: number, callback) => {
 				var parser = new asn_parser.ASNParser();
