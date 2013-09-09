@@ -122,6 +122,10 @@ var DCaseAPI;
         return this.call("getProject", { projectId: projectId });
     };
 
+    DCaseAPI.deleteProject = function (projectId) {
+        return this.call("deleteProject", { projectId: projectId });
+    };
+
     DCaseAPI.editDCase = function (dcaseId, name) {
         return this.call("editDCase", {
             dcaseId: dcaseId,

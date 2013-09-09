@@ -38,7 +38,7 @@ block content
                         option(value="en") English
                         option(value="ja") Japanese
                     label.checkbox= lang.public
-                        input#inputIsPublic(type="checkbox",checked="checked")
+                        input#inputIsPublic(type="checkbox")
                 #MemberList
                     h3= lang.member
                     form.form-inline
@@ -47,5 +47,7 @@ block content
                 form
                     if projectId
                         button.btn.btn-primary#project-create(type="button")= lang.update
+                        | &nbsp;
+                        button.btn.btn-danger#project-delete(type="button")=  lang.delete
                     else
                         button.btn.btn-primary#project-create(type="button")= lang.create

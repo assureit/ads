@@ -23,7 +23,7 @@ var ADS = (function () {
         });
 
         router.route("project/new", "project", function () {
-            var create_pressed = false;
+            var page_moved = false;
 
             var idMatchResult = location.pathname.match(/(\d+)\/edit/);
             var projectId = idMatchResult ? idMatchResult[1] - 0 : 0;
@@ -57,7 +57,7 @@ var ADS = (function () {
             var setProjectInfo = function (project) {
                 $("#inputProjectName").attr("value", project.name);
 
-                if (project.public_flag) {
+                if (project.isPublic == 1) {
                     $("#inputIsPublic").attr("checked", "checked");
                 }
             };
@@ -69,9 +69,9 @@ var ADS = (function () {
 
             $("#project-create").click(function (e) {
                 e.preventDefault();
-                if (create_pressed)
+                if (page_moved)
                     return;
-                create_pressed = true;
+                page_moved = true;
                 var name = $("#inputProjectName").attr("value");
                 var isPublic = $("#inputIsPublic").attr("checked") != null;
                 var language = $("#inputLanguage").attr("value");
@@ -86,11 +86,24 @@ var ADS = (function () {
                 }
             });
 
+            $("#project-delete").click(function (e) {
+                e.preventDefault();
+                if (projectId) {
+                    if (page_moved)
+                        return;
+                    page_moved = true;
+                    DCaseAPI.deleteProject(projectId);
+                    location.href = "../../";
+                }
+            });
+
             if (projectId) {
                 var project = DCaseAPI.getProject(projectId);
                 var memberList = DCaseAPI.getProjectUserAndRole(projectId);
                 setProjectInfo(project);
                 setMemberList(memberList);
+            } else {
+                $("#inputIsPublic").attr("checked", "checked");
             }
         });
 
