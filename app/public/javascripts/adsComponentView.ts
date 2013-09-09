@@ -67,6 +67,7 @@ class SelectDCaseView {
 			for(var j = 0; j < project.cases.length; j++){
 				var dcase = project.cases[j];
 				dcase.dateTime = TimeUtil.formatDate(dcase.latestCommit.dateTime);
+				dcase.latestCommit.dateTime = (new Date(dcase.latestCommit.dateTime)).toString();
 			}
 		}
 		$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(projects) );
