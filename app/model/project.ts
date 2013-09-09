@@ -10,7 +10,7 @@ export class Project {
 	constructor(public id:number, public name:string, public isPublic:number) {
 	}
 	static tableToObject(table: any): Project {
-		return new Project(table.id, table.name, table.isPublic);
+		return new Project(table.id, table.name, table.public_flag);
 	}
 }
 
@@ -19,7 +19,7 @@ export class ProjectDAO extends model.DAO {
 	get(userId: number, projectId: number, callback: (err:any, result: Project)=>void): void {
 		async.waterfall([
 			(next) => {
-				this.con.query({sql:'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.id=? AND (p.public_flag=1 OR pu.user_id=?)',
+				this.con.query({sql:'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.delete_flag=0 AND p.id=? AND (p.public_flag=1 OR pu.user_id=?)',
 					nestTables:true}, [projectId, userId], (err:any, result:any) => next(err, result));
 			},
 			(result:any, next) => {
@@ -41,7 +41,7 @@ export class ProjectDAO extends model.DAO {
 	list(userId: number, callback: (err:any, result: Project[])=>void): void {
 		async.waterfall([
 			(next) => {
-				this.con.query({sql:'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.public_flag=0 AND pu.user_id=?',
+				this.con.query({sql:'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.delete_flag=0 AND p.public_flag=0 AND pu.user_id=?',
 					nestTables:true}, [userId], (err:any, result:any) => {
 						next(err, result);
 				});
@@ -61,7 +61,7 @@ export class ProjectDAO extends model.DAO {
 	publiclist(userId: number, callback: (err:any, result: Project[])=>void): void {
 		async.waterfall([
 			(next) => {
-				this.con.query('SELECT * FROM project AS p WHERE p.public_flag=1', (err:any, result:any) => {
+				this.con.query('SELECT * FROM project AS p WHERE p.delete_flag=0 AND p.public_flag=1', (err:any, result:any) => {
 					next(err, result);
 				});
 			},

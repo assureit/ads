@@ -19,7 +19,7 @@ var Project = (function () {
         this.isPublic = isPublic;
     }
     Project.tableToObject = function (table) {
-        return new Project(table.id, table.name, table.isPublic);
+        return new Project(table.id, table.name, table.public_flag);
     };
     return Project;
 })();
@@ -35,7 +35,7 @@ var ProjectDAO = (function (_super) {
         async.waterfall([
             function (next) {
                 _this.con.query({
-                    sql: 'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.id=? AND (p.public_flag=1 OR pu.user_id=?)',
+                    sql: 'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.delete_flag=0 AND p.id=? AND (p.public_flag=1 OR pu.user_id=?)',
                     nestTables: true
                 }, [projectId, userId], function (err, result) {
                     return next(err, result);
@@ -62,7 +62,7 @@ var ProjectDAO = (function (_super) {
         async.waterfall([
             function (next) {
                 _this.con.query({
-                    sql: 'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.public_flag=0 AND pu.user_id=?',
+                    sql: 'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.delete_flag=0 AND p.public_flag=0 AND pu.user_id=?',
                     nestTables: true
                 }, [userId], function (err, result) {
                     next(err, result);
@@ -84,7 +84,7 @@ var ProjectDAO = (function (_super) {
         var _this = this;
         async.waterfall([
             function (next) {
-                _this.con.query('SELECT * FROM project AS p WHERE p.public_flag=1', function (err, result) {
+                _this.con.query('SELECT * FROM project AS p WHERE p.delete_flag=0 AND p.public_flag=1', function (err, result) {
                     next(err, result);
                 });
             },

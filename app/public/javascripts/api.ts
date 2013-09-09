@@ -118,6 +118,10 @@ module DCaseAPI {
 		return this.call("getProject", { projectId: projectId });
 	};
 	
+	export var deleteProject = function(projectId: number) {
+		return this.call("deleteProject", { projectId: projectId });
+	};
+	
 	export var editDCase = function(dcaseId: number, name: string) {
 		return this.call("editDCase", {
 			dcaseId: dcaseId,
