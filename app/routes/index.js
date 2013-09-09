@@ -51,6 +51,21 @@ exports.caseView = function (req, res) {
     res.render(page, params);
 };
 
+exports.historyListView = function (req, res) {
+    var page = 'history';
+    var auth = new util_auth.Auth(req, res);
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, caseId: req.params.id };
+    if (auth.isLogin()) {
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName(), caseId: req.params.id };
+    }
+
+    if (req.cookies.lang == 'en') {
+        params.lang = lang.lang.en;
+    }
+
+    res.render(page, params);
+};
+
 exports.historyView = function (req, res) {
     var page = 'case';
     var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, caseId: req.params.id, commitHistory: req.params.history };

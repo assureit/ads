@@ -7,7 +7,6 @@ html
         link(rel='stylesheet', href='#{basepath}/lib/jquery.colorPicker.css')
         link(rel='stylesheet', href='#{basepath}/lib/flatstrap/bootstrap.min.css')
         link(rel='stylesheet', href='#{basepath}/lib/bootstrap.icons.css')
-        link(rel='stylesheet', href='#{basepath}/lib/flatstrap/bootstrap-responsive.min.css')
         link(rel='stylesheet', href='#{basepath}/font-awesome/css/font-awesome.min.css')
         link(rel='stylesheet', href='#{basepath}/lib/codemirror.css')
         link(rel='stylesheet', href='#{basepath}/stylesheets/dcase-node.css')
@@ -45,15 +44,10 @@ html
         script(type='text/javascript', src='#{basepath}/javascripts/api.js')
         script(type='text/javascript', src='#{basepath}/javascripts/animation.js')
         script(type='text/javascript', src='#{basepath}/javascripts/sidemenu.js')
+        script(type='text/javascript', src='#{basepath}/javascripts/timeutil.js')
+        script(type='text/javascript', src='#{basepath}/javascripts/history.js')
         script(type='text/javascript', src='#{basepath}/javascripts/DCaseTree.js')
         script(type='text/javascript', src='#{basepath}/javascripts/Xml2DCaseTree.js')
-        script(type='text/javascript', src='#{basepath}/javascripts/index.js')
-        //for XML import
-        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseEncoder.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/Converter.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseModel.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/PlugInManager.js")
         block script
     body
         block bar
