@@ -17,7 +17,7 @@ block append content
                         | 0&nbsp;
                 small
                     |${userName} updated 
-                    span ${dateTime}
+                    abbr(title="${dateTimeString}") ${dateTime}
 block bar
     a(href="#{basepath}/")
         img#menu-button(src="#{basepath}/images/ait.png") Menu
@@ -26,6 +26,8 @@ block bar
             if userName
                 li#monitors-menu
                     a(href='#') Monitors
+                li
+                    a(href='#{basepath}/case/#{caseId}') Edit
                 li#settings-menu
                     a(href='#') Settings
                 include signout

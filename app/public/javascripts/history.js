@@ -1,8 +1,7 @@
 var CommitModel = (function () {
-    function CommitModel(CommitId, Message, dateTime, userId, userName, LatestFlag, caseId, revisionId) {
+    function CommitModel(CommitId, Message, time, userId, userName, LatestFlag, caseId, revisionId) {
         this.CommitId = CommitId;
         this.Message = Message;
-        this.dateTime = dateTime;
         this.userId = userId;
         this.userName = userName;
         this.LatestFlag = LatestFlag;
@@ -11,6 +10,8 @@ var CommitModel = (function () {
         if (Message == "" || Message == null) {
             this.Message = "(No message)";
         }
+        this.dateTimeString = (new Date(time)).toString();
+        this.dateTime = TimeUtil.formatDate(time);
     }
     return CommitModel;
 })();
@@ -30,7 +31,7 @@ var CommitCollection = (function () {
         var CommitModels = [];
         for (var i = 0; i < json_array.length; i++) {
             var j = json_array[i];
-            CommitModels.push(new CommitModel(j.commitId, j.commitMessage, TimeUtil.formatDate(j.dateTime), j.userId, j.userName, false, caseId, i));
+            CommitModels.push(new CommitModel(j.commitId, j.commitMessage, j.dateTime, j.userId, j.userName, false, caseId, i));
         }
         CommitModels[json_array.length - 1].LatestFlag = true;
         return new CommitCollection(CommitModels);

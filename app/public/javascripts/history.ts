@@ -1,11 +1,15 @@
 class CommitModel {
+	dateTime: string;
+	dateTimeString: string;
 	constructor(public CommitId: number, public Message:string,
-			public dateTime: string, public userId:number,
+			time: string, public userId:number,
 			public userName: string, public LatestFlag: boolean,
 			public caseId: number, public revisionId: number) {
 		if(Message == ""|| Message == null) {
 			this.Message = "(No message)";
 		}
+		this.dateTimeString = (new Date(time)).toString();
+		this.dateTime = TimeUtil.formatDate(time);
 	}
 
 }
@@ -28,7 +32,7 @@ class CommitCollection {
 		var CommitModels: CommitModel[] = [];
 		for(var i: number = 0; i < json_array.length; i++) {
 			var j = json_array[i];
-			CommitModels.push(new CommitModel(j.commitId, j.commitMessage, TimeUtil.formatDate(j.dateTime), j.userId, j.userName, false, caseId, i));
+			CommitModels.push(new CommitModel(j.commitId, j.commitMessage, j.dateTime, j.userId, j.userName, false, caseId, i));
 		}
 		CommitModels[json_array.length - 1].LatestFlag = true; //Latest one
 		return new CommitCollection(CommitModels);
