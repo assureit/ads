@@ -209,6 +209,7 @@ function createDCase(params, userId, callback) {
         return;
 
     var con = new db.Database();
+
     con.begin(function (err, result) {
         var userDAO = new model_user.UserDAO(con);
         userDAO.select(userId, function (err, user) {
@@ -327,6 +328,7 @@ function deleteDCase(params, userId, callback) {
         return;
 
     var con = new db.Database();
+
     con.begin(function (err, result) {
         var userDAO = new model_user.UserDAO(con);
         userDAO.select(userId, function (err, user) {
@@ -386,6 +388,7 @@ function editDCase(params, userId, callback) {
         return;
 
     var con = new db.Database();
+
     con.begin(function (err, result) {
         var userDAO = new model_user.UserDAO(con);
         userDAO.select(userId, function (err, user) {

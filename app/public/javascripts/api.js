@@ -110,12 +110,16 @@ var DCaseAPI;
         return this.call("getDCase", { dcaseId: dcaseId });
     };
 
-    DCaseAPI.getProjectList = function (userId) {
-        return this.call("getProjectList", { userId: userId });
+    DCaseAPI.getProjectList = function () {
+        return this.call("getProjectList", {});
     };
 
     DCaseAPI.getPublicProjectList = function () {
         return this.call("getPublicProjectList", {});
+    };
+
+    DCaseAPI.getProject = function (projectId) {
+        return this.call("getProject", { projectId: projectId });
     };
 
     DCaseAPI.editDCase = function (dcaseId, name) {

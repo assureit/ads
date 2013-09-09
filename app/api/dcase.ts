@@ -191,6 +191,7 @@ export function createDCase(params:any, userId: number, callback: type.Callback)
 	if (!validate(params)) return;
 
 	var con = new db.Database();
+	// FIXME: Use "async.waterfall"
 	con.begin((err, result) => {
 		var userDAO = new model_user.UserDAO(con);
 		userDAO.select(userId, (err:any, user: model_user.User) => {
@@ -292,6 +293,7 @@ export function deleteDCase(params:any, userId: number, callback: type.Callback)
 	if (!validate(params)) return;
 
 	var con = new db.Database();
+	// FIXME: Use "async.waterfall"
 	con.begin((err, result) => {
 		var userDAO = new model_user.UserDAO(con);
 		userDAO.select(userId, (err:any, user: model_user.User) => {
@@ -344,6 +346,7 @@ export function editDCase(params:any, userId: number, callback: type.Callback) {
 	if (!validate(params)) return;
 
 	var con = new db.Database();
+	// FIXME: Use "async.waterfall"
 	con.begin((err, result) => {
 		var userDAO = new model_user.UserDAO(con);
 		userDAO.select(userId, (err:any, user: model_user.User) => {

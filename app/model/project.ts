@@ -15,6 +15,29 @@ export class Project {
 }
 
 export class ProjectDAO extends model.DAO {
+
+	get(userId: number, projectId: number, callback: (err:any, result: Project)=>void): void {
+		async.waterfall([
+			(next) => {
+				this.con.query({sql:'SELECT * FROM project AS p INNER JOIN project_has_user AS pu ON p.id=pu.project_id WHERE p.id=? AND (p.public_flag=1 OR pu.user_id=?)',
+					nestTables:true}, [projectId, userId], (err:any, result:any) => next(err, result));
+			},
+			(result:any, next) => {
+				var list:Project[] = [];
+				result.forEach((row) => {
+					list.push(Project.tableToObject(row.p));
+				});
+				if (list.length == 0) {
+					next(new error.ForbiddenError('You need permission to access the project', {userId:userId, projectId:projectId}));
+					return;
+				}
+				next(null, list[0]);
+			}
+		], (err:any, list: Project) => {
+			callback(err, list);
+		});
+	}
+
 	list(userId: number, callback: (err:any, result: Project[])=>void): void {
 		async.waterfall([
 			(next) => {

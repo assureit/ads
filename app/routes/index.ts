@@ -26,16 +26,15 @@ export var index = function(req: any, res: any) {
 
 export var newprojectView = function(req: any, res: any) {
 	var page = 'newproject';
-	var params: any = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: null};
+	var params: any = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: null, projectId: req.params.id};
 	var auth = new util_auth.Auth(req, res);
 	if(auth.isLogin()) {
-		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
+		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName(), projectId: req.params.id};
 	}
 
 	if( req.cookies.lang == 'en') {
 		params.lang = lang.lang.en;
 	}
-
 	res.render(page, params);
 }
 

@@ -106,12 +106,16 @@ module DCaseAPI {
 		return this.call("getDCase", { dcaseId: dcaseId });
 	};
 
-	export var getProjectList = function(userId: number) {
-		return this.call("getProjectList", { userId: userId });
+	export var getProjectList = function() {
+		return this.call("getProjectList", {});
 	};
 
 	export var getPublicProjectList = function() {
 		return this.call("getPublicProjectList", {});
+	};
+
+	export var getProject = function(projectId: number) {
+		return this.call("getProject", { projectId: projectId });
 	};
 	
 	export var editDCase = function(dcaseId: number, name: string) {

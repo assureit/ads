@@ -24,7 +24,10 @@ block content
     .container
         .row
             .span6.offset3
-                h2= lang.new_Project
+                if projectId
+                    h2= lang.edit_Project
+                else
+                    h2= lang.new_Project
                 form
                     label(for="inputProjectName")= lang.Project_name
                     input#inputProjectName(type="text")
@@ -40,4 +43,7 @@ block content
                         button.btn.btn-success#AddMemberButton
                             i.icon-plus &nbsp;
                 form
-                    button.btn.btn-primary#project-create(type="button")= lang.create
+                    if projectId
+                        button.btn.btn-primary#project-create(type="button")= lang.update
+                    else
+                        button.btn.btn-primary#project-create(type="button")= lang.create

@@ -14,6 +14,27 @@ var async = require('async');
 var _ = require('underscore');
 var CONFIG = require('config');
 
+function getProject(params, userId, callback) {
+    var con = new db.Database();
+    var projectDAO = new model_project.ProjectDAO(con);
+    params = params || {};
+    async.waterfall([
+        function (next) {
+            projectDAO.get(userId, params.projectId, function (err, result) {
+                return next(err, result);
+            });
+        }
+    ], function (err, result) {
+        con.close();
+        if (err) {
+            callback.onFailure(err);
+            return;
+        }
+        callback.onSuccess(result);
+    });
+}
+exports.getProject = getProject;
+
 function getProjectList(params, userId, callback) {
     var con = new db.Database();
     var projectDAO = new model_project.ProjectDAO(con);

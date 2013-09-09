@@ -180,7 +180,7 @@ var SelectDCaseView = (function () {
 
     SelectDCaseView.prototype.addElements = function (userId, pageIndex, tags) {
         var isLoggedin = userId != null;
-        var privateProjects = isLoggedin ? DCaseAPI.getProjectList(userId).projectList : [];
+        var privateProjects = isLoggedin ? DCaseAPI.getProjectList().projectList : [];
         var publicProjects = DCaseAPI.getPublicProjectList().projectList;
         var projects = privateProjects.concat(publicProjects);
         for (var i = 0; i < privateProjects.length; i++) {
@@ -195,7 +195,6 @@ var SelectDCaseView = (function () {
                 dcase.dateTime = this.formatDate(dcase.latestCommit.dateTime);
             }
         }
-        console.log(projects);
         $("#ProjectList").append(($)("#project_tmpl").tmpl(projects));
 
         $(".DeleteCaseButton").click(function () {

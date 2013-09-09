@@ -97,6 +97,9 @@ class ADS {
 		router.route("project/new", "project", () => {
 			var create_pressed = false;
 
+			var idMatchResult = location.pathname.match(/(\d+)\/edit/);
+			var projectId: number = idMatchResult ? <any>idMatchResult[1]-0 : 0;
+
 			var addNewMember = function(){
 				var newMemberForm = (<any>$)("#member_tmpl").tmpl({name: "", role: ""});
 				newMemberForm.find(".DeleteMemberButton").click(function(e){
@@ -104,12 +107,29 @@ class ADS {
 					$((<any>($(this))).tmplItem().nodes).remove();
 				});
 				$("#AddMemberButton").before(newMemberForm);
+				return newMemberForm;
 			}
 
 			var getMemberList = function(){
 				var members = [];
 				$(".memberForm").each(function(i,v){ members.push([$(v).find(".userName").attr("value"), $(v).find(".role").attr("value")]); });
 				return members;
+			}
+
+			var setMemberList = function(list: string[][]){
+				for(var i = 0; i < list.length; i++){
+					var newMemberForm = addNewMember();
+					newMemberForm.find(".userName").attr("value", list[i][0]).addClass("disabled").attr("disabled", "");
+					newMemberForm.find(".role").attr("value", list[i][1]);
+				}
+			}
+
+			var setProjectInfo = function(project: any){
+				$("#inputProjectName").attr("value", project.name);
+				//$("#inputLanguage").attr("value", project.);
+				if(project.public_flag){
+					$("#inputIsPublic").attr("checked", "checked");
+				}
 			}
 
 			$("#AddMemberButton").click((e)=>{
@@ -124,10 +144,23 @@ class ADS {
 				var name = $("#inputProjectName").attr("value");
 				var isPublic = $("#inputIsPublic").attr("checked") != null;
 				var language = $("#inputLanguage").attr("value");
-				var r = DCaseAPI.createProject(name, isPublic).projectId;
-				DCaseAPI.updateProjectUser(r, getMemberList());
-				location.href = "../";
+				if(projectId){
+					DCaseAPI.editProject(projectId, name, isPublic);
+					DCaseAPI.updateProjectUser(projectId, getMemberList());
+					location.href = "../../";
+				}else{
+					var r = DCaseAPI.createProject(name, isPublic).projectId;
+					DCaseAPI.updateProjectUser(r, getMemberList());
+					location.href = "../";
+				}
 			});
+
+			if(projectId){
+				var project = DCaseAPI.getProject(projectId);
+				var memberList = DCaseAPI.getProjectUserAndRole(projectId);
+				setProjectInfo(project);
+				setMemberList(memberList);
+			}
 		});
 
 		var defaultRouter = (pageIndex: any, tag?: string) => {

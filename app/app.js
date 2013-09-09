@@ -49,6 +49,7 @@ app.get('/page/:id', client.index);
 app.get('/tag/:t', client.index);
 app.get('/new/:projectId', client.index);
 app.get('/project/new', client.newprojectView);
+app.get('/project/:id/edit', client.newprojectView);
 app.get('/dcase/:id', client.index);
 app.get('/case/:id', client.caseView);
 app.get('/case/:id/history/:history', client.historyView);
