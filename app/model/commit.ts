@@ -14,22 +14,23 @@ export interface InsertArg {
 	prevId?: number;
 	dcaseId: number;
 	userId: number;
+	metaData?: string;
 	message?: string;
 }
 export class Commit {
 	public user: model_user.User;
-	constructor(public id:number, public prevCommitId: number, public dcaseId: number, public userId: number, public message:string, public data:string, public dateTime: Date, public latestFlag: bool) {
+	constructor(public id:number, public prevCommitId: number, public dcaseId: number, public userId: number, public metaData:string, public message:string, public data:string, public dateTime: Date, public latestFlag: bool) {
 		this.latestFlag = !!this.latestFlag;
 	}
 	static tableToObject(row:any) {
-		return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.message, row.data, row.date_time, row.latest_flag);
+		return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.meta_data, row.message, row.data, row.date_time, row.latest_flag);
 	}
 }
 export class CommitDAO extends model.DAO {
 	insert(params: InsertArg, callback: (err:any, commitId: number)=>void): void {
 		params.prevId = params.prevId || 0;
-		this.con.query('INSERT INTO commit(data, date_time, prev_commit_id, latest_flag,  dcase_id, `user_id`, `message`) VALUES(?,now(),?,TRUE,?,?,?)', 
-			[params.data, params.prevId, params.dcaseId, params.userId, params.message], (err, result) => {
+		this.con.query('INSERT INTO commit(data, date_time, prev_commit_id, latest_flag,  dcase_id, user_id, meta_data, message) VALUES(?,now(),?,TRUE,?,?,?,?)', 
+			[params.data, params.prevId, params.dcaseId, params.userId, params.metaData, params.message], (err, result) => {
 			if (err) {
 				callback(err, null);
 				return;
@@ -70,7 +71,7 @@ export class CommitDAO extends model.DAO {
 				return;
 			}
 			result = result[0];
-			callback(err, new Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
+			callback(err, Commit.tableToObject(result));
 		});
 	}
 
@@ -83,7 +84,7 @@ export class CommitDAO extends model.DAO {
 
 			var list = new Array<Commit>();
 			result.forEach((row) => {
-				var c = new Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
+				var c = Commit.tableToObject(row.c);
 				c.user = model_user.User.tableToObject(row.u);
 				list.push(c);
 			});

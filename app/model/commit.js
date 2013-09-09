@@ -14,11 +14,12 @@ var error = require('../api/error');
 var async = require('async');
 
 var Commit = (function () {
-    function Commit(id, prevCommitId, dcaseId, userId, message, data, dateTime, latestFlag) {
+    function Commit(id, prevCommitId, dcaseId, userId, metaData, message, data, dateTime, latestFlag) {
         this.id = id;
         this.prevCommitId = prevCommitId;
         this.dcaseId = dcaseId;
         this.userId = userId;
+        this.metaData = metaData;
         this.message = message;
         this.data = data;
         this.dateTime = dateTime;
@@ -26,7 +27,7 @@ var Commit = (function () {
         this.latestFlag = !!this.latestFlag;
     }
     Commit.tableToObject = function (row) {
-        return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.message, row.data, row.date_time, row.latest_flag);
+        return new Commit(row.id, row.prev_commit_id, row.dcase_id, row.user_id, row.meta_data, row.message, row.data, row.date_time, row.latest_flag);
     };
     return Commit;
 })();
@@ -39,7 +40,7 @@ var CommitDAO = (function (_super) {
     CommitDAO.prototype.insert = function (params, callback) {
         var _this = this;
         params.prevId = params.prevId || 0;
-        this.con.query('INSERT INTO commit(data, date_time, prev_commit_id, latest_flag,  dcase_id, `user_id`, `message`) VALUES(?,now(),?,TRUE,?,?,?)', [params.data, params.prevId, params.dcaseId, params.userId, params.message], function (err, result) {
+        this.con.query('INSERT INTO commit(data, date_time, prev_commit_id, latest_flag,  dcase_id, user_id, meta_data, message) VALUES(?,now(),?,TRUE,?,?,?,?)', [params.data, params.prevId, params.dcaseId, params.userId, params.metaData, params.message], function (err, result) {
             if (err) {
                 callback(err, null);
                 return;
@@ -80,7 +81,7 @@ var CommitDAO = (function (_super) {
                 return;
             }
             result = result[0];
-            callback(err, new Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
+            callback(err, Commit.tableToObject(result));
         });
     };
 
@@ -93,7 +94,7 @@ var CommitDAO = (function (_super) {
 
             var list = new Array();
             result.forEach(function (row) {
-                var c = new Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
+                var c = Commit.tableToObject(row.c);
                 c.user = model_user.User.tableToObject(row.u);
                 list.push(c);
             });

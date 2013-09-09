@@ -146,7 +146,7 @@ var DCaseDAO = (function (_super) {
             result.forEach(function (row) {
                 var d = DCase.tableToObject(row.d);
                 d.user = model_user.User.tableToObject(row.u);
-                d.latestCommit = new model_commit.Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
+                d.latestCommit = model_commit.Commit.tableToObject(row.c);
                 d.latestCommit.user = model_user.User.tableToObject(row.cu);
                 list.push(d);
             });
