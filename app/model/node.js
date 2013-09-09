@@ -49,7 +49,9 @@ var NodeDAO = (function (_super) {
         }
         async.waterfall([
             function (next) {
-                next(null);
+                _this.registerTag(dcaseId, list, function (err) {
+                    return next(err);
+                });
             }
         ], function (err) {
             if (err) {
@@ -83,17 +85,14 @@ var NodeDAO = (function (_super) {
 
     NodeDAO.prototype.registerTag = function (dcaseId, list, callback) {
         var tagDAO = new model_tag.TagDAO(this.con);
-        var noteList = _.flatten(_.map(list, function (node) {
-            return node.Notes;
-        }));
-        noteList = _.filter(noteList, function (note) {
-            return note && note.Body.Type == 'Tag';
+        var tagList = _.map(_.filter(list, function (node) {
+            return node.Notes && node.Notes['Tag'];
+        }), function (node) {
+            return node.Notes['Tag'];
         });
-        var tagList = _.uniq(_.filter((_.map(noteList, function (note) {
-            return note.Body.Tag;
-        })), function (tag) {
-            return typeof (tag) == 'string' && tag.length > 0;
-        }));
+        tagList = _.uniq(_.flatten(_.map(tagList, function (tag) {
+            return tag.split(',');
+        })));
         async.waterfall([
             function (next) {
                 tagDAO.replaceDCaseTag(dcaseId, tagList, function (err) {

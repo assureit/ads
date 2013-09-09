@@ -10,16 +10,17 @@ var error = require('../api/error');
 var net_ldap = require('../net/ldap');
 
 var User = (function () {
-    function User(id, loginName, deleteFlag, systemFlag) {
+    function User(id, loginName, mailAddress, deleteFlag, systemFlag) {
         this.id = id;
         this.loginName = loginName;
+        this.mailAddress = mailAddress;
         this.deleteFlag = deleteFlag;
         this.systemFlag = systemFlag;
         this.deleteFlag = !!this.deleteFlag;
         this.systemFlag = !!this.systemFlag;
     }
     User.tableToObject = function (row) {
-        return new User(row.id, row.login_name, row.delete_flag, row.system_flag);
+        return new User(row.id, row.login_name, row.mail_address, row.delete_flag, row.system_flag);
     };
     return User;
 })();
@@ -67,7 +68,7 @@ var UserDAO = (function (_super) {
                     callback(err, resultSelect);
                     return;
                 } else {
-                    _this.insert(loginName, function (err, resultInsert) {
+                    _this.insert(loginName, null, function (err, resultInsert) {
                         if (err) {
                             callback(err, null);
                             return;
@@ -80,7 +81,7 @@ var UserDAO = (function (_super) {
         });
     };
 
-    UserDAO.prototype.register = function (loginName, password, callback) {
+    UserDAO.prototype.register = function (loginName, password, email, callback) {
         var _this = this;
         function validate(loginName, password) {
             var checks = [];
@@ -90,6 +91,8 @@ var UserDAO = (function (_super) {
                 checks.push('Login name should not exceed 45 characters.');
             if (password.length == 0)
                 checks.push('Password is required.');
+            if (email && email.length > 256)
+                checks.push('Email should not exceed 256 characters.');
             if (checks.length > 0) {
                 callback(new error.InvalidParamsError(checks, null), null);
                 return false;
@@ -105,7 +108,7 @@ var UserDAO = (function (_super) {
                 callback(err, null);
                 return;
             }
-            _this.insert(loginName, function (err, resultInsert) {
+            _this.insert(loginName, email, function (err, resultInsert) {
                 if (err) {
                     ldap.del(loginName, function (err2) {
                         if (err2) {
@@ -132,7 +135,7 @@ var UserDAO = (function (_super) {
             if (result.length == 0) {
                 err = new error.NotFoundError('UserId Not Found.');
             } else {
-                resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
+                resultUser = User.tableToObject(result[0]);
             }
             callback(err, resultUser);
         });
@@ -146,7 +149,7 @@ var UserDAO = (function (_super) {
             }
             var resultUser = null;
             if (result.length > 0) {
-                resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
+                resultUser = User.tableToObject(result[0]);
             }
             callback(err, resultUser);
         });
@@ -166,9 +169,11 @@ var UserDAO = (function (_super) {
         });
     };
 
-    UserDAO.prototype.insert = function (loginName, callback) {
+    UserDAO.prototype.insert = function (loginName, mailAddress, callback) {
         var _this = this;
-        this.con.query('INSERT INTO user(login_name) VALUES(?) ', [loginName], function (err, result) {
+        if (!mailAddress)
+            mailAddress = '';
+        this.con.query('INSERT INTO user(login_name, mail_address) VALUES(?, ?) ', [loginName, mailAddress], function (err, result) {
             if (err) {
                 if (err.code == 'ER_DUP_ENTRY') {
                     err = new error.DuplicatedError('The login name is already exist.');
@@ -180,7 +185,7 @@ var UserDAO = (function (_super) {
                 if (err) {
                     callback(err, null);
                 }
-                var resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
+                var resultUser = User.tableToObject(result[0]);
                 callback(err, resultUser);
             });
         });

@@ -4,12 +4,12 @@ import error = module('../api/error')
 import net_ldap = module('../net/ldap')
 
 export class User {
-	constructor(public id:number, public loginName: string, public deleteFlag: bool, public systemFlag: bool) {
+	constructor(public id:number, public loginName: string, public mailAddress: string, public deleteFlag: bool, public systemFlag: bool) {
 		this.deleteFlag = !!this.deleteFlag;
 		this.systemFlag = !!this.systemFlag;
 	}
 	static tableToObject(row:any) {
-		return new User(row.id, row.login_name, row.delete_flag, row.system_flag);
+		return new User(row.id, row.login_name, row.mail_address, row.delete_flag, row.system_flag);
 	}
 }
 
@@ -47,7 +47,7 @@ export class UserDAO extends model.DAO {
 					callback(err, resultSelect);
 					return;
 				} else {
-					this.insert(loginName, (err, resultInsert) => {
+					this.insert(loginName, null, (err, resultInsert) => {
 						if (err) {
 							callback(err, null);
 							return;
@@ -61,12 +61,13 @@ export class UserDAO extends model.DAO {
 		});
 	}
 
-	register(loginName: string, password: string, callback: (err:any, user: User) => void) {
+	register(loginName: string, password: string, email: string, callback: (err:any, user: User) => void) {
 		function validate(loginName: string, password: string) {
 			var checks = [];
 			if (loginName.length == 0) checks.push('Login name is required.');
 			if (loginName.length > 45) checks.push('Login name should not exceed 45 characters.'); 
 			if (password.length == 0) checks.push('Password is required.');
+			if (email && email.length > 256) checks.push('Email should not exceed 256 characters.');
 			if (checks.length > 0) {
 				callback(new error.InvalidParamsError(checks, null), null);
 				return false;
@@ -82,7 +83,7 @@ export class UserDAO extends model.DAO {
 				callback(err, null);
 				return;
 			}
-			this.insert(loginName, (err, resultInsert) => {
+			this.insert(loginName, email, (err, resultInsert) => {
 				if (err) {
 					ldap.del(loginName, (err2: any) => {
 						if (err2) {
@@ -109,7 +110,7 @@ export class UserDAO extends model.DAO {
 			if (result.length == 0) {
 				err = new error.NotFoundError('UserId Not Found.');
 			} else {
-				resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
+				resultUser = User.tableToObject(result[0]);
 			}	
 			callback(err, resultUser);
 		});
@@ -125,7 +126,7 @@ export class UserDAO extends model.DAO {
 			}
 			var resultUser : User = null;
 			if (result.length > 0) {
-				resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
+				resultUser = User.tableToObject(result[0]);
 			}
 			callback(err, resultUser);
 		});
@@ -146,13 +147,14 @@ export class UserDAO extends model.DAO {
 		});
 	}
 
-	insert(loginName: string, callback: (err:any, user:User) => void) {
+	insert(loginName: string, mailAddress:string, callback: (err:any, user:User) => void) {
 		// this.con.on('error', (err) => {
 		// 	if (err.code == 'ER_DUP_ENTRY') {
 		// 		throw new error.DuplicatedError('The login name is already exist.');
 		// 	}
 		// });
-		this.con.query('INSERT INTO user(login_name) VALUES(?) ', [loginName], (err, result) => {
+		if (!mailAddress) mailAddress = '';
+		this.con.query('INSERT INTO user(login_name, mail_address) VALUES(?, ?) ', [loginName, mailAddress], (err, result) => {
 			if (err) {
 				if (err.code == 'ER_DUP_ENTRY') {
 					err = new error.DuplicatedError('The login name is already exist.');
@@ -164,7 +166,7 @@ export class UserDAO extends model.DAO {
 				if (err) {
 					callback(err, null);
 				}
-				var resultUser = new User(result[0].id, result[0].login_name, result[0].delete_flag, result[0].system_flag);
+				var resultUser = User.tableToObject(result[0]);
 				callback(err, resultUser);
 
 			});

@@ -9,6 +9,7 @@ var model_user = require('./user');
 var model_node = require('../model/node');
 
 var asn_parser = require('../util/asn-parser');
+var error = require('../api/error');
 
 var async = require('async');
 
@@ -74,6 +75,10 @@ var CommitDAO = (function (_super) {
                 callback(err, null);
                 return;
             }
+            if (result.length == 0) {
+                callback(new error.NotFoundError('Effective Commit does not exist.', { commitId: commitId }), null);
+                return;
+            }
             result = result[0];
             callback(err, new Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
         });
@@ -89,7 +94,7 @@ var CommitDAO = (function (_super) {
             var list = new Array();
             result.forEach(function (row) {
                 var c = new Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
-                c.user = new model_user.User(row.u.id, row.u.login_name, row.u.delete_flag, row.u.system_flag);
+                c.user = model_user.User.tableToObject(row.u);
                 list.push(c);
             });
             callback(err, list);
@@ -111,7 +116,13 @@ var CommitDAO = (function (_super) {
             },
             function (com, commitId, callback) {
                 var parser = new asn_parser.ASNParser();
-                var nodes = parser.parseNodeList(contents);
+                var nodes = null;
+                try  {
+                    nodes = parser.parseNodeList(contents);
+                } catch (e) {
+                    callback(e);
+                    return;
+                }
                 var nodeDAO = new model_node.NodeDAO(_this.con);
                 nodeDAO.insertList(com.dcaseId, commitId, nodes, function (err) {
                     callback(err, com, commitId);
