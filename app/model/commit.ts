@@ -5,6 +5,7 @@ import model_user = module('./user')
 import model_node = module('../model/node')
 import model_issue = module('../model/issue')
 import asn_parser = module('../util/asn-parser')
+import error = module('../api/error')
 //import model_monitor = module('../model/monitor')
 var async = require('async')
 
@@ -64,6 +65,10 @@ export class CommitDAO extends model.DAO {
 				callback(err, null);
 				return;
 			}
+			if (result.length == 0) {
+				callback(new error.NotFoundError('Effective Commit does not exist.', {commitId: commitId}), null);
+				return;
+			}
 			result = result[0];
 			callback(err, new Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
 		});
@@ -79,7 +84,7 @@ export class CommitDAO extends model.DAO {
 			var list = new Array<Commit>();
 			result.forEach((row) => {
 				var c = new Commit(row.c.id, row.c.prev_commit_id, row.c.dcase_id, row.c.user_id, row.c.message, row.c.data, row.c.date_time, row.c.latest_flag);
-				c.user = new model_user.User(row.u.id, row.u.login_name, row.u.delete_flag, row.u.system_flag)
+				c.user = model_user.User.tableToObject(row.u);
 				list.push(c);
 			});
 			callback(err, list);
@@ -97,7 +102,13 @@ export class CommitDAO extends model.DAO {
 			}
 			, (com: Commit, commitId: number, callback) => {
 				var parser = new asn_parser.ASNParser();
-				var nodes = parser.parseNodeList(contents);
+				var nodes = null;
+				try {
+					nodes = parser.parseNodeList(contents);
+				} catch (e) {
+					callback(e);
+					return;
+				}
 				var nodeDAO = new model_node.NodeDAO(this.con);
 				nodeDAO.insertList(com.dcaseId, commitId, nodes, (err:any) => {callback(err, com, commitId);});
 			}

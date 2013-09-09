@@ -37,44 +37,12 @@ describe('model', function() {
 			commitMessage: 'test',
 			contents: '*goal\n' +
 						'dcase1\n' +
-						'Note0::\n' +
-						'	Type: Issue\n' +
-						'	Subject: このゴールを満たす必要がある\n' +
-						'	Visible: true\n' +
-						'	詳細な情報をここに記述する\n' +
-						'Note1::\n' +
-						'	Type: LastUpdated\n' +
-						'	User: Shida\n' +
-						'	Visible: false\n' +
-						'Note2::\n' +
-						'	Type: Tag\n' +
-						'	Tag: tag1\n' +
-						'	Visible: true\n' +
+						'Tag::tag1\n\n' +
 						'*strategy\n' +
-						's1\n' +
+						's1\n\n' +
 						'**goal\n' +
 						'g1\n' +
-						'Note0::\n' +
-						'	Type: Issue\n' +
-						'	Subject: 2つ目のイシュー\n' +
-						'	Visible: true\n' +
-						'	あああ詳細な情報をここに記述する\n' +
-						'Note1::\n' +
-						'	Type: LastUpdated\n' +
-						'	User: Shida\n' +
-						'	Visible: false\n' +
-						'Note2::\n' +
-						'	Type: Tag\n' +
-						'	Tag: tag1\n' +
-						'	Visible: true\n' +
-						'Note3::\n' +
-						'	Type: Tag\n' +
-						'	Tag: tag2\n' +
-						'	Visible: true\n' +
-						'Note4::\n' +
-						'	Type: Tag\n' +
-						'	Tag: newTag\n' +
-						'	Visible: true'
+						'Tag::tag1,tag2,newTag'
 		};
 
 		testdata.begin(['test/default-data.yaml', 'test/model/commit.yaml'], (err:any, c:db.Database) => {
