@@ -3,6 +3,7 @@ import type = module('../api/type')
 import dcase = module('../api/dcase')
 import project = module('../api/project')
 import rec = module('../api/rec')
+import user = module('../api/user')
 
 jsonrpc.add('version', function(params: any, userId: number, callback: type.Callback) {
 	callback.onSuccess('version 1.0');
@@ -11,6 +12,7 @@ jsonrpc.add('version', function(params: any, userId: number, callback: type.Call
 jsonrpc.addModule(dcase);
 jsonrpc.addModule(project);
 jsonrpc.addModule(rec);
+jsonrpc.addModule(user);
 jsonrpc.requireAuth(['createDCase', 'commit', 'editDCase', 'deleteDCase', 'createProject', 'editProject', 'deleteProject']);
 
 export var httpHandler = jsonrpc.httpHandler;

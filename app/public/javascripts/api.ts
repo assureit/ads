@@ -121,7 +121,7 @@ module DCaseAPI {
 	export var deleteProject = function(projectId: number) {
 		return this.call("deleteProject", { projectId: projectId });
 	};
-	
+
 	export var editDCase = function(dcaseId: number, name: string) {
 		return this.call("editDCase", {
 			dcaseId: dcaseId,
@@ -152,5 +152,13 @@ module DCaseAPI {
 	        description: description,
 	        userName: userName
 	    });
+	};
+
+	export var getUserById = function(userId: number) {
+		return this.call("getUserById", {userId: userId});
+	};
+
+	export var getUserByName = function(userName: string) {
+		return this.call("getUserByName", {userName: userName});
 	};
 }

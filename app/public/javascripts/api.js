@@ -157,4 +157,12 @@ var DCaseAPI;
             userName: userName
         });
     };
+
+    DCaseAPI.getUserById = function (userId) {
+        return this.call("getUserById", { userId: userId });
+    };
+
+    DCaseAPI.getUserByName = function (userName) {
+        return this.call("getUserByName", { userName: userName });
+    };
 })(DCaseAPI || (DCaseAPI = {}));
