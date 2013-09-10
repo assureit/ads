@@ -181,7 +181,7 @@ function modifyMonitorStatus(params, userId, callback) {
                         }
 
                         var commitDAO = new model_commit.CommitDAO(con);
-                        commitDAO.commit(userId, latestCommit.id, commitMessage, data, function (err, result) {
+                        commitDAO.commit(userId, latestCommit.id, commitMessage, null, data, function (err, result) {
                             if (err) {
                                 callback.onFailure(err);
                                 return;
