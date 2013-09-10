@@ -1,4 +1,5 @@
 ///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
+///<reference path='../../types/jquery_plugins.d.ts'/>
 ///<reference path='adsComponentView.ts'/>
 ///<reference path='router.ts'/>
 ///<reference path='color.ts'/>
@@ -103,15 +104,25 @@ class ADS {
 				var newMemberForm = (<any>$)("#member_tmpl").tmpl({name: "", role: ""});
 				newMemberForm.find(".DeleteMemberButton").click(function(e){
 					e.preventDefault();
-					$((<any>($(this))).tmplItem().nodes).remove();
+					$($(this).tmplItem().nodes).remove();
+					//if(getMemberList().length <= 1){
+					//	$(".DeleteMemberButton").hide();
+					//}
 				});
 				$("#AddMemberButton").before(newMemberForm);
+				//$(".DeleteMemberButton").show();
 				return newMemberForm;
 			}
 
 			var getMemberList = function(){
 				var members = [];
-				$(".memberForm").each(function(i,v){ members.push([$(v).find(".userName").attr("value"), $(v).find(".role").attr("value")]); });
+				$(".memberForm").each((i, v) => {
+					var name = $(v).find(".userName").attr("value").trim();
+					var role = $(v).find(".role").attr("value").trim();
+					if(name.length > 0){
+						members.push([name, role]);
+					}
+				});
 				return members;
 			}
 
@@ -121,6 +132,11 @@ class ADS {
 					newMemberForm.find(".userName").attr("value", list[i][0]).addClass("disabled").attr("disabled", "");
 					newMemberForm.find(".role").attr("value", list[i][1]);
 				}
+				//if(list.length == 0){
+				//	$(".DeleteMemberButton").hide();
+				//}else{
+				//	$(".DeleteMemberButton").show();
+				//}
 			}
 
 			var setProjectInfo = function(project: any){
@@ -132,7 +148,11 @@ class ADS {
 			}
 
 			var setMemberListVisible = function(isVisible: boolean){
-				$("#MemberList").css("display", (isVisible ? "" : "none"));
+				if(isVisible){
+					$("#MemberList").show();
+				}else{
+					$("#MemberList").hide();
+				}
 			}
 
 			$("#AddMemberButton").click((e)=>{
@@ -180,6 +200,11 @@ class ADS {
 				setMemberList(memberList);
 			}else{
 				$("#inputIsPublic").attr("checked", "checked");
+				var userName = $.cookie("userName");
+				if(userName){
+					setMemberList([[userName, ""]]);
+				}
+				//$(".DeleteMemberButton").hide();
 			}
 			setMemberListVisible($("#inputIsPublic").attr("checked") == null);
 		});

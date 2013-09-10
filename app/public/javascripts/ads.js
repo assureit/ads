@@ -32,16 +32,21 @@ var ADS = (function () {
                 var newMemberForm = ($)("#member_tmpl").tmpl({ name: "", role: "" });
                 newMemberForm.find(".DeleteMemberButton").click(function (e) {
                     e.preventDefault();
-                    $((($(this))).tmplItem().nodes).remove();
+                    $($(this).tmplItem().nodes).remove();
                 });
                 $("#AddMemberButton").before(newMemberForm);
+
                 return newMemberForm;
             };
 
             var getMemberList = function () {
                 var members = [];
                 $(".memberForm").each(function (i, v) {
-                    members.push([$(v).find(".userName").attr("value"), $(v).find(".role").attr("value")]);
+                    var name = $(v).find(".userName").attr("value").trim();
+                    var role = $(v).find(".role").attr("value").trim();
+                    if (name.length > 0) {
+                        members.push([name, role]);
+                    }
                 });
                 return members;
             };
@@ -63,7 +68,11 @@ var ADS = (function () {
             };
 
             var setMemberListVisible = function (isVisible) {
-                $("#MemberList").css("display", (isVisible ? "" : "none"));
+                if (isVisible) {
+                    $("#MemberList").show();
+                } else {
+                    $("#MemberList").hide();
+                }
             };
 
             $("#AddMemberButton").click(function (e) {
@@ -112,6 +121,10 @@ var ADS = (function () {
                 setMemberList(memberList);
             } else {
                 $("#inputIsPublic").attr("checked", "checked");
+                var userName = $.cookie("userName");
+                if (userName) {
+                    setMemberList([[userName, ""]]);
+                }
             }
             setMemberListVisible($("#inputIsPublic").attr("checked") == null);
         });
