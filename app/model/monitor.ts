@@ -151,7 +151,7 @@ export class MonitorDAO extends model.DAO {
 			}
 
 			result = result[0];
-			callback(err, new model_commit.Commit(result.id, result.prev_commit_id, result.dcase_id, result.user_id, result.message, result.data, result.date_time, result.latest_flag));
+			callback(err, model_commit.Commit.tableToObject(result));
 				
 		});
 	}

@@ -49,7 +49,8 @@ function searchDCase(params, userId, callback) {
                     commitId: val.latestCommit.id,
                     userName: val.latestCommit.user.loginName,
                     userId: val.latestCommit.userId,
-                    commitMessage: val.latestCommit.message
+                    commitMessage: val.latestCommit.message,
+                    summary: val.latestCommit.metaData
                 }
             };
         });
@@ -112,6 +113,7 @@ function getDCase(params, userId, callback) {
         callback.onSuccess({
             commitId: dcase.latestCommit.id,
             dcaseName: dcase.name,
+            summary: dcase.latestCommit.metaData,
             contents: dcase.latestCommit.data
         });
     });
@@ -157,6 +159,7 @@ function getNodeTree(params, userId, callback) {
             return;
         }
         callback.onSuccess({
+            summary: commit.metaData,
             contents: commit.data
         });
     });
@@ -235,7 +238,7 @@ function createDCase(params, userId, callback) {
                     return;
                 }
                 var commitDAO = new model_commit.CommitDAO(con);
-                commitDAO.insert({ data: params.contents, dcaseId: dcaseId, userId: userId, message: 'Initial Commit' }, function (err, commitId) {
+                commitDAO.insert({ data: params.contents, metaData: params.summary, dcaseId: dcaseId, userId: userId, message: 'Initial Commit' }, function (err, commitId) {
                     if (err) {
                         callback.onFailure(err);
                         return;
@@ -298,7 +301,7 @@ function commit(params, userId, callback) {
                 return;
             }
 
-            commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, function (err, result) {
+            commitDAO.commit(userId, params.commitId, params.commitMessage, params.summary, params.contents, function (err, result) {
                 return next(err, result);
             });
         },
@@ -474,7 +477,7 @@ function getCommitList(params, userId, callback) {
 
         var commitList = [];
         list.forEach(function (c) {
-            commitList.push({ commitId: c.id, dateTime: c.dateTime, commitMessage: c.message, userId: c.userId, userName: c.user.loginName });
+            commitList.push({ commitId: c.id, dateTime: c.dateTime, summary: c.metaData, commitMessage: c.message, userId: c.userId, userName: c.user.loginName });
         });
         callback.onSuccess({
             commitList: commitList
