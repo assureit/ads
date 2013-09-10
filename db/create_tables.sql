@@ -9,6 +9,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 CREATE  TABLE IF NOT EXISTS `project` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(1024) NOT NULL ,
+  `meta_data` TEXT NULL ,
   `public_flag` TINYINT(1) NOT NULL DEFAULT FALSE ,
   `delete_flag` TINYINT(1) NOT NULL DEFAULT FALSE ,
   `last_modified` DATETIME NULL COMMENT 'プロジェクト内のDCaseが最終的に更新された日時' ,
