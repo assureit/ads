@@ -101,17 +101,31 @@ class ADS {
 			var projectId: number = idMatchResult ? <any>idMatchResult[1]-0 : 0;
 
 			var addNewMember = function(){
-				var newMemberForm = (<any>$)("#member_tmpl").tmpl({name: "", role: ""});
+				var newMemberForm = $("#member_tmpl").tmpl({name: "", role: ""});
 				newMemberForm.find(".DeleteMemberButton").click(function(e){
 					e.preventDefault();
 					$($(this).tmplItem().nodes).remove();
-					//if(getMemberList().length <= 1){
-					//	$(".DeleteMemberButton").hide();
-					//}
+					updateDeleteButtonState();
+				});
+				newMemberForm.find(".userName").blur(function(e){
+					var name = this.value;
+					var user = DCaseAPI.getUserByName(name);
+					if(user && user.loginName == name && countNameInMember(name) == 1){
+						$(this).addClass("disabled").attr("disabled", "");
+						updateDeleteButtonState();
+					}
 				});
 				$("#AddMemberButton").before(newMemberForm);
-				//$(".DeleteMemberButton").show();
 				return newMemberForm;
+			}
+
+			var countNameInMember = function(name: string){
+				var list = getMemberList();
+				var count = 0;
+				for(var i = 0; i < list.length; i++){
+					if(list[i][0] == name) count++;
+				}
+				return count;
 			}
 
 			var getMemberList = function(){
@@ -132,11 +146,7 @@ class ADS {
 					newMemberForm.find(".userName").attr("value", list[i][0]).addClass("disabled").attr("disabled", "");
 					newMemberForm.find(".role").attr("value", list[i][1]);
 				}
-				//if(list.length == 0){
-				//	$(".DeleteMemberButton").hide();
-				//}else{
-				//	$(".DeleteMemberButton").show();
-				//}
+				updateDeleteButtonState();
 			}
 
 			var setProjectInfo = function(project: any){
@@ -155,9 +165,29 @@ class ADS {
 				}
 			}
 
+			var updateDeleteButtonState = function(){
+				var validMemberCount = 0;
+				$(".memberForm").each((i, v) => {
+					if($(v).find(".userName").attr("disabled") != null){
+						validMemberCount++;
+					}else{
+						$(v).find(".DeleteMemberButton").show();
+					}
+				});
+				$(".memberForm").each((i, v) => {
+					if($(v).find(".userName").attr("disabled") != null){
+						if(validMemberCount > 1){
+							$(v).find(".DeleteMemberButton").show();
+						}else{
+							$(v).find(".DeleteMemberButton").hide();
+						}
+					}
+				});
+			}
+
 			$("#AddMemberButton").click((e)=>{
 				e.preventDefault();
-				addNewMember();
+				addNewMember().find(".userName").focus();
 			});
 
 			$("#inputIsPublic").click((e)=>{
@@ -204,7 +234,6 @@ class ADS {
 				if(userName){
 					setMemberList([[userName, ""]]);
 				}
-				//$(".DeleteMemberButton").hide();
 			}
 			setMemberListVisible($("#inputIsPublic").attr("checked") == null);
 		});
