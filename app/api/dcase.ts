@@ -49,7 +49,8 @@ export function searchDCase(params:any, userId: number, callback: type.Callback)
 						commitId: val.latestCommit.id,
 						userName: val.latestCommit.user.loginName,
 						userId: val.latestCommit.userId,
-						commitMessage: val.latestCommit.message
+						commitMessage: val.latestCommit.message,
+						summary: val.latestCommit.metaData
 					}
 				};
 			});
@@ -103,6 +104,7 @@ export function getDCase(params:any, userId: number, callback: type.Callback) {
 		callback.onSuccess({
 			commitId: dcase.latestCommit.id,
 			dcaseName: dcase.name,
+			summary: dcase.latestCommit.metaData,
 			contents: dcase.latestCommit.data
 		});
 	});
@@ -160,6 +162,7 @@ export function getNodeTree(params:any, userId: number, callback: type.Callback)
 			return
 		}
 		callback.onSuccess({
+			summary: commit.metaData,
 			contents: commit.data
 		});
 	});
@@ -249,7 +252,7 @@ export function createDCase(params:any, userId: number, callback: type.Callback)
 					return;
 				}
 				var commitDAO = new model_commit.CommitDAO(con);
-				commitDAO.insert({data: params.contents, dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (err:any, commitId:number) => {
+				commitDAO.insert({data: params.contents, metaData: params.summary, dcaseId: dcaseId, userId: userId, message: 'Initial Commit'}, (err:any, commitId:number) => {
 					if (err) {
 						callback.onFailure(err);
 						return;
@@ -300,7 +303,7 @@ export function commit(params: any, userId: number, callback: type.Callback) {
 				return;
 			}
 			// commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err:any, result:any) => next(err, resultCheck.dcaseId, result));
-			commitDAO.commit(userId, params.commitId, params.commitMessage, params.contents, (err:any, result:any) => next(err, result));
+			commitDAO.commit(userId, params.commitId, params.commitMessage, params.summary, params.contents, (err:any, result:any) => next(err, result));
 		},
 		// (dcaseId:number, commitResult, next) => {
 		// 	projectDAO.updateMember(dcaseId, (err:any) => next(err, commitResult));
@@ -459,7 +462,7 @@ export function getCommitList(params:any, userId: number, callback: type.Callbac
 
 		var commitList = [];
 		list.forEach((c: model_commit.Commit) => {
-			commitList.push({commitId: c.id, dateTime: c.dateTime, commitMessage: c.message, userId: c.userId, userName: c.user.loginName});
+			commitList.push({commitId: c.id, dateTime: c.dateTime, summary: c.metaData, commitMessage: c.message, userId: c.userId, userName: c.user.loginName});
 		});
 		callback.onSuccess({
 			commitList: commitList

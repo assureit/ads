@@ -100,7 +100,6 @@ export class TestDB {
 	}
 
 	clearTable(table:string, callback: (err:any)=>void) {
-		// console.log('DELETING: ' + table);
 		this.con.query('DELETE FROM ' + table, (err:any, result:any) => {
 			callback(err)
 		});
