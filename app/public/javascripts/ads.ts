@@ -131,9 +131,17 @@ class ADS {
 				}
 			}
 
+			var setMemberListVisible = function(isVisible: boolean){
+				$("#MemberList").css("display", (isVisible ? "" : "none"));
+			}
+
 			$("#AddMemberButton").click((e)=>{
 				e.preventDefault();
 				addNewMember();
+			});
+
+			$("#inputIsPublic").click((e)=>{
+				setMemberListVisible($("#inputIsPublic").attr("checked") == null);
 			});
 
 			$("#project-create").click(function(e) {
@@ -173,6 +181,7 @@ class ADS {
 			}else{
 				$("#inputIsPublic").attr("checked", "checked");
 			}
+			setMemberListVisible($("#inputIsPublic").attr("checked") == null);
 		});
 
 		var defaultRouter = (pageIndex: any, tag?: string) => {

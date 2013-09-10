@@ -62,9 +62,17 @@ var ADS = (function () {
                 }
             };
 
+            var setMemberListVisible = function (isVisible) {
+                $("#MemberList").css("display", (isVisible ? "" : "none"));
+            };
+
             $("#AddMemberButton").click(function (e) {
                 e.preventDefault();
                 addNewMember();
+            });
+
+            $("#inputIsPublic").click(function (e) {
+                setMemberListVisible($("#inputIsPublic").attr("checked") == null);
             });
 
             $("#project-create").click(function (e) {
@@ -105,6 +113,7 @@ var ADS = (function () {
             } else {
                 $("#inputIsPublic").attr("checked", "checked");
             }
+            setMemberListVisible($("#inputIsPublic").attr("checked") == null);
         });
 
         var defaultRouter = function (pageIndex, tag) {
