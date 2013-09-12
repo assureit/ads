@@ -3,8 +3,8 @@ public/javascripts/adsComponentView.ts
 public/javascripts/api.ts
 public/javascripts/importfile.ts
 public/javascripts/config.ts
-public/javascripts/index.ts
 public/javascripts/router.ts
 public/javascripts/sidemenu.ts
 public/javascripts/timeutil.ts
 public/javascripts/history.ts
+public/javascripts/route/index.ts
