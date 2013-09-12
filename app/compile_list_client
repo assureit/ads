@@ -1,7 +1,6 @@
 public/javascripts/ads.ts
 public/javascripts/adsComponentView.ts
 public/javascripts/api.ts
-public/javascripts/color.ts
 public/javascripts/importfile.ts
 public/javascripts/config.ts
 public/javascripts/index.ts
