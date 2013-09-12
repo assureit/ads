@@ -1,6 +1,5 @@
 $(function () {
     var ads = new ADS(document.getElementById("ase"));
-    ads.initDefaultEventListeners();
 
     var sidemenu = new SideMenu();
 
