@@ -1,5 +1,5 @@
-///<reference path='../../DefinitelyTyped/jquery/jquery.d.ts'/>
-///<reference path='ads.ts'/>
+///<reference path='../../../DefinitelyTyped/jquery/jquery.d.ts'/>
+///<reference path='../ads.ts'/>
 
 $(()=>{
 	var ads: ADS = new ADS(document.getElementById("ase"));
