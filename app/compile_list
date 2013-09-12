@@ -62,4 +62,9 @@ public/javascripts/sidemenu.ts
 public/javascripts/timeutil.ts
 public/javascripts/history.ts
 public/javascripts/route/index.ts
+public/javascripts/route/case.ts
+public/javascripts/route/editproject.ts
+public/javascripts/route/history.ts
+public/javascripts/route/newcase.ts
+public/javascripts/route/newproject.ts
 job/monitor.ts
