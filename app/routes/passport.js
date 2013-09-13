@@ -16,7 +16,6 @@ var CONFIG = require('config');
             consumerSecret: CONFIG.passport.TWITTER_CONSUMER_SECRET,
             callbackURL: "/auth/twitter/callback"
         }, function (token, tokenSecret, profile, done) {
-            console.log(profile);
             passport.session.accessToken = token;
             passport.session.profile = profile;
             process.nextTick(function () {

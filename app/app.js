@@ -64,13 +64,10 @@ app.get('/javascripts/config.js', js.config);
 
 app.get('/auth/twitter', passport.passport.authenticate('twitter'), function (req, res) {
 });
-app.get('/auth/twitter/callback', passport.passport.authenticate('twitter', { failureRedirect: 'login/twitter' }), function (req, res) {
-    res.redirect('/');
-});
+app.get('/auth/twitter/callback', passport.passport.authenticate('twitter', { failureRedirect: 'login/twitter' }), client.login_twitter);
 
 app.post('/login', client.login);
 app.post('/logout', client.logout);
-app.post('/register', client.register);
 
 app.post('/file', file.upload);
 app.get('/file/:id/:fileName', file.download);

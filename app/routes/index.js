@@ -139,11 +139,33 @@ exports.exporter = function (req, res) {
     });
 };
 
+exports.login_twitter = function (req, res) {
+    var con = new db.Database();
+    var userDAO = new model_user.UserDAO(con);
+    userDAO.login(req.user.displayName, function (err, result) {
+        if (err) {
+            console.error(err);
+            res.redirect(CONFIG.ads.basePath + '/');
+
+            return;
+        }
+        var auth = new util_auth.Auth(req, res);
+        auth.set(result.id, result.loginName);
+        res.redirect(CONFIG.ads.basePath + '/');
+    });
+};
+
 exports.login = function (req, res) {
     var con = new db.Database();
     var userDAO = new model_user.UserDAO(con);
 
-    userDAO.login(req.body.username, req.body.password, function (err, result) {
+    userDAO.register(req.body.username, "", function (err, result) {
+        if (err) {
+            return;
+        }
+        console.log("Registering process successfully ended.");
+    });
+    userDAO.login(req.body.username, function (err, result) {
         if (err) {
             console.error(err);
             res.redirect(CONFIG.ads.basePath + '/');
@@ -159,21 +181,7 @@ exports.login = function (req, res) {
 exports.logout = function (req, res) {
     var auth = new util_auth.Auth(req, res);
     auth.clear();
+    req.logout();
     res.redirect(CONFIG.ads.basePath + '/');
-};
-
-exports.register = function (req, res) {
-    var con = new db.Database();
-    var userDAO = new model_user.UserDAO(con);
-
-    userDAO.register(req.body.username, req.body.password, req.body.mailAddress, function (err, result) {
-        if (err) {
-            res.redirect(CONFIG.ads.basePath + '/');
-            return;
-        }
-        var auth = new util_auth.Auth(req, res);
-        auth.set(result.id, result.loginName);
-        res.redirect(CONFIG.ads.basePath + '/');
-    });
 };
 

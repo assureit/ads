@@ -86,14 +86,12 @@ app.get('/auth/twitter',
 );
 app.get('/auth/twitter/callback',
   passport.passport.authenticate('twitter', {failureRedirect: 'login/twitter' }),
-  function(req, res) {
-    res.redirect('/');
-  }
+  client.login_twitter
 );
 
 app.post('/login', client.login);
 app.post('/logout', client.logout);
-app.post('/register', client.register);
+//app.post('/register', client.register);
 
 app.post('/file', file.upload);
 app.get('/file/:id/:fileName', file.download);
