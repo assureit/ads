@@ -32,6 +32,9 @@ app.configure(function() {
 	app.use(express.cookieParser(CONFIG.cookie.secret));
 //	app.use(express.cookieSession());
 	app.use(express.methodOverride());
+	app.use(express.session());
+	app.use(passport.passport.initialize());
+	app.use(passport.passport.session());
 	// app.use(function(req, res, next) {
 	//     console.log([
 	//       req.headers['x-forwarded-for'] || req.client.remoteAddress,
@@ -77,9 +80,15 @@ app.post('/export.*', client.exporter);
 app.get('/case/:id/export/:type/node/:n', gts.exporter);
 app.get('/javascripts/config.js', js.config);
 
-app.get('/login/twitter',
-	passport.passport.authenticate('twitter'),
-	function(req, res) {}
+app.get('/auth/twitter',
+  passport.passport.authenticate('twitter'),
+  function(req, res) {}
+);
+app.get('/auth/twitter/callback',
+  passport.passport.authenticate('twitter', {failureRedirect: 'login/twitter' }),
+  function(req, res) {
+    res.redirect('/');
+  }
 );
 
 app.post('/login', client.login);
