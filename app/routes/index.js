@@ -9,14 +9,14 @@ var CONFIG = require('config');
 
 exports.index = function (req, res) {
     var page = 'index';
-    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: null };
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: null };
     var auth = new util_auth.Auth(req, res);
     if (auth.isLogin()) {
-        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName() };
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName() };
     }
 
-    if (req.cookies.lang == 'en') {
-        params.lang = lang.lang.en;
+    if (req.cookies.lang == 'ja') {
+        params.lang = lang.lang.ja;
     }
 
     res.render(page, params);
@@ -24,28 +24,28 @@ exports.index = function (req, res) {
 
 exports.newprojectView = function (req, res) {
     var page = 'newproject';
-    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: null, projectId: req.params.id };
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: null, projectId: req.params.id };
     var auth = new util_auth.Auth(req, res);
     if (auth.isLogin()) {
-        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName(), projectId: req.params.id };
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName(), projectId: req.params.id };
     }
 
-    if (req.cookies.lang == 'en') {
-        params.lang = lang.lang.en;
+    if (req.cookies.lang == 'ja') {
+        params.lang = lang.lang.ja;
     }
     res.render(page, params);
 };
 
 exports.caseView = function (req, res) {
     var page = 'case';
-    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, caseId: req.params.id };
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, caseId: req.params.id };
     var auth = new util_auth.Auth(req, res);
     if (auth.isLogin()) {
-        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName(), caseId: req.params.id };
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName(), caseId: req.params.id };
     }
 
-    if (req.cookies.lang == 'en') {
-        params.lang = lang.lang.en;
+    if (req.cookies.lang == 'ja') {
+        params.lang = lang.lang.ja;
     }
 
     res.render(page, params);
@@ -54,13 +54,13 @@ exports.caseView = function (req, res) {
 exports.historyListView = function (req, res) {
     var page = 'history';
     var auth = new util_auth.Auth(req, res);
-    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, caseId: req.params.id };
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, caseId: req.params.id };
     if (auth.isLogin()) {
-        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName(), caseId: req.params.id };
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName(), caseId: req.params.id };
     }
 
-    if (req.cookies.lang == 'en') {
-        params.lang = lang.lang.en;
+    if (req.cookies.lang == 'ja') {
+        params.lang = lang.lang.ja;
     }
 
     res.render(page, params);
@@ -68,14 +68,14 @@ exports.historyListView = function (req, res) {
 
 exports.historyView = function (req, res) {
     var page = 'case';
-    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, caseId: req.params.id, commitHistory: req.params.history };
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, caseId: req.params.id, commitHistory: req.params.history };
     var auth = new util_auth.Auth(req, res);
     if (auth.isLogin()) {
-        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.ja, userName: auth.getLoginName(), caseId: req.params.id, commitHistory: req.params.history };
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName(), caseId: req.params.id, commitHistory: req.params.history };
     }
 
-    if (req.cookies.lang == 'en') {
-        params.lang = lang.lang.en;
+    if (req.cookies.lang == 'ja') {
+        params.lang = lang.lang.ja;
     }
 
     res.render(page, params);
