@@ -74,9 +74,48 @@ module Xml2DCaseTree {
 			return thisNode;
 		}
 
+		parseXmlWeaver(xmlText: string): DCaseTree.TopGoalNode {
+			var self : Converter = this;
+			$($.parseXML(xmlText).getElementsByTagName("node")).each(function(index : any, elem : Element) : JQuery {
+				var NodeType : string = $(this).attr("type");
+
+				var IdText : string = $(this).attr("id");
+				var Description : string = $(this.getElementsByTagName("description")).text();
+				var NodeName : string = $(this).attr("name");
+
+				self.addNodeIdToMap(IdText);
+
+				var node : DCaseTree.DCaseNode = new DCaseTree[NodeType + "Node"](Description, null, self.nodeIdMap[IdText]);
+				node.NodeName = NodeName;
+				self.nodes[IdText] = node;
+
+				return null;
+			});
+
+			$($.parseXML(xmlText).getElementsByTagName("link")).each(function(index : any, elem : Element) : JQuery {
+				var IdText : any = $(this).attr("id");
+				var source : string = $(this).attr("source");
+				var target : string = $(this).attr("target");
+				var link : DCaseLink = new DCaseLink(source, target);
+
+				self.links[IdText] = link;
+
+				return null;
+			});
+
+			var rootNode : DCaseTree.TopGoalNode = <DCaseTree.TopGoalNode>this.makeTree(this.rootNodeIdText);
+			rootNode.NodeCount = this.NodeCount;
+			rootNode.TopGoalId = 0;
+
+			return rootNode;
+		}
+
 		parseXml(xmlText : string) : DCaseTree.TopGoalNode {
 			var self : Converter = this;
 
+			if($(xmlText).find("rootBasicNode").length == 0) {
+				return this.parseXmlWeaver(xmlText);
+			}
 			$(xmlText).find("rootBasicNode").each(function(index : any, elem : Element) : JQuery {
 				var xsiType : string = $(this).attr("xsi\:type");
 

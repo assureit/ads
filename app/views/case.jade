@@ -72,6 +72,7 @@ html
                pluginManager.SetPlugIn("portraitlayout", new LayoutPortraitPlugIn(pluginManager));
                pluginManager.SetPlugIn("export", new ExportPlugIn(pluginManager));
                pluginManager.SetPlugIn("timeline", new TimeLinePlugIn(pluginManager));
+               pluginManager.SetPlugIn("pattern", new SimplePatternPlugIn(pluginManager));
                pluginManager.SetUseLayoutEngine("portraitlayout");
 
                var contents;
@@ -97,6 +98,9 @@ html
 
                var Screen = new AssureIt.ScreenManager(shapelayer, contentlayer, controllayer, backgroundlayer);
                var Viewer = new AssureIt.CaseViewer(Case0, pluginManager, serverApi, Screen);
+
+               pluginManager.RegisterKeyEvents(Case0, serverApi);
+
                if (!isNaN(history)) {
                    Case0.SetEditable(false);
                } else {
