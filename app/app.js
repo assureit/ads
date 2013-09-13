@@ -6,7 +6,7 @@ var client = require('./routes/index');
 var gts = require('./routes/gtsexport');
 var js = require('./routes/javascript');
 var monitor = require('./routes/monitor');
-
+var passport = require('./routes/passport');
 var path = require('path');
 var file = require('./routes/file');
 
@@ -58,6 +58,9 @@ app.get('/case/:id/history/:history', client.historyView);
 app.post('/export.*', client.exporter);
 app.get('/case/:id/export/:type/node/:n', gts.exporter);
 app.get('/javascripts/config.js', js.config);
+
+app.get('/login/twitter', passport.passport.authenticate('twitter'), function (req, res) {
+});
 
 app.post('/login', client.login);
 app.post('/logout', client.logout);

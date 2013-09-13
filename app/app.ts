@@ -77,6 +77,11 @@ app.post('/export.*', client.exporter);
 app.get('/case/:id/export/:type/node/:n', gts.exporter);
 app.get('/javascripts/config.js', js.config);
 
+app.get('/login/twitter',
+	passport.passport.authenticate('twitter'),
+	function(req, res) {}
+);
+
 app.post('/login', client.login);
 app.post('/logout', client.logout);
 app.post('/register', client.register);
