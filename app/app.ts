@@ -9,13 +9,11 @@ import client = module('./routes/index')
 import gts = module('./routes/gtsexport')
 import js = module('./routes/javascript')
 import monitor = module('./routes/monitor')
+import passport = module('./routes/passport');
 import path = module('path')
 import file = module('./routes/file')
 import constant = module('./constant')
 import utilFs = module('./util/fs')
-import passport = module('passport')
-import passport-facebook = module('passport-facebook')
-import passport-twitter = module('passport-twitter')
 var CONFIG = require('config');
 
 var app = exports.app = <Express> express();
