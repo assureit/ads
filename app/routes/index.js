@@ -155,6 +155,24 @@ exports.login_twitter = function (req, res) {
     });
 };
 
+exports.login_facebook = function (req, res) {
+    console.log("login_facebook");
+    console.log(req.user);
+    var con = new db.Database();
+    var userDAO = new model_user.UserDAO(con);
+    userDAO.login(req.user.displayName, function (err, result) {
+        if (err) {
+            console.error(err);
+            res.redirect(CONFIG.ads.basePath + '/');
+
+            return;
+        }
+        var auth = new util_auth.Auth(req, res);
+        auth.set(result.id, result.loginName);
+        res.redirect(CONFIG.ads.basePath + '/');
+    });
+};
+
 exports.login = function (req, res) {
     var con = new db.Database();
     var userDAO = new model_user.UserDAO(con);
