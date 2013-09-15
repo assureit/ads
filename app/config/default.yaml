@@ -61,6 +61,7 @@ ldap:
     ip: 'localhost'
     port: 3040
 passport:
+  resolveURL: ''
   FACEBOOK_APP_ID: ''
   FACEBOOK_APP_SECRET: ''
   TWITTER_CONSUMER_KEY: ''

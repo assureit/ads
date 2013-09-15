@@ -17,7 +17,7 @@ var CONFIG = require('config');
     passport.use(new TwitterStrategy({
         consumerKey: CONFIG.passport.TWITTER_CONSUMER_KEY,
         consumerSecret: CONFIG.passport.TWITTER_CONSUMER_SECRET,
-        callbackURL: "/auth/twitter/callback"
+        callbackURL: CONFIG.passport.resolveURL + "/auth/twitter/callback"
     }, function (token, tokenSecret, profile, done) {
         passport.session.accessToken = token;
         passport.session.profile = profile;
@@ -34,7 +34,7 @@ var CONFIG = require('config');
     passport.use(new FacebookStrategy({
         clientID: CONFIG.passport.FACEBOOK_APP_ID,
         clientSecret: CONFIG.passport.FACEBOOK_APP_SECRET,
-        callbackURL: "/auth/facebook/callback"
+        callbackURL: CONFIG.passport.resolveURL + "/auth/facebook/callback"
     }, function (accessToken, refreshToken, profile, done) {
         process.nextTick(function () {
             done(null, profile);
