@@ -112,10 +112,6 @@ var ProjectDAO = (function (_super) {
                 });
             }
         ], function (err, result) {
-            if (err) {
-                console.log('insert');
-                console.log(JSON.stringify(err));
-            }
             callback(err, result.insertId);
         });
     };

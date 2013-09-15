@@ -166,25 +166,21 @@ function createProject(params, userId, callback) {
             });
         },
         function (user, next) {
-            console.log('1');
             projectDAO.insert(params.name, params.summary, params.isPublic, function (err, projectId) {
                 return next(err, user, projectId);
             });
         },
         function (user, projectId, next) {
-            console.log('2');
             projectDAO.addMember(projectId, userId, function (err) {
                 return next(err, user, projectId);
             });
         },
         function (user, projectId, next) {
-            console.log('3');
             con.commit(function (err, result) {
                 return next(err, user, projectId);
             });
         }
     ], function (err, user, projectId) {
-        console.log('4');
         con.close();
         if (err) {
             callback.onFailure(err);
