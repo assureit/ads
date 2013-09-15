@@ -102,7 +102,7 @@ html
                if (!isNaN(history)) {
                    Case0.SetEditable(false);
                } else {
-                   Case0.SetEditable();
+                   Case0.SetEditable("#{userName}".length > 0);
                }
                Viewer.Draw();
                Viewer.Screen.SetOffset(($('html').width() / 2) - ((AssureIt.CaseViewer.ElementWidth) + Viewer.ViewMap[Viewer.ElementTop.Label].AbsX),80); //Center TopGoal in the view

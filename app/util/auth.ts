@@ -1,29 +1,25 @@
 export class Auth {
 	constructor(public req: any, public res: any) {}
 	isLogin(): bool {
-		return !!this.req.signedCookies.sessionUserId;
+		return this.req.session.userId != null;
 	}
 
-	set(userId:number, loginName:string): void {
-		this.res.cookie('userId',userId);
-		this.res.cookie('userName',loginName);
-		this.res.cookie('sessionUserId',userId, {signed: true});
-		this.res.cookie('sessionUserName',loginName, {signed: true});
+	set(userId:number, userName:string): void {
+		this.req.session.userId = userId;
+		this.req.session.userName = userName;
 	}
 
 	getLoginName(): string {
-		return this.req.signedCookies.sessionUserName;
+		return this.req.session.userName;
 	}
 
 	getUserId(): number {
-		if (this.req.signedCookies.sessionUserId) return parseInt(this.req.signedCookies.sessionUserId, 10);
+		if (this.req.session.userId) return parseInt(this.req.session.sessionId, 10);
 		return undefined;
 	}
 
 	clear(): void {
-		this.res.clearCookie('userId');
-		this.res.clearCookie('userName');
-		this.res.clearCookie('sessionUserId');
-		this.res.clearCookie('sessionUserName');
+		delete this.req.session.userId;
+		delete this.req.session.userName;
 	}
 }
