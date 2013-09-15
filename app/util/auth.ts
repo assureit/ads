@@ -18,7 +18,7 @@ export class Auth {
 	}
 
 	getUserId(): number {
-		if (this.req.session.userId) return parseInt(this.req.session.sessionId, 10);
+		if (this.req.session.userId) return parseInt(this.req.session.userId, 10);
 		return undefined;
 	}
 

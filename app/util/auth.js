@@ -22,7 +22,7 @@ var Auth = (function () {
 
     Auth.prototype.getUserId = function () {
         if (this.req.session.userId)
-            return parseInt(this.req.session.sessionId, 10);
+            return parseInt(this.req.session.userId, 10);
         return undefined;
     };
 
