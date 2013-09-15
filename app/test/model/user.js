@@ -78,10 +78,9 @@ describe('model', function () {
         describe('register', function () {
             it('should return User object property', function (done) {
                 var loginName = 'unittest01';
-                var pwd = 'password';
                 var mailAddress = 'mail@example.com';
 
-                userDAO.register(loginName, pwd, mailAddress, function (err, result) {
+                userDAO.register(loginName, mailAddress, function (err, result) {
                     expect(err).to.be(null);
                     expect(result).not.to.be(null);
                     expect(result.loginName).to.eql(loginName);
@@ -91,10 +90,9 @@ describe('model', function () {
             });
             it('should insert data to user table', function (done) {
                 var loginName = 'unittest01';
-                var pwd = 'password';
                 var mailAddress = 'mail@example.com';
 
-                userDAO.register(loginName, pwd, mailAddress, function (err, result) {
+                userDAO.register(loginName, mailAddress, function (err, result) {
                     con.query('SELECT id, login_name, mail_address, delete_flag, system_flag FROM user WHERE login_name = ? ', [loginName], function (err, expectedResult) {
                         expect(err).to.be(null);
 
@@ -110,12 +108,11 @@ describe('model', function () {
             });
             it('The login name is already registered into LDAP. ', function (done) {
                 var loginName = 'unittest02';
-                var pwd = 'password';
                 var mailAddress = 'mail@example.com';
 
-                userDAO.register(loginName, pwd, mailAddress, function (err, result) {
+                userDAO.register(loginName, mailAddress, function (err, result) {
                     expect(err).to.be(null);
-                    userDAO.register(loginName, pwd, mailAddress, function (err, result) {
+                    userDAO.register(loginName, mailAddress, function (err, result) {
                         expect(err).not.to.be(null);
                         expect(err instanceof error.LoginError).to.be(true);
                         expect(err.message).to.be('Login Name is already exist.');
@@ -125,17 +122,16 @@ describe('model', function () {
             });
             it('can not register if login name is duplicated', function (done) {
                 var loginName = 'unittest02';
-                var pwd = 'password';
                 var mailAddress = 'mail@example.com';
 
-                userDAO.register(loginName, pwd, mailAddress, function (err, result) {
+                userDAO.register(loginName, mailAddress, function (err, result) {
                     expect(err).to.be(null);
                     var client = ldap.createClient({ url: CONFIG.ldap.url });
                     client.bind(CONFIG.ldap.root, CONFIG.ldap.password, function (err) {
                         var dn = CONFIG.ldap.dn.replace('$1', 'unittest02');
                         client.del(dn, function (err) {
                             client.unbind(function (err) {
-                                userDAO.register(loginName, pwd, mailAddress, function (err, result) {
+                                userDAO.register(loginName, mailAddress, function (err, result) {
                                     expect(err).not.to.be(null);
                                     expect(err instanceof error.DuplicatedError).to.be(true);
                                     done();
@@ -147,10 +143,9 @@ describe('model', function () {
             });
             it('Login name is empty', function (done) {
                 var loginName = '';
-                var pwd = 'password';
                 var mailAddress = 'mail@example.com';
 
-                userDAO.register(loginName, pwd, mailAddress, function (err, result) {
+                userDAO.register(loginName, mailAddress, function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err instanceof error.InvalidParamsError).to.be(true);
                     expect(err.rpcHttpStatus).to.be(200);
@@ -161,10 +156,9 @@ describe('model', function () {
             });
             it('Login name is too long', function (done) {
                 var loginName = util_test.str.random(46);
-                var pwd = 'password';
                 var mailAddress = 'mail@example.com';
 
-                userDAO.register(loginName, pwd, mailAddress, function (err, result) {
+                userDAO.register(loginName, mailAddress, function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err instanceof error.InvalidParamsError).to.be(true);
                     expect(err.rpcHttpStatus).to.be(200);
@@ -175,10 +169,9 @@ describe('model', function () {
             });
             it('Password is empty', function (done) {
                 var loginName = 'system';
-                var pwd = '';
                 var mailAddress = 'mail@example.com';
 
-                userDAO.register(loginName, pwd, mailAddress, function (err, result) {
+                userDAO.register(loginName, mailAddress, function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err instanceof error.InvalidParamsError).to.be(true);
                     expect(err.rpcHttpStatus).to.be(200);
@@ -189,10 +182,9 @@ describe('model', function () {
             });
             it('root account authority went wrong', function (done) {
                 var loginName = 'unittest02';
-                var pwd = 'password';
                 var mailAddress = 'mail@example.com';
                 CONFIG.ldap.root = '';
-                userDAO.register(loginName, pwd, mailAddress, function (err, result) {
+                userDAO.register(loginName, mailAddress, function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err instanceof error.ExternalParameterError).to.be(true);
                     expect(err.rpcHttpStatus).to.be(200);
@@ -205,9 +197,8 @@ describe('model', function () {
         describe('login', function () {
             it('should return User object property', function (done) {
                 var loginName = 'system';
-                var pwd = 'password';
 
-                userDAO.login(loginName, pwd, function (err, result) {
+                userDAO.login(loginName, function (err, result) {
                     expect(result).not.to.be(undefined);
                     expect(result.loginName).to.eql(loginName);
                     done();
@@ -215,9 +206,8 @@ describe('model', function () {
             });
             it('OpenLDAP auth error', function (done) {
                 var loginName = 'NoSetData';
-                var pwd = 'password';
 
-                userDAO.login(loginName, pwd, function (err, result) {
+                userDAO.login(loginName, function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err instanceof error.LoginError).to.be(true);
                     done();
@@ -225,9 +215,8 @@ describe('model', function () {
             });
             it('Login name is empty', function (done) {
                 var loginName = '';
-                var pwd = 'password';
 
-                userDAO.login(loginName, pwd, function (err, result) {
+                userDAO.login(loginName, function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err instanceof error.InvalidParamsError).to.be(true);
                     expect(err.rpcHttpStatus).to.be(200);
@@ -238,9 +227,8 @@ describe('model', function () {
             });
             it('Login name is too long', function (done) {
                 var loginName = util_test.str.random(46);
-                var pwd = 'password';
 
-                userDAO.login(loginName, pwd, function (err, result) {
+                userDAO.login(loginName, function (err, result) {
                     expect(err).not.to.be(null);
                     expect(err instanceof error.InvalidParamsError).to.be(true);
                     expect(err.rpcHttpStatus).to.be(200);
