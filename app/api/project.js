@@ -54,7 +54,8 @@ function getProjectList(params, userId, callback) {
         var resultProjectlist = _.map(result, function (val) {
             return {
                 projectId: val.id,
-                projectName: val.name
+                projectName: val.name,
+                projectSummary: val.metaData
             };
         });
         callback.onSuccess({
@@ -83,7 +84,8 @@ function getPublicProjectList(params, userId, callback) {
         var resultProjectlist = _.map(result, function (val) {
             return {
                 projectId: val.id,
-                projectName: val.name
+                projectName: val.name,
+                projectSummary: val.metaData
             };
         });
         callback.onSuccess({
@@ -164,21 +166,25 @@ function createProject(params, userId, callback) {
             });
         },
         function (user, next) {
-            projectDAO.insert(params.name, params.isPublic, function (err, projectId) {
+            console.log('1');
+            projectDAO.insert(params.name, params.summary, params.isPublic, function (err, projectId) {
                 return next(err, user, projectId);
             });
         },
         function (user, projectId, next) {
+            console.log('2');
             projectDAO.addMember(projectId, userId, function (err) {
                 return next(err, user, projectId);
             });
         },
         function (user, projectId, next) {
+            console.log('3');
             con.commit(function (err, result) {
                 return next(err, user, projectId);
             });
         }
     ], function (err, user, projectId) {
+        console.log('4');
         con.close();
         if (err) {
             callback.onFailure(err);
@@ -206,7 +212,7 @@ exports.updateProjectUser = updateProjectUser;
 function editProject(params, userId, callback) {
     var con = new db.Database();
     var projectDAO = new model_project.ProjectDAO(con);
-    projectDAO.edit(params.projectId, params.name, params.isPublic, function (err) {
+    projectDAO.edit(params.projectId, params.name, params.summary, params.isPublic, function (err) {
         con.close();
         if (err) {
             callback.onFailure(err);
