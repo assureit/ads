@@ -54,7 +54,8 @@ export function getProjectList(params:any, userId: number, callback: type.Callba
 			var resultProjectlist = _.map(result, (val: model_project.Project) => {
 				return {
 					projectId: val.id, 
-					projectName: val.name
+					projectName: val.name,
+					projectSummary: val.metaData
 				};
 			});
 			callback.onSuccess({
@@ -83,7 +84,8 @@ export function getPublicProjectList(params:any, userId: number, callback: type.
 			var resultProjectlist = _.map(result, (val: model_project.Project) => {
 				return {
 					projectId: val.id, 
-					projectName: val.name
+					projectName: val.name,
+					projectSummary: val.metaData
 				};
 			});
 			callback.onSuccess({
@@ -166,7 +168,7 @@ export function createProject(params:any, userId: number, callback: type.Callbac
 		},
 		(user:model_user.User, next) => {
 			// dcase = JSON.parse(dcaseStr.replace('%USER%', user.loginName));
-			projectDAO.insert(params.name, params.isPublic, (err:any, projectId: number) => next(err, user, projectId));
+			projectDAO.insert(params.name, params.summary, params.isPublic, (err:any, projectId: number) => next(err, user, projectId));
 		},
 		(user:model_user.User, projectId:number, next) => {
 			projectDAO.addMember(projectId, userId, (err:any) => next(err, user, projectId));
@@ -213,7 +215,7 @@ export function editProject(params:any, userId: number, callback: type.Callback)
 	//TODO validation
 	var con = new db.Database();
 	var projectDAO = new model_project.ProjectDAO(con);
-	projectDAO.edit(params.projectId, params.name, params.isPublic, (err:any) => {
+	projectDAO.edit(params.projectId, params.name, params.summary, params.isPublic, (err:any) => {
 		con.close();
 		if (err) {
 			callback.onFailure(err);

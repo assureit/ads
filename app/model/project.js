@@ -13,13 +13,14 @@ var async = require('async');
 var _ = require('underscore');
 
 var Project = (function () {
-    function Project(id, name, isPublic) {
+    function Project(id, name, metaData, isPublic) {
         this.id = id;
         this.name = name;
+        this.metaData = metaData;
         this.isPublic = isPublic;
     }
     Project.tableToObject = function (table) {
-        return new Project(table.id, table.name, table.public_flag);
+        return new Project(table.id, table.name, table.meta_data, table.public_flag);
     };
     return Project;
 })();
@@ -100,15 +101,21 @@ var ProjectDAO = (function (_super) {
         });
     };
 
-    ProjectDAO.prototype.insert = function (name, public_flag, callback) {
+    ProjectDAO.prototype.insert = function (name, metaData, public_flag, callback) {
         var _this = this;
+        if (metaData === null || metaData === undefined)
+            metaData = '';
         async.waterfall([
             function (next) {
-                _this.con.query('INSERT INTO project(name, public_flag) VALUES(?, ?)', [name, public_flag], function (err, result) {
+                _this.con.query('INSERT INTO project(name, meta_data, public_flag) VALUES(?, ?, ?)', [name, metaData, public_flag], function (err, result) {
                     next(err, result);
                 });
             }
         ], function (err, result) {
+            if (err) {
+                console.log('insert');
+                console.log(JSON.stringify(err));
+            }
             callback(err, result.insertId);
         });
     };
@@ -160,6 +167,10 @@ var ProjectDAO = (function (_super) {
 
     ProjectDAO.prototype.updateProjectUser = function (projectId, users, callback) {
         var _this = this;
+        if (users == null || users.length == 0) {
+            callback(null);
+            return;
+        }
         var roles = {};
         for (var i = 0; i < users.length; i++) {
             roles[users[i][0]] = users[i][1];
@@ -232,11 +243,13 @@ var ProjectDAO = (function (_super) {
         });
     };
 
-    ProjectDAO.prototype.edit = function (projectId, name, public_flag, callback) {
+    ProjectDAO.prototype.edit = function (projectId, name, metaData, public_flag, callback) {
         var _this = this;
+        if (metaData === null || metaData === undefined)
+            metaData = '';
         async.waterfall([
             function (next) {
-                _this.con.query('UPDATE project SET name=?, public_flag=? WHERE id=?', [name, public_flag, projectId], function (err, result) {
+                _this.con.query('UPDATE project SET name=?, meta_data=?, public_flag=? WHERE id=?', [name, metaData, public_flag, projectId], function (err, result) {
                     next(err, result);
                 });
             }

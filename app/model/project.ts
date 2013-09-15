@@ -7,10 +7,10 @@ var async = require('async');
 var _ = require('underscore');
 
 export class Project {
-	constructor(public id:number, public name:string, public isPublic:number) {
+	constructor(public id:number, public name:string, public metaData:string, public isPublic:number) {
 	}
 	static tableToObject(table: any): Project {
-		return new Project(table.id, table.name, table.public_flag);
+		return new Project(table.id, table.name, table.meta_data, table.public_flag);
 	}
 }
 
@@ -77,11 +77,12 @@ export class ProjectDAO extends model.DAO {
 		});
 	}
 
-	insert(name: string, public_flag: boolean, callback: (err:any, projectId:number)=>void): void {
+	insert(name: string, metaData: string, public_flag: boolean, callback: (err:any, projectId:number)=>void): void {
+		if (metaData === null || metaData === undefined) metaData = '';
 		async.waterfall([
 			(next) => {
 				//TODO insert first member
-				this.con.query('INSERT INTO project(name, public_flag) VALUES(?, ?)', [name, public_flag], (err:any, result:any) => {
+				this.con.query('INSERT INTO project(name, meta_data, public_flag) VALUES(?, ?, ?)', [name, metaData, public_flag], (err:any, result:any) => {
 					next(err, result);
 				});
 			},
@@ -130,6 +131,10 @@ export class ProjectDAO extends model.DAO {
 
 	//users: [[name, role], [name, role], ...]
 	updateProjectUser(projectId: number, users:string[][], callback: (err:any) => void): void {
+		if (users == null || users.length == 0) {
+			callback(null);
+			return;
+		}
 		var roles = {};
 		for(var i = 0; i < users.length; i++){
 			roles[users[i][0]] = users[i][1];
@@ -189,11 +194,12 @@ export class ProjectDAO extends model.DAO {
 		});
 	}
 
-	edit(projectId: number, name: string, public_flag: boolean, callback: (err:any)=>void): void {
+	edit(projectId: number, name: string, metaData:string, public_flag: boolean, callback: (err:any)=>void): void {
+		if (metaData === null || metaData === undefined) metaData = '';
 		async.waterfall([
 			(next) => {
-				this.con.query('UPDATE project SET name=?, public_flag=? WHERE id=?',
-					[name, public_flag, projectId],
+				this.con.query('UPDATE project SET name=?, meta_data=?, public_flag=? WHERE id=?',
+					[name, metaData, public_flag, projectId],
 					(err:any, result:any) => {
 						next(err, result);
 				});
