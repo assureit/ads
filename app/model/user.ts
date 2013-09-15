@@ -14,8 +14,8 @@ export class User {
 }
 
 export class UserDAO extends model.DAO {
-	login(loginName: string, password: string, callback: (err:any, user: User) => void) {
-		function validate(loginName: string, password: string) {
+	login(loginName: string, callback: (err:any, user: User) => void) {
+		function validate(loginName: string) {
 			var checks = [];
 			if (loginName.length == 0) checks.push('Login name is required.');
 			if (loginName.length > 45) checks.push('Login name should not exceed 45 characters.'); 
@@ -25,17 +25,17 @@ export class UserDAO extends model.DAO {
 			}
 			return true;
 		}
-		if (!validate(loginName, password)) return;
+		if (!validate(loginName)) return;
 
 		var ldap = new net_ldap.Ldap();
 		
-		ldap.auth(loginName, password, (err: any) => {
-			if (err) {
-				console.error(err);
-				err = new error.LoginError('Login name or Password is invalid.');
-				callback(err, null);
-				return;
-			}
+		//ldap.auth(loginName, password, (err: any) => {
+		//	if (err) {
+		//		console.error(err);
+		//		err = new error.LoginError('Login name or Password is invalid.');
+		//		callback(err, null);
+		//		return;
+		//	}
 
 			this.selectName(loginName, (err, resultSelect) => {
 				if (err) {
@@ -58,15 +58,14 @@ export class UserDAO extends model.DAO {
 				}
 
 			});
-		});
+		//});
 	}
 
-	register(loginName: string, password: string, email: string, callback: (err:any, user: User) => void) {
-		function validate(loginName: string, password: string) {
+	register(loginName: string, email: string, callback: (err:any, user: User) => void) {
+		function validate(loginName: string) {
 			var checks = [];
 			if (loginName.length == 0) checks.push('Login name is required.');
 			if (loginName.length > 45) checks.push('Login name should not exceed 45 characters.'); 
-			if (password.length == 0) checks.push('Password is required.');
 			if (email && email.length > 256) checks.push('Email should not exceed 256 characters.');
 			if (checks.length > 0) {
 				callback(new error.InvalidParamsError(checks, null), null);
@@ -74,30 +73,30 @@ export class UserDAO extends model.DAO {
 			}
 			return true;
 		}
-		if (!validate(loginName, password)) return;
+		if (!validate(loginName)) return;
 		
 
-		var ldap = new net_ldap.Ldap();
-		ldap.add(loginName, password, (err: any) => {
-			if (err) {
-				callback(err, null);
-				return;
-			}
+		//var ldap = new net_ldap.Ldap();
+		//ldap.add(loginName, password, (err: any) => {
+		//	if (err) {
+		//		callback(err, null);
+		//		return;
+		//	}
 			this.insert(loginName, email, (err, resultInsert) => {
 				if (err) {
-					ldap.del(loginName, (err2: any) => {
-						if (err2) {
-							callback(err2, null);
-							return;
-						}
+					//ldap.del(loginName, (err2: any) => {
+					//	if (err2) {
+					//		callback(err2, null);
+					//		return;
+					//	}
 						callback(err, null);
 						return;
-					});
+					//});
 				} else {
 					callback(null, resultInsert);
 				}
 			});
-		});
+		//});
 	}
 
 	select(id: number, callback: (err:any, user: User) => void) {

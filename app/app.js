@@ -6,6 +6,7 @@ var client = require('./routes/index');
 var gts = require('./routes/gtsexport');
 var js = require('./routes/javascript');
 var monitor = require('./routes/monitor');
+var passport = require('./routes/passport');
 var path = require('path');
 var file = require('./routes/file');
 
@@ -27,6 +28,9 @@ app.configure(function () {
     app.use(express.cookieParser(CONFIG.cookie.secret));
 
     app.use(express.methodOverride());
+    app.use(express.session());
+    app.use(passport.passport.initialize());
+    app.use(passport.passport.session());
 
     app.use(app.router);
     app.use(express.static(path.join(__dirname, 'public')));
@@ -58,9 +62,17 @@ app.post('/export.*', client.exporter);
 app.get('/case/:id/export/:type/node/:n', gts.exporter);
 app.get('/javascripts/config.js', js.config);
 
+app.get('/auth/twitter', passport.passport.authenticate('twitter'), function (req, res) {
+});
+app.get('/auth/twitter/callback', passport.passport.authenticate('twitter', { failureRedirect: '/' }), client.login_twitter);
+
+app.get('/auth/facebook', passport.passport.authenticate('facebook'), function (req, res) {
+});
+
+app.get('/auth/facebook/callback', passport.passport.authenticate('facebook', { failureRedirect: '/' }), client.login_facebook);
+
 app.post('/login', client.login);
 app.post('/logout', client.logout);
-app.post('/register', client.register);
 
 app.post('/file', file.upload);
 app.get('/file/:id/:fileName', file.download);

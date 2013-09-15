@@ -31,9 +31,9 @@ var UserDAO = (function (_super) {
     function UserDAO() {
         _super.apply(this, arguments);
     }
-    UserDAO.prototype.login = function (loginName, password, callback) {
+    UserDAO.prototype.login = function (loginName, callback) {
         var _this = this;
-        function validate(loginName, password) {
+        function validate(loginName) {
             var checks = [];
             if (loginName.length == 0)
                 checks.push('Login name is required.');
@@ -45,52 +45,40 @@ var UserDAO = (function (_super) {
             }
             return true;
         }
-        if (!validate(loginName, password))
+        if (!validate(loginName))
             return;
 
         var ldap = new net_ldap.Ldap();
 
-        ldap.auth(loginName, password, function (err) {
+        this.selectName(loginName, function (err, resultSelect) {
             if (err) {
-                console.error(err);
-                err = new error.LoginError('Login name or Password is invalid.');
                 callback(err, null);
                 return;
             }
 
-            _this.selectName(loginName, function (err, resultSelect) {
-                if (err) {
-                    callback(err, null);
-                    return;
-                }
-
-                if (resultSelect) {
-                    callback(err, resultSelect);
-                    return;
-                } else {
-                    _this.insert(loginName, null, function (err, resultInsert) {
-                        if (err) {
-                            callback(err, null);
-                            return;
-                        }
-                        callback(null, resultInsert);
+            if (resultSelect) {
+                callback(err, resultSelect);
+                return;
+            } else {
+                _this.insert(loginName, null, function (err, resultInsert) {
+                    if (err) {
+                        callback(err, null);
                         return;
-                    });
-                }
-            });
+                    }
+                    callback(null, resultInsert);
+                    return;
+                });
+            }
         });
     };
 
-    UserDAO.prototype.register = function (loginName, password, email, callback) {
-        var _this = this;
-        function validate(loginName, password) {
+    UserDAO.prototype.register = function (loginName, email, callback) {
+        function validate(loginName) {
             var checks = [];
             if (loginName.length == 0)
                 checks.push('Login name is required.');
             if (loginName.length > 45)
                 checks.push('Login name should not exceed 45 characters.');
-            if (password.length == 0)
-                checks.push('Password is required.');
             if (email && email.length > 256)
                 checks.push('Email should not exceed 256 characters.');
             if (checks.length > 0) {
@@ -99,29 +87,16 @@ var UserDAO = (function (_super) {
             }
             return true;
         }
-        if (!validate(loginName, password))
+        if (!validate(loginName))
             return;
 
-        var ldap = new net_ldap.Ldap();
-        ldap.add(loginName, password, function (err) {
+        this.insert(loginName, email, function (err, resultInsert) {
             if (err) {
                 callback(err, null);
                 return;
+            } else {
+                callback(null, resultInsert);
             }
-            _this.insert(loginName, email, function (err, resultInsert) {
-                if (err) {
-                    ldap.del(loginName, function (err2) {
-                        if (err2) {
-                            callback(err2, null);
-                            return;
-                        }
-                        callback(err, null);
-                        return;
-                    });
-                } else {
-                    callback(null, resultInsert);
-                }
-            });
         });
     };
 

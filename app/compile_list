@@ -9,6 +9,7 @@ routes/javascript.ts
 routes/lang.ts
 routes/dscript.ts
 routes/file.ts
+routes/passport.ts
 api/error.ts
 api/jsonrpc.ts
 api/dcase.ts
