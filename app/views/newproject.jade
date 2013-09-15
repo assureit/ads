@@ -21,7 +21,7 @@ block append content
             input.input-medium.role(type="text", placeholder="role", value="${role}")
             |&nbsp;
             button.btn.btn-danger.DeleteMemberButton
-                i.icon-minus &nbsp;
+                i.icon-minus
 block content
     .container
         .row
@@ -33,8 +33,8 @@ block content
                 form
                     label(for="inputProjectName")= lang.Project_name
                     input#inputProjectName(type="text")
-                    label(for="inputLanguage")= lang.locale
-                    select#inputLanguage
+                    //label(for="inputLanguage")= lang.locale
+                    //select#inputLanguage
                         option(value="en") English
                         option(value="ja") Japanese
                     label.checkbox= lang.public
@@ -43,7 +43,7 @@ block content
                     h3= lang.member
                     form.form-inline
                         button.btn.btn-success#AddMemberButton
-                            i.icon-plus &nbsp;
+                            i.icon-plus
                 form
                     if projectId
                         button.btn.btn-primary#project-create(type="button")= lang.update

@@ -62,9 +62,48 @@ var Xml2DCaseTree;
             return thisNode;
         };
 
+        Converter.prototype.parseXmlWeaver = function (xmlText) {
+            var self = this;
+            $($.parseXML(xmlText).getElementsByTagName("node")).each(function (index, elem) {
+                var NodeType = $(this).attr("type");
+
+                var IdText = $(this).attr("id");
+                var Description = $(this.getElementsByTagName("description")).text();
+                var NodeName = $(this).attr("name");
+
+                self.addNodeIdToMap(IdText);
+
+                var node = new DCaseTree[NodeType + "Node"](Description, null, self.nodeIdMap[IdText]);
+                node.NodeName = NodeName;
+                self.nodes[IdText] = node;
+
+                return null;
+            });
+
+            $($.parseXML(xmlText).getElementsByTagName("link")).each(function (index, elem) {
+                var IdText = $(this).attr("id");
+                var source = $(this).attr("source");
+                var target = $(this).attr("target");
+                var link = new DCaseLink(source, target);
+
+                self.links[IdText] = link;
+
+                return null;
+            });
+
+            var rootNode = this.makeTree(this.rootNodeIdText);
+            rootNode.NodeCount = this.NodeCount;
+            rootNode.TopGoalId = 0;
+
+            return rootNode;
+        };
+
         Converter.prototype.parseXml = function (xmlText) {
             var self = this;
 
+            if ($(xmlText).find("rootBasicNode").length == 0) {
+                return this.parseXmlWeaver(xmlText);
+            }
             $(xmlText).find("rootBasicNode").each(function (index, elem) {
                 var xsiType = $(this).attr("xsi\:type");
 

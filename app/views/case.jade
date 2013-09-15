@@ -31,14 +31,13 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/codemirror.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/mode/ASN/asn.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/display/placeholder.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/Editor.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/SearchNode/SearchNode.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/SimplePattern/SimplePattern.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScript.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/FullScreenEditor/FullScreenEditor.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery.jqdock.min.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/MenuBar.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Scale/Scale.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/DefaultStatementRender/DefaultStatementRender.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Annotation/Annotation.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Monitor/lib/DataTables-1.9.4/js/jquery.dataTables.min.js")
@@ -59,13 +58,12 @@ html
                var serverApi = new AssureIt.ServerAPI(Config.BASEPATH);
                var pluginManager = new AssureIt.PlugInManager(Config.BASEPATH);
                pluginManager.SetPlugIn("menu", new MenuBarPlugIn(pluginManager));
-               pluginManager.SetPlugIn("editor", new EditorPlugIn(pluginManager));
+               pluginManager.SetPlugIn("scale", new ScalePlugIn(pluginManager));
                pluginManager.SetPlugIn("colortheme", new TiffanyBlueThemePlugIn(pluginManager));
                pluginManager.SetPlugIn("statements", new DefaultStatementRenderPlugIn(pluginManager));
                pluginManager.SetPlugIn("annotation", new AnnotationPlugIn(pluginManager));
                pluginManager.SetPlugIn("note", new NotePlugIn(pluginManager));
                pluginManager.SetPlugIn("monitor", new MonitorPlugIn(pluginManager));
-               pluginManager.SetPlugIn("fullscreeneditor", new FullScreenEditorPlugIn(pluginManager));
                pluginManager.SetPlugIn("dscript", new DScriptPlugIn(pluginManager));
                pluginManager.SetPlugIn("file", new DragFilePlugIn(pluginManager));
                pluginManager.SetPlugIn("unload", new BeforeUnloadPlugIn(pluginManager));
@@ -98,6 +96,9 @@ html
 
                var Screen = new AssureIt.ScreenManager(shapelayer, contentlayer, controllayer, backgroundlayer);
                var Viewer = new AssureIt.CaseViewer(Case0, pluginManager, serverApi, Screen);
+
+               pluginManager.RegisterKeyEvents(Case0, serverApi);
+
                if (!isNaN(history)) {
                    Case0.SetEditable(false);
                } else {
