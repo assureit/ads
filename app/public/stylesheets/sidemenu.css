@@ -8,17 +8,21 @@
 	left: 26px;
 	z-index: 99998;
 }
-
-/*#menu-button:hover {
-	background: #2C3E50
-}*/
+/*
+.sidebar-nav-fixed {
+	position:fixed;
+	top:64px;
+	left:10px;
+	width: 160px;
+	z-index: 99998;
+}
+*/
 
 .menu {
 	position: absolute;
 	top: 48px;
 	left: 0px;
 	z-index: 99998;
-	/*height: 100%;*/
 	-webkit-transition: all ease-in-out;
 	-webkit-transition-delay: 0.5s;
 	-moz-transition: all ease-in-out 0.5s;
@@ -75,7 +79,6 @@
 	width: 200px;
 	color: #000;
 	text-decoration: none;
-	/*background: none;*/
 	background: #eee;
 }
 
