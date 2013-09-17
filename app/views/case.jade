@@ -79,19 +79,30 @@ html
                var contents;
                /* N th oldest commit starting with zero.*/
                var history = Number("#{commitHistory}".length == 0 ? "NaN" : "#{commitHistory}");
-               var oldJsonData = serverApi.GetCase("",#{caseId});
-               var contents = oldJsonData.contents;
+               var CaseData = serverApi.GetCase("",#{caseId});
+               var contents = CaseData.contents;
+               var PrevContents = null;
                if (!isNaN(history)) {
                    var commits = serverApi.GetCommitList(#{caseId});
                    if (commits.CommitModels.length > history) {
                        var commitId = commits.CommitModels[history].CommitId;
                        contents = serverApi.GetNodeTree(commitId);
+                       if(history > 0) {
+                           var PrevCommitId = commits.CommitModels[history-1].CommitId;
+                           PrevContents = serverApi.GetNodeTree(PrevCommitId);
+                       }
                    }
                }
-               var Case0 = new AssureIt.Case(oldJsonData.DCaseName, #{caseId}, oldJsonData.commitId, pluginManager);
+               var Case0 = new AssureIt.Case(CaseData.DCaseName, #{caseId}, CaseData.commitId, pluginManager);
                var caseDecoder = new AssureIt.CaseDecoder();
                var root = caseDecoder.ParseASN(Case0, contents, null);
                Case0.SetElementTop(root);
+               if(PrevContents) {
+                   var PrevCase = new AssureIt.Case(CaseData.DCaseName, #{caseId}, CaseData.commitId, pluginManager); //FIXME
+                   var PrevRoot = new AssureIt.CaseDecoder().ParseASN(PrevCase, PrevContents, null);
+                   PrevCase.SetElementTop(root);
+                   Case0.DiffCase(PrevCase);
+               }
                var backgroundlayer = document.getElementById("background");
                var shapelayer = document.getElementById("layer0");
                var contentlayer = document.getElementById("layer1");
