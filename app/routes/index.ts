@@ -9,79 +9,52 @@ import util_auth = module('../util/auth')
 var CONFIG = require('config')
 //import ex = module('./exporter')
 
-export var index = function(req: any, res: any) {
-	var page = 'index';
+var getBasicParam = function(req: any, res: any) {
 	var params: any = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: null};
 	var auth = new util_auth.Auth(req, res);
 	if(auth.isLogin()) {
 		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName() };
 	}
-
-	if( req.cookies.lang == 'ja') {
-		params.lang = lang.lang.ja;
-	}
-
-	res.render(page, params);
-};
-
-export var newprojectView = function(req: any, res: any) {
-	var page = 'newproject';
-	var params: any = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: null, projectId: req.params.id};
-	var auth = new util_auth.Auth(req, res);
-	if(auth.isLogin()) {
-		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName(), projectId: req.params.id};
-	}
-
-	if( req.cookies.lang == 'ja') {
-		params.lang = lang.lang.ja;
-	}
-	res.render(page, params);
+	//if( req.cookies.lang == 'ja') {
+	//	params.lang = lang.lang.ja;
+	//}
+	return params;
 }
 
-export var caseView = function(req: any, res: any) {
-	var page = 'case';
-	var params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, caseId: req.params.id};
-	var auth = new util_auth.Auth(req, res);
-	if(auth.isLogin()) {
-		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName(), caseId: req.params.id };
-	}
+export var index = function(req: any, res: any) {
+	var params: any = getBasicParam(req, res);
+	res.render('index', params);
+}
 
-	if( req.cookies.lang == 'ja') {
-		params.lang = lang.lang.ja;
-	}
+export var newcase = function(req: any, res: any) {
+	var params: any = getBasicParam(req, res);
+	res.render('newcase', params);
+}
 
-	res.render(page, params);
-};
+export var newproject = function(req: any, res: any) {
+	var params: any = getBasicParam(req, res);
+	params.projectId = req.params.id;
+	res.render('newproject', params);
+}
 
-export var historyListView = function(req: any, res: any) {
-	var page = 'history';
-	var auth = new util_auth.Auth(req, res);
-	var params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, caseId: req.params.id};
-	if(auth.isLogin()) {
-		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName(), caseId: req.params.id };
-	}
+export var caseview = function(req: any, res: any) {
+	var params: any = getBasicParam(req, res);
+	params.caseId = req.params.id;
+	res.render('caseview', params);
+}
 
-	if( req.cookies.lang == 'ja') {
-		params.lang = lang.lang.ja;
-	}
+export var historyList = function(req: any, res: any) {
+	var params: any = getBasicParam(req, res);
+	params.caseId = req.params.id;
+	res.render('history', params);
+}
 
-	res.render(page, params);
-};
-
-export var historyView = function(req: any, res: any) {
-	var page = 'case';
-	var params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, caseId: req.params.id, commitHistory: req.params.history};
-	var auth = new util_auth.Auth(req, res);
-	if(auth.isLogin()) {
-		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName(), caseId: req.params.id, commitHistory: req.params.history};
-	}
-
-	if( req.cookies.lang == 'ja') {
-		params.lang = lang.lang.ja;
-	}
-
-	res.render(page, params);
-};
+export var history = function(req: any, res: any) {
+	var params: any = getBasicParam(req, res);
+	params.caseId = req.params.id;
+	params.commitHistory = req.params.history;
+	res.render('case', params);
+}
 
 export var exporter = function(req: any, res: any) {
 	var exec = childProcess.exec;
@@ -137,7 +110,6 @@ export var exporter = function(req: any, res: any) {
 			});
 		});
 	});
-
 };
 
 export var login_twitter = function(req: any, res: any) {
