@@ -22,7 +22,6 @@
 	position: absolute;
 	top: 48px;
 	left: 0px;
-	z-index: 99998;
 	-webkit-transition: all ease-in-out;
 	-webkit-transition-delay: 0.5s;
 	-moz-transition: all ease-in-out 0.5s;
