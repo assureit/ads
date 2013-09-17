@@ -1,6 +1,6 @@
-extends layout
+extends base
 block script
-    script(type='text/javascript', src='#{basepath}/javascripts/route/index.js')
+    +js('/javascripts/route/index.js')
 block bar
     include logo
     .menu
@@ -14,7 +14,7 @@ block bar
             else
                 include signin
 block append content
-    script#member_tmpl(type="text/x-jquery-tmpl")
+    +template("member_tmpl")
         form.form-inline.memberForm
             input.input-large.userName(type="text", placeholder="username", value="${name}")
             |&nbsp;

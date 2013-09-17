@@ -1,0 +1,32 @@
+extends base
+block bar
+    include logo
+    .menu
+        ul#drop-menu
+            if userName
+                li#monitors-menu
+                    a(href='#') Monitors
+                li#settings-menu
+                    a(href='#') Settings
+                include signout
+            else
+                include signin
+block script
+    +js('/javascripts/route/newcase.js')
+block content
+    #dcase-manager.container
+        .row
+            #newDCase.col-md-6.col-md-offset-3
+                h2= lang.new_DCase
+                form.form-horizontal
+                    .control-group#newdcase-name
+                        label.control-label(for="inputDCaseName")= lang.DCase_name
+                        .controls
+                            input#inputDCaseName(type="text")
+                    .control-group#newdcase-desc
+                        label.control-label(for="inputDesc")= lang.topgoal
+                        .controls
+                            textarea#inputDesc(rows=5)
+                    .control-group
+                        .controls
+                            button.btn.btn-default.btn-primary#dcase-create(type="button")= lang.create
