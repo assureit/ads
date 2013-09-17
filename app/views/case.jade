@@ -3,17 +3,19 @@ html
         title Assure-It
         link(rel='stylesheet', href='#{basepath}/stylesheets/sidemenu.css')
         link(rel='stylesheet', href='#{basepath}/stylesheets/index.css')
-        link(rel='stylesheet', href='#{basepath}/lib/bootstrap.min.css')
+        //link(rel='stylesheet', href='#{basepath}/lib/bootstrap.min.css')
+        link(rel='stylesheet', href='#{basepath}/lib/flatstrap/bootstrap.min.css')
         link(rel='stylesheet', href='#{basepath}/lib/bootstrap.icons.css')
-        link(rel='stylesheet', href='#{basepath}/lib/bootstrap-responsive.min.css')
+        //link(rel='stylesheet', href='#{basepath}/lib/bootstrap-responsive.min.css')
         link(rel='stylesheet', href='#{basepath}/stylesheets/dcase-node.css')
         link(rel='stylesheet',href='#{basepath}/assurejs/plugins/Editor/lib/codemirror/codemirror.css')
         link(rel='stylesheet',href="#{basepath}/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.css")
         link(rel='stylesheet',href="#{basepath}/assurejs/plugins/Monitor/lib/DataTables-1.9.4/css/jquery.dataTables.css")
         link(rel='stylesheet',href="#{basepath}/assurejs/lib/animate-custom.css")
-        script(type='text/javascript', src='#{basepath}/javascripts/sidemenu.js')
+        script(type='text/javascript',src='#{basepath}/javascripts/sidemenu.js')
         script(type="text/javascript",src="#{basepath}/assurejs/lib/jquery.min.js")
         script(type="text/javascript",src="#{basepath}/assurejs/lib/pointer.min.js")
+        script(type='text/javascript',src='#{basepath}/lib/bootstrap.min.js')
         script(type="text/javascript",src="#{basepath}/assurejs/lib/ASNParser/peg.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/CaseModel.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/CaseViewer.js")
@@ -27,6 +29,7 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/src/PlugInManager.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/ServerApi.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/Pattern.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/src/SideMenuModel.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/ColorTheme/ColorTheme.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/codemirror.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/mode/ASN/asn.js")
@@ -100,6 +103,7 @@ html
                var Viewer = new AssureIt.CaseViewer(Case0, pluginManager, serverApi, Screen);
 
                pluginManager.RegisterKeyEvents(Case0, serverApi);
+               pluginManager.CreateSideMenu(Viewer, Case0, serverApi);
 
                if (!isNaN(history)) {
                    Case0.SetEditable(false);
@@ -114,16 +118,22 @@ html
                }
             });
     body(style="overflow: hidden; margin: 0px;")
-        a(href="#{basepath}/")
-            img#menu-button(src="#{basepath}/images/ait.png") Menu
-        #assureit-status
-            ul
-                li#assureit-mode Viewer mode
         #viewer(style="width: 100%; height: 100%;")
             svg#layer0box(xmlns="http://www.w3.org/2000/svg",version="1.1",style="width: 100%; height: 100%; position: absolute")
                 g#layer0(transform="translate(0,0)")
             #background(style="width: 100%; height: 100%; position: absolute;")
             #layer1(style="width: 0px; height: 0px; position: absolute;")
+            a(href="#{basepath}/")
+                img#menu-button(src="#{basepath}/images/ait.png") Menu
+            .container
+                .row
+                    .menu.sidebar-nav-fixed.bs-docs-sidebar
+                        //ul.nav.nav-list.bs-docs-sidenav.affix-top.well#drop-menu
+                        ul#drop-menu
+                            if userName
+                                include signout
+                            else
+                                include signin
             #layer2(style="width: 0px; height: 0px; position: absolute;")
         svg(width="0",height="0")
             defs
