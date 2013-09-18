@@ -14,6 +14,8 @@ var model_tag = require('./tag');
 
 var _ = require('underscore');
 var async = require('async');
+var CONFIG = require('config');
+var mstranslator = require('mstranslator');
 
 var Node = (function () {
     function Node(id, commitId, thisNodeId, nodeType, description) {
@@ -84,10 +86,23 @@ var NodeDAO = (function (_super) {
     };
 
     NodeDAO.prototype.translate = function (dcaseId, commitId, model, callback) {
-        if (model == null) {
+        if (model == null || CONFIG.translator.CLIENT_ID.length == 0) {
             callback(null);
             return;
         }
+        console.log("translate");
+        var Translator = new mstranslator({ client_id: CONFIG.translator.CLIENT_ID, client_secret: CONFIG.translator.CLIENT_SECRET });
+        Translator.initialize_token(function (keys) {
+            console.log(keys);
+            var param = {
+                text: "",
+                to: "en"
+            };
+            Translator.translate(param, function (err, data) {
+                console.log(data);
+            });
+        });
+        callback(null);
     };
 
     NodeDAO.prototype.registerTag = function (dcaseId, list, callback) {
