@@ -76,14 +76,14 @@ var ASNParser = (function () {
             for (var i = 0; i < model.Children.length; i++) {
                 var child_model = model.Children[i];
 
-                if (child_model.Label[0] == "C" || child_model.Label[0] == "c") {
+                if (child_model.Label && (child_model.Label[0] == "C" || child_model.Label[0] == "c")) {
                     ret += arguments.callee(child_model, prefix);
                     break;
                 }
             }
             for (var i = 0; i < model.Children.length; i++) {
                 var child_model = model.Children[i];
-                if (child_model.Label[0] != "C" && child_model.Label[0] != "c") {
+                if (child_model.Label && (child_model.Label[0] != "C" && child_model.Label[0] != "c")) {
                     ret += arguments.callee(child_model, prefix);
                 }
             }

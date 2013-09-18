@@ -148,6 +148,7 @@ var CommitDAO = (function (_super) {
                         contents = asn;
                     }
                     callback(err, com, commitId);
+                    return;
                 });
             },
             function (com, commitId, callback) {

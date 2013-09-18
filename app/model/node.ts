@@ -259,7 +259,9 @@ export class NodeDAO extends model.DAO {
 					console.log(err);
 					console.log(data);
 					callback(null, null);
+					return;
 				}
+				console.log(items);
 				for (var i in items[0]) {
 					var model_translated = items[0][i];
 					model_translated.Notes['TranslatedTextEn'] = data[i]['TranslatedText'];
@@ -269,6 +271,7 @@ export class NodeDAO extends model.DAO {
 				console.log('---- SUCCESSFULLY TRANSLATED ----')
 				console.log(asn);
 				callback(null, asn);
+				return;
 			});
 		});
 	}

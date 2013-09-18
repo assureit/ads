@@ -129,6 +129,7 @@ export class CommitDAO extends model.DAO {
 						contents = asn;
 					}
 					callback(err, com, commitId);
+					return;
 				});
 			} , (com: Commit, commitId: number, callback) => {
 				// this.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
