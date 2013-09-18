@@ -143,7 +143,8 @@ var CommitDAO = (function (_super) {
                     return;
                 }
                 var nodeDAO = new model_node.NodeDAO(_this.con);
-                nodeDAO.translate(com.dcaseId, commitId, nodemodel, function (err) {
+                nodeDAO.translate(com.dcaseId, commitId, nodemodel, function (err, asn) {
+                    contents = asn;
                     callback(err, com, commitId);
                 });
             },
