@@ -1,18 +1,6 @@
 extends base
 block script
     +js('/javascripts/route/newproject.js')
-block bar
-    include logo
-    .menu
-        ul#drop-menu
-            if userName
-                li#monitors-menu
-                    a(href='#') Monitors
-                li#settings-menu
-                    a(href='#') Settings
-                include signout
-            else
-                include signin
 block append content
     +template("member_tmpl")
         .form-inline.memberForm

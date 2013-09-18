@@ -52,18 +52,6 @@ block append content
                 |{{else}}
                 li.list-group-item (no case)
                 |{{/if}}
-block bar
-    include logo
-    .menu
-        ul#drop-menu
-            if userName
-                li#monitors-menu
-                    a(href='#') Monitors
-                li#settings-menu
-                    a(href='#') Settings
-                include signout
-            else
-                include signin
 block content
     #dcase-manager.container
         .row

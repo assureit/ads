@@ -43,8 +43,8 @@ $(()=>{
 	var getMemberList = function(){
 		var members = [];
 		$(".memberForm").each((i, v) => {
-			var name = $(v).find(".userName").attr("value").trim();
-			var role = $(v).find(".role").attr("value").trim();
+			var name = $(v).find(".userName").val().trim();
+			var role = $(v).find(".role").val().trim();
 			if(name.length > 0){
 				members.push([name, role]);
 			}
@@ -55,18 +55,21 @@ $(()=>{
 	var setMemberList = function(list: string[][]){
 		for(var i = 0; i < list.length; i++){
 			var newMemberForm = addNewMember();
-			newMemberForm.find(".userName").attr("value", list[i][0]).addClass("disabled").attr("disabled", "");
-			newMemberForm.find(".role").attr("value", list[i][1]);
+			newMemberForm.find(".userName").val(list[i][0]).addClass("disabled").attr("disabled", "disabled");
+			newMemberForm.find(".role").val(list[i][1]);
 		}
 		updateDeleteButtonState();
 	}
 
 	var setProjectInfo = function(project: any){
-		$("#inputProjectName").attr("value", project.name);
-		//$("#inputLanguage").attr("value", project.);
+		$("#inputProjectName").val(project.name);
+		//$("#inputLanguage").val(project.);
 		if(project.isPublic == 1){
 			$("#inputIsPublic").attr("checked", "checked");
+		}else{
+			$("#inputIsPublic").removeAttr("checked")
 		}
+		setMemberListVisible(!project.isPublic);
 	}
 
 	var setMemberListVisible = function(isVisible: boolean){
@@ -85,7 +88,7 @@ $(()=>{
 		$(".memberForm").each((i, v) => {
 			if($(v).find(".userName").attr("disabled") != null){
 				if(validMemberCount > 1){
-					$(v).find(".DeleteMemberButton").attr("disabled", "");
+					$(v).find(".DeleteMemberButton").removeAttr("disabled");
 				}else{
 					$(v).find(".DeleteMemberButton").attr("disabled", "disabled")
 				}
@@ -106,9 +109,9 @@ $(()=>{
 		e.preventDefault();
 		if(page_moved) return;
 		page_moved = true;
-		var name = $("#inputProjectName").attr("value");
+		var name = $("#inputProjectName").val();
 		var isPublic = $("#inputIsPublic").attr("checked") != null;
-		var language = $("#inputLanguage").attr("value");
+		var language = $("#inputLanguage").val();
 		if(projectId){
 			DCaseAPI.editProject(projectId, name, isPublic);
 			DCaseAPI.updateProjectUser(projectId, getMemberList());
@@ -143,5 +146,4 @@ $(()=>{
 			setMemberList([[userName, ""]]);
 		}
 	}
-	setMemberListVisible($("#inputIsPublic").attr("checked") == null);
 });

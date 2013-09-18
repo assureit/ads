@@ -1,0 +1,11 @@
+include logo
+.menu
+    ul#drop-menu
+        if userName
+            li#monitors-menu
+                a(href='#') Monitors
+            li#settings-menu
+                a(href='#') Settings
+            include signout
+        else
+            include signin
