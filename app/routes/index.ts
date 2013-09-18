@@ -40,7 +40,7 @@ export var newproject = function(req: any, res: any) {
 export var caseview = function(req: any, res: any) {
 	var params: any = getBasicParam(req, res);
 	params.caseId = req.params.id;
-	res.render('caseview', params);
+	res.render('case', params);
 }
 
 export var historyList = function(req: any, res: any) {
