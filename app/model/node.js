@@ -88,7 +88,7 @@ var NodeDAO = (function (_super) {
 
     NodeDAO.prototype.translate = function (dcaseId, commitId, model, callback) {
         console.log("0");
-        if (model == null || CONFIG.translator.CLIENT_ID.length == 0) {
+        if (model == null || !CONFIG.translator || CONFIG.translator.CLIENT_ID.length == 0) {
             callback(null, null);
             return;
         }

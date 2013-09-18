@@ -202,7 +202,7 @@ export class NodeDAO extends model.DAO {
 
 	translate(dcaseId:number, commitId: number, model: any, callback: (err:any, asn: string)=> void): void {
 		console.log("0");
-		if (model == null || CONFIG.translator.CLIENT_ID.length == 0) {
+		if (model == null || !CONFIG.translator || CONFIG.translator.CLIENT_ID.length == 0) {
 			callback(null, null);
 			return;
 		}
