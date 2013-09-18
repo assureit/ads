@@ -8,16 +8,22 @@
 	left: 26px;
 	z-index: 99998;
 }
-/*
+
 .sidebar-nav-fixed {
 	position:fixed;
 	top:64px;
-	left:10px;
+	left:25px;
 	width: 160px;
 	z-index: 99998;
 }
-*/
 
+.bs-sidenav {
+	background-color: #f7f5fa;
+	border-radius: 5px;
+	border: 1px solid;
+	border-color: #ddd;
+}
+/*
 .menu {
 	position: absolute;
 	top: 48px;
@@ -121,3 +127,4 @@
 	border: 1px solid;
 	border-color: #000;
 }
+*/

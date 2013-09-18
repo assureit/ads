@@ -1,0 +1,27 @@
+doctype 5
+include mixin
+html
+    head
+        title =title
+        +css('/lib/jquery.ui.autocomplete.css')
+        +css('/lib/bootstrap3/css/bootstrap.min.css')
+        +css('/lib/codemirror.css')
+        +css('/stylesheets/sidemenu.css')
+        +css('/stylesheets/index.css')
+        block link
+    body
+        include sidemenu
+        block content
+        +js('/lib/jquery.min.js')
+        +js('/lib/jquery.tmpl.min.js')
+        +js('/lib/jquery.ui.autocomplete.js')
+        +js('/lib/jquery.autosize-min.js')
+        +js('/lib/jquery.cookie.js')
+        +js('/lib/bootstrap3/js/bootstrap.min.js')
+        +js('/lib/spin.min.js')
+        +js('/javascripts/analytics.js')
+        +js('/javascripts/config.js')
+        +js('/javascripts/api.js')
+        +js('/javascripts/sidemenu.js')
+        +js('/javascripts/timeutil.js')
+        block script
