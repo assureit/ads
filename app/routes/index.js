@@ -36,7 +36,7 @@ exports.newproject = function (req, res) {
 exports.caseview = function (req, res) {
     var params = getBasicParam(req, res);
     params.caseId = req.params.id;
-    res.render('caseview', params);
+    res.render('case', params);
 };
 
 exports.historyList = function (req, res) {
