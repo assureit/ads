@@ -144,7 +144,9 @@ var CommitDAO = (function (_super) {
                 }
                 var nodeDAO = new model_node.NodeDAO(_this.con);
                 nodeDAO.translate(com.dcaseId, commitId, nodemodel, function (err, asn) {
-                    contents = asn;
+                    if (asn) {
+                        contents = asn;
+                    }
                     callback(err, com, commitId);
                 });
             },

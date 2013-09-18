@@ -118,9 +118,11 @@ var NodeDAO = (function (_super) {
             }
         };
         traverse(model);
+        if (items[0].length == 0) {
+            callback(null, null);
+        }
 
         Translator.initialize_token(function (keys) {
-            console.log(items);
             var param = {
                 texts: items[1],
                 to: "en"

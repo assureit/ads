@@ -125,7 +125,9 @@ export class CommitDAO extends model.DAO {
 				}
 				var nodeDAO = new model_node.NodeDAO(this.con);
 				nodeDAO.translate(com.dcaseId, commitId, nodemodel, (err:any, asn: string) => {
-					contents = asn;
+					if (asn) {
+						contents = asn;
+					}
 					callback(err, com, commitId);
 				});
 			} , (com: Commit, commitId: number, callback) => {
