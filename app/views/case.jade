@@ -54,6 +54,7 @@ html
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/LayoutPortrait/LayoutPortrait.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/Export/Export.js")
         script(type="text/javascript",src="#{basepath}/assurejs/plugins/TimeLine/TimeLine.js")
+        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Commit/Commit.js")
         script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
         //script(type="text/javascript",src="#{basepath}/assurejs/mock/Index.js")
         script(type='text/javascript',src='#{basepath}/javascripts/config.js')
@@ -75,6 +76,7 @@ html
                pluginManager.SetPlugIn("portraitlayout", new LayoutPortraitPlugIn(pluginManager));
                pluginManager.SetPlugIn("export", new ExportPlugIn(pluginManager));
                pluginManager.SetPlugIn("timeline", new TimeLinePlugIn(pluginManager));
+               pluginManager.SetPlugIn("commit", new CommitPlugIn(pluginManager));
                pluginManager.SetPlugIn("pattern", new SimplePatternPlugIn(pluginManager));
                pluginManager.SetUseLayoutEngine("portraitlayout");
 
@@ -113,14 +115,15 @@ html
                var Screen = new AssureIt.ScreenManager(shapelayer, contentlayer, controllayer, backgroundlayer);
                var Viewer = new AssureIt.CaseViewer(Case0, pluginManager, serverApi, Screen);
 
-               pluginManager.RegisterKeyEvents(Case0, serverApi);
-               pluginManager.CreateSideMenu(Viewer, Case0, serverApi);
-
                if (!isNaN(history)) {
                    Case0.SetEditable(false);
                } else {
                    Case0.SetEditable("#{userName}".length > 0);
                }
+
+               pluginManager.RegisterKeyEvents(Case0, serverApi);
+               pluginManager.CreateSideMenu(Viewer, Case0, serverApi);
+
                Viewer.Draw();
                Viewer.Screen.SetOffset(($('html').width() / 2) - ((AssureIt.CaseViewer.ElementWidth) + Viewer.ViewMap[Viewer.ElementTop.Label].AbsX),80); //Center TopGoal in the view
                if(Case0.IsEditable()) {
