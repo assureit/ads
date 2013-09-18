@@ -197,6 +197,13 @@ export class NodeDAO extends model.DAO {
 		);
 	}
 
+	translate(dcaseId:number, commitId: number, model: any, callback: (err:any)=> void): void {
+		if (model == null) {
+			callback(null);
+			return;
+		}
+	}
+
 	/* obsolete */
 	registerTag(dcaseId:number, list: NodeData[], callback: (err:any) => void) {
 		var tagDAO = new model_tag.TagDAO(this.con);

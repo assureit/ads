@@ -134,6 +134,20 @@ var CommitDAO = (function (_super) {
                 });
             },
             function (com, commitId, callback) {
+                var parser = new asn_parser.ASNParser();
+                var nodemodel = null;
+                try  {
+                    nodemodel = parser.parse(contents);
+                } catch (e) {
+                    callback(e);
+                    return;
+                }
+                var nodeDAO = new model_node.NodeDAO(_this.con);
+                nodeDAO.translate(com.dcaseId, commitId, nodemodel, function (err) {
+                    callback(err, com, commitId);
+                });
+            },
+            function (com, commitId, callback) {
                 _this.update(commitId, contents, function (err) {
                     return callback(err, { commitId: commitId });
                 });

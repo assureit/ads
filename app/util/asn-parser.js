@@ -19,6 +19,9 @@ var ASNParser = (function () {
         traverse(obj);
         return node;
     };
+    ASNParser.prototype.parse = function (asn) {
+        return peg.parse(asn)[1];
+    };
     return ASNParser;
 })();
 exports.ASNParser = ASNParser;

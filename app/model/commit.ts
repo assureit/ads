@@ -114,8 +114,18 @@ export class CommitDAO extends model.DAO {
 				}
 				var nodeDAO = new model_node.NodeDAO(this.con);
 				nodeDAO.insertList(com.dcaseId, commitId, nodes, (err:any) => {callback(err, com, commitId);});
-			}
-			, (com: Commit, commitId: number, callback) => {
+			}, (com: Commit, commitId: number, callback) => {
+				var parser = new asn_parser.ASNParser();
+				var nodemodel = null;
+				try {
+					nodemodel = parser.parse(contents);
+				} catch (e) {
+					callback(e);
+					return;
+				}
+				var nodeDAO = new model_node.NodeDAO(this.con);
+				nodeDAO.translate(com.dcaseId, commitId, nodemodel, (err:any) => {callback(err, com, commitId);});
+			} , (com: Commit, commitId: number, callback) => {
 				// this.update(commitId, JSON.stringify(contents), (err:any) => {callback(err, com, commitId);});
 				this.update(commitId, contents, (err:any) => callback(err, {commitId: commitId}));
 			}

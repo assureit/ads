@@ -17,4 +17,7 @@ export class ASNParser {
 		traverse(obj);
 		return node;
 	}
+	parse(asn:string): any[] {
+		return peg.parse(asn)[1];
+	}
 }

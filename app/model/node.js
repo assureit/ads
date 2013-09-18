@@ -83,6 +83,13 @@ var NodeDAO = (function (_super) {
         });
     };
 
+    NodeDAO.prototype.translate = function (dcaseId, commitId, model, callback) {
+        if (model == null) {
+            callback(null);
+            return;
+        }
+    };
+
     NodeDAO.prototype.registerTag = function (dcaseId, list, callback) {
         var tagDAO = new model_tag.TagDAO(this.con);
         var tagList = _.map(_.filter(list, function (node) {
