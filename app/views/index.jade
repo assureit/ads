@@ -1,4 +1,4 @@
-extends layout
+extends base
 block script
     +js('/javascripts/route/index.js')
     //for XML import
@@ -10,49 +10,44 @@ block script
 
 block append content
     +template("case_tmpl")
-        li.media
-            img.media-object.pull-left(data-src="holder.js/64x64",alt="64x64",style="width: 64px; height: 64px;",src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABP0lEQVR4Xu2YQQ7DIAwEyTnfyrN5U245t6ISFUptEhNQEUxvFdTxrsxOyrLv+8tN/FkwgAngCJABE2egIwShABSAAlAACkzsABgEg2AQDILBiSHAnyEwCAbBIBgEg2BwYgeqYNB7/7Vw27YfO+O6tKZ536Km9KzHBqTiJKFXQqSmWtTUjK5qQE5MWLs7AVcTU2JqcwPiA84ipWbPArXvlpqlMVZ1AiQh67q64zg+/aXmpMZoa2G/pWaJCX8zIDSrjXouA8KaZmqXBpybkqZAOzbaBORqWk1oOgGxmSs6WI5ArqZVfNj/2IB0lLWkvxt6WkbUerdo8h5Q4npPv6kyAT0JsvaCAdwIcSPEjRA3QtbkHGk/FIACUAAKQIGRUt2qBQpAASgABaCANTlH2g8FoAAUgAJQYKRUt2qBArNT4A1sFqCQARPBMwAAAABJRU5ErkJggg==")
-            .media-body
-                h4
-                    //|@${dcaseId} 
-                    a(href='#{basepath}/case/${dcaseId}') ${dcaseName}
-                    a.btn.btn-danger.btn-mini.pull-right.DeleteCaseButton
-                        i.icon-trash　&nbsp;
-                        |Delete
-                    span.pull-right
-                        i.icon-sitemap
-                        | 0&nbsp;
-                p ${description}
+        li.list-group-item
+            h4.list-group-item-heading
+                //|@${dcaseId} 
+                a(href='#{basepath}/case/${dcaseId}') ${dcaseName}
+                small.pull-right 0 nodes
+            p.list-group-item-text ${description}
                 small
                     |${userName} updated 
                     abbr(title="${latestCommit.dateTime}") ${dateTime}
+                small.pull-right
+                    a.text-danger.DeleteCaseButton
+                        span.glyphicon.glyphicon-trash
+                        | &nbsp;Delete
     +template("project_tmpl")
-        article(id="project${projectId}")
-            h3
-                //|#${projectId} 
-                a(href='#{basepath}/project/${projectId}/edit') ${projectName}
-                a.btn.btn-success.btn-small.pull-right.NewCaseButton(href='#{basepath}/new/${projectId}')
-                    i.icon-plus　&nbsp;
-                    |New case
-            ul.inline
-                li
-                    i.icon-user　&nbsp;
-                    |${users && users.length > 0 ? users.length : "Public"}
-                |{{if users}}
-                |{{each users}}
-                li
-                    |${this.loginName}
-                |{{/each}}
-                |{{/if}}
-            ul.media-list
+        .panel.panel-default(id="project${projectId}")
+            .panel-heading
+                h4
+                    //|#${projectId} 
+                    a(href='#{basepath}/project/${projectId}/edit') ${projectName}
+                    a.btn.btn-success.btn-xs.pull-right.NewCaseButton(href='#{basepath}/new/${projectId}')
+                        span.glyphicon.glyphicon-plus
+                        | &nbsp;New case
+                .list-inline
+                    li
+                        span.glyphicon.glyphicon-user
+                        |&nbsp;${users && users.length > 0 ? users.length : "Public"}
+                    |{{if users}}
+                    |{{each users}}
+                    li
+                        |${this.loginName}
+                    |{{/each}}
+                    |{{/if}}
+            ul.list-group
                 |{{if cases.length > 0}}
                 |{{tmpl(cases) "#case_tmpl"}}
                 |{{else}}
-                li.media
-                    .media-body
-                        p.text-center (no case)
+                li.list-group-item (no case)
                 |{{/if}}
-        hr
 block bar
     include logo
     .menu
@@ -68,24 +63,10 @@ block bar
 block content
     #dcase-manager.container
         .row
-            #newDCase.span6.offset3(style='display: none;')
-                h2= lang.new_DCase
-                form.form-horizontal
-                    .control-group#newdcase-name
-                        label.control-label(for="inputDCaseName")= lang.DCase_name
-                        .controls
-                            input#inputDCaseName(type="text", id="inputDCaseName")
-                    .control-group#newdcase-desc
-                        label.control-label(for="inputDesc")= lang.topgoal
-                        .controls
-                            textarea#inputDesc(rows=5)
-                    .control-group
-                        .controls
-                            button.btn.btn-primary#dcase-create(type="button")= lang.create
-            #selectDCase.span6.offset3
+            #selectDCase.col-md-6.col-md-offset-3
                 h2 Projects&nbsp;
-                    a.btn.btn-success.pull-right.NewProjectButton(href="./project/new")
-                        i.icon-plus &nbsp;
-                        |New project
+                    a.btn.btn.btn-success.pull-right.NewProjectButton(href="./project/new")
+                        span.glyphicon.glyphicon-plus
+                        | &nbsp;New project
                 hr
                 #ProjectList

@@ -1,6 +1,7 @@
 ///<reference path='../../../DefinitelyTyped/jquery/jquery.d.ts'/>
 ///<reference path='../ads.ts'/>
 
+/*
 $(()=>{
 	var ads: ADS = new ADS(document.getElementById("ase"));
 
@@ -20,9 +21,37 @@ $(()=>{
 	$id.keyup(verify);
 	$pass1.keyup(verify);
 	$pass2.keyup(verify);
+});
+*/
+$(()=>{
+	var matchResult = document.cookie.match(/userId=(\w+);?/);
+	var userId = matchResult ? parseInt(matchResult[1]) : null;
+	var isLoggedin = userId != null;
+	var privateProjects: any = isLoggedin ? DCaseAPI.getProjectList().projectList : [];
+	var publicProjects: any = DCaseAPI.getPublicProjectList().projectList;
+	var projects = privateProjects.concat(publicProjects);
+	for(var i = 0; i < privateProjects.length; i++){
+		privateProjects[i].isPrivate = true;
+	}
+	for(var i = 0; i < projects.length; i++){
+		var project = projects[i];
+		project.users = project.isPrivate ? DCaseAPI.getProjectUser(project.projectId).userList : [];
+		project.cases = DCaseAPI.getProjectDCase(1, project.projectId).dcaseList;
+		for(var j = 0; j < project.cases.length; j++){
+			var dcase = project.cases[j];
+			dcase.dateTime = TimeUtil.formatDate(dcase.latestCommit.dateTime);
+			dcase.latestCommit.dateTime = (new Date(dcase.latestCommit.dateTime)).toString();
+		}
+	}
+	$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(projects) );
 
-// hide url bar for ipod touch
-	setTimeout(()=>{
-	window.scrollTo(0, 0);
-	}, 0);
+	$(".DeleteCaseButton").click(function(){
+		var dcaseId = (<any>($(this))).tmplItem().data.dcaseId;
+		if(window.confirm('dcaseを削除しますか?')) {
+			if(DCaseAPI.deleteDCase(dcaseId) != null) {
+				alert("削除しました");
+				location.reload();
+			}
+		}
+	});
 });

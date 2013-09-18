@@ -1,5 +1,5 @@
 ///<reference path='../../../DefinitelyTyped/jquery/jquery.d.ts'/>
-///<reference path='../../types/jquery_plugins.d.ts'/>
+///<reference path='../../../types/jquery_plugins.d.ts'/>
 ///<reference path='../api.ts'/>
 
 $(()=>{

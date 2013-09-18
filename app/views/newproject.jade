@@ -16,16 +16,16 @@ block bar
 block append content
     +template("member_tmpl")
         form.form-inline.memberForm
-            input.input-large.userName(type="text", placeholder="username", value="${name}")
+            input.input-lg.userName(type="text", placeholder="username", value="${name}")
             |&nbsp;
             input.input-medium.role(type="text", placeholder="role", value="${role}")
             |&nbsp;
-            button.btn.btn-danger.DeleteMemberButton
-                i.icon-minus
+            button.btn.btn-default.btn.btn-default-default.btn.btn-default-danger.DeleteMemberButton
+                span.glyphicon.glyphicon-minus
 block content
     .container
         .row
-            .span6.offset3
+            .col-md-6.col-md-offset-3
                 if projectId
                     h2= lang.edit_Project
                 else
@@ -42,12 +42,12 @@ block content
                 #MemberList
                     h3= lang.member
                     form.form-inline
-                        button.btn.btn-success#AddMemberButton
-                            i.icon-plus
+                        button.btn.btn-default.btn.btn-default-success#AddMemberButton
+                            span.glyphicon.glyphicon-plus
                 form
                     if projectId
-                        button.btn.btn-primary#project-create(type="button")= lang.update
+                        button.btn.btn-default.btn.btn-default-primary#project-create(type="button")= lang.update
                         | &nbsp;
-                        button.btn.btn-danger#project-delete(type="button")=  lang.delete
+                        button.btn.btn-default.btn.btn-default-danger#project-delete(type="button")=  lang.delete
                     else
-                        button.btn.btn-primary#project-create(type="button")= lang.create
+                        button.btn.btn-default.btn.btn-default-primary#project-create(type="button")= lang.create
