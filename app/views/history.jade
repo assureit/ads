@@ -15,9 +15,7 @@ block append content
                         |${userName} commited 
                         abbr(title="${dateTimeString}") ${dateTime}
 block content
-    .container
-        .row
-            .col-md-6.col-md-offset-3
-                h2 History&nbsp;
-                hr
-                #history-list
+    +mainCollum
+        h2 History&nbsp;
+        hr
+        #history-list

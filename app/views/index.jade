@@ -7,12 +7,10 @@ block script
     +js("/assurejs/src/CaseDecoder.js")
     +js("/assurejs/src/CaseModel.js")
     +js("/assurejs/src/PlugInManager.js")
-
 block append content
     +template("case_tmpl")
         li.list-group-item
             h4.list-group-item-heading
-                //|@${dcaseId} 
                 a(href='#{basepath}/case/${dcaseId}') ${dcaseName}
                 small.pull-right 0 nodes
             p.list-group-item-text ${description}
@@ -53,13 +51,11 @@ block append content
                 li.list-group-item (no case)
                 |{{/if}}
 block content
-    #dcase-manager.container
-        .row
-            #selectDCase.col-md-6.col-md-offset-3
-                h2 Projects&nbsp;
-                    if userName
-                        a.btn.btn.btn-success.pull-right.NewProjectButton(href="./project/new")
-                            span.glyphicon.glyphicon-plus
-                            | &nbsp;New project
-                hr
-                #ProjectList
+    +mainCollum
+        h2 Projects&nbsp;
+            if userName
+                a.btn.btn.btn-success.pull-right.NewProjectButton(href="./project/new")
+                    span.glyphicon.glyphicon-plus
+                    | &nbsp;New project
+        hr
+        #ProjectList

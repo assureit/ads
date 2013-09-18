@@ -14,32 +14,27 @@ block append content
                 span.glyphicon.glyphicon-minus
         p         
 block content
-    .container
-        .row
-            .col-md-6.col-md-offset-3
+    +mainCollum
+        h2= projectId ? lang.edit_Project : lang.new_Project
+        form(role="form")
+            .form-group
+                label.control-label(for="inputProjectName")= lang.Project_name
+                input.form-control#inputProjectName(type="text")
+            .checkbox
+                label
+                    input#inputIsPublic(type="checkbox")
+                    = lang.public
+            #MemberList(style="display:none;")
+                .form-group
+                    label.control-label= lang.member
+                    #MemberInsertPoint
+                    .form-inline
+                        button.btn.btn-default#AddMemberButton
+                            span.glyphicon.glyphicon-plus
+            .form-group
                 if projectId
-                    h2= lang.edit_Project
+                    button.btn.btn-primary#project-create(type="button")= lang.update
+                    | &nbsp;
+                    button.btn.btn-danger#project-delete(type="button")=  lang.delete
                 else
-                    h2= lang.new_Project
-                form(role="form")
-                    .form-group
-                        label.control-label(for="inputProjectName")= lang.Project_name
-                        input.form-control#inputProjectName(type="text")
-                    .checkbox
-                        label
-                            input#inputIsPublic(type="checkbox")
-                            = lang.public
-                    #MemberList(style="display:none;")
-                        .form-group
-                            label.control-label= lang.member
-                            #MemberInsertPoint
-                            .form-inline
-                                button.btn.btn-default#AddMemberButton
-                                    span.glyphicon.glyphicon-plus
-                    .form-group
-                        if projectId
-                            button.btn.btn-primary#project-create(type="button")= lang.update
-                            | &nbsp;
-                            button.btn.btn-danger#project-delete(type="button")=  lang.delete
-                        else
-                            button.btn.btn-primary#project-create(type="button")= lang.create
+                    button.btn.btn-primary#project-create(type="button")= lang.create
