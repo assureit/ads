@@ -1,3 +1,7 @@
+///<reference path='../../../DefinitelyTyped/jquery/jquery.d.ts'/>
+///<reference path='../../../types/jquery_plugins.d.ts'/>
+///<reference path='../api.ts'/>
+
 class CommitModel {
 	dateTime: string;
 	dateTimeString: string;
@@ -70,6 +74,13 @@ class HistoryView {
 		var commitList: any[] = DCaseAPI.getCommitList(caseId);
 		var commits: CommitCollection = CommitCollection.FromJson(commitList, caseId);
 		commits.reverse();
-		$(this.selector).append( (<any>$)("#history_tmpl").tmpl(commits.CommitModels) );
+		$("#history_tmpl").tmpl(commits.CommitModels).appendTo($(this.selector));
 	}
 }
+
+$(()=>{
+	var idMatchResult = location.pathname.match(/case\/(\d+)/);
+	var caseId: number = idMatchResult ? <any>idMatchResult[1]-0 : 0;
+    var list = new HistoryView();
+    list.addElements(caseId);
+});

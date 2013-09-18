@@ -1,0 +1,16 @@
+extends base
+block script
+    +js('/javascripts/route/newcase.js')
+block content
+    #dcase-manager.container
+        .row
+            #newDCase.col-md-6.col-md-offset-3
+                h2= lang.new_DCase
+                form(role="form")
+                    .form-group
+                        label.control-label(for="inputDCaseName")= lang.DCase_name
+                        input.form-control#inputDCaseName(type="text")
+                    .form-group
+                        label.control-label(for="inputDesc")= lang.topgoal
+                        textarea.form-control#inputDesc(rows=5)
+                    button.btn.btn-default.btn-primary#dcase-create(type="button")= lang.create
