@@ -138,11 +138,11 @@ var NodeDAO = (function (_super) {
                 }
                 var parser = new asn_parser.ASNParser();
                 var asn = parser.ConvertToASN(model, false);
-                asn = asn.replace('\\n', '\n');
-                asn = asn.replace('\\t', '\t');
-                asn = asn.replace('\\r', '\r');
+                asn = asn.replace('\\n', "\n");
+                asn = asn.replace('\\t', "\t");
+                asn = asn.replace('\\r', "\r");
                 console.log('---- SUCCESSFULLY TRANSLATED ----');
-                console.log(data);
+                console.log(asn);
                 callback(null, asn);
             });
         });

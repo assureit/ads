@@ -34,8 +34,9 @@ var ASNParser = (function () {
         var encoded = (function (model, prefix) {
             var IndentToken = "    ";
             var ret = "";
-            switch (model.Type) {
-                case NodeType["Goal"]:
+            switch (model.Label[0]) {
+                case "G":
+                case "g":
                     prefix += "*";
                     ret += (prefix + " " + model.Label);
                     break;
@@ -75,14 +76,14 @@ var ASNParser = (function () {
             for (var i = 0; i < model.Children.length; i++) {
                 var child_model = model.Children[i];
 
-                if (child_model.Type == NodeType["Context"]) {
+                if (child_model.Label[0] == "C" || child_model.Label[0] == "c") {
                     ret += arguments.callee(child_model, prefix);
                     break;
                 }
             }
             for (var i = 0; i < model.Children.length; i++) {
                 var child_model = model.Children[i];
-                if (child_model.Type != NodeType["Context"]) {
+                if (child_model.Label[0] != "C" && child_model.Label[0] != "c") {
                     ret += arguments.callee(child_model, prefix);
                 }
             }

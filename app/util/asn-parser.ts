@@ -29,8 +29,10 @@ export class ASNParser {
 		var encoded : string = (function(model , prefix : string) : string {
 			var IndentToken: string = "    ";
 			var ret : string = "";
-			switch (model.Type) {
-			case NodeType["Goal"]:
+			switch (model.Label[0]) {
+			case "G":
+			case "g":
+			//case NodeType["Goal"]:
 				prefix += "*";
 				ret += (prefix + " " + model.Label);
 				break;
@@ -70,14 +72,14 @@ export class ASNParser {
 			for (var i = 0; i < model.Children.length; i++) {
 				var child_model = model.Children[i];
 				//console.log(child_model.Type);
-				if (child_model.Type == NodeType["Context"]) {
+				if (child_model.Label[0] == "C" || child_model.Label[0] == "c") {
 					ret += arguments.callee(child_model, prefix);
 					break;
 				}
 			}
 			for (var i = 0; i < model.Children.length; i++) {
 				var child_model = model.Children[i];
-				if (child_model.Type != NodeType["Context"]) {
+				if (child_model.Label[0] !="C" && child_model.Label[0] != "c") {
 					ret += arguments.callee(child_model, prefix);
 				}
 			}
