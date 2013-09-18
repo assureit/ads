@@ -101,7 +101,6 @@ var NodeDAO = (function (_super) {
             return false;
         };
         var Translator = new mstranslator({ client_id: CONFIG.translator.CLIENT_ID, client_secret: CONFIG.translator.CLIENT_SECRET });
-        console.log("2");
         var items = [[], []];
         var traverse = function (model) {
             if (model.Statement != '' && CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
@@ -120,6 +119,7 @@ var NodeDAO = (function (_super) {
         traverse(model);
         if (items[0].length == 0) {
             callback(null, null);
+            return;
         }
 
         Translator.initialize_token(function (keys) {
@@ -132,7 +132,6 @@ var NodeDAO = (function (_super) {
                     console.log(err);
                     callback(null, null);
                 }
-                console.log(data);
                 for (var i in items[0]) {
                     var model_translated = items[0][i];
                     model_translated.Notes['TranslatedTextEn'] = data[i]['TranslatedText'];
@@ -142,7 +141,8 @@ var NodeDAO = (function (_super) {
                 asn = asn.replace('\\n', '\n');
                 asn = asn.replace('\\t', '\t');
                 asn = asn.replace('\\r', '\r');
-                console.log(asn);
+                console.log('---- SUCCESSFULLY TRANSLATED ----');
+                console.log(data);
                 callback(null, asn);
             });
         });

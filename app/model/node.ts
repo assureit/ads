@@ -215,7 +215,6 @@ export class NodeDAO extends model.DAO {
 			return false;
 		};
 		var Translator = new mstranslator({client_id: CONFIG.translator.CLIENT_ID, client_secret: CONFIG.translator.CLIENT_SECRET});
-		console.log("2");
 		var items = [[], []];
 		var traverse = (model) => {
 			if (model.Statement != '' && CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
@@ -234,6 +233,7 @@ export class NodeDAO extends model.DAO {
 		traverse(model);
 		if (items[0].length == 0) {
 			callback(null, null);
+			return;
 		}
 
 		Translator.initialize_token(function(keys) {
@@ -246,7 +246,6 @@ export class NodeDAO extends model.DAO {
 					console.log(err);
 					callback(null, null);
 				}
-				console.log(data);
 				for (var i in items[0]) {
 					var model_translated = items[0][i];
 					model_translated.Notes['TranslatedTextEn'] = data[i]['TranslatedText'];
@@ -256,7 +255,8 @@ export class NodeDAO extends model.DAO {
 				asn = asn.replace('\\n', '\n');
 				asn = asn.replace('\\t', '\t');
 				asn = asn.replace('\\r', '\r');
-				console.log(asn);
+				console.log('---- SUCCESSFULLY TRANSLATED ----')
+				console.log(data);
 				callback(null, asn);
 			});
 		});
