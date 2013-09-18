@@ -24,7 +24,6 @@
     "passport": "*",
     "passport-facebook": "*",
     "passport-twitter": "*",
-    "mstranslator": "*"
   },
   "devDependencies": {
     "typescript": "0.9.0-1",

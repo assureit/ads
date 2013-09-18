@@ -12,7 +12,7 @@ import asn_parser = module('../util/asn-parser')
 var _ = require('underscore');
 var async = require('async');
 var CONFIG = require('config');
-var mstranslator = require('mstranslator');
+var mstranslator = require('../util/mstranslator/mstranslator');
 
 /* obsolete */
 export interface NodeNote {
