@@ -218,7 +218,7 @@ export class NodeDAO extends model.DAO {
 		console.log("2");
 		var items = [[], []];
 		var traverse = (model) => {
-			if (model.Statement != '' && CheckLength(model.Statement) && model.Notes['TranslatedTo'] == null) {
+			if (model.Statement != '' && CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
 				model.Statement = model.Statement.replace('\n', '\\n');
 				model.Statement = model.Statement.replace('\t', '\\t');
 				model.Statement = model.Statement.replace('\r', '\\r');
@@ -249,12 +249,7 @@ export class NodeDAO extends model.DAO {
 				console.log(data);
 				for (var i in items[0]) {
 					var model_translated = items[0][i];
-					if (model_translated.Annotations == '') {
-						model_translated.Annotations = [{Name: 'en', Body: ''}];
-					} else {
-						model_translated.Annotations.push({Name: 'en', Body: ''});
-					}
-					model_translated.Notes["TranslatedTo"] = data[i]['TranslatedText'];
+					model_translated.Notes['TranslatedTextEn'] = data[i]['TranslatedText'];
 				}
 				var parser = new asn_parser.ASNParser();
 				var asn = parser.ConvertToASN(model, false);
