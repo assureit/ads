@@ -1,25 +1,33 @@
 $(function () {
-    var ads = new ADS(document.getElementById("ase"));
+    var idMatchResult = location.pathname.match(/new\/(\d+)/);
+    var projectId = idMatchResult ? idMatchResult[1] - 0 : 0;
+    var name = "";
+    var description = "";
 
-    var sidemenu = new SideMenu();
+    var $inputDCaseName = $("#inputDCaseName");
+    var $inputDesc = $("#inputDesc");
 
-    var $id = $('#signup-userid');
-    var $pass1 = $('#signup-pass');
-    var $pass2 = $('#signup-pass2');
+    $inputDCaseName.blur(function (e) {
+        name = $inputDCaseName.val();
+        $inputDCaseName.parent(".form-group").toggleClass("has-error", !name || name.trim().length == 0);
+    });
 
-    function verify() {
-        if ($id.val().length > 0 && $pass1.val().length > 0 && $pass1.val() == $pass2.val()) {
-            $('#sign-up-form .btn').removeAttr("disabled");
+    $inputDesc.blur(function (e) {
+        description = $inputDesc.val();
+        $inputDesc.parent(".form-group").toggleClass("has-error", !description || description.trim().length == 0);
+    });
+
+    $("#dcase-create").click(function (e) {
+        e.preventDefault();
+        var error = projectId == 0 || (!name || name.trim().length == 0) || (!description || description.trim().length == 0);
+        if (error)
+            return;
+        var tree = "*Goal\n" + description;
+        var r = DCaseAPI.createDCase(name, tree, projectId);
+        if (r && r.dcaseId) {
+            location.href = "../case/" + r.dcaseId;
         } else {
-            $('#sign-up-form .btn').attr("disabled", "disabled");
+            alert("ajax error");
         }
-    }
-    ;
-    $id.keyup(verify);
-    $pass1.keyup(verify);
-    $pass2.keyup(verify);
-
-    setTimeout(function () {
-        window.scrollTo(0, 0);
-    }, 0);
+    });
 });

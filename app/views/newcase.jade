@@ -18,15 +18,11 @@ block content
         .row
             #newDCase.col-md-6.col-md-offset-3
                 h2= lang.new_DCase
-                form.form-horizontal
-                    .control-group#newdcase-name
+                form(role="form")
+                    .form-group
                         label.control-label(for="inputDCaseName")= lang.DCase_name
-                        .controls
-                            input#inputDCaseName(type="text")
-                    .control-group#newdcase-desc
+                        input.form-control#inputDCaseName(type="text")
+                    .form-group
                         label.control-label(for="inputDesc")= lang.topgoal
-                        .controls
-                            textarea#inputDesc(rows=5)
-                    .control-group
-                        .controls
-                            button.btn.btn-default.btn-primary#dcase-create(type="button")= lang.create
+                        textarea.form-control#inputDesc(rows=5)
+                    button.btn.btn-default.btn-primary#dcase-create(type="button")= lang.create

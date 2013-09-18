@@ -17,13 +17,17 @@ $(()=>{
 		});
 		newMemberForm.find(".userName").blur(function(e){
 			var name = this.value;
-			var user = DCaseAPI.getUserByName(name);
-			if(user && user.loginName == name && countNameInMember(name) == 1){
-				$(this).addClass("disabled").attr("disabled", "");
-				updateDeleteButtonState();
+			if(name.trim().length > 0){
+				var user = DCaseAPI.getUserByName(name);
+				if(user && user.loginName == name && countNameInMember(name) == 1){
+					$(this).attr("disabled", "").parent(".form-group").removeClass("has-error");
+					updateDeleteButtonState();
+					return;
+				}
 			}
+			$(this).parent(".form-group").addClass("has-error");
 		});
-		$("#AddMemberButton").before(newMemberForm);
+		$("#MemberInsertPoint").before(newMemberForm);
 		return newMemberForm;
 	}
 
@@ -66,11 +70,7 @@ $(()=>{
 	}
 
 	var setMemberListVisible = function(isVisible: boolean){
-		if(isVisible){
-			$("#MemberList").show();
-		}else{
-			$("#MemberList").hide();
-		}
+		$("#MemberList").toggle(isVisible);
 	}
 
 	var updateDeleteButtonState = function(){
@@ -79,15 +79,15 @@ $(()=>{
 			if($(v).find(".userName").attr("disabled") != null){
 				validMemberCount++;
 			}else{
-				$(v).find(".DeleteMemberButton").show();
+				$(v).find(".DeleteMemberButton").attr("disabled", "disabled");
 			}
 		});
 		$(".memberForm").each((i, v) => {
 			if($(v).find(".userName").attr("disabled") != null){
 				if(validMemberCount > 1){
-					$(v).find(".DeleteMemberButton").show();
+					$(v).find(".DeleteMemberButton").attr("disabled", "");
 				}else{
-					$(v).find(".DeleteMemberButton").hide();
+					$(v).find(".DeleteMemberButton").attr("disabled", "disabled")
 				}
 			}
 		});

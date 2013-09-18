@@ -19,19 +19,23 @@ block append content
                 small
                     |${userName} updated 
                     abbr(title="${latestCommit.dateTime}") ${dateTime}
-                small.pull-right
-                    a.text-danger.DeleteCaseButton
-                        span.glyphicon.glyphicon-trash
-                        | &nbsp;Delete
+                if userName
+                    small.pull-right
+                        a.text-danger.DeleteCaseButton
+                            span.glyphicon.glyphicon-trash
+                            | &nbsp;Delete
     +template("project_tmpl")
         .panel.panel-default(id="project${projectId}")
             .panel-heading
                 h4
-                    //|#${projectId} 
-                    a(href='#{basepath}/project/${projectId}/edit') ${projectName}
-                    a.btn.btn-success.btn-xs.pull-right.NewCaseButton(href='#{basepath}/new/${projectId}')
-                        span.glyphicon.glyphicon-plus
-                        | &nbsp;New case
+                    if userName
+                        a(href='#{basepath}/project/${projectId}/edit') ${projectName}
+                    else
+                        ${projectName}
+                    if userName
+                        a.btn.btn-success.btn-xs.pull-right.NewCaseButton(href='#{basepath}/new/${projectId}')
+                            span.glyphicon.glyphicon-plus
+                            | &nbsp;New case
                 .list-inline
                     li
                         span.glyphicon.glyphicon-user
@@ -65,8 +69,9 @@ block content
         .row
             #selectDCase.col-md-6.col-md-offset-3
                 h2 Projects&nbsp;
-                    a.btn.btn.btn-success.pull-right.NewProjectButton(href="./project/new")
-                        span.glyphicon.glyphicon-plus
-                        | &nbsp;New project
+                    if userName
+                        a.btn.btn.btn-success.pull-right.NewProjectButton(href="./project/new")
+                            span.glyphicon.glyphicon-plus
+                            | &nbsp;New project
                 hr
                 #ProjectList
