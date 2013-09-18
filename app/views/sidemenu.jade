@@ -1,0 +1,9 @@
+include logo
+.menu.sidebar-nav-fixed.bs-sidebar.hidden-print.affix-top
+    ul.nav.bs-sidenav#drop-menu
+        if userName
+            li#settings-menu
+                a(href='#') Settings
+            include signout
+        else
+            include signin

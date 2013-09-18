@@ -1,53 +1,40 @@
-extends layout
+extends base
 block script
-    script(type='text/javascript', src='#{basepath}/javascripts/index.js')
-block bar
-    include logo
-    .menu
-        ul#drop-menu
-            if userName
-                li#monitors-menu
-                    a(href='#') Monitors
-                li#settings-menu
-                    a(href='#') Settings
-                include signout
-            else
-                include signin
+    +js('/javascripts/route/newproject.js')
 block append content
-    script#member_tmpl(type="text/x-jquery-tmpl")
-        form.form-inline.memberForm
-            input.input-large.userName(type="text", placeholder="username", value="${name}")
-            |&nbsp;
-            input.input-medium.role(type="text", placeholder="role", value="${role}")
-            |&nbsp;
+    +template("member_tmpl")
+        .form-inline.memberForm
+            .form-group
+                input.form-control.userName(type="text", placeholder="username", value="${name}")
+            | &nbsp;
+            .form-group
+                input.form-control.role(type="text", placeholder="role", value="${role}")
+            | &nbsp;
             button.btn.btn-danger.DeleteMemberButton
-                i.icon-minus
+                span.glyphicon.glyphicon-minus
+        p         
 block content
-    .container
-        .row
-            .span6.offset3
+    +mainCollum
+        h2= projectId ? lang.edit_Project : lang.new_Project
+        form(role="form")
+            .form-group
+                label.control-label(for="inputProjectName")= lang.Project_name
+                input.form-control#inputProjectName(type="text")
+            .checkbox
+                label
+                    input#inputIsPublic(type="checkbox")
+                    = lang.public
+            #MemberList(style="display:none;")
+                .form-group
+                    label.control-label= lang.member
+                    #MemberInsertPoint
+                    .form-inline
+                        button.btn.btn-default#AddMemberButton
+                            span.glyphicon.glyphicon-plus
+            .form-group
                 if projectId
-                    h2= lang.edit_Project
+                    button.btn.btn-primary#project-create(type="button")= lang.update
+                    | &nbsp;
+                    button.btn.btn-danger#project-delete(type="button")=  lang.delete
                 else
-                    h2= lang.new_Project
-                form
-                    label(for="inputProjectName")= lang.Project_name
-                    input#inputProjectName(type="text")
-                    //label(for="inputLanguage")= lang.locale
-                    //select#inputLanguage
-                        option(value="en") English
-                        option(value="ja") Japanese
-                    label.checkbox= lang.public
-                        input#inputIsPublic(type="checkbox")
-                #MemberList
-                    h3= lang.member
-                    form.form-inline
-                        button.btn.btn-success#AddMemberButton
-                            i.icon-plus
-                form
-                    if projectId
-                        button.btn.btn-primary#project-create(type="button")= lang.update
-                        | &nbsp;
-                        button.btn.btn-danger#project-delete(type="button")=  lang.delete
-                    else
-                        button.btn.btn-primary#project-create(type="button")= lang.create
+                    button.btn.btn-primary#project-create(type="button")= lang.create

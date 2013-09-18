@@ -1,62 +1,93 @@
+include mixin
 html
     head
         title Assure-It
-        link(rel='stylesheet', href='#{basepath}/stylesheets/sidemenu.css')
-        link(rel='stylesheet', href='#{basepath}/stylesheets/index.css')
-        //link(rel='stylesheet', href='#{basepath}/lib/bootstrap.min.css')
-        link(rel='stylesheet', href='#{basepath}/lib/flatstrap/bootstrap.min.css')
-        link(rel='stylesheet', href='#{basepath}/lib/bootstrap.icons.css')
-        //link(rel='stylesheet', href='#{basepath}/lib/bootstrap-responsive.min.css')
-        link(rel='stylesheet', href='#{basepath}/stylesheets/dcase-node.css')
-        link(rel='stylesheet',href='#{basepath}/assurejs/plugins/Editor/lib/codemirror/codemirror.css')
-        link(rel='stylesheet',href="#{basepath}/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.css")
-        link(rel='stylesheet',href="#{basepath}/assurejs/plugins/Monitor/lib/DataTables-1.9.4/css/jquery.dataTables.css")
-        link(rel='stylesheet',href="#{basepath}/assurejs/lib/animate-custom.css")
-        script(type='text/javascript',src='#{basepath}/javascripts/sidemenu.js')
-        script(type="text/javascript",src="#{basepath}/assurejs/lib/jquery.min.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/lib/pointer.min.js")
-        script(type='text/javascript',src='#{basepath}/lib/bootstrap.min.js')
-        script(type="text/javascript",src="#{basepath}/assurejs/lib/ASNParser/peg.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseModel.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseViewer.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/Converter.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseEncoder.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/CommitModel.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/EditorUtil.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/RecApi.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/Layout.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/PlugInManager.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/ServerApi.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/Pattern.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/SideMenuModel.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/ColorTheme/ColorTheme.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/codemirror.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/mode/ASN/asn.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Editor/lib/codemirror/display/placeholder.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/SearchNode/SearchNode.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/SimplePattern/SimplePattern.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScript.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery.jqdock.min.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/MenuBar/MenuBar.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Scale/Scale.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Scale/ScaleUp.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DefaultStatementRender/DefaultStatementRender.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Annotation/Annotation.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Monitor/lib/DataTables-1.9.4/js/jquery.dataTables.min.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Monitor/Monitor.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Note/Note.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DragFile/DragFile.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/BeforeUnload/BeforeUnload.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScript.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/DScript/DScriptGenerator.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/LayoutPortrait/LayoutPortrait.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/Export/Export.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/plugins/TimeLine/TimeLine.js")
-        script(type="text/javascript",src="#{basepath}/assurejs/src/CaseDecoder.js")
-        //script(type="text/javascript",src="#{basepath}/assurejs/mock/Index.js")
-        script(type='text/javascript',src='#{basepath}/javascripts/config.js')
+        +css("/stylesheets/sidemenu.css")
+        +css("/stylesheets/index.css")
+        +css("/lib/bootstrap3/css/bootstrap.min.css")
+        +css("/stylesheets/dcase-node.css")
+        +css("/assurejs/plugins/Editor/lib/codemirror/codemirror.css")
+        +css("/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.css")
+        +css("/assurejs/plugins/Monitor/lib/DataTables-1.9.4/css/jquery.dataTables.css")
+        +css("/assurejs/lib/animate-custom.css")
+
+    body(style="overflow: hidden; margin: 0px;")
+        a(href="#{basepath}/")
+            img#menu-button(src="#{basepath}/images/ait.png") Menu
+        //#assureit-status
+            ul
+                li#assureit-mode Viewer mode
+        #viewer(style="width: 100%; height: 100%;")
+            svg#layer0box(xmlns="http://www.w3.org/2000/svg",version="1.1",style="width: 100%; height: 100%; position: absolute")
+                g#layer0(transform="translate(0,0)")
+            #background(style="width: 100%; height: 100%; position: absolute;")
+            #layer1(style="width: 0px; height: 0px; position: absolute;")
+            include sidemenu
+            #layer2(style="width: 0px; height: 0px; position: absolute;")
+        svg(width="0",height="0")
+            defs
+                marker#Triangle-black(viewBox="0 0 10 10",refX="10",refY="5",markerUnits="strokeWidth",markerWidth="15",markerHeight="9",orient="auto")
+                    path(d="M 0 0 L 10 5 L 0 10 z",fill="gray",stroke="gray")
+                marker#Triangle-white(viewBox="0 0 10 10",refX="10",refY="5",markerUnits="strokeWidth",markerWidth="15",markerHeight="9",orient="auto")
+                    path(d="M 0 0 L 10 5 L 0 10 z",fill="white",stroke="gray")
+                polygon#UndevelopdSymbol(fill="none",stroke="#333",stroke-width="1.5",points="0 -20 -20 0 0 20 20 0")
+        #editor-wrapper(style="border: 1px solid black")
+            textarea#editor(placeholder="Type something...")
+        #fullscreen-editor-wrapper(style="border: 1px solid black")
+            textarea#fullscreen-editor(placeholder="Type something...")
+        #dscript-editor-wrapper(style="border: 1px solid black")
+            div
+                textarea#dscript-editor-left(placeholder="")
+            div
+                textarea#dscript-editor-right(placeholder="Generated code goes here.")
+
+        +js("/javascripts/sidemenu.js")
+        +js("/assurejs/lib/jquery.min.js")
+        +js("/lib/bootstrap3/js/bootstrap.min.js")
+        +js("/assurejs/lib/pointer.min.js")
+        +js("/assurejs/lib/underscore-min.js")
+        +js("/assurejs/lib/ASNParser/peg.js")
+        +js("/assurejs/src/CaseModel.js")
+        +js("/assurejs/src/CaseViewer.js")
+        +js("/assurejs/src/Converter.js")
+        +js("/assurejs/src/CaseEncoder.js")
+        +js("/assurejs/src/CaseDecoder.js")
+        +js("/assurejs/src/CommitModel.js")
+        +js("/assurejs/src/EditorUtil.js")
+        +js("/assurejs/src/RecApi.js")
+        +js("/assurejs/src/Layout.js")
+        +js("/assurejs/src/PlugInManager.js")
+        +js("/assurejs/src/ServerApi.js")
+        +js("/assurejs/src/Pattern.js")
+        +js("/assurejs/src/SideMenuModel.js")
+        +js("/assurejs/plugins/ColorTheme/ColorTheme.js")
+        +js("/assurejs/plugins/Editor/lib/codemirror/codemirror.js")
+        +js("/assurejs/plugins/Editor/lib/codemirror/mode/ASN/asn.js")
+        +js("/assurejs/plugins/Editor/lib/codemirror/display/placeholder.js")
+        +js("/assurejs/plugins/SearchNode/SearchNode.js")
+        +js("/assurejs/plugins/SimplePattern/SimplePattern.js")
+        +js("/assurejs/plugins/DScript/DScript.js")
+        +js("/assurejs/plugins/MenuBar/lib/jquery.jqdock.min.js")
+        +js("/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.js")
+        +js("/assurejs/plugins/MenuBar/MenuBar.js")
+        +js("/assurejs/plugins/Scale/Scale.js")
+        +js("/assurejs/plugins/Scale/ScaleUp.js")
+        +js("/assurejs/plugins/Scale/ScaleUp.js")
+        +js("/assurejs/plugins/Commit/Commit.js")
+        +js("/assurejs/plugins/DefaultStatementRender/DefaultStatementRender.js")
+        +js("/assurejs/plugins/Annotation/Annotation.js")
+        +js("/assurejs/plugins/Monitor/lib/DataTables-1.9.4/js/jquery.dataTables.min.js")
+        +js("/assurejs/plugins/Monitor/Monitor.js")
+        +js("/assurejs/plugins/Note/Note.js")
+        +js("/assurejs/plugins/DragFile/DragFile.js")
+        +js("/assurejs/plugins/BeforeUnload/BeforeUnload.js")
+        +js("/assurejs/plugins/DScript/DScript.js")
+        +js("/assurejs/plugins/DScript/DScriptGenerator.js")
+        +js("/assurejs/plugins/LayoutPortrait/LayoutPortrait.js")
+        +js("/assurejs/plugins/Export/Export.js")
+        +js("/assurejs/plugins/TimeLine/TimeLine.js")
+        +js("/assurejs/src/CaseDecoder.js")
+        +js("/javascripts/config.js")
         script(type='text/javascript').
             $(function(){
                var serverApi = new AssureIt.ServerAPI(Config.BASEPATH);
@@ -75,6 +106,7 @@ html
                pluginManager.SetPlugIn("portraitlayout", new LayoutPortraitPlugIn(pluginManager));
                pluginManager.SetPlugIn("export", new ExportPlugIn(pluginManager));
                pluginManager.SetPlugIn("timeline", new TimeLinePlugIn(pluginManager));
+               pluginManager.SetPlugIn("commit", new CommitPlugIn(pluginManager));
                pluginManager.SetPlugIn("pattern", new SimplePatternPlugIn(pluginManager));
                pluginManager.SetUseLayoutEngine("portraitlayout");
 
@@ -113,14 +145,15 @@ html
                var Screen = new AssureIt.ScreenManager(shapelayer, contentlayer, controllayer, backgroundlayer);
                var Viewer = new AssureIt.CaseViewer(Case0, pluginManager, serverApi, Screen);
 
-               pluginManager.RegisterKeyEvents(Case0, serverApi);
-               pluginManager.CreateSideMenu(Viewer, Case0, serverApi);
-
                if (!isNaN(history)) {
                    Case0.SetEditable(false);
                } else {
                    Case0.SetEditable("#{userName}".length > 0);
                }
+
+               pluginManager.RegisterKeyEvents(Case0, serverApi);
+               pluginManager.CreateSideMenu(Viewer, Case0, serverApi);
+
                Viewer.Draw();
                Viewer.Screen.SetOffset(($('html').width() / 2) - ((AssureIt.CaseViewer.ElementWidth) + Viewer.ViewMap[Viewer.ElementTop.Label].AbsX),80); //Center TopGoal in the view
                if(Case0.IsEditable()) {
@@ -128,37 +161,3 @@ html
                    Case0.SetModified(false);
                }
             });
-    body(style="overflow: hidden; margin: 0px;")
-        #viewer(style="width: 100%; height: 100%;")
-            svg#layer0box(xmlns="http://www.w3.org/2000/svg",version="1.1",style="width: 100%; height: 100%; position: absolute")
-                g#layer0(transform="translate(0,0)")
-            #background(style="width: 100%; height: 100%; position: absolute;")
-            #layer1(style="width: 0px; height: 0px; position: absolute;")
-            a(href="#{basepath}/")
-                img#menu-button(src="#{basepath}/images/ait.png") Menu
-            .container
-                .row
-                    .menu.sidebar-nav-fixed.bs-docs-sidebar
-                        //ul.nav.nav-list.bs-docs-sidenav.affix-top.well#drop-menu
-                        ul#drop-menu
-                            if userName
-                                include signout
-                            else
-                                include signin
-            #layer2(style="width: 0px; height: 0px; position: absolute;")
-        svg(width="0",height="0")
-            defs
-                marker#Triangle-black(viewBox="0 0 10 10",refX="10",refY="5",markerUnits="strokeWidth",markerWidth="15",markerHeight="9",orient="auto")
-                    path(d="M 0 0 L 10 5 L 0 10 z",fill="gray",stroke="gray")
-                marker#Triangle-white(viewBox="0 0 10 10",refX="10",refY="5",markerUnits="strokeWidth",markerWidth="15",markerHeight="9",orient="auto")
-                    path(d="M 0 0 L 10 5 L 0 10 z",fill="white",stroke="gray")
-                polygon#UndevelopdSymbol(fill="none",stroke="#333",stroke-width="1.5",points="0 -20 -20 0 0 20 20 0")
-        #editor-wrapper(style="border: 1px solid black")
-            textarea#editor(placeholder="Type something...")
-        #fullscreen-editor-wrapper(style="border: 1px solid black")
-            textarea#fullscreen-editor(placeholder="Type something...")
-        #dscript-editor-wrapper(style="border: 1px solid black")
-            div
-                textarea#dscript-editor-left(placeholder="")
-            div
-                textarea#dscript-editor-right(placeholder="Generated code goes here.")

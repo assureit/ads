@@ -1,0 +1,13 @@
+mixin js(path)
+    script(type='text/javascript', src=basepath+path)
+mixin css(path)
+    link(rel='stylesheet', href=basepath+path)
+mixin template(id)
+    script(id=id, type="text/x-jquery-tmpl")
+        block
+mixin mainCollum
+    .container(style="width: 970px;")
+        .row
+            .col-xs-3
+            .col-xs-6
+                block

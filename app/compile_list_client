@@ -1,11 +1,11 @@
-public/javascripts/ads.ts
-public/javascripts/adsComponentView.ts
 public/javascripts/api.ts
-public/javascripts/color.ts
 public/javascripts/importfile.ts
 public/javascripts/config.ts
-public/javascripts/index.ts
-public/javascripts/router.ts
 public/javascripts/sidemenu.ts
 public/javascripts/timeutil.ts
-public/javascripts/history.ts
+public/javascripts/route/case.ts
+public/javascripts/route/editproject.ts
+public/javascripts/route/history.ts
+public/javascripts/route/index.ts
+public/javascripts/route/newcase.ts
+public/javascripts/route/newproject.ts
