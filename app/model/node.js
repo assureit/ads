@@ -87,12 +87,10 @@ var NodeDAO = (function (_super) {
     };
 
     NodeDAO.prototype.translate = function (dcaseId, commitId, model, callback) {
-        console.log("0");
         if (model == null || !CONFIG.translator || CONFIG.translator.CLIENT_ID.length == 0) {
             callback(null, null);
             return;
         }
-        console.log("1");
         var CheckLength = function (str) {
             for (var i = 0; i < str.length; i++) {
                 var c = str.charCodeAt(i);
@@ -102,40 +100,28 @@ var NodeDAO = (function (_super) {
             }
             return false;
         };
-        console.log("2");
         var Translator = new mstranslator({ client_id: CONFIG.translator.CLIENT_ID, client_secret: CONFIG.translator.CLIENT_SECRET });
         var items = [[], []];
-        try  {
-            var traverse = function (model) {
-                if (model.Statement && model.Statement != '' && CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
-                    model.Statement = model.Statement.replace(/\r\n/g, '');
-                    model.Statement = model.Statement.replace(/\n/g, '');
-                    model.Statement = model.Statement.replace(/\t/g, '');
-                    model.Statement = model.Statement.replace(/ /g, '');
-                    items[0].push(model);
-                    items[1].push(model.Statement);
-                    console.log(model.Statement);
-                    console.log("");
+        var traverse = function (model) {
+            if (model.Statement && model.Statement != '' && CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
+                model.Statement = model.Statement.replace(/\r\n/g, '');
+                model.Statement = model.Statement.replace(/\n/g, '');
+                model.Statement = model.Statement.replace(/\t/g, '');
+                model.Statement = model.Statement.replace(/ /g, '');
+                items[0].push(model);
+                items[1].push(model.Statement);
+            }
+            for (var i in model.Children) {
+                if (model.Children[i] != '') {
+                    traverse(model.Children[i]);
                 }
-                console.log(model.Children);
-                for (var i in model.Children) {
-                    if (model.Children[i] != '') {
-                        traverse(model.Children[i]);
-                    }
-                }
-            };
-        } catch (e) {
-            console.log(e);
-        }
-        console.log("3");
+            }
+        };
         traverse(model);
-        console.log("4");
         if (items[0].length == 0) {
             callback(null, null);
             return;
         }
-        console.log(items[1]);
-        console.log("5");
 
         Translator.initialize_token(function (keys) {
             var param = {
