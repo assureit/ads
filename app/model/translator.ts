@@ -10,14 +10,12 @@ var async = require('async');
 export class TranslatorDAO extends model.DAO {
 
 	insert (model: any, items: {model: any;statement: string}[], callback: (err: any, _model: string)=>void) {
-		console.log("insert");
-		console.log(items);
 		var self = this;
 		var Translator = new mstranslator({client_id: CONFIG.translator.CLIENT_ID, client_secret: CONFIG.translator.CLIENT_SECRET});
 		Translator.initialize_token(function (keys) {
 			var texts = [];
-			items.forEach((item: {model: any;statement: string}) => {
-				texts.push(item.statement);
+			items.forEach((i: {model: any;statement: string}) => {
+				texts.push(i.statement);
 			});
 			var param = {
 				texts: texts,
@@ -27,16 +25,19 @@ export class TranslatorDAO extends model.DAO {
 			Translator.translateArray(param, function (err, data) {
 				if (err) {
 					console.log('---- TRANSLATED FAILED ----')
-					console.log(param);
 					console.log(err);
 					console.log(data);
 					callback(null, null);
 					return;
 				}
 				console.log('---- SUCCESSFULLY TRANSLATED ----')
-				console.log(items);
+				console.log(data);
+				items.forEach((i: {model: any;statement: string}, index) => {
+					i.statement = data[index].TranslatedText;
+				});
 
 				async.each(items,(i:{model: any;statement: string},callback:(err: any)=>void)=> {
+					i.model.Notes['TranslatedTextEn'] = i.statement;
 					self._insert(i.model.Statement, i.statement, (err: any, to_text: string) => {
 						callback(err);
 					});
@@ -45,6 +46,7 @@ export class TranslatorDAO extends model.DAO {
 						callback(err, null);
 						return;
 					}
+					console.log('---- TRANSLATION END ----')
 					callback(null, model);
 					return;
 				});
@@ -117,8 +119,6 @@ export class TranslatorDAO extends model.DAO {
 		var items: {model: any; statement: string}[] = [];
 		async.each(models, (model: any, callback:(err: any)=>void) => {
 			this.get(model.Statement, (err: any, to_text: string) => {
-				console.log("get");
-				console.log(to_text);
 				if (err) {
 					callback(null);
 					return;
@@ -131,13 +131,13 @@ export class TranslatorDAO extends model.DAO {
 					verified = verified.replace(/ /g, '');
 					items.push({model: model, statement: verified});
 				} else {
+					console.log("Translation found on database.");
+					console.log(to_text);
 					model.Notes['TranslatedTextEn'] = to_text;
 				}
 				callback(null);
 			});
 		}, (err: any) => {
-			console.log("just before insert");
-			console.log(items);
 			if (items.length == 0) {
 				console.log('---- TRANSLATION END ----')
 				callback(null, model);

@@ -19,14 +19,12 @@ var TranslatorDAO = (function (_super) {
         _super.apply(this, arguments);
     }
     TranslatorDAO.prototype.insert = function (model, items, callback) {
-        console.log("insert");
-        console.log(items);
         var self = this;
         var Translator = new mstranslator({ client_id: CONFIG.translator.CLIENT_ID, client_secret: CONFIG.translator.CLIENT_SECRET });
         Translator.initialize_token(function (keys) {
             var texts = [];
-            items.forEach(function (item) {
-                texts.push(item.statement);
+            items.forEach(function (i) {
+                texts.push(i.statement);
             });
             var param = {
                 texts: texts,
@@ -36,16 +34,19 @@ var TranslatorDAO = (function (_super) {
             Translator.translateArray(param, function (err, data) {
                 if (err) {
                     console.log('---- TRANSLATED FAILED ----');
-                    console.log(param);
                     console.log(err);
                     console.log(data);
                     callback(null, null);
                     return;
                 }
                 console.log('---- SUCCESSFULLY TRANSLATED ----');
-                console.log(items);
+                console.log(data);
+                items.forEach(function (i, index) {
+                    i.statement = data[index].TranslatedText;
+                });
 
                 async.each(items, function (i, callback) {
+                    i.model.Notes['TranslatedTextEn'] = i.statement;
                     self._insert(i.model.Statement, i.statement, function (err, to_text) {
                         callback(err);
                     });
@@ -54,6 +55,7 @@ var TranslatorDAO = (function (_super) {
                         callback(err, null);
                         return;
                     }
+                    console.log('---- TRANSLATION END ----');
                     callback(null, model);
                     return;
                 });
@@ -114,8 +116,6 @@ var TranslatorDAO = (function (_super) {
         var items = [];
         async.each(models, function (model, callback) {
             _this.get(model.Statement, function (err, to_text) {
-                console.log("get");
-                console.log(to_text);
                 if (err) {
                     callback(null);
                     return;
@@ -128,6 +128,8 @@ var TranslatorDAO = (function (_super) {
                     verified = verified.replace(/ /g, '');
                     items.push({ model: model, statement: verified });
                 } else {
+                    console.log("Translation found on database.");
+                    console.log(to_text);
                     model.Notes['TranslatedTextEn'] = to_text;
                 }
                 callback(null);
