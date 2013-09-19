@@ -3,12 +3,7 @@ body {
 	margin: 0px;
 }
 
-article * {
-	border: none;
-	overflow: hidden;
-}
-
-article.hover {
+.hover li {
 	background-color: #eee;
 /*	border: 10px dashed;
 	border-color: #000;

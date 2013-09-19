@@ -34,28 +34,33 @@ $(function () {
     var importFile = new ImportFile(".panel");
     importFile.read(function (file, target) {
         var x2dc = new Xml2DCaseTree.Converter();
-        var tree = x2dc.parseXml(file.result);
-        var j = tree.convertAllChildNodeIntoJson([]);
+        try  {
+            var tree = x2dc.parseXml(file.result);
+            var j = tree.convertAllChildNodeIntoJson([]);
 
-        var converter = new AssureIt.Converter();
-        var encoder = new AssureIt.CaseEncoder();
-        var decoder = new AssureIt.CaseDecoder();
+            var converter = new AssureIt.Converter();
+            var encoder = new AssureIt.CaseEncoder();
+            var decoder = new AssureIt.CaseDecoder();
 
-        var s = {};
-        s.contents = JSON.stringify({
-            DCaseName: file.name,
-            NodeCount: tree.NodeCount,
-            TopGoalId: tree.TopGoalId,
-            NodeList: j
-        });
+            var s = {};
+            s.contents = JSON.stringify({
+                DCaseName: file.name,
+                NodeCount: tree.NodeCount,
+                TopGoalId: tree.TopGoalId,
+                NodeList: j
+            });
 
-        var JsonData = converter.GenNewJson(s);
-        var Case0 = new AssureIt.Case(file.name, 0, 0, new AssureIt.PlugInManager("FIXME"));
-        var root = decoder.ParseJson(Case0, JsonData);
-        Case0.SetElementTop(root);
-        var encoded = encoder.ConvertToASN(Case0.ElementTop, false);
-        var projectId = parseInt($(target).attr("id").replace(/[a-zA-Z]*/, ""));
-        var r = DCaseAPI.createDCase(file.name, encoded, projectId);
-        location.href = "./case/" + r.dcaseId;
+            var JsonData = converter.GenNewJson(s);
+            var Case0 = new AssureIt.Case(file.name, 0, 0, new AssureIt.PlugInManager("FIXME"));
+            var root = decoder.ParseJson(Case0, JsonData);
+            Case0.SetElementTop(root);
+            var encoded = encoder.ConvertToASN(Case0.ElementTop, false);
+            var projectId = parseInt($(target).attr("id").replace(/[a-zA-Z]*/, ""));
+            var r = DCaseAPI.createDCase(file.name, encoded, projectId);
+            location.href = "./case/" + r.dcaseId;
+        } catch (e) {
+            console.log(e);
+            alert("Invaild file error");
+        }
     });
 });
