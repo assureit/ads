@@ -8,6 +8,7 @@ var model = require('./model');
 var model_user = require('./user');
 var model_node = require('../model/node');
 
+var model_translator = require('../model/translator');
 var asn_parser = require('../util/asn-parser');
 var error = require('../api/error');
 
@@ -142,8 +143,8 @@ var CommitDAO = (function (_super) {
                     callback(e);
                     return;
                 }
-                var nodeDAO = new model_node.NodeDAO(_this.con);
-                nodeDAO.translate(com.dcaseId, commitId, nodemodel, function (err, asn) {
+                var translatorDAO = new model_translator.TranslatorDAO(_this.con);
+                translatorDAO.translate(com.dcaseId, commitId, nodemodel, function (err, asn) {
                     if (asn) {
                         contents = asn;
                     }

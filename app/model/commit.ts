@@ -4,6 +4,7 @@ import model = module('./model')
 import model_user = module('./user')
 import model_node = module('../model/node')
 import model_issue = module('../model/issue')
+import model_translator = module('../model/translator')
 import asn_parser = module('../util/asn-parser')
 import error = module('../api/error')
 //import model_monitor = module('../model/monitor')
@@ -123,8 +124,8 @@ export class CommitDAO extends model.DAO {
 					callback(e);
 					return;
 				}
-				var nodeDAO = new model_node.NodeDAO(this.con);
-				nodeDAO.translate(com.dcaseId, commitId, nodemodel, (err:any, asn: string) => {
+				var translatorDAO = new model_translator.TranslatorDAO(this.con);
+				translatorDAO.translate(com.dcaseId, commitId, nodemodel, (err:any, asn: string) => {
 					if (asn) {
 						contents = asn;
 					}
