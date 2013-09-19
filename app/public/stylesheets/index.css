@@ -1,6 +1,7 @@
 body {
 	min-height: 480px;
 	margin: 0px;
+	line-height: 20px;
 }
 
 .hover li {
@@ -34,23 +35,10 @@ body {
 	font-weight: bold;
 }
 
-#assureit-status {
-	position: absolute;
-	left: 10px;
-	top : 52px;
-	-webkit-transition: all ease-in-out;
-	-webkit-transition-delay: 0.5s;
-	-moz-transition: all ease-in-out 0.5s;
-	-o-transition: all ease-in-out 0.5s;
-	transition: all ease-in-out 0.5s;
+.node {
+	box-sizing: content-box;
 }
 
-#assureit-status ul {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-}
-
-.CodeMirror {
-	z-index: 99999;
+h4 {
+	font-weight: bold;
 }
