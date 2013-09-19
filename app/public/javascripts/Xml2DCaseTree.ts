@@ -85,6 +85,12 @@ module Xml2DCaseTree {
 
 				self.addNodeIdToMap(IdText);
 
+				if(NodeType == "Module") {
+					NodeType = "Goal";
+				}
+				if(NodeType == "Monitor" || NodeType == "Undeveloped") {
+					NodeType = "Evidence";
+				}
 				var node : DCaseTree.DCaseNode = new DCaseTree[NodeType + "Node"](Description, null, self.nodeIdMap[IdText]);
 				node.NodeName = NodeName;
 				self.nodes[IdText] = node;
