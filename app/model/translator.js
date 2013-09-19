@@ -11,65 +11,25 @@ var model = require('./model');
 var CONFIG = require('config');
 var asn_parser = require('../util/asn-parser');
 var mstranslator = require('../util/mstranslator/mstranslator');
+var async = require('async');
 
 var TranslatorDAO = (function (_super) {
     __extends(TranslatorDAO, _super);
     function TranslatorDAO() {
         _super.apply(this, arguments);
     }
-    TranslatorDAO.prototype.insert = function (from_text, to_text, callback) {
-        this.con.query('INSERT INTO translate(from_description, to_description) VALUES(?,?)', [from_text, to_text], function (err, result) {
-            if (err) {
-                callback(err, null);
-                return;
-            }
-            callback(err, to_text);
-        });
-    };
-
-    TranslatorDAO.prototype.get = function (from_text, callback) {
-        this.con.query('SELECT to_description FROM translate where from_description=?', [from_text], function (err, result) {
-            if (err) {
-                callback(err, null);
-                return;
-            }
-            console.log(result);
-            callback(err, null);
-        });
-    };
-
-    TranslatorDAO.prototype.translate = function (dcaseId, commitId, model, callback) {
-        var _this = this;
-        if (model == null || !CONFIG.translator || CONFIG.translator.CLIENT_ID.length == 0) {
-            callback(null, null);
-            return;
-        }
+    TranslatorDAO.prototype.insert = function (model, items, callback) {
+        console.log("insert");
+        console.log(items);
+        var self = this;
         var Translator = new mstranslator({ client_id: CONFIG.translator.CLIENT_ID, client_secret: CONFIG.translator.CLIENT_SECRET });
-        var items = [[], []];
-        var traverse = function (model) {
-            if (model.Statement && model.Statement != '' && _this.CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
-                model.Statement = model.Statement.replace(/\r\n/g, '');
-                model.Statement = model.Statement.replace(/\n/g, '');
-                model.Statement = model.Statement.replace(/\t/g, '');
-                model.Statement = model.Statement.replace(/ /g, '');
-                items[0].push(model);
-                items[1].push(model.Statement);
-            }
-            for (var i in model.Children) {
-                if (model.Children[i] != '') {
-                    traverse(model.Children[i]);
-                }
-            }
-        };
-        traverse(model);
-        if (items[0].length == 0) {
-            callback(null, null);
-            return;
-        }
-
         Translator.initialize_token(function (keys) {
+            var texts = [];
+            items.forEach(function (item) {
+                texts.push(item.statement);
+            });
             var param = {
-                texts: items[1],
+                texts: texts,
                 from: "ja",
                 to: "en"
             };
@@ -82,18 +42,105 @@ var TranslatorDAO = (function (_super) {
                     callback(null, null);
                     return;
                 }
-                console.log(items);
-                for (var i in items[0]) {
-                    var model_translated = items[0][i];
-                    model_translated.Notes['TranslatedTextEn'] = data[i]['TranslatedText'];
-                }
-                var parser = new asn_parser.ASNParser();
-                var asn = parser.ConvertToASN(model, false);
                 console.log('---- SUCCESSFULLY TRANSLATED ----');
-                console.log(asn);
-                callback(null, asn);
-                return;
+                console.log(items);
+
+                async.each(items, function (i, callback) {
+                    self._insert(i.model.Statement, i.statement, function (err, to_text) {
+                        callback(err);
+                    });
+                }, function (err) {
+                    if (err) {
+                        callback(err, null);
+                        return;
+                    }
+                    callback(null, model);
+                    return;
+                });
             });
+        });
+    };
+
+    TranslatorDAO.prototype._insert = function (from_text, to_text, callback) {
+        this.con.query('INSERT INTO translate(from_description, to_description) VALUES(?,?)', [from_text, to_text], function (err, result) {
+            if (err) {
+                callback(err, null);
+                return;
+            }
+            callback(err, to_text);
+        });
+    };
+
+    TranslatorDAO.prototype.get = function (from_text, callback) {
+        this.con.query('SELECT to_description FROM translate where from_description=?', [from_text], function (err, result) {
+            if (err || result.length == 0) {
+                callback(err, null);
+                return;
+            }
+            callback(err, result[0].to_description);
+        });
+    };
+
+    TranslatorDAO.prototype.translate = function (dcaseId, commitId, model, callback) {
+        var _this = this;
+        if (model == null || !CONFIG.translator || CONFIG.translator.CLIENT_ID.length == 0) {
+            callback(null, null);
+            return;
+        }
+        var models = [];
+        var traverse = function (model) {
+            console.log(model);
+            if (model.Statement && model.Statement != '' && _this.CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
+                models.push(model);
+                for (var i in model.Children) {
+                    if (model.Children[i] != '') {
+                        traverse(model.Children[i]);
+                    }
+                }
+            }
+        };
+        traverse(model);
+        console.log("before insert");
+        console.log(models);
+        if (models.length == 0) {
+            callback(null, null);
+            return;
+        }
+        this.insertresult(model, models, callback);
+    };
+
+    TranslatorDAO.prototype.insertresult = function (model, models, callback) {
+        var _this = this;
+        var items = [];
+        async.each(models, function (model, callback) {
+            _this.get(model.Statement, function (err, to_text) {
+                console.log("get");
+                console.log(to_text);
+                if (err) {
+                    callback(null);
+                    return;
+                }
+                if (to_text == null) {
+                    var verified = model.Statement;
+                    verified = verified.replace(/\r\n/g, '');
+                    verified = verified.replace(/\n/g, '');
+                    verified = verified.replace(/\t/g, '');
+                    verified = verified.replace(/ /g, '');
+                    items.push({ model: model, statement: verified });
+                } else {
+                    model.Notes['TranslatedTextEn'] = to_text;
+                }
+                callback(null);
+            });
+        }, function (err) {
+            console.log("just before insert");
+            console.log(items);
+            if (items.length == 0) {
+                console.log('---- TRANSLATION END ----');
+                callback(null, model);
+                return;
+            }
+            _this.insert(model, items, callback);
         });
     };
 

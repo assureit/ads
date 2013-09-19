@@ -144,9 +144,9 @@ var CommitDAO = (function (_super) {
                     return;
                 }
                 var translatorDAO = new model_translator.TranslatorDAO(_this.con);
-                translatorDAO.translate(com.dcaseId, commitId, nodemodel, function (err, asn) {
-                    if (asn) {
-                        contents = asn;
+                translatorDAO.translate(com.dcaseId, commitId, nodemodel, function (err, model) {
+                    if (model) {
+                        contents = parser.ConvertToASN(model, false);
                     }
                     callback(err, com, commitId);
                     return;

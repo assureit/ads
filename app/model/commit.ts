@@ -125,9 +125,9 @@ export class CommitDAO extends model.DAO {
 					return;
 				}
 				var translatorDAO = new model_translator.TranslatorDAO(this.con);
-				translatorDAO.translate(com.dcaseId, commitId, nodemodel, (err:any, asn: string) => {
-					if (asn) {
-						contents = asn;
+				translatorDAO.translate(com.dcaseId, commitId, nodemodel, (err:any, model: any) => {
+					if (model) {
+						contents = parser.ConvertToASN(model, false);
 					}
 					callback(err, com, commitId);
 					return;
