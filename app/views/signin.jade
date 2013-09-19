@@ -1,5 +1,7 @@
 li.line.dropdown
-    a.dropdown-toggle(href="#", data-toggle="dropdown") Sign In
+    a.dropdown-toggle(href="#", data-toggle="dropdown")
+        span.glyphicon.glyphicon-user
+        |&nbsp; Sign In
         strong.caret
     .dropdown-menu(style="padding: 15px; padding-bottom: 0px;")
           form#sign-in-form.navbar-formjright(action="#{basepath}/auth/twitter") Sign in with Twitter

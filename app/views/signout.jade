@@ -1,5 +1,8 @@
 li.line.dropdown
-    a.dropdown-toggle(href="#", data-toggle="dropdown")= userName
+    a.dropdown-toggle(href="#", data-toggle="dropdown")
+        span.glyphicon.glyphicon-user
+        |&nbsp;
+        = userName
         strong.caret
     .dropdown-menu
         form#sign-in-form.navbar-form(method="post", action="#{basepath}/logout")
