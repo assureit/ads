@@ -7,24 +7,36 @@ var asn_parser = require('../util/asn-parser');
 var mstranslator = require('../util/mstranslator/mstranslator');
 
 export class TranslatorDAO extends model.DAO {
+	insert(from_text: string, to_text: string, callback: (err: any, result: string) => void) {
+		this.con.query('INSERT INTO translate(from_description, to_description) VALUES(?,?)', [from_text, to_text], (err, result) => {
+			if (err) {
+				callback(err, null);
+				return;
+			}
+			callback(err, to_text);
+		});
+	}
+
+	get(from_text: string, callback: (err: any, to_text: string) => void): void {
+		this.con.query('SELECT to_description FROM translate where from_description=?', [from_text], (err, result) => {
+			if (err) {
+				callback(err, null);
+				return;
+			}
+			console.log(result);
+			callback(err, null);
+		});
+	}
+
 	translate(dcaseId:number, commitId: number, model: any, callback: (err:any, asn: string)=> void): void {
 		if (model == null || !CONFIG.translator || CONFIG.translator.CLIENT_ID.length == 0) {
 			callback(null, null);
 			return;
 		}
-		var CheckLength = function (str) {
-			for (var i = 0; i < str.length; i++) {
-				var c = str.charCodeAt(i);
-				if ( !((c >= 0x0 && c < 0x81) || (c == 0xf8f0) || (c >= 0xff61 && c < 0xffa0) || (c >= 0xf8f1 && c < 0xf8f4))) {
-					return true;
-				}
-			}
-			return false;
-		};
 		var Translator = new mstranslator({client_id: CONFIG.translator.CLIENT_ID, client_secret: CONFIG.translator.CLIENT_SECRET});
 		var items = [[], []];
 		var traverse = (model) => {
-			if (model.Statement && model.Statement != '' && CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
+			if (model.Statement && model.Statement != '' && this.CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
 				model.Statement = model.Statement.replace(/\r\n/g, '');
 				model.Statement = model.Statement.replace(/\n/g, '');
 				model.Statement = model.Statement.replace(/\t/g, '');
@@ -74,4 +86,13 @@ export class TranslatorDAO extends model.DAO {
 		});
 	}
 
+	CheckLength(str: string) {
+		for (var i = 0; i < str.length; i++) {
+			var c = str.charCodeAt(i);
+			if ( !((c >= 0x0 && c < 0x81) || (c == 0xf8f0) || (c >= 0xff61 && c < 0xffa0) || (c >= 0xf8f1 && c < 0xf8f4))) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
