@@ -60,7 +60,7 @@ $(function () {
             location.href = "./case/" + r.dcaseId;
         } catch (e) {
             console.log(e);
-            alert("Invaild file error");
+            alert("Your file format is currently not supported on Assure-It");
         }
     });
 });
