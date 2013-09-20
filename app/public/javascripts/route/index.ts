@@ -72,7 +72,7 @@ $(()=>{
 		if(msg != null) {
 			if(DCaseAPI.editDCase(caseId, msg) != null) {
 				data.dcaseName = msg;
-				$(this).find(".caseName").text(msg);
+				$($(this).tmplItem().nodes).find(".caseName").text(msg);
 				alert("Renamed.");
 			}
 		}
