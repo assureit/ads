@@ -1,4 +1,5 @@
 ///<reference path='../../../DefinitelyTyped/jquery/jquery.d.ts'/>
+///<reference path='../../../types/jquery_plugins.d.ts'/>
 ///<reference path='../Xml2DCaseTree.ts'/>
 ///<reference path='../DCaseTree.ts'/>
 
@@ -28,28 +29,7 @@ declare module AssureIt {
 		constructor(path: string);
 	}
 }
-/*
-$(()=>{
-	var ads: ADS = new ADS(document.getElementById("ase"));
 
-	var sidemenu = new SideMenu();
-
-	var $id: JQuery    = $('#signup-userid');
-	var $pass1: JQuery = $('#signup-pass');
-	var $pass2: JQuery = $('#signup-pass2');
-
-	function verify(): void{
-		if($id.val().length > 0 && $pass1.val().length > 0 && $pass1.val() == $pass2.val()){
-			$('#sign-up-form .btn').removeAttr("disabled");
-		} else {
-			$('#sign-up-form .btn').attr("disabled", "disabled");
-		}
-	};
-	$id.keyup(verify);
-	$pass1.keyup(verify);
-	$pass2.keyup(verify);
-});
-*/
 $(()=>{
 	var matchResult = document.cookie.match(/userId=(\w+);?/);
 	var userId = matchResult ? parseInt(matchResult[1]) : null;
@@ -70,14 +50,30 @@ $(()=>{
 			dcase.latestCommit.dateTime = (new Date(dcase.latestCommit.dateTime)).toString();
 		}
 	}
-	$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(projects) );
+	$("#ProjectList").append( $("#project_tmpl").tmpl(projects) );
 
 	$(".DeleteCaseButton").click(function(){
-		var dcaseId = (<any>($(this))).tmplItem().data.dcaseId;
-		if(window.confirm('dcaseを削除しますか?')) {
-			if(DCaseAPI.deleteDCase(dcaseId) != null) {
-				alert("削除しました");
+		var data = $(this).tmplItem().data;
+		var caseId = data.dcaseId;
+		var caseName = data.dcaseName;
+		if(window.confirm('Are you sure to delete "' + caseName + '"?')) {
+			if(DCaseAPI.deleteDCase(caseId) != null) {
+				alert("Deleted.");
 				location.reload();
+			}
+		}
+	});
+
+	$(".EditCaseButton").click(function(){
+		var data = $(this).tmplItem().data;
+		var caseId = data.dcaseId;
+		var caseName = data.dcaseName;
+		var msg = prompt('New name for "' + caseName + '":', caseName);
+		if(msg != null) {
+			if(DCaseAPI.editDCase(caseId, msg) != null) {
+				data.dcaseName = msg;
+				$($(this).tmplItem().nodes).find(".caseName").text(msg);
+				alert("Renamed.");
 			}
 		}
 	});

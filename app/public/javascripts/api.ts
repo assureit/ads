@@ -93,7 +93,7 @@ module DCaseAPI {
 		return this.call("getTagList", {});
 	};
 
-	export var commit = function(tree, msg: string, commitId: number) {
+	export var commit = function(tree, msg: string, commitId: number, summary) {
 		return this.call("commit", {
 			contents: tree,
 			commitMessage: msg,
