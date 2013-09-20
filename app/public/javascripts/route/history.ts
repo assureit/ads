@@ -14,7 +14,7 @@ class CommitModel {
 		if(Message == ""|| Message == null) {
 			this.Message = "(No message)";
 		}
-		if(summary != "" || summary != null) {
+		if(summary != "" && summary != null) {
 			this.summary = JSON.parse(summary);
 			this.CheckSummary();
 		} else {
