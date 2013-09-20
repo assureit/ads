@@ -135,8 +135,6 @@ var TranslatorDAO = (function (_super) {
                 callback(null);
             });
         }, function (err) {
-            console.log("just before insert");
-            console.log(items);
             if (items.length == 0) {
                 console.log('---- TRANSLATION END ----');
                 callback(null, model);

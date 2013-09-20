@@ -22,9 +22,15 @@ block append content
                     abbr(title="${latestCommit.dateTime}") ${dateTime}
                 if userName
                     small.pull-right
+                        |&nbsp;
                         a.text-danger.DeleteCaseButton
                             span.glyphicon.glyphicon-trash
                             | &nbsp;Delete
+                    small.pull-right
+                        |&nbsp;
+                        a.EditCaseButton
+                            span.glyphicon.glyphicon-edit
+                            | &nbsp;Edit
     +template("project_tmpl")
         .panel.panel-default(id="project${projectId}")
             .panel-heading

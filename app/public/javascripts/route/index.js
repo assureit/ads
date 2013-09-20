@@ -22,10 +22,21 @@ $(function () {
     $("#ProjectList").append(($)("#project_tmpl").tmpl(projects));
 
     $(".DeleteCaseButton").click(function () {
-        var dcaseId = (($(this))).tmplItem().data.dcaseId;
+        var dcaseId = $(this).tmplItem().data.dcaseId;
         if (window.confirm('dcaseを削除しますか?')) {
             if (DCaseAPI.deleteDCase(dcaseId) != null) {
                 alert("削除しました");
+                location.reload();
+            }
+        }
+    });
+
+    $(".EditCaseButton").click(function () {
+        var dcaseId = $(this).tmplItem().data.dcaseId;
+        var msg = prompt("dcase名を入力して下さい");
+        if (msg != null) {
+            if (DCaseAPI.editDCase(dcaseId, msg) != null) {
+                alert("変更しました");
                 location.reload();
             }
         }
