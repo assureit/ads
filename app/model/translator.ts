@@ -112,6 +112,12 @@ export class TranslatorDAO extends model.DAO {
 					verified = verified.replace(/\n/g, '');
 					verified = verified.replace(/\t/g, '');
 					verified = verified.replace(/ /g, '');
+
+					/* It's a bit ad-hoc but surely effective. */
+					if (verified[verified.length-1] != '。') {
+						verified = verified.concat('。');
+					}
+
 					items.push({model: model, statement: verified});
 				} else {
 					console.log("Translation found on database.");
