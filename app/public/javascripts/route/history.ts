@@ -5,17 +5,30 @@
 class CommitModel {
 	dateTime: string;
 	dateTimeString: string;
-	constructor(public CommitId: number, public Message:string,
+	summary: any;
+	count: number = 0;
+	constructor(public CommitId: number, public Message:string, summary: string,
 			time: string, public userId:number,
 			public userName: string, public LatestFlag: boolean,
 			public caseId: number, public revisionId: number) {
 		if(Message == ""|| Message == null) {
 			this.Message = "(No message)";
 		}
+		if(summary != "" && summary != null) {
+			this.summary = JSON.parse(summary);
+			this.CheckSummary();
+		} else {
+			this.summary = {};
+		}
 		this.dateTimeString = (new Date(time)).toString();
 		this.dateTime = TimeUtil.formatDate(time);
 	}
 
+	CheckSummary() {
+		if(this.summary) {
+			this.count = this.summary.count;
+		}
+	}
 }
 
 class CommitCollection {
@@ -36,7 +49,7 @@ class CommitCollection {
 		var CommitModels: CommitModel[] = [];
 		for(var i: number = 0; i < json_array.length; i++) {
 			var j = json_array[i];
-			CommitModels.push(new CommitModel(j.commitId, j.commitMessage, j.dateTime, j.userId, j.userName, false, caseId, i));
+			CommitModels.push(new CommitModel(j.commitId, j.commitMessage, j.summary, j.dateTime, j.userId, j.userName, false, caseId, i));
 		}
 		CommitModels[json_array.length - 1].LatestFlag = true; //Latest one
 		return new CommitCollection(CommitModels);
@@ -81,6 +94,6 @@ class HistoryView {
 $(()=>{
 	var idMatchResult = location.pathname.match(/case\/(\d+)/);
 	var caseId: number = idMatchResult ? <any>idMatchResult[1]-0 : 0;
-    var list = new HistoryView();
-    list.addElements(caseId);
+	var list = new HistoryView();
+	list.addElements(caseId);
 });
