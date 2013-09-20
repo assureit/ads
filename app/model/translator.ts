@@ -50,20 +50,6 @@ export class TranslatorDAO extends model.DAO {
 					callback(null, model);
 					return;
 				});
-				//	this.get(model.Statement, (err: any, to_text: string) => {
-				//for (var i in items) {
-				//	var model_translated = items[i].model;
-				//	model_translated.Notes['TranslatedTextEn'] = data[i]['TranslatedText'];
-				//	self._insert(model_translated.Statement, data[i]['TranslatedText'], (err: any, to_text: string) => {
-				//		if (err) {
-				//			callback(null, model);
-				//			return;
-				//		}
-				//	});
-				//}
-				//console.log('---- TRANSLATION END ----')
-				//callback(null, model);
-				//return;
 			});
 		});
 	}
