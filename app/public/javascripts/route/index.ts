@@ -53,8 +53,9 @@ $(()=>{
 	$("#ProjectList").append( $("#project_tmpl").tmpl(projects) );
 
 	$(".DeleteCaseButton").click(function(){
-		var caseId = $(this).tmplItem().data.dcaseId;
-		var caseName = $(this).tmplItem().data.dcaseName;
+		var data = $(this).tmplItem().data;
+		var caseId = data.dcaseId;
+		var caseName = data.dcaseName;
 		if(window.confirm('Are you sure to delete "' + caseName + '"?')) {
 			if(DCaseAPI.deleteDCase(caseId) != null) {
 				alert("Deleted.");
@@ -64,13 +65,15 @@ $(()=>{
 	});
 
 	$(".EditCaseButton").click(function(){
-		var caseId = $(this).tmplItem().data.dcaseId;
-		var caseName = $(this).tmplItem().data.dcaseName;
-		var msg = prompt('New name for "' + caseName + '"?', caseName);
+		var data = $(this).tmplItem().data;
+		var caseId = data.dcaseId;
+		var caseName = data.dcaseName;
+		var msg = prompt('New name for "' + caseName + '":', caseName);
 		if(msg != null) {
 			if(DCaseAPI.editDCase(caseId, msg) != null) {
+				data.dcaseName = msg;
+				$(this).find(".caseName").text(msg);
 				alert("Renamed.");
-				location.reload();
 			}
 		}
 	});

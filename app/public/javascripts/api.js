@@ -98,7 +98,7 @@ var DCaseAPI;
         return this.call("getTagList", {});
     };
 
-    DCaseAPI.commit = function (tree, msg, commitId) {
+    DCaseAPI.commit = function (tree, msg, commitId, summary) {
         return this.call("commit", {
             contents: tree,
             commitMessage: msg,

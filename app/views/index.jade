@@ -14,7 +14,7 @@ block append content
     +template("case_tmpl")
         li.list-group-item
             h4.list-group-item-heading
-                a(href='#{basepath}/case/${dcaseId}') ${dcaseName}
+                a.caseName(href='#{basepath}/case/${dcaseId}') ${dcaseName}
                 small.pull-right 0 nodes
             p.list-group-item-text ${description}
                 small
