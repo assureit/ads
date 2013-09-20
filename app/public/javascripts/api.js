@@ -60,11 +60,12 @@ var DCaseAPI;
         return users ? users.userList : [];
     };
 
-    DCaseAPI.createDCase = function (name, tree, projectId) {
+    DCaseAPI.createDCase = function (name, tree, projectId, summary) {
         return this.call("createDCase", {
             dcaseName: name,
             contents: tree,
-            projectId: projectId
+            projectId: projectId,
+            summary: JSON.stringify(summary)
         });
     };
 

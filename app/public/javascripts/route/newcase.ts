@@ -25,7 +25,7 @@ $(()=>{
 		var error = projectId == 0 || (!name || name.trim().length == 0) || (!description || description.trim().length == 0);
 		if(error) return;
 		var tree = "*Goal\n" + description;
-		var r: any = DCaseAPI.createDCase(name, tree, projectId);
+		var r: any = DCaseAPI.createDCase(name, tree, projectId,{count: 1});
 		if(r && r.dcaseId){
 			location.href = "../case/" + r.dcaseId;
 		}else{
