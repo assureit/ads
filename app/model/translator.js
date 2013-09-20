@@ -91,7 +91,6 @@ var TranslatorDAO = (function (_super) {
         }
         var models = [];
         var traverse = function (model) {
-            console.log(model);
             if (model.Statement && model.Statement != '' && _this.CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
                 models.push(model);
                 for (var i in model.Children) {
@@ -102,8 +101,6 @@ var TranslatorDAO = (function (_super) {
             }
         };
         traverse(model);
-        console.log("before insert");
-        console.log(models);
         if (models.length == 0) {
             callback(null, null);
             return;
@@ -135,8 +132,6 @@ var TranslatorDAO = (function (_super) {
                 callback(null);
             });
         }, function (err) {
-            console.log("just before insert");
-            console.log(items);
             if (items.length == 0) {
                 console.log('---- TRANSLATION END ----');
                 callback(null, model);

@@ -95,7 +95,6 @@ export class TranslatorDAO extends model.DAO {
 		}
 		var models: any[] = [];
 		var traverse = (model) => {
-			console.log(model);
 			if (model.Statement && model.Statement != '' && this.CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
 				models.push(model);
 				for (var i in model.Children) {
@@ -106,8 +105,6 @@ export class TranslatorDAO extends model.DAO {
 			}
 		}
 		traverse(model);
-		console.log("before insert");
-		console.log(models);
 		if (models.length == 0) {
 			callback(null, null);
 			return;
