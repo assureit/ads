@@ -15,7 +15,7 @@ block append content
         li.list-group-item
             h4.list-group-item-heading
                 a.caseName(href='#{basepath}/case/${dcaseId}') ${dcaseName}
-                small.pull-right 0 nodes
+                small.pull-right ${latestCommit.summary.count} nodes
             p.list-group-item-text ${description}
                 small
                     |${userName} updated 

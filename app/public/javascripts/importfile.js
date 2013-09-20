@@ -19,10 +19,14 @@ var ImportFile = (function () {
             e.stopPropagation();
             e.preventDefault();
             $(e.currentTarget).addClass('hover');
+            $(e.currentTarget).addClass('panel-info');
+            $(e.currentTarget).removeClass('panel-default');
         }).on('dragleave', function (e) {
             e.stopPropagation();
             e.preventDefault();
             $(e.currentTarget).removeClass('hover');
+            $(e.currentTarget).addClass('panel-default');
+            $(e.currentTarget).removeClass('panel-info');
             flag = true;
         });
     }

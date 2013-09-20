@@ -1,5 +1,11 @@
 var _this = this;
 $(function () {
+    function MakeSummary(case0) {
+        var ret = {};
+
+        ret.count = Object.keys(case0.ElementMap).length;
+        return ret;
+    }
     var matchResult = document.cookie.match(/userId=(\w+);?/);
     var userId = matchResult ? parseInt(matchResult[1]) : null;
     var isLoggedin = userId != null;
@@ -17,6 +23,12 @@ $(function () {
             var dcase = project.cases[j];
             dcase.dateTime = TimeUtil.formatDate(dcase.latestCommit.dateTime);
             dcase.latestCommit.dateTime = (new Date(dcase.latestCommit.dateTime)).toString();
+            var summary = {};
+            if (dcase.latestCommit.summary) {
+                summary = JSON.parse(dcase.latestCommit.summary);
+            }
+            dcase.latestCommit.summary = {};
+            dcase.latestCommit.summary.count = summary.count ? summary.count : 0;
         }
     }
     $("#ProjectList").append($("#project_tmpl").tmpl(projects));
@@ -72,7 +84,7 @@ $(function () {
             Case0.SetElementTop(root);
             var encoded = encoder.ConvertToASN(Case0.ElementTop, false);
             var projectId = parseInt($(target).attr("id").replace(/[a-zA-Z]*/, ""));
-            var r = DCaseAPI.createDCase(file.name, encoded, projectId);
+            var r = DCaseAPI.createDCase(file.name, encoded, projectId, MakeSummary(Case0));
             location.href = "./case/" + r.dcaseId;
         } catch (e) {
             console.log(e);

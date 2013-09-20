@@ -24,6 +24,7 @@ declare module AssureIt {
 		constructor(name:string, a:number, b:number, PlugInManager: PlugInManager);
 		SetElementTop(root:any);
 		ElementTop: any;
+		ElementMap: any;
 	}
 	export class PlugInManager {
 		constructor(path: string);
@@ -31,6 +32,12 @@ declare module AssureIt {
 }
 
 $(()=>{
+	function MakeSummary(case0: AssureIt.Case): any {
+		var ret: any = {};
+
+		ret.count = Object.keys(case0.ElementMap).length;
+		return ret;
+	}
 	var matchResult = document.cookie.match(/userId=(\w+);?/);
 	var userId = matchResult ? parseInt(matchResult[1]) : null;
 	var isLoggedin = userId != null;
@@ -48,6 +55,12 @@ $(()=>{
 			var dcase = project.cases[j];
 			dcase.dateTime = TimeUtil.formatDate(dcase.latestCommit.dateTime);
 			dcase.latestCommit.dateTime = (new Date(dcase.latestCommit.dateTime)).toString();
+			var summary: any = {};
+			if(dcase.latestCommit.summary) {
+				summary = JSON.parse(dcase.latestCommit.summary);
+			}
+			dcase.latestCommit.summary = {};
+			dcase.latestCommit.summary.count = summary.count? summary.count: 0;
 		}
 	}
 	$("#ProjectList").append( $("#project_tmpl").tmpl(projects) );
@@ -103,7 +116,7 @@ $(()=>{
 			Case0.SetElementTop(root);
 			var encoded = encoder.ConvertToASN(Case0.ElementTop, false);
 			var projectId = parseInt($(target).attr("id").replace(/[a-zA-Z]*/, ""));
-			var r = DCaseAPI.createDCase(file.name, encoded, projectId);
+			var r = DCaseAPI.createDCase(file.name, encoded, projectId, MakeSummary(Case0));
 			location.href = "./case/" + r.dcaseId;
 		} catch(e) {
 			console.log(e);

@@ -23,7 +23,7 @@ $(function () {
         if (error)
             return;
         var tree = "*Goal\n" + description;
-        var r = DCaseAPI.createDCase(name, tree, projectId);
+        var r = DCaseAPI.createDCase(name, tree, projectId, { count: 1 });
         if (r && r.dcaseId) {
             location.href = "../case/" + r.dcaseId;
         } else {

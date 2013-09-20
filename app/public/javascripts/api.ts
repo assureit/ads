@@ -65,9 +65,10 @@ module DCaseAPI {
 		return users ? users.userList : [];
 	};
 
-	export var createDCase = function(name: string, tree, projectId: number) {
+	export var createDCase = function(name: string, tree, projectId: number, summary: any) {
 		return this.call("createDCase", {
-			dcaseName: name, contents: tree , projectId: projectId });
+			dcaseName: name, contents: tree , projectId: projectId , summary: JSON.stringify(summary)
+		});
 	};
 
 	export var createProject = function(name: string, isPublic: boolean) {
