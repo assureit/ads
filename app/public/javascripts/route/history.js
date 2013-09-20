@@ -1,5 +1,5 @@
 var CommitModel = (function () {
-    function CommitModel(CommitId, Message, time, userId, userName, LatestFlag, caseId, revisionId) {
+    function CommitModel(CommitId, Message, summary, time, userId, userName, LatestFlag, caseId, revisionId) {
         this.CommitId = CommitId;
         this.Message = Message;
         this.userId = userId;
@@ -7,12 +7,24 @@ var CommitModel = (function () {
         this.LatestFlag = LatestFlag;
         this.caseId = caseId;
         this.revisionId = revisionId;
+        this.count = 0;
         if (Message == "" || Message == null) {
             this.Message = "(No message)";
+        }
+        if (summary != "" || summary != null) {
+            this.summary = JSON.parse(summary);
+            this.CheckSummary();
+        } else {
+            this.summary = {};
         }
         this.dateTimeString = (new Date(time)).toString();
         this.dateTime = TimeUtil.formatDate(time);
     }
+    CommitModel.prototype.CheckSummary = function () {
+        if (this.summary) {
+            this.count = this.summary.count;
+        }
+    };
     return CommitModel;
 })();
 
@@ -31,7 +43,7 @@ var CommitCollection = (function () {
         var CommitModels = [];
         for (var i = 0; i < json_array.length; i++) {
             var j = json_array[i];
-            CommitModels.push(new CommitModel(j.commitId, j.commitMessage, j.dateTime, j.userId, j.userName, false, caseId, i));
+            CommitModels.push(new CommitModel(j.commitId, j.commitMessage, j.summary, j.dateTime, j.userId, j.userName, false, caseId, i));
         }
         CommitModels[json_array.length - 1].LatestFlag = true;
         return new CommitCollection(CommitModels);
