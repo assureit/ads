@@ -21,10 +21,14 @@ class ImportFile {
 			e.stopPropagation();
 			e.preventDefault();
 			$(e.currentTarget).addClass('hover');
+			$(e.currentTarget).addClass('panel-info');
+			$(e.currentTarget).removeClass('panel-default');
 		}).on('dragleave', (e) => {
 			e.stopPropagation();
 			e.preventDefault();
 			$(e.currentTarget).removeClass('hover');
+			$(e.currentTarget).addClass('panel-default');
+			$(e.currentTarget).removeClass('panel-info');
 			flag = true;
 //			var left = Number($(e.currentTarget).css('margin-left').replace("px","")) + 10;
 //			$(e.currentTarget).css({'margin-left': left + 'px'});
