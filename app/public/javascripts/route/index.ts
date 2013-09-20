@@ -50,24 +50,26 @@ $(()=>{
 			dcase.latestCommit.dateTime = (new Date(dcase.latestCommit.dateTime)).toString();
 		}
 	}
-	$("#ProjectList").append( (<any>$)("#project_tmpl").tmpl(projects) );
+	$("#ProjectList").append( $("#project_tmpl").tmpl(projects) );
 
 	$(".DeleteCaseButton").click(function(){
-		var dcaseId = $(this).tmplItem().data.dcaseId;
-		if(window.confirm('dcaseを削除しますか?')) {
-			if(DCaseAPI.deleteDCase(dcaseId) != null) {
-				alert("削除しました");
+		var caseId = $(this).tmplItem().data.dcaseId;
+		var caseName = $(this).tmplItem().data.dcaseName;
+		if(window.confirm('Are you sure to delete "' + caseName + '"?')) {
+			if(DCaseAPI.deleteDCase(caseId) != null) {
+				alert("Deleted.");
 				location.reload();
 			}
 		}
 	});
 
 	$(".EditCaseButton").click(function(){
-		var dcaseId = $(this).tmplItem().data.dcaseId;
-		var msg = prompt("dcase名を入力して下さい");
+		var caseId = $(this).tmplItem().data.dcaseId;
+		var caseName = $(this).tmplItem().data.dcaseName;
+		var msg = prompt('New name for "' + caseName + '"?', caseName);
 		if(msg != null) {
-			if(DCaseAPI.editDCase(dcaseId, msg) != null) {
-				alert("変更しました");
+			if(DCaseAPI.editDCase(caseId, msg) != null) {
+				alert("Renamed.");
 				location.reload();
 			}
 		}
