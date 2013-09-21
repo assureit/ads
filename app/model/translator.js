@@ -13,6 +13,15 @@ var asn_parser = require('../util/asn-parser');
 var mstranslator = require('../util/mstranslator/mstranslator');
 var async = require('async');
 
+var TranslateItem = (function () {
+    function TranslateItem(model, statement) {
+        this.model = model;
+        this.statement = statement;
+    }
+    return TranslateItem;
+})();
+exports.TranslateItem = TranslateItem;
+
 var TranslatorDAO = (function (_super) {
     __extends(TranslatorDAO, _super);
     function TranslatorDAO() {
@@ -21,6 +30,24 @@ var TranslatorDAO = (function (_super) {
     TranslatorDAO.prototype.insert = function (model, items, callback) {
         var self = this;
         var Translator = new mstranslator({ client_id: CONFIG.translator.CLIENT_ID, client_secret: CONFIG.translator.CLIENT_SECRET });
+
+        var SOURCE_TEXT_MAX_LENGTH = 1000;
+        var items_fragment = [];
+        var current_items = [];
+        var statement_length = 0;
+        items.forEach(function (i, index) {
+            current_items.push(i);
+            statement_length += i.statement.length;
+            if (statement_length > SOURCE_TEXT_MAX_LENGTH) {
+                items_fragment.push(current_items);
+                current_items = [];
+                statement_length = 0;
+            }
+        });
+        if (current_items.length != 0) {
+            items_fragment.push(current_items);
+        }
+
         Translator.initialize_token(function (keys) {
             var texts = [];
             items.forEach(function (i) {
@@ -128,7 +155,7 @@ var TranslatorDAO = (function (_super) {
                         verified = verified.concat('。');
                     }
 
-                    items.push({ model: model, statement: verified });
+                    items.push(new TranslateItem(model, verified));
                 } else {
                     console.log("Translation found on database.");
                     console.log(to_text);

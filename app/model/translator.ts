@@ -7,14 +7,39 @@ var asn_parser = require('../util/asn-parser');
 var mstranslator = require('../util/mstranslator/mstranslator');
 var async = require('async');
 
+export class TranslateItem {
+	constructor(public model: any, public statement: string) {}
+}
+
 export class TranslatorDAO extends model.DAO {
 
-	insert (model: any, items: {model: any;statement: string}[], callback: (err: any, _model: string)=>void) {
+	insert (model: any, items: TranslateItem[], callback: (err: any, _model: string)=>void) {
 		var self = this;
 		var Translator = new mstranslator({client_id: CONFIG.translator.CLIENT_ID, client_secret: CONFIG.translator.CLIENT_SECRET});
+
+		/* split items into acceptable size */
+		var SOURCE_TEXT_MAX_LENGTH = 1000;
+		var items_fragment: TranslateItem[][] = [];
+		var current_items: TranslateItem[] = [];
+		var statement_length: number = 0;
+		items.forEach((i: TranslateItem, index) => {
+			current_items.push(i);
+			statement_length += i.statement.length;
+			if (statement_length > SOURCE_TEXT_MAX_LENGTH) {
+				items_fragment.push(current_items);
+				current_items = [];
+				statement_length = 0;
+			}
+		});
+		if (current_items.length != 0) {
+			items_fragment.push(current_items);
+		}
+
+		//async.each(items_fragment,(items:
+
 		Translator.initialize_token(function (keys) {
 			var texts = [];
-			items.forEach((i: {model: any;statement: string}) => {
+			items.forEach((i: TranslateItem) => {
 				texts.push(i.statement);
 			});
 			var param = {
@@ -32,11 +57,11 @@ export class TranslatorDAO extends model.DAO {
 				}
 				console.log('---- SUCCESSFULLY TRANSLATED ----')
 				console.log(data);
-				items.forEach((i: {model: any;statement: string}, index) => {
+				items.forEach((i: TranslateItem, index) => {
 					i.statement = data[index].TranslatedText;
 				});
 
-				async.each(items,(i:{model: any;statement: string},callback:(err: any)=>void)=> {
+				async.each(items,(i: TranslateItem,callback:(err: any)=>void)=> {
 					i.model.Notes['TranslatedTextEn'] = i.statement;
 					self._insert(i.model.Statement, i.statement, (err: any, to_text: string) => {
 						callback(err);
@@ -99,7 +124,7 @@ export class TranslatorDAO extends model.DAO {
 	}
 
 	insertresult(model: any, models: any[], callback: (err: any, _model: string)=>void) {
-		var items: {model: any; statement: string}[] = [];
+		var items: TranslateItem[] = [];
 		async.each(models, (model: any, callback:(err: any)=>void) => {
 			this.get(model.Statement, (err: any, to_text: string) => {
 				if (err) {
@@ -118,7 +143,7 @@ export class TranslatorDAO extends model.DAO {
 						verified = verified.concat('。');
 					}
 
-					items.push({model: model, statement: verified});
+					items.push(new TranslateItem(model, verified));
 				} else {
 					console.log("Translation found on database.");
 					console.log(to_text);
