@@ -48,45 +48,53 @@ var TranslatorDAO = (function (_super) {
             items_fragment.push(current_items);
         }
 
-        Translator.initialize_token(function (keys) {
-            var texts = [];
-            items.forEach(function (i) {
-                texts.push(i.statement);
-            });
-            var param = {
-                texts: texts,
-                from: "ja",
-                to: "en"
-            };
-            Translator.translateArray(param, function (err, data) {
-                if (err) {
-                    console.log('---- TRANSLATED FAILED ----');
-                    console.log(err);
-                    console.log(data);
-                    callback(null, null);
-                    return;
-                }
-                console.log('---- SUCCESSFULLY TRANSLATED ----');
-                console.log(data);
-                items.forEach(function (i, index) {
-                    i.statement = data[index].TranslatedText;
+        async.each(items_fragment, function (items, callback) {
+            Translator.initialize_token(function (keys) {
+                var texts = [];
+                items.forEach(function (i) {
+                    texts.push(i.statement);
                 });
-
-                async.each(items, function (i, callback) {
-                    i.model.Notes['TranslatedTextEn'] = i.statement;
-                    self._insert(i.model.Statement, i.statement, function (err, to_text) {
-                        callback(err);
-                    });
-                }, function (err) {
+                var param = {
+                    texts: texts,
+                    from: "ja",
+                    to: "en"
+                };
+                Translator.translateArray(param, function (err, data) {
                     if (err) {
-                        callback(err, null);
+                        callback(err);
                         return;
                     }
-                    console.log('---- TRANSLATION END ----');
-                    callback(null, model);
-                    return;
+                    console.log('---- SUCCESSFULLY TRANSLATED ----');
+                    console.log(data);
+                    items.forEach(function (i, index) {
+                        i.statement = data[index].TranslatedText;
+                    });
+
+                    async.each(items, function (i, callback) {
+                        i.model.Notes['TranslatedTextEn'] = i.statement;
+                        self._insert(i.model.Statement, i.statement, function (err, to_text) {
+                            callback(err);
+                            return;
+                        });
+                    }, function (err) {
+                        if (err) {
+                            callback(err);
+                            return;
+                        }
+                        callback(null);
+                        return;
+                    });
                 });
             });
+        }, function (err) {
+            if (err) {
+                console.log('---- TRANSLATED FAILED ----');
+                console.log(err);
+                callback(null, null);
+                return;
+            }
+            console.log('---- TRANSLATION END ----');
+            callback(null, model);
         });
     };
 

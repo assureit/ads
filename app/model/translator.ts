@@ -35,47 +35,53 @@ export class TranslatorDAO extends model.DAO {
 			items_fragment.push(current_items);
 		}
 
-		//async.each(items_fragment,(items:
-
-		Translator.initialize_token(function (keys) {
-			var texts = [];
-			items.forEach((i: TranslateItem) => {
-				texts.push(i.statement);
-			});
-			var param = {
-				texts: texts,
-				from: "ja",
-				to: "en"
-			};
-			Translator.translateArray(param, function (err, data) {
-				if (err) {
-					console.log('---- TRANSLATED FAILED ----')
-					console.log(err);
-					console.log(data);
-					callback(null, null);
-					return;
-				}
-				console.log('---- SUCCESSFULLY TRANSLATED ----')
-				console.log(data);
-				items.forEach((i: TranslateItem, index) => {
-					i.statement = data[index].TranslatedText;
+		async.each(items_fragment,(items: TranslateItem[], callback: (err: any) => void) => {
+			Translator.initialize_token(function (keys) {
+				var texts = [];
+				items.forEach((i: TranslateItem) => {
+					texts.push(i.statement);
 				});
-
-				async.each(items,(i: TranslateItem,callback:(err: any)=>void)=> {
-					i.model.Notes['TranslatedTextEn'] = i.statement;
-					self._insert(i.model.Statement, i.statement, (err: any, to_text: string) => {
-						callback(err);
-					});
-				}, (err) => {
+				var param = {
+					texts: texts,
+					from: "ja",
+					to: "en"
+				};
+				Translator.translateArray(param, function (err, data) {
 					if (err) {
-						callback(err, null);
+						callback(err);
 						return;
 					}
-					console.log('---- TRANSLATION END ----')
-					callback(null, model);
-					return;
+					console.log('---- SUCCESSFULLY TRANSLATED ----')
+					console.log(data);
+					items.forEach((i: TranslateItem, index) => {
+						i.statement = data[index].TranslatedText;
+					});
+
+					async.each(items,(i: TranslateItem,callback:(err: any)=>void)=> {
+						i.model.Notes['TranslatedTextEn'] = i.statement;
+						self._insert(i.model.Statement, i.statement, (err: any, to_text: string) => {
+							callback(err);
+							return;
+						});
+					}, (err) => {
+						if (err) {
+							callback(err);
+							return;
+						}
+						callback(null);
+						return;
+					});
 				});
 			});
+		}, (err) => {
+			if (err) {
+				console.log('---- TRANSLATED FAILED ----');
+				console.log(err);
+				callback(null, null);
+				return;
+			}
+			console.log('---- TRANSLATION END ----');
+			callback(null, model);
 		});
 	}
 
