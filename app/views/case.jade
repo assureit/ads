@@ -91,7 +91,7 @@ html
         +js("/javascripts/config.js")
         script(type='text/javascript').
             $(function(){
-               var serverApi = new AssureIt.ServerAPI(Config.BASEPATH);
+               var serverApi = new AssureIt.ServerAPI(Config.BASEPATH, "#{rechost}" + "#{api}");
                var pluginManager = new AssureIt.PlugInManager(Config.BASEPATH);
                pluginManager.SetPlugIn("menu", new MenuBarPlugIn(pluginManager));
                pluginManager.SetPlugIn("scale", new ScalePlugIn(pluginManager));

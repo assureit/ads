@@ -40,6 +40,8 @@ export var newproject = function(req: any, res: any) {
 export var caseview = function(req: any, res: any) {
 	var params: any = getBasicParam(req, res);
 	params.caseId = req.params.id;
+	params.rechost = CONFIG.rec.host;
+	params.api = CONFIG.rec.api;
 	res.render('case', params);
 }
 
@@ -53,6 +55,8 @@ export var history = function(req: any, res: any) {
 	var params: any = getBasicParam(req, res);
 	params.caseId = req.params.id;
 	params.commitHistory = req.params.history;
+	params.rechost = CONFIG.rec.host;
+	params.api = CONFIG.rec.api;
 	res.render('case', params);
 }
 

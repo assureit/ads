@@ -53,7 +53,7 @@ export class ASNParser {
 			}
 			ret += "\n";
 
-			if (model.Statement != "") ret += (model.Statement + "\n");
+			if (model.Statement && model.Statement != "") ret += (model.Statement + "\n");
 
 			for(var key in model.Notes) {
 				var Note = model.Notes[key];

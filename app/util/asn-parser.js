@@ -57,7 +57,7 @@ var ASNParser = (function () {
             }
             ret += "\n";
 
-            if (model.Statement != "")
+            if (model.Statement && model.Statement != "")
                 ret += (model.Statement + "\n");
 
             for (var key in model.Notes) {

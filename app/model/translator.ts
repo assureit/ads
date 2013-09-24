@@ -7,64 +7,81 @@ var asn_parser = require('../util/asn-parser');
 var mstranslator = require('../util/mstranslator/mstranslator');
 var async = require('async');
 
+export class TranslateItem {
+	constructor(public model: any, public statement: string) {}
+}
+
 export class TranslatorDAO extends model.DAO {
 
-	insert (model: any, items: {model: any;statement: string}[], callback: (err: any, _model: string)=>void) {
+	insert (model: any, items: TranslateItem[], callback: (err: any, _model: string)=>void) {
 		var self = this;
 		var Translator = new mstranslator({client_id: CONFIG.translator.CLIENT_ID, client_secret: CONFIG.translator.CLIENT_SECRET});
-		Translator.initialize_token(function (keys) {
-			var texts = [];
-			items.forEach((i: {model: any;statement: string}) => {
-				texts.push(i.statement);
-			});
-			var param = {
-				texts: texts,
-				from: "ja",
-				to: "en"
-			};
-			Translator.translateArray(param, function (err, data) {
-				if (err) {
-					console.log('---- TRANSLATED FAILED ----')
-					console.log(err);
-					console.log(data);
-					callback(null, null);
-					return;
-				}
-				console.log('---- SUCCESSFULLY TRANSLATED ----')
-				console.log(data);
-				items.forEach((i: {model: any;statement: string}, index) => {
-					i.statement = data[index].TranslatedText;
-				});
 
-				async.each(items,(i:{model: any;statement: string},callback:(err: any)=>void)=> {
-					i.model.Notes['TranslatedTextEn'] = i.statement;
-					self._insert(i.model.Statement, i.statement, (err: any, to_text: string) => {
-						callback(err);
-					});
-				}, (err) => {
+		/* split items into acceptable size */
+		var SOURCE_TEXT_MAX_LENGTH = 1000;
+		var items_fragment: TranslateItem[][] = [];
+		var current_items: TranslateItem[] = [];
+		var statement_length: number = 0;
+		items.forEach((i: TranslateItem, index) => {
+			current_items.push(i);
+			statement_length += i.statement.length;
+			if (statement_length > SOURCE_TEXT_MAX_LENGTH) {
+				items_fragment.push(current_items);
+				current_items = [];
+				statement_length = 0;
+			}
+		});
+		if (current_items.length != 0) {
+			items_fragment.push(current_items);
+		}
+
+		async.each(items_fragment,(items: TranslateItem[], callback: (err: any) => void) => {
+			Translator.initialize_token(function (keys) {
+				var texts = [];
+				items.forEach((i: TranslateItem) => {
+					texts.push(i.statement);
+				});
+				var param = {
+					texts: texts,
+					from: "ja",
+					to: "en"
+				};
+				Translator.translateArray(param, function (err, data) {
 					if (err) {
-						callback(err, null);
+						callback(err);
 						return;
 					}
-					console.log('---- TRANSLATION END ----')
-					callback(null, model);
-					return;
+					console.log('---- SUCCESSFULLY TRANSLATED ----')
+					console.log(data);
+					items.forEach((i: TranslateItem, index) => {
+						i.statement = data[index].TranslatedText;
+					});
+
+					async.each(items,(i: TranslateItem,callback:(err: any)=>void)=> {
+						i.model.Notes['TranslatedTextEn'] = i.statement;
+						self._insert(i.model.Statement, i.statement, (err: any, to_text: string) => {
+							callback(err);
+							return;
+						});
+					}, (err) => {
+						if (err) {
+							callback(err);
+							return;
+						}
+						callback(null);
+						return;
+					});
 				});
-				//	this.get(model.Statement, (err: any, to_text: string) => {
-				//for (var i in items) {
-				//	var model_translated = items[i].model;
-				//	model_translated.Notes['TranslatedTextEn'] = data[i]['TranslatedText'];
-				//	self._insert(model_translated.Statement, data[i]['TranslatedText'], (err: any, to_text: string) => {
-				//		if (err) {
-				//			callback(null, model);
-				//			return;
-				//		}
-				//	});
-				//}
-				//console.log('---- TRANSLATION END ----')
-				//callback(null, model);
-				//return;
 			});
+		}, (err) => {
+			if (err) {
+				console.log('---- TRANSLATED FAILED ----');
+				console.log(err);
+				callback(null, null);
+				return;
+			}
+			console.log('---- TRANSLATION END ----');
+			callback(null, model);
 		});
 	}
 
@@ -95,7 +112,6 @@ export class TranslatorDAO extends model.DAO {
 		}
 		var models: any[] = [];
 		var traverse = (model) => {
-			console.log(model);
 			if (model.Statement && model.Statement != '' && this.CheckLength(model.Statement) && model.Notes['TranslatedTextEn'] == null) {
 				models.push(model);
 				for (var i in model.Children) {
@@ -106,8 +122,6 @@ export class TranslatorDAO extends model.DAO {
 			}
 		}
 		traverse(model);
-		console.log("before insert");
-		console.log(models);
 		if (models.length == 0) {
 			callback(null, null);
 			return;
@@ -116,7 +130,7 @@ export class TranslatorDAO extends model.DAO {
 	}
 
 	insertresult(model: any, models: any[], callback: (err: any, _model: string)=>void) {
-		var items: {model: any; statement: string}[] = [];
+		var items: TranslateItem[] = [];
 		async.each(models, (model: any, callback:(err: any)=>void) => {
 			this.get(model.Statement, (err: any, to_text: string) => {
 				if (err) {
@@ -129,7 +143,13 @@ export class TranslatorDAO extends model.DAO {
 					verified = verified.replace(/\n/g, '');
 					verified = verified.replace(/\t/g, '');
 					verified = verified.replace(/ /g, '');
-					items.push({model: model, statement: verified});
+
+					/* It's a bit ad-hoc but surely effective. */
+					if (verified[verified.length-1] != '。') {
+						verified = verified.concat('。');
+					}
+
+					items.push(new TranslateItem(model, verified));
 				} else {
 					console.log("Translation found on database.");
 					console.log(to_text);
