@@ -63,14 +63,13 @@ app.get('/javascripts/config.js', js.config);
 
 app.get('/auth/twitter', passport.passport.authenticate('twitter'), function (req, res) {
 });
-app.get('/auth/twitter/callback', passport.passport.authenticate('twitter', { failureRedirect: '/' }), client.login_twitter);
+app.get('/auth/twitter/callback', passport.passport.authenticate('twitter', { failureRedirect: '/' }), client.login);
 
 app.get('/auth/facebook', passport.passport.authenticate('facebook'), function (req, res) {
 });
 
-app.get('/auth/facebook/callback', passport.passport.authenticate('facebook', { failureRedirect: '/' }), client.login_facebook);
+app.get('/auth/facebook/callback', passport.passport.authenticate('facebook', { failureRedirect: '/' }), client.login);
 
-app.post('/login', client.login);
 app.post('/logout', client.logout);
 
 app.post('/file', file.upload);

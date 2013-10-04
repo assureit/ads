@@ -66,3 +66,5 @@ passport:
 translator:
   CLIENT_ID: ''
   CLIENT_SECRET: ''
+debug_user:
+  loginName: 'tsunade'
