@@ -103,7 +103,8 @@ var DCaseAPI;
         return this.call("commit", {
             contents: tree,
             commitMessage: msg,
-            commitId: commitId
+            commitId: commitId,
+            summary: summary
         }).commitId;
     };
 
