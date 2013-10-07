@@ -12,18 +12,40 @@ var CONFIG = require('config')
 var getBasicParam = function(req: any, res: any) {
 	var params: any = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: null};
 	var auth = new util_auth.Auth(req, res);
+
 	if(auth.isLogin()) {
 		params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName() };
 	}
-	//if( req.cookies.lang == 'ja') {
-	//	params.lang = lang.lang.ja;
-	//}
 	return params;
+}
+
+var index_DummyUser = function(req: any, res: any, params: any) {
+	if (CONFIG && CONFIG.debugt_user && CONFIG.debug_user.loginName) {
+		req.user = {displayName: CONFIG.debug_user.loginName};
+	} else {
+		req.user = {displayName: 'tsunade'};
+	}
+	var con = new db.Database();
+	var userDAO = new model_user.UserDAO(con);
+	userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
+		if (err) {
+			console.error(err);
+			res.redirect(CONFIG.ads.basePath+'/');
+			return;
+		}
+		var auth = new util_auth.Auth(req, res);
+		auth.set(result.id, result.loginName);
+		res.render('index', params);
+	});
 }
 
 export var index = function(req: any, res: any) {
 	var params: any = getBasicParam(req, res);
-	res.render('index', params);
+	if (process.argv.length > 2 && process.argv[2] == '--debug') {
+		index_DummyUser(req, res, params);
+	} else {
+		res.render('index', params);
+	}
 }
 
 export var newcase = function(req: any, res: any) {
@@ -116,54 +138,10 @@ export var exporter = function(req: any, res: any) {
 	});
 };
 
-export var login_twitter = function(req: any, res: any) {
-	var con = new db.Database();
-	var userDAO = new model_user.UserDAO(con);
-	userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
-		if (err) {
-			// TODO: display error information
-			console.error(err);
-			res.redirect(CONFIG.ads.basePath+'/');
-			// res.redirect('/');
-			return;
-		}
-		var auth = new util_auth.Auth(req, res);
-		auth.set(result.id, result.loginName);
-		res.redirect(CONFIG.ads.basePath+'/');
-	});
-}
-
-export var login_facebook = function(req: any, res: any) {
-	console.log("login_facebook");
-	console.log(req.user);
-	var con = new db.Database();
-	var userDAO = new model_user.UserDAO(con);
-	userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
-		if (err) {
-			// TODO: display error information
-			console.error(err);
-			res.redirect(CONFIG.ads.basePath+'/');
-			// res.redirect('/');
-			return;
-		}
-		var auth = new util_auth.Auth(req, res);
-		auth.set(result.id, result.loginName);
-		res.redirect(CONFIG.ads.basePath+'/');
-	});
-}
-
 export var login = function(req: any, res: any) {
 	var con = new db.Database();
 	var userDAO = new model_user.UserDAO(con);
-	
-	userDAO.register(req.body.username, "", (err:any, result: model_user.User) => {
-		if (err) {
-			/* do nothing */
-			return;
-		}
-		console.log("Registering process successfully ended.");
-	});
-	userDAO.login(req.body.username, (err:any, result: model_user.User) => {
+	userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
 		if (err) {
 			// TODO: display error information
 			console.error(err);
@@ -175,7 +153,7 @@ export var login = function(req: any, res: any) {
 		auth.set(result.id, result.loginName);
 		res.redirect(CONFIG.ads.basePath+'/');
 	});
-};
+}
 
 export var logout = function(req: any, res: any) {
 	var auth = new util_auth.Auth(req, res);

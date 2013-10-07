@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node app.js",
+    "start_with_debug": "node app.js --debug",
     "start_ldap": "node ldap-dummy.js",
     "start_ldap_mem": "node ldap-memory.js",
     "test": "sh ../scripts/test.sh",

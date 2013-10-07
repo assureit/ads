@@ -6,8 +6,10 @@ mixin template(id)
     script(id=id, type="text/x-jquery-tmpl")
         block
 mixin mainCollum
-    .container(style="width: 970px;")
+    // Width is temporary set to 600px for Nexus7(600px) and iPad mini(640px).
+    // TODO: Change width by the device.
+    .container(style="width: 600px;")
         .row
             .col-xs-3
-            .col-xs-6
+            .col-xs-9
                 block

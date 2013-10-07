@@ -85,7 +85,7 @@ app.get('/auth/twitter',
 );
 app.get('/auth/twitter/callback',
   passport.passport.authenticate('twitter', {failureRedirect: '/' }),
-  client.login_twitter
+  client.login
 );
 
 app.get('/auth/facebook',
@@ -95,10 +95,9 @@ app.get('/auth/facebook',
 
 app.get('/auth/facebook/callback',
   passport.passport.authenticate('facebook', { failureRedirect: '/' }),
-  client.login_facebook
+  client.login
 );
 
-app.post('/login', client.login);
 app.post('/logout', client.logout);
 //app.post('/register', client.register);
 
