@@ -120,6 +120,7 @@ html
                var CaseData = serverApi.GetCase("",#{caseId});
                var contents = CaseData.contents;
                var summary = CaseData.summary;
+               console.log(summary);
                var PrevContents = null;
                if (!isNaN(history)) {
                    var commits = serverApi.GetCommitList(#{caseId});
