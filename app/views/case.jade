@@ -133,7 +133,7 @@ html
                        }
                    }
                }
-               var Case0 = new AssureIt.Case(CaseData.DCaseName, summary, #{caseId}, CaseData.commitId, pluginManager);
+               var Case0 = new AssureIt.Case(CaseData.DCaseName, summary, contents, #{caseId}, CaseData.commitId, pluginManager);
                var caseDecoder = new AssureIt.CaseDecoder();
                var root = caseDecoder.ParseASN(Case0, contents, null);
                Case0.SetElementTop(root);
