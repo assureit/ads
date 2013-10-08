@@ -82,6 +82,7 @@ html
         +js("/assurejs/plugins/Monitor/lib/DataTables-1.9.4/js/jquery.dataTables.min.js")
         +js("/assurejs/plugins/Monitor/Monitor.js")
         +js("/assurejs/plugins/Note/Note.js")
+        +js("/assurejs/plugins/LastModified/LastModified.js")
         +js("/assurejs/plugins/DragFile/DragFile.js")
         +js("/assurejs/plugins/BeforeUnload/BeforeUnload.js")
         +js("/assurejs/plugins/DScript/DScript.js")
@@ -103,6 +104,7 @@ html
                pluginManager.SetPlugIn("statements", new DefaultStatementRenderPlugIn(pluginManager));
                pluginManager.SetPlugIn("annotation", new AnnotationPlugIn(pluginManager));
                pluginManager.SetPlugIn("note", new NotePlugIn(pluginManager));
+               pluginManager.SetPlugIn("note", new LastModifiedPlugIn(pluginManager));
                pluginManager.SetPlugIn("monitor", new MonitorPlugIn(pluginManager));
                pluginManager.SetPlugIn("dscript", new DScriptPlugIn(pluginManager));
                pluginManager.SetPlugIn("editor", new EditorPlugIn(pluginManager));
