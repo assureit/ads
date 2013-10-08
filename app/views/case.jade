@@ -37,10 +37,6 @@ html
         #fullscreen-editor-wrapper(style="border: 1px solid black")
             textarea#fullscreen-editor(placeholder="Type something...")
         #dscript-editor-wrapper(style="border: 1px solid black")
-            div
-                textarea#dscript-editor-left(placeholder="")
-            div
-                textarea#dscript-editor-right(placeholder="Generated code goes here.")
 
         +js("/javascripts/sidemenu.js")
         +js("/assurejs/lib/jquery.min.js")
@@ -69,6 +65,9 @@ html
         +js("/assurejs/plugins/SearchNode/SearchNode.js")
         +js("/assurejs/plugins/SimplePattern/SimplePattern.js")
         +js("/assurejs/plugins/DScript/DScript.js")
+        +js("/assurejs/plugins/DScript/DScriptActionMap.js")
+        +js("/assurejs/plugins/DScript/DScriptGenerator.js")
+        +js("/assurejs/plugins/DScript/DScriptPaneManager.js")
         +js("/assurejs/plugins/Editor/Editor.js")
         +js("/assurejs/plugins/MenuBar/lib/jquery.jqdock.min.js")
         +js("/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.js")
@@ -83,9 +82,6 @@ html
         +js("/assurejs/plugins/Note/Note.js")
         +js("/assurejs/plugins/DragFile/DragFile.js")
         +js("/assurejs/plugins/BeforeUnload/BeforeUnload.js")
-        +js("/assurejs/plugins/DScript/DScript.js")
-        +js("/assurejs/plugins/DScript/DScriptGenerator.js")
-        +js("/assurejs/plugins/DScript/DScriptActionMap.js")
         +js("/assurejs/plugins/LayoutPortrait/LayoutPortrait.js")
         +js("/assurejs/plugins/Export/Export.js")
         +js("/assurejs/plugins/TimeLine/TimeLine.js")
