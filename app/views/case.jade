@@ -10,6 +10,7 @@ html
         +css("/assurejs/plugins/Monitor/lib/DataTables-1.9.4/css/jquery.dataTables.css")
         +css("/assurejs/lib/animate-custom.css")
         +css("/stylesheets/sidemenu.css")
+        +css("/stylesheets/historymenu.css")
         +css("/stylesheets/index.css")
 
     body(style="overflow: hidden; margin: 0px;")
@@ -24,6 +25,7 @@ html
             #background(style="width: 100%; height: 100%; position: absolute;")
             #layer1(style="width: 0px; height: 0px; position: absolute;")
             include sidemenu
+            include historymenu
             #layer2(style="width: 0px; height: 0px; position: absolute;")
         svg(width="0",height="0")
             defs
