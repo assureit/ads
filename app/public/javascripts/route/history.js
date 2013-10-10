@@ -8,6 +8,12 @@ var CommitModel = (function () {
         this.caseId = caseId;
         this.revisionId = revisionId;
         this.count = 0;
+        this.added = 0;
+        this.modified = 0;
+        this.deleted = 0;
+        this.addedString = "";
+        this.modifiedString = "";
+        this.deletedString = "";
         if (Message == "" || Message == null) {
             this.Message = "(No message)";
         }
@@ -20,9 +26,39 @@ var CommitModel = (function () {
         this.dateTimeString = (new Date(time)).toString();
         this.dateTime = TimeUtil.formatDate(time);
     }
+    CommitModel.prototype.StringifyNodeList = function (list) {
+        var res = "";
+        for (var i in list) {
+            res += list[i] + ", ";
+        }
+        res = res.substring(0, res.length - 2);
+        return res;
+    };
+
     CommitModel.prototype.CheckSummary = function () {
         if (this.summary) {
             this.count = this.summary.count;
+            if (this.summary.added && this.summary.added.length) {
+                this.added = this.summary.added.length;
+                this.addedString = this.StringifyNodeList(this.summary.added);
+            } else {
+                this.added = 0;
+                this.addedString = "";
+            }
+            if (this.summary.modified && this.summary.modified.length) {
+                this.modified = this.summary.modified.length;
+                this.modifiedString = this.StringifyNodeList(this.summary.modified);
+            } else {
+                this.modified = 0;
+                this.modifiedString = "";
+            }
+            if (this.summary.deleted && this.summary.deleted.length) {
+                this.deleted = this.summary.deleted.length;
+                this.deletedString = this.StringifyNodeList(this.summary.deleted);
+            } else {
+                this.deleted = 0;
+                this.deletedString = "";
+            }
         }
     };
     return CommitModel;

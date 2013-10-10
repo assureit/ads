@@ -14,6 +14,21 @@ block append content
                     small
                         |${userName} commited 
                         abbr(title="${dateTimeString}") ${dateTime}
+                p.list-group-item-text.text-right
+                    small
+                        | Added 
+                        abbr(title="${addedString}") ${added} 
+                        | node(s).
+                p.list-group-item-text.text-right
+                    small
+                        | Modified 
+                        abbr(title="${modifiedString}") ${modified} 
+                        | node(s).
+                p.list-group-item-text.text-right
+                    small
+                        | Deleted 
+                        abbr(title="${deletedString}") ${deleted} 
+                        | node(s).
 block content
     +mainCollum
         h2 Change History&nbsp;
