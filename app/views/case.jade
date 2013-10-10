@@ -147,7 +147,7 @@ html
                        console.log(commitModel);
                        var prevRevision = "history/" + ((history == 0) ? 0 : history-1);
                        var nextRevision = "history/" + (history+1);
-                       if (history+1 >= commits.CommitModels.length) {
+                       if (history >= commits.CommitModels.length) {
                            nextRevision = "";
                        }
                        $("#historymenu_tmpl").tmpl({userName: commitModel.userName, Message: commitModel.Message, dateTime: TimeUtil.formatDate(commitModel.date), dateTimeString: commitModel.date, count: jsonSummary.count, caseId: #{caseId}, revisionId: history, nextRevision: nextRevision, prevRevision: prevRevision}).appendTo("#historymenu");
