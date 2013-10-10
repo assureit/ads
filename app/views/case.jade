@@ -142,7 +142,7 @@ html
                        var jsonSummary = JSON.parse(summary);
                        if(history > 0) {
                            var PrevCommitId = commits.CommitModels[history-1].CommitId;
-                           PrevContents = serverApi.GetNodeTree(PrevCommitId);
+                           PrevContents = serverApi.GetNodeTree(PrevCommitId).contents;
                        }
                        console.log(commitModel);
                        var prevRevision = "history/" + ((history == 0) ? 0 : history-1);
