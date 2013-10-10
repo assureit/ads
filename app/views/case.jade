@@ -145,7 +145,7 @@ html
                            PrevContents = serverApi.GetNodeTree(PrevCommitId);
                        }
                        console.log(commitModel);
-                       $("#historymenu_tmpl").tmpl({userName: commitModel.userName, Message: commitModel.Message, dateTime: TimeUtil.formatDate(commitModel.date), dateTimeString: commitModel.date, count: jsonSummary.count, caseId: #{caseId}, revisionId: history}).appendTo("#historymenu");
+                       $("#historymenu_tmpl").tmpl({userName: commitModel.userName, Message: commitModel.Message, dateTime: TimeUtil.formatDate(commitModel.date), dateTimeString: commitModel.date, count: jsonSummary.count, caseId: #{caseId}, revisionId: history, nextRevisionId: history+1, prevRevisionId: history-1}).appendTo("#historymenu");
                    }
                }
                var Case0 = new AssureIt.Case(CaseData.DCaseName, summary, contents, #{caseId}, CaseData.commitId, pluginManager);

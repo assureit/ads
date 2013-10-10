@@ -1,4 +1,7 @@
 #historymenu
+block script
+    +js('/javascripts/route/historymenu.js')
+    script(type='text/javascript').
 
 block append content
     +template("historymenu_tmpl")
@@ -11,18 +14,12 @@ block append content
                     small
                         |${userName} commited 
                         abbr(title="${dateTimeString}") ${dateTime}
-                //p.list-group-item-text.text-right
-                //    small
-                //        | Added 
-                //        abbr(title="${addedString}") ${added} 
-                //        | node(s).
-                //p.list-group-item-text.text-right
-                //    small
-                //        | Modified 
-                //        abbr(title="${modifiedString}") ${modified} 
-                //        | node(s).
-                //p.list-group-item-text.text-right
-                //    small
-                //        | Deleted 
-                //        abbr(title="${deletedString}") ${deleted} 
-                //        | node(s).
+
+                h4.list-group-item-heading(style="margin-top:10px")
+                    big
+                        a(href='#{basepath}/case/${caseId}/history/${prevRevisionId}') 
+                            span.glyphicon.glyphicon-circle-arrow-left
+                        a(href='#{basepath}/case/${caseId}') 
+                            span.glyphicon.glyphicon-ok-sign
+                        a(href='#{basepath}/case/${caseId}/history/${nextRevisionId}') 
+                            span.glyphicon.glyphicon-circle-arrow-right
