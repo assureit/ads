@@ -76,6 +76,7 @@ html
         +js("/assurejs/plugins/SimplePattern/SimplePattern.js")
         +js("/assurejs/plugins/DScript/DScript.js")
         +js("/assurejs/plugins/Editor/Editor.js")
+        +js("/assurejs/plugins/FullScreenEditor/FullScreenEditor.js")
         +js("/assurejs/plugins/MenuBar/lib/jquery.jqdock.min.js")
         +js("/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.js")
         +js("/assurejs/plugins/MenuBar/MenuBar.js")
@@ -114,6 +115,7 @@ html
                pluginManager.SetPlugIn("monitor", new MonitorPlugIn(pluginManager));
                pluginManager.SetPlugIn("copypaste", new CopyPastePlugIn(pluginManager));
                pluginManager.SetPlugIn("dscript", new DScriptPlugIn(pluginManager));
+               pluginManager.SetPlugIn("fullscreeneditor", new FullScreenEditorPlugIn(pluginManager));
                pluginManager.SetPlugIn("editor", new EditorPlugIn(pluginManager));
                pluginManager.SetPlugIn("file", new DragFilePlugIn(pluginManager));
                pluginManager.SetPlugIn("unload", new BeforeUnloadPlugIn(pluginManager));
