@@ -98,6 +98,7 @@ html
         +js("/assurejs/plugins/LayoutPortrait/LayoutPortrait.js")
         +js("/assurejs/plugins/Export/Export.js")
         +js("/assurejs/plugins/TimeLine/TimeLine.js")
+        +js("/assurejs/plugins/Reload/Reload.js")
         +js("/assurejs/src/CaseDecoder.js")
         +js("/javascripts/config.js")
         script(type='text/javascript').
@@ -122,6 +123,7 @@ html
                pluginManager.SetPlugIn("portraitlayout", new LayoutPortraitPlugIn(pluginManager));
                pluginManager.SetPlugIn("export", new ExportPlugIn(pluginManager));
                pluginManager.SetPlugIn("timeline", new TimeLinePlugIn(pluginManager));
+               pluginManager.SetPlugIn("reload", new ReloadPlugIn(pluginManager));
                pluginManager.SetPlugIn("commit", new CommitPlugIn(pluginManager));
                pluginManager.SetPlugIn("pattern", new SimplePatternPlugIn(pluginManager));
                pluginManager.SetUseLayoutEngine("portraitlayout");
@@ -181,7 +183,7 @@ html
                    Case0.SetEditable("#{userName}".length > 0);
                }
 
-               pluginManager.RegisterKeyEvents(Case0, serverApi);
+               pluginManager.RegisterKeyEvents(Viewer, Case0, serverApi);
                pluginManager.CreateSideMenu(Viewer, Case0, serverApi);
 
                Viewer.Draw();
