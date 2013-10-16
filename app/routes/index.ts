@@ -63,7 +63,9 @@ export var caseview = function(req: any, res: any) {
 	var params: any = getBasicParam(req, res);
 	params.caseId = req.params.id;
 	params.rechost = CONFIG.rec.host;
-	params.api = CONFIG.rec.api;
+	params.recapi = CONFIG.rec.api;
+	params.agenthost = CONFIG.agent.host;
+	params.agentapi = CONFIG.agent.api;
 	res.render('case', params);
 }
 

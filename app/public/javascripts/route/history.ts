@@ -6,7 +6,13 @@ class CommitModel {
 	dateTime: string;
 	dateTimeString: string;
 	summary: any;
-	count: number = 0;
+	count:    number = 0;
+	added:    number = 0;
+	modified: number = 0;
+	deleted:  number = 0;
+	addedString:    string = "";
+	modifiedString: string = "";
+	deletedString:  string = "";
 	constructor(public CommitId: number, public Message:string, summary: string,
 			time: string, public userId:number,
 			public userName: string, public LatestFlag: boolean,
@@ -24,9 +30,39 @@ class CommitModel {
 		this.dateTime = TimeUtil.formatDate(time);
 	}
 
+	StringifyNodeList(list) : string {
+		var res = "";
+		for (var i in list) {
+			res += list[i] + ", ";
+		}
+		res = res.substring(0, res.length-2);
+		return res;
+	}
+
 	CheckSummary() {
 		if(this.summary) {
 			this.count = this.summary.count;
+			if (this.summary.added && this.summary.added.length) {
+				this.added = this.summary.added.length;
+				this.addedString = this.StringifyNodeList(this.summary.added);
+			} else {
+				this.added = 0;
+				this.addedString = "";
+			}
+			if (this.summary.modified && this.summary.modified.length) {
+				this.modified = this.summary.modified.length;
+				this.modifiedString = this.StringifyNodeList(this.summary.modified);
+			} else {
+				this.modified = 0;
+				this.modifiedString = "";
+			}
+			if (this.summary.deleted && this.summary.deleted.length) {
+				this.deleted = this.summary.deleted.length;
+				this.deletedString = this.StringifyNodeList(this.summary.deleted);
+			} else {
+				this.deleted = 0;
+				this.deletedString = "";
+			}
 		}
 	}
 }

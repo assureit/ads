@@ -1,0 +1,25 @@
+#historymenu
+block script
+    +js('/javascripts/route/historymenu.js')
+    script(type='text/javascript').
+
+block append content
+    +template("historymenu_tmpl")
+        .panel.panel-default.historymenu
+            .panel-body
+                h4.list-group-item-heading
+                    a(href='#{basepath}/case/${caseId}/history/${revisionId}') ${Message}
+                    small.pull-right ${count} nodes
+                p.list-group-item-text
+                    small
+                        |${userName} commited 
+                        abbr(title="${dateTimeString}") ${dateTime}
+
+                h4.list-group-item-heading(style="margin-top:10px")
+                    big
+                        a(href='#{basepath}/case/${caseId}/${prevRevision}') 
+                            span.glyphicon.glyphicon-circle-arrow-left
+                        a(href='#{basepath}/case/${caseId}') 
+                            span.glyphicon.glyphicon-ok-sign
+                        a(href='#{basepath}/case/${caseId}/${nextRevision}') 
+                            span.glyphicon.glyphicon-circle-arrow-right

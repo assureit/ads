@@ -11,6 +11,7 @@ html
         +css("/assurejs/plugins/DScript/DScript.css")
         +css("/assurejs/lib/animate-custom.css")
         +css("/stylesheets/sidemenu.css")
+        +css("/stylesheets/historymenu.css")
         +css("/stylesheets/index.css")
 
     body(style="overflow: hidden; margin: 0px;")
@@ -25,6 +26,8 @@ html
             #background(style="width: 100%; height: 100%; position: absolute;")
             #layer1(style="width: 0px; height: 0px; position: absolute;")
             include sidemenu
+            if commitHistory
+                include historymenu
             #layer2(style="width: 0px; height: 0px; position: absolute;")
         svg(width="0",height="0")
             defs
@@ -40,7 +43,10 @@ html
         #dscript-editor-wrapper(style="border: 1px solid black")
 
         +js("/javascripts/sidemenu.js")
+        +js("/javascripts/timeutil.js")
         +js("/assurejs/lib/jquery.min.js")
+        +js('/lib/jquery.tmpl.min.js')
+        +js("/assurejs/lib/jquery.cookie.js")
         +js("/lib/bootstrap3/js/bootstrap.min.js")
         +js("/assurejs/lib/pointer.min.js")
         +js("/assurejs/lib/underscore-min.js")
@@ -70,6 +76,7 @@ html
         +js("/assurejs/plugins/DScript/DScriptGenerator.js")
         +js("/assurejs/plugins/DScript/DScriptPaneManager.js")
         +js("/assurejs/plugins/Editor/Editor.js")
+        +js("/assurejs/plugins/FullScreenEditor/FullScreenEditor.js")
         +js("/assurejs/plugins/MenuBar/lib/jquery.jqdock.min.js")
         +js("/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.js")
         +js("/assurejs/plugins/MenuBar/MenuBar.js")
@@ -80,17 +87,20 @@ html
         +js("/assurejs/plugins/Annotation/Annotation.js")
         +js("/assurejs/plugins/Monitor/lib/DataTables-1.9.4/js/jquery.dataTables.min.js")
         +js("/assurejs/plugins/Monitor/Monitor.js")
+        +js("/assurejs/plugins/CopyPaste/CopyPaste.js")
         +js("/assurejs/plugins/Note/Note.js")
+        +js("/assurejs/plugins/LastModified/LastModified.js")
         +js("/assurejs/plugins/DragFile/DragFile.js")
         +js("/assurejs/plugins/BeforeUnload/BeforeUnload.js")
         +js("/assurejs/plugins/LayoutPortrait/LayoutPortrait.js")
         +js("/assurejs/plugins/Export/Export.js")
         +js("/assurejs/plugins/TimeLine/TimeLine.js")
+        +js("/assurejs/plugins/Reload/Reload.js")
         +js("/assurejs/src/CaseDecoder.js")
         +js("/javascripts/config.js")
         script(type='text/javascript').
             $(function(){
-               var serverApi = new AssureIt.ServerAPI(Config.BASEPATH, "#{rechost}" + "#{api}");
+               var serverApi = new AssureIt.ServerAPI(Config.BASEPATH, "#{rechost}" + "#{recapi}", "#{agenthost}" + "#{agentapi}");
                var pluginManager = new AssureIt.PlugInManager(Config.BASEPATH);
                pluginManager.SetPlugIn("menu", new MenuBarPlugIn(pluginManager));
                pluginManager.SetPlugIn("scale", new ScalePlugIn(pluginManager));
@@ -99,36 +109,54 @@ html
                pluginManager.SetPlugIn("statements", new DefaultStatementRenderPlugIn(pluginManager));
                pluginManager.SetPlugIn("annotation", new AnnotationPlugIn(pluginManager));
                pluginManager.SetPlugIn("note", new NotePlugIn(pluginManager));
+               pluginManager.SetPlugIn("lastmodefied", new LastModifiedPlugIn(pluginManager));
                pluginManager.SetPlugIn("monitor", new MonitorPlugIn(pluginManager));
+               pluginManager.SetPlugIn("copypaste", new CopyPastePlugIn(pluginManager));
                pluginManager.SetPlugIn("dscript", new DScriptPlugIn(pluginManager));
+               pluginManager.SetPlugIn("fullscreeneditor", new FullScreenEditorPlugIn(pluginManager));
                pluginManager.SetPlugIn("editor", new EditorPlugIn(pluginManager));
                pluginManager.SetPlugIn("file", new DragFilePlugIn(pluginManager));
                pluginManager.SetPlugIn("unload", new BeforeUnloadPlugIn(pluginManager));
                pluginManager.SetPlugIn("portraitlayout", new LayoutPortraitPlugIn(pluginManager));
                pluginManager.SetPlugIn("export", new ExportPlugIn(pluginManager));
                pluginManager.SetPlugIn("timeline", new TimeLinePlugIn(pluginManager));
+               pluginManager.SetPlugIn("reload", new ReloadPlugIn(pluginManager));
                pluginManager.SetPlugIn("commit", new CommitPlugIn(pluginManager));
                pluginManager.SetPlugIn("pattern", new SimplePatternPlugIn(pluginManager));
                pluginManager.SetUseLayoutEngine("portraitlayout");
 
-               var contents;
                /* N th oldest commit starting with zero.*/
                var history = Number("#{commitHistory}".length == 0 ? "NaN" : "#{commitHistory}");
+               console.log("#{commitHistory}");
+               console.log("#{commitHistory}".length);
                var CaseData = serverApi.GetCase("",#{caseId});
                var contents = CaseData.contents;
+               var summary = CaseData.summary;
+               console.log(summary);
                var PrevContents = null;
                if (!isNaN(history)) {
                    var commits = serverApi.GetCommitList(#{caseId});
                    if (commits.CommitModels.length > history) {
-                       var commitId = commits.CommitModels[history].CommitId;
-                       contents = serverApi.GetNodeTree(commitId);
+                       var commitModel = commits.CommitModels[history];
+                       var commitId = commitModel.CommitId;
+                       var OldCaseData = serverApi.GetNodeTree(commitId);
+                       contents = OldCaseData.contents;
+                       summary = (OldCaseData.summary) ? OldCaseData.summary : "{}";
+                       var jsonSummary = JSON.parse(summary);
                        if(history > 0) {
                            var PrevCommitId = commits.CommitModels[history-1].CommitId;
-                           PrevContents = serverApi.GetNodeTree(PrevCommitId);
+                           PrevContents = serverApi.GetNodeTree(PrevCommitId).contents;
                        }
+                       console.log(commitModel);
+                       var prevRevision = "history/" + ((history == 0) ? 0 : history-1);
+                       var nextRevision = "history/" + (history+1);
+                       if (history+1 >= commits.CommitModels.length) {
+                           nextRevision = "";
+                       }
+                       $("#historymenu_tmpl").tmpl({userName: commitModel.userName, Message: commitModel.Message, dateTime: TimeUtil.formatDate(commitModel.date), dateTimeString: commitModel.date, count: jsonSummary.count, caseId: #{caseId}, revisionId: history, nextRevision: nextRevision, prevRevision: prevRevision}).appendTo("#historymenu");
                    }
                }
-               var Case0 = new AssureIt.Case(CaseData.DCaseName, #{caseId}, CaseData.commitId, pluginManager);
+               var Case0 = new AssureIt.Case(CaseData.DCaseName, JSON.stringify(summary), contents, #{caseId}, CaseData.commitId, pluginManager);
                var caseDecoder = new AssureIt.CaseDecoder();
                var root = caseDecoder.ParseASN(Case0, contents, null);
                Case0.SetElementTop(root);
@@ -152,7 +180,7 @@ html
                    Case0.SetEditable("#{userName}".length > 0);
                }
 
-               pluginManager.RegisterKeyEvents(Case0, serverApi);
+               pluginManager.RegisterKeyEvents(Viewer, Case0, serverApi);
                pluginManager.CreateSideMenu(Viewer, Case0, serverApi);
 
                Viewer.Draw();
