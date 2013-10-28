@@ -1,24 +1,28 @@
 import fs = module('fs');
 import type = module('./type')
 import error = module('./error');
+var CONFIG = require('config');
 
 
 var dscriptLibrary: { [index: string]: string } = {};
 
 
-function initDScriptLibrary() {
-	var dscriptFileNames: string[] = fs.readdirSync('./dscript');
+function initDScriptLibrary(libraryPath: string) {
+	var dscriptFileNames: string[] = fs.readdirSync(libraryPath);
 
 	for(var i: number = 0; i < dscriptFileNames.length; i++) {
 		var fileName: string = dscriptFileNames[i];
 
 		if(fileName.match(/.+\.ds/)) {
-			var script: string = fs.readFileSync('./dscript/'+fileName, 'utf-8');
+			var script: string = fs.readFileSync(libraryPath+'/'+fileName, 'utf-8');
 			dscriptLibrary[fileName.replace(/\.ds/, "")] = script;
 		}
 	}
 }
-//initDScriptLibrary();
+if(CONFIG.dscript.libraryPath != "") {
+	initDScriptLibrary(CONFIG.dscript.libraryPath);
+}
+
 
 export function getDScript(params: any, userId: number, callback: type.Callback) {
 	function validate(params: any): boolean {
