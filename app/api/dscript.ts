@@ -18,7 +18,7 @@ function initDScriptLibrary() {
 		}
 	}
 }
-initDScriptLibrary();
+//initDScriptLibrary();
 
 export function getDScript(params: any, userId: number, callback: type.Callback) {
 	function validate(params: any): boolean {
