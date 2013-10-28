@@ -15,7 +15,6 @@ function initDScriptLibrary() {
             dscriptLibrary[fileName.replace(/\.ds/, "")] = script;
         }
     }
-    console.log(dscriptLibrary);
 }
 initDScriptLibrary();
 
