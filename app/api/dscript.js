@@ -16,7 +16,6 @@ function initDScriptLibrary() {
         }
     }
 }
-initDScriptLibrary();
 
 function getDScript(params, userId, callback) {
     function validate(params) {
