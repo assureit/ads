@@ -8,6 +8,7 @@ html
         +css("/assurejs/plugins/Editor/lib/codemirror/codemirror.css")
         +css("/assurejs/plugins/MenuBar/lib/jquery-ui-1.10.3.custom.min.css")
         +css("/assurejs/plugins/Monitor/lib/DataTables-1.9.4/css/jquery.dataTables.css")
+        +css("/assurejs/plugins/ColorTheme/css/default.css")
         +css("/assurejs/lib/animate-custom.css")
         +css("/stylesheets/sidemenu.css")
         +css("/stylesheets/historymenu.css")
@@ -50,6 +51,7 @@ html
         +js("/assurejs/lib/pointer.min.js")
         +js("/assurejs/lib/underscore-min.js")
         +js("/assurejs/lib/ASNParser/peg.js")
+        +js("/assurejs/src/ColorMap.js")
         +js("/assurejs/src/CaseModel.js")
         +js("/assurejs/src/CaseViewer.js")
         +js("/assurejs/src/Converter.js")
@@ -108,7 +110,6 @@ html
                pluginManager.SetPlugIn("menu", new MenuBarPlugIn(pluginManager));
                pluginManager.SetPlugIn("scale", new ScalePlugIn(pluginManager));
                pluginManager.SetPlugIn("scaleup", new ScaleUpPlugIn(pluginManager));
-               pluginManager.SetPlugIn("colortheme", new TiffanyBlueThemePlugIn(pluginManager));
                pluginManager.SetPlugIn("statements", new DefaultStatementRenderPlugIn(pluginManager));
                pluginManager.SetPlugIn("annotation", new AnnotationPlugIn(pluginManager));
                pluginManager.SetPlugIn("note", new NotePlugIn(pluginManager));
@@ -127,6 +128,7 @@ html
                pluginManager.SetPlugIn("commit", new CommitPlugIn(pluginManager));
                pluginManager.SetPlugIn("pattern", new SimplePatternPlugIn(pluginManager));
                pluginManager.SetPlugIn("search", new SearchNodePlugIn(pluginManager));
+               pluginManager.SetPlugIn("colortheme", new TiffanyBlueThemePlugIn(pluginManager));
                pluginManager.SetUseLayoutEngine("portraitlayout");
 
                /* N th oldest commit starting with zero.*/
