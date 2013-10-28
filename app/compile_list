@@ -17,6 +17,7 @@ api/monitor.ts
 api/rec.ts
 api/project.ts
 api/user.ts
+api/dscript.ts
 db/db.ts
 test/server.ts
 test/db/db.ts
