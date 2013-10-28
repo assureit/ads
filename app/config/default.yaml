@@ -45,8 +45,8 @@ mysql:
   password: ''
   database: 'ads'
 rec:
-  host: "localhost"
-  api: "/api/2.0/"
+  host: ""
+  api: ""
 agent:
   host: "http://localhost:8081"
   api: ""
