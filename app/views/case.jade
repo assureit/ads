@@ -126,6 +126,7 @@ html
                pluginManager.SetPlugIn("reload", new ReloadPlugIn(pluginManager));
                pluginManager.SetPlugIn("commit", new CommitPlugIn(pluginManager));
                pluginManager.SetPlugIn("pattern", new SimplePatternPlugIn(pluginManager));
+               pluginManager.SetPlugIn("search", new SearchNodePlugIn(pluginManager));
                pluginManager.SetUseLayoutEngine("portraitlayout");
 
                /* N th oldest commit starting with zero.*/
