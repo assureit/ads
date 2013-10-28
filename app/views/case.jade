@@ -66,7 +66,7 @@ html
         +js("/assurejs/src/ServerApi.js")
         +js("/assurejs/src/Pattern.js")
         +js("/assurejs/src/SideMenuModel.js")
-        +js("/assurejs/plugins/ColorTheme/ColorTheme.js")
+        +js("/assurejs/plugins/Hover/Hover.js")
         +js("/assurejs/plugins/Editor/lib/codemirror/codemirror.js")
         +js("/assurejs/plugins/Editor/lib/codemirror/mode/ASN/asn.js")
         +js("/assurejs/plugins/Editor/lib/codemirror/display/placeholder.js")
@@ -130,7 +130,7 @@ html
                pluginManager.SetPlugIn("commit", new CommitPlugIn(pluginManager));
                pluginManager.SetPlugIn("pattern", new SimplePatternPlugIn(pluginManager));
                pluginManager.SetPlugIn("search", new SearchNodePlugIn(pluginManager));
-               pluginManager.SetPlugIn("colortheme", new TiffanyBlueThemePlugIn(pluginManager));
+               pluginManager.SetPlugIn("hover", new HoverPlugIn(pluginManager));
                pluginManager.SetUseLayoutEngine("portraitlayout");
 
                /* N th oldest commit starting with zero.*/
