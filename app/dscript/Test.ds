@@ -1,4 +1,4 @@
-Test() {
-	print();
+DFault Test() {
+	print("Test called!!");
 	return null;
 }
