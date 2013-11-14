@@ -1,0 +1,5 @@
+DFault RestartWebServer() {
+	DFault ret = null;
+	// restart motion
+	return ret;
+}

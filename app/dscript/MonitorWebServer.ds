@@ -1,0 +1,10 @@
+DFault MonitorWebServer() {
+	DFault ret = null;
+	if (Monitor) {
+		//pass
+	}
+	else {
+		ret = fault(Risk);
+	}
+	return ret;
+}
