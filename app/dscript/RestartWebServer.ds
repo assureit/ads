@@ -1,5 +1,12 @@
 DFault RestartWebServer() {
 	DFault ret = null;
 	// restart apache
+	command sleep, sudo, apachectl;
+	int i = 0;
+	while(i < 5) {
+		sleep 1;
+		i += 1;
+	}
+	sudo apachectl restart &;
 	return ret;
 }
