@@ -2,11 +2,7 @@ DFault RestartWebServer() {
 	DFault ret = null;
 	// restart motion
 	command sleep, killall, motion;
-	int i = 0;
-	while(i < 5) {
-		sleep 1;
-		i += 1;
-	}
+	sleep 5;
 	killall motion;
 	motion &;
 	return ret;
