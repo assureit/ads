@@ -4,7 +4,6 @@ DFault RestartAppServer() {
 	print("Restart App server...");
 	command sleep, killall, motion;
 	sleep 5;
-	killall motion;
 	motion &;
 	return ret;
 }
