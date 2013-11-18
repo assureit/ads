@@ -98,6 +98,16 @@ app.get('/auth/facebook/callback',
   client.login
 );
 
+app.get('/auth/github',
+  passport.passport.authenticate('github'),
+  function(req, res) {}
+);
+
+app.get('/auth/github/callback',
+  passport.passport.authenticate('github', { failureRedirect: '/failure' }),
+  client.login
+);
+
 app.post('/logout', client.logout);
 //app.post('/register', client.register);
 

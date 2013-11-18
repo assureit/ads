@@ -1,6 +1,7 @@
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
+var GitHubStrategy = require('passport-github').Strategy;
 var CONFIG = require('config');
 
 (function () {
@@ -38,6 +39,24 @@ var CONFIG = require('config');
     }, function (accessToken, refreshToken, profile, done) {
         process.nextTick(function () {
             done(null, profile);
+        });
+    }));
+})();
+
+(function () {
+    if (CONFIG.passport.GITHUB_CLIENT_ID == '')
+        return;
+
+    passport.use(new GitHubStrategy({
+        clientID: CONFIG.passport.GITHUB_CLIENT_ID,
+        clientSecret: CONFIG.passport.GITHUB_CLIENT_SECRET,
+        callbackURL: CONFIG.passport.resolveURL + "/auth/github/callback"
+    }, function (accessToken, refreshToken, profile, done) {
+        profile.displayName = profile.username;
+        profile.loginName = profile.username;
+        console.log(profile);
+        process.nextTick(function () {
+            return done(null, profile);
         });
     }));
 })();

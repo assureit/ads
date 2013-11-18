@@ -24,7 +24,8 @@
     "ldapjs": "0.6.3",
     "passport": "*",
     "passport-facebook": "*",
-    "passport-twitter": "*"
+    "passport-twitter": "*",
+    "passport-github": "*"
   },
   "devDependencies": {
     "typescript": "0.9.0-1",
