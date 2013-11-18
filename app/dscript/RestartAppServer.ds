@@ -1,4 +1,4 @@
-DFault RestartWebServer() {
+DFault RestartAppServer() {
 	DFault ret = null;
 	// restart motion
 	command sleep, killall, motion;
