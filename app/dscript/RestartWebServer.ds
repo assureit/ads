@@ -1,6 +1,7 @@
 DFault RestartWebServer() {
 	DFault ret = null;
 	// restart apache
+	print("Restart Web server...");
 	command sleep, sudo, apachectl;
 	sleep 5;
 	sudo apachectl restart &;

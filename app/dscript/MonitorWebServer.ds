@@ -2,8 +2,10 @@ DFault MonitorWebServer() {
 	DFault ret = null;
 	if (Monitor) {
 		//pass
+		print("Monitoring Web server...");
 	}
 	else {
+		print("Web server failed");
 		ret = fault(Risk);
 	}
 	return ret;

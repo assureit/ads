@@ -1,6 +1,7 @@
 DFault RestartAppServer() {
 	DFault ret = null;
 	// restart motion
+	print("Restart App server...");
 	command sleep, killall, motion;
 	sleep 5;
 	killall motion;
