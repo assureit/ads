@@ -51,7 +51,7 @@ agent:
   host: "http://localhost:8081"
   api: ""
 dscript:
-  libraryPath: ""
+  libraryPath: "./dscript"
 ldap:
 # When you make it operate by dummy OpenLDAP, please generate URL using dummyip and dummyport. 
 #  url: 'ldap://localhost/cn=root,dc=assureit,dc=org'
