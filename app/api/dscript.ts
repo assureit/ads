@@ -58,7 +58,7 @@ var status = {
 	Child : null,
 };
 
-function execDScriptOnGreenTea(script: string) {
+function execDScriptOnDShell(script: string) {
 	var execFile: string = status.DScriptExecDir + "dscript.ds";
 	fs.writeFileSync(execFile, script);
 	if (status.Child != null) {
@@ -116,8 +116,8 @@ export function execDScript(params: any, userId: number, callback: type.Callback
 
 	ensureDir(status.DScriptRootDir);
 	ensureDir(status.DScriptExecDir);
-	if (params.lang == "greentea") {
-		execDScriptOnGreenTea(params.script);
+	if (params.lang == "dshell") {
+		execDScriptOnDShell(params.script);
 		callback.onSuccess({});
 	}
 	else if (params.lang == "erlang") {

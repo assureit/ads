@@ -1,12 +1,12 @@
 DFault PortScanMonitor() {
-	print("PortScanMonitor called...");
+	println("PortScanMonitor called...");
 	DFault ret = null;
 	if (Monitor) {
 		//pass
-		print("success");
+		println("success");
 	}
 	else {
-		print("fault!!");
+		println("fault!!");
 		ret = fault(Risk);
 	}
 	return ret;
